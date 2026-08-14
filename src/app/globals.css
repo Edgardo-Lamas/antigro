@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --fondo: #0d1117;
+  --superficie: #151b23;
+  --borde: #232b36;
+  --tinta: #e6eaef;
+  --tenue: #8b95a1;
+  --acento: #4e9bb9;
+  --atencion: #d08a3e;
+  --riesgo: #c4553d;
+  --calma: #5e9c76;
+}
+
+@layer base {
+  body {
+    background-color: var(--fondo);
+    color: var(--tinta);
+    font-family: var(--font-geist-sans), Inter, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: var(--acento);
+    color: var(--fondo);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--fondo);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--borde);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--acento);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* El sistema no grita: si alguien pidió menos movimiento, se le hace caso. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
