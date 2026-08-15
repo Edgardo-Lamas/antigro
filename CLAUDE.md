@@ -122,13 +122,34 @@ el chico. Verificado de punta a punta.
 📌 `senales` se guarda con `id` de texto (viene de la fuente) y `upsert`, para que releer la
 misma ventana no duplique.
 
-### IA
+### IA (fase 2, 14/8)
 
-Modelo: **`claude-opus-5`**.
+Modelo: **`claude-opus-5`**. Vive en `src/lib/ia/`.
+
+🔴 **El modelo no decide nada.** El motor decide con el registro fechado; la IA sólo pone eso
+en palabras para una persona con la edad que tiene. Tres piezas:
+
+| Archivo | Qué hace |
+|---|---|
+| `redactar.ts` | La llamada. Prompt estable en `system` con `cache_control`; los datos del chico van en el mensaje del usuario. |
+| `reglas.ts` | **El control.** Nada generado sale sin pasar por acá. |
+| `respaldo.ts` | Los textos deterministas por banda de edad. La garantía. |
+
+🔑 **Si el texto generado no pasa el control, sale el de respaldo** — y se guarda el rechazado
+en `Redaccion.rechazado`, para poder mostrar en pantalla lo que el sistema frenó. Un prompt que
+pide no afirmar es una intención; esto es una verificación.
+
+⚠ **Las reglas entienden la negación, regla por regla.** "No leemos lo que escribís" y "todavía
+no hay nada confirmado" son lo que el sistema TIENE que decir; "no estás a salvo" sigue
+prohibida. Sin esto el control frena los textos correctos (pasó, y estaba mal).
+
 ⚠ En Opus 5 el pensamiento viene **encendido por defecto** y `max_tokens` topea pensamiento +
-respuesta **juntos**. Con 512 las respuestas se cortan a mitad — arrancar en 2048 como mínimo.
-⚠ Los fragmentos variables **no van en el system prompt**: anulan la caché. Van como mensaje de
-rol `system`.
+respuesta **juntos**: mínimo 2048. Y **`effort` NO acorta la salida visible** — el largo se pide
+en el prompt o no se consigue.
+
+🔴 **La clave va en `ANTIGRO_ANTHROPIC_KEY`, no en `ANTHROPIC_API_KEY`.** Next.js no pisa una
+variable que ya exista en el proceso: si la terminal exporta su propia `ANTHROPIC_API_KEY`, esa
+gana y el `.env.local` queda ignorado. El síntoma es un 401 con una clave que aparte anda bien.
 
 ---
 
