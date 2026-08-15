@@ -9,6 +9,7 @@
  */
 
 import { generarToken } from "@/lib/supabase";
+import { exigeVinculacion, generarCodigo } from "./tipos";
 import type {
   AdultoResponsable,
   Chico,
@@ -54,7 +55,8 @@ function sembrar(): {
         nombre: "Ana",
         edad: 12,
         genero: "nena",
-        canal: { tipo: "telegram", destino: "demo-chico" },
+        // 🔴 Arranca sin vincular a propósito: así se ve el flujo real.
+        canal: { tipo: "telegram", destino: "", codigo: "ANA123" },
         activo: true,
         creado: ahora,
       },
@@ -76,7 +78,7 @@ function sembrar(): {
         nombre: "Carla",
         vinculo: "tia_tio",
         elegidoPorElChico: true,
-        canal: { tipo: "telegram", destino: "demo-tia" },
+        canal: { tipo: "telegram", destino: "", codigo: "CARLA7" },
         creado: ahora,
       },
     ],
@@ -114,6 +116,7 @@ export class RepositorioEnMemoria implements Repositorio {
 
     const chicos: Chico[] = alta.chicos.map((c) => ({
       ...c,
+      canal: conCodigo(c.canal),
       id: nuevoId("chico"),
       familiaId: familia.id,
       activo: true,
@@ -122,6 +125,7 @@ export class RepositorioEnMemoria implements Repositorio {
 
     const adultos: AdultoResponsable[] = alta.adultos.map((a) => ({
       ...a,
+      canal: conCodigo(a.canal),
       id: nuevoId("adulto"),
       familiaId: familia.id,
       creado: ahora,
@@ -151,6 +155,24 @@ export class RepositorioEnMemoria implements Repositorio {
   async cambiarEstado(id: string, activo: boolean): Promise<void> {
     const familia = this.familias.find((f) => f.id === id);
     if (familia) familia.activo = activo;
+  }
+
+  async vincularPorCodigo(codigo: string, destino: string) {
+    const buscado = codigo.trim().toUpperCase();
+
+    for (const chico of this.chicos) {
+      if (chico.canal.codigo === buscado && !chico.canal.vinculado) {
+        chico.canal = { ...chico.canal, destino, vinculado: new Date().toISOString() };
+        return { quien: "chico" as const, nombre: chico.nombre, familiaId: chico.familiaId };
+      }
+    }
+    for (const adulto of this.adultos) {
+      if (adulto.canal.codigo === buscado && !adulto.canal.vinculado) {
+        adulto.canal = { ...adulto.canal, destino, vinculado: new Date().toISOString() };
+        return { quien: "adulto" as const, nombre: adulto.nombre, familiaId: adulto.familiaId };
+      }
+    }
+    return null;
   }
 
   async registrarSenales(senales: SenalRegistrada[]): Promise<void> {
@@ -187,4 +209,10 @@ export class RepositorioEnMemoria implements Repositorio {
       .filter((o) => o.chicoId === chicoId && dentroDe(o.fecha, desde, hasta))
       .sort((a, b) => a.fecha.localeCompare(b.fecha));
   }
+}
+
+/** Le pone código a los canales que exigen que la persona apriete "Iniciar". */
+function conCodigo(canal: { tipo: "telegram" | "correo" | "whatsapp"; destino: string }) {
+  if (!exigeVinculacion(canal.tipo)) return canal;
+  return { ...canal, destino: "", codigo: generarCodigo() };
 }

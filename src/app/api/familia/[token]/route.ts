@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { faltantesDeAlta, repositorio } from "@/lib/datos";
+import { canalListo, faltantesDeAlta, repositorio } from "@/lib/datos";
+import { enlaceDeVinculacion } from "@/lib/mensajeria/vinculacion";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
 
 /**
@@ -47,13 +48,25 @@ export async function GET(req: Request, { params }: { params: { token: string } 
       faltantes: faltantesDeAlta(datos),
     },
     chico: chico
-      ? { id: chico.id, nombre: chico.nombre, edad: chico.edad, genero: chico.genero }
+      ? {
+          id: chico.id,
+          nombre: chico.nombre,
+          edad: chico.edad,
+          genero: chico.genero,
+          canal: chico.canal.tipo,
+          vinculado: canalListo(chico.canal),
+          codigo: chico.canal.codigo,
+          enlace: chico.canal.codigo ? enlaceDeVinculacion(chico.canal.codigo) : null,
+        }
       : null,
     adultos: datos.adultos.map((a) => ({
       nombre: a.nombre,
       vinculo: a.vinculo,
       elegidoPorElChico: a.elegidoPorElChico,
       canal: a.canal.tipo,
+      vinculado: canalListo(a.canal),
+      codigo: a.canal.codigo,
+      enlace: a.canal.codigo ? enlaceDeVinculacion(a.canal.codigo) : null,
     })),
     almacenamiento: repo.clase,
     ventana,

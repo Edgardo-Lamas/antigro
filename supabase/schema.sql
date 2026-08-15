@@ -60,7 +60,11 @@ create table if not exists chicos (
   edad          smallint not null check (edad between 7 and 17),
   genero        text not null check (genero in ('nena', 'varon', 'otro')),
   canal_tipo    text not null check (canal_tipo in ('telegram', 'correo', 'whatsapp')),
-  canal_destino text not null,
+  -- 🔴 Vacío hasta que la persona aprieta "Iniciar" en el bot: el chat_id de
+  -- Telegram no se puede cargar a mano, sólo lo entrega Telegram al vincular.
+  canal_destino text,
+  codigo_vinculacion text unique,
+  vinculado_en  timestamptz,
   activo        boolean not null default true,
   created_at    timestamptz default now()
 );
@@ -83,11 +87,15 @@ create table if not exists adultos (
                        check (vinculo in ('madre','padre','tia_tio','hermano_a','abuelo_a','otro')),
   elegido_por_el_chico boolean not null default false,
   canal_tipo           text not null check (canal_tipo in ('telegram', 'correo', 'whatsapp')),
-  canal_destino        text not null,
+  canal_destino        text,
+  codigo_vinculacion   text unique,
+  vinculado_en         timestamptz,
   created_at           timestamptz default now()
 );
 
 create index if not exists adultos_familia_idx on adultos (familia_id);
+create index if not exists adultos_codigo_idx  on adultos (codigo_vinculacion);
+create index if not exists chicos_codigo_idx   on chicos (codigo_vinculacion);
 
 alter table adultos enable row level security;
 

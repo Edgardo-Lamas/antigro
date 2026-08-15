@@ -8,6 +8,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generarToken } from "@/lib/supabase";
+import { exigeVinculacion, generarCodigo } from "./tipos";
 import type {
   AdultoResponsable,
   Canal,
@@ -39,7 +40,9 @@ type FilaChico = {
   edad: number;
   genero: Chico["genero"];
   canal_tipo: Canal["tipo"];
-  canal_destino: string;
+  canal_destino: string | null;
+  codigo_vinculacion: string | null;
+  vinculado_en: string | null;
   activo: boolean;
   created_at: string;
 };
@@ -51,9 +54,24 @@ type FilaAdulto = {
   vinculo: AdultoResponsable["vinculo"];
   elegido_por_el_chico: boolean;
   canal_tipo: Canal["tipo"];
-  canal_destino: string;
+  canal_destino: string | null;
+  codigo_vinculacion: string | null;
+  vinculado_en: string | null;
   created_at: string;
 };
+
+/** Fila ⇄ Canal. El destino puede venir vacío: en Telegram llega al vincular. */
+const aCanal = (f: {
+  canal_tipo: Canal["tipo"];
+  canal_destino: string | null;
+  codigo_vinculacion: string | null;
+  vinculado_en: string | null;
+}): Canal => ({
+  tipo: f.canal_tipo,
+  destino: f.canal_destino ?? "",
+  codigo: f.codigo_vinculacion ?? undefined,
+  vinculado: f.vinculado_en ?? undefined,
+});
 
 const aFamilia = (f: FilaFamilia): Familia => ({
   id: f.id,
@@ -71,7 +89,7 @@ const aChico = (c: FilaChico): Chico => ({
   nombre: c.nombre,
   edad: c.edad,
   genero: c.genero,
-  canal: { tipo: c.canal_tipo, destino: c.canal_destino },
+  canal: aCanal(c),
   activo: c.activo,
   creado: c.created_at,
 });
@@ -82,7 +100,7 @@ const aAdulto = (a: FilaAdulto): AdultoResponsable => ({
   nombre: a.nombre,
   vinculo: a.vinculo,
   elegidoPorElChico: a.elegido_por_el_chico,
-  canal: { tipo: a.canal_tipo, destino: a.canal_destino },
+  canal: aCanal(a),
   creado: a.created_at,
 });
 
@@ -117,7 +135,8 @@ export class RepositorioSupabase implements Repositorio {
           edad: c.edad,
           genero: c.genero,
           canal_tipo: c.canal.tipo,
-          canal_destino: c.canal.destino,
+          canal_destino: exigeVinculacion(c.canal.tipo) ? null : c.canal.destino,
+          codigo_vinculacion: exigeVinculacion(c.canal.tipo) ? generarCodigo() : null,
         })),
       )
       .select()
@@ -132,7 +151,8 @@ export class RepositorioSupabase implements Repositorio {
           vinculo: a.vinculo,
           elegido_por_el_chico: a.elegidoPorElChico,
           canal_tipo: a.canal.tipo,
-          canal_destino: a.canal.destino,
+          canal_destino: exigeVinculacion(a.canal.tipo) ? null : a.canal.destino,
+          codigo_vinculacion: exigeVinculacion(a.canal.tipo) ? generarCodigo() : null,
         })),
       )
       .select()
@@ -178,6 +198,29 @@ export class RepositorioSupabase implements Repositorio {
 
   async cambiarEstado(id: string, activo: boolean): Promise<void> {
     await this.db.from("familias").update({ activo }).eq("id", id);
+  }
+
+  async vincularPorCodigo(codigo: string, destino: string) {
+    const buscado = codigo.trim().toUpperCase();
+    const vinculado = new Date().toISOString();
+
+    // 🔴 `is("vinculado_en", null)` es lo que hace que el código sirva UNA vez.
+    // Sin eso, cualquiera que lo consiga se mete en el canal de una familia.
+    for (const [tabla, quien] of [
+      ["chicos", "chico"],
+      ["adultos", "adulto"],
+    ] as const) {
+      const { data } = await this.db
+        .from(tabla)
+        .update({ canal_destino: destino, vinculado_en: vinculado })
+        .eq("codigo_vinculacion", buscado)
+        .is("vinculado_en", null)
+        .select("nombre, familia_id")
+        .maybeSingle<{ nombre: string; familia_id: string }>();
+
+      if (data) return { quien, nombre: data.nombre, familiaId: data.familia_id };
+    }
+    return null;
   }
 
   async registrarSenales(senales: SenalRegistrada[]): Promise<void> {

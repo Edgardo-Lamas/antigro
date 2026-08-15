@@ -28,12 +28,46 @@ export const CANALES: { tipo: CanalTipo; nombre: string; conectable: boolean }[]
 
 export interface Canal {
   tipo: CanalTipo;
-  /** Chat de Telegram, dirección de correo o número. Nunca se muestra completo. */
+  /**
+   * A dónde va el mensaje. En correo es la dirección y se carga en el alta.
+   * En Telegram es el `chat_id`, y **no se puede cargar a mano**: sólo aparece
+   * cuando la persona le da "Iniciar" al bot. Hasta entonces va vacío.
+   */
   destino: string;
+  /**
+   * 🔑 El código de vinculación. Es lo que hace que una familia no tenga que
+   * crear ningún bot ni generar ninguna clave: el sistema tiene UN bot, y cada
+   * persona se conecta apretando "Iniciar" una vez.
+   */
+  codigo?: string;
+  /** Cuándo quedó conectado, en ISO. */
+  vinculado?: string;
 }
 
 export function canalConectable(tipo: CanalTipo): boolean {
   return CANALES.find((c) => c.tipo === tipo)?.conectable ?? false;
+}
+
+/** Telegram exige que la persona apriete "Iniciar" primero. El correo no. */
+export function exigeVinculacion(tipo: CanalTipo): boolean {
+  return tipo === "telegram" || tipo === "whatsapp";
+}
+
+/** ¿Se le puede escribir a esta persona hoy? */
+export function canalListo(canal: Canal): boolean {
+  return canal.destino.trim().length > 0;
+}
+
+/**
+ * Códigos cortos y sin caracteres que se confundan al dictarlos por teléfono:
+ * sin 0/O, sin 1/I/L. Se leen en voz alta sin que nadie tenga que deletrear.
+ */
+const ALFABETO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+
+export function generarCodigo(largo = 6): string {
+  const bytes = new Uint8Array(largo);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => ALFABETO[b % ALFABETO.length]).join("");
 }
 
 /* ── Familia ─────────────────────────────────────────────────────────────── */

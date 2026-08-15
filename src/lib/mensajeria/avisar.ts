@@ -12,7 +12,7 @@
  */
 
 import { diaLocal, type Lectura } from "@/lib/motor";
-import { repositorio, type AdultoResponsable, type Chico, type Familia } from "@/lib/datos";
+import { canalListo, repositorio, type AdultoResponsable, type Chico, type Familia } from "@/lib/datos";
 import type { ClaseDeRespuesta, Respuesta } from "@/lib/datos/tipos";
 import { transporteDe } from "./index";
 import type { ResultadoDeEnvio } from "./tipos";
@@ -26,6 +26,8 @@ export interface AvisoEmitido {
   resultado: ResultadoDeEnvio;
   /** true cuando ya se había avisado hoy y no se volvió a mandar. */
   omitidoPorRepetido: boolean;
+  /** true cuando esa persona todavía no apretó "Iniciar" en el bot. */
+  sinVincular?: boolean;
 }
 
 export interface Aviso {
@@ -78,6 +80,29 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
     texto: string,
     asunto?: string,
   ) => {
+    /* 🔴 Sin vincular no se le puede escribir, y eso NO se disimula. Un adulto
+       que cree que va a recibir avisos y no los recibe está peor que uno que
+       sabe que le falta un clic. */
+    if (!canalListo(canal)) {
+      emitidos.push({
+        clase,
+        paraQuien,
+        canal: canal.tipo,
+        texto,
+        resultado: {
+          transporte: "—",
+          entregado: false,
+          ensayo: false,
+          detalle: canal.codigo
+            ? `Falta que ${paraQuien} apriete "Iniciar" (código ${canal.codigo}).`
+            : "No tiene canal cargado.",
+        },
+        omitidoPorRepetido: false,
+        sinVincular: true,
+      });
+      return;
+    }
+
     if (yaSeAviso(previas, clase, canal.destino, ahora)) {
       emitidos.push({
         clase,
@@ -91,6 +116,7 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
           detalle: "Ya se avisó hoy.",
         },
         omitidoPorRepetido: true,
+        sinVincular: false,
       });
       return;
     }
@@ -114,7 +140,15 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
       entregado: resultado.entregado,
     });
 
-    emitidos.push({ clase, paraQuien, canal: canal.tipo, texto, resultado, omitidoPorRepetido: false });
+    emitidos.push({
+      clase,
+      paraQuien,
+      canal: canal.tipo,
+      texto,
+      resultado,
+      omitidoPorRepetido: false,
+      sinVincular: false,
+    });
   };
 
   /* ── 1. Los adultos responsables. Todos, no el primero que aparezca. ── */

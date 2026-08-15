@@ -14,8 +14,25 @@ import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senale
 
 interface Respuesta {
   familia: { nombre: string; faltantes: string[] };
-  chico: { id: string; nombre: string; edad: number; genero: string } | null;
-  adultos: { nombre: string; vinculo: string; elegidoPorElChico: boolean; canal: string }[];
+  chico: {
+    id: string;
+    nombre: string;
+    edad: number;
+    genero: string;
+    canal: string;
+    vinculado: boolean;
+    codigo?: string;
+    enlace: string | null;
+  } | null;
+  adultos: {
+    nombre: string;
+    vinculo: string;
+    elegidoPorElChico: boolean;
+    canal: string;
+    vinculado: boolean;
+    codigo?: string;
+    enlace: string | null;
+  }[];
   almacenamiento: string;
   ventana: { desde: string; hasta: string; dias: number };
   fuente: { id: string; nombre: string; simulada: boolean; motivo?: string };
@@ -45,6 +62,39 @@ function diaLocal(iso: string): string {
   const mes = `${d.getMonth() + 1}`.padStart(2, "0");
   const dia = `${d.getDate()}`.padStart(2, "0");
   return `${d.getFullYear()}-${mes}-${dia}`;
+}
+
+/**
+ * 🔑 Acá se ve por qué nadie tiene que crear un bot: cada persona se conecta
+ * con un toque. El código existe porque Telegram no deja escribirle a nadie
+ * por teléfono — sólo se puede responder a quien le habló al bot primero.
+ */
+function Vinculacion({
+  persona,
+}: {
+  persona: { nombre: string; vinculado: boolean; codigo?: string; enlace: string | null };
+}) {
+  if (persona.vinculado) {
+    return <p className="text-xs text-calma">Conectado. Los avisos le llegan.</p>;
+  }
+  if (!persona.codigo) {
+    return <p className="text-xs text-atencion">Sin canal cargado.</p>;
+  }
+  return (
+    <p className="text-xs leading-relaxed text-atencion">
+      Falta que {persona.nombre} entre una vez y apriete «Iniciar».{" "}
+      {persona.enlace ? (
+        <a href={persona.enlace} className="text-acento underline" rel="noreferrer">
+          Abrir el enlace
+        </a>
+      ) : (
+        <span className="text-apagado">
+          (el enlace aparece cuando se configure el bot; código{" "}
+          <span className="font-mono">{persona.codigo}</span>)
+        </span>
+      )}
+    </p>
+  );
 }
 
 export default function EnlaceDeFamilia({ params }: { params: { token: string } }) {
@@ -131,21 +181,36 @@ export default function EnlaceDeFamilia({ params }: { params: { token: string } 
           </p>
         )}
 
-        <ul className="mt-4 flex flex-col gap-2">
+        <ul className="mt-4 flex flex-col gap-3">
           {datos.adultos.map((a) => (
-            <li key={a.nombre} className="flex items-baseline gap-2 text-sm">
-              <span className="text-tinta">{a.nombre}</span>
-              <span className="text-apagado">— {VINCULO[a.vinculo] ?? a.vinculo}</span>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-apagado">
-                {a.canal}
-              </span>
-              {a.elegidoPorElChico && (
-                <span className="rounded bg-acentoSuave px-1.5 py-0.5 text-[10px] text-acento">
-                  elección de {datos.chico?.nombre ?? "el chico"}
+            <li key={a.nombre} className="flex flex-col gap-1">
+              <div className="flex flex-wrap items-baseline gap-2 text-sm">
+                <span className="text-tinta">{a.nombre}</span>
+                <span className="text-apagado">— {VINCULO[a.vinculo] ?? a.vinculo}</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-apagado">
+                  {a.canal}
                 </span>
-              )}
+                {a.elegidoPorElChico && (
+                  <span className="rounded bg-acentoSuave px-1.5 py-0.5 text-[10px] text-acento">
+                    elección de {datos.chico?.nombre ?? "el chico"}
+                  </span>
+                )}
+              </div>
+              <Vinculacion persona={a} />
             </li>
           ))}
+          {datos.chico && (
+            <li className="flex flex-col gap-1 border-t border-borde pt-3">
+              <div className="flex flex-wrap items-baseline gap-2 text-sm">
+                <span className="text-tinta">{datos.chico.nombre}</span>
+                <span className="text-apagado">— es a quien cuida el sistema</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-apagado">
+                  {datos.chico.canal}
+                </span>
+              </div>
+              <Vinculacion persona={datos.chico} />
+            </li>
+          )}
         </ul>
 
         {datos.familia.faltantes.length > 0 && (
