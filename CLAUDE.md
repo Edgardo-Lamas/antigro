@@ -228,6 +228,20 @@ volumen y plataforma nueva sigue sin disparar alerta durante el aprendizaje. Can
 sumar a la vía absoluta: chat con desconocidos en chicos de 7 a 10 — ahí la EDAD hace de
 referencia en lugar de la historia.
 
+🔑 **El cuestionario es la primera respuesta, no un formulario** (idea de Edgardo, 14/8).
+Ante una conducta anormal —un chico de 8 chateando, por ejemplo— lo primero que dispara el
+sistema **no es una alerta: es el cuestionario a los adultos.** Sirve para dos cosas a la vez:
+
+1. Consigue el dato que a la red le falta. Hay cambios que el sistema no va a ver nunca y los
+   adultos sí, y con eso el motor pasa a tener un elemento más y contundente.
+2. **Los pone en alerta sin decirlo.** Quizá vieron esos cambios y los archivaron como "cosas
+   de la edad"; las preguntas los hacen mirar de nuevo. Si después llega una alerta, ya venían
+   atentos.
+
+⚠ **Por eso el pedido del cuestionario NO puede sonar a que se detectó algo.** Tiene que leerse
+como rutina. Si dice "notamos algo", es una alarma con pasos de más, y vuelve el problema del
+falso positivo que gasta la confianza. 📌 Falta implementarlo.
+
 🔴 **Sólo se avisa con patrón sostenido.** El estado "hay un cambio" no le escribe a nadie: ni
 a los adultos ni al chico. Cualquier chico se queda una noche hasta tarde por algo puntual, y
 alarmar por eso gasta la atención de los adultos y —peor— la confianza del chico, que es el
