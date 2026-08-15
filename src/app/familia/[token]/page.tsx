@@ -7,27 +7,20 @@ import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senale
 /**
  * El enlace privado de cada familia. Se entra sin cuenta.
  *
- * 📌 Fase 0: se ve qué señales llegaron y por qué fuente. La lectura en
+ * 📌 Se ve quién está en el sistema y qué señales llegaron. La lectura en
  * pantalla —qué vio la red, qué contaron los adultos, qué mirar ahora— es la
  * fase 4.
  */
 
 interface Respuesta {
-  nombre: string;
-  demo: boolean;
+  familia: { nombre: string; faltantes: string[] };
+  chico: { id: string; nombre: string; edad: number; genero: string } | null;
+  adultos: { nombre: string; vinculo: string; elegidoPorElChico: boolean; canal: string }[];
+  almacenamiento: string;
   ventana: { desde: string; hasta: string; dias: number };
   fuente: { id: string; nombre: string; simulada: boolean; motivo?: string };
   escenario: string;
   senales: SenalDeRed[];
-  actualizado: string;
-}
-
-/** `YYYY-MM-DD` en la hora local del que mira, no en UTC. */
-function diaLocal(iso: string): string {
-  const d = new Date(iso);
-  const mes = `${d.getMonth() + 1}`.padStart(2, "0");
-  const dia = `${d.getDate()}`.padStart(2, "0");
-  return `${d.getFullYear()}-${mes}-${dia}`;
 }
 
 const COLOR: Record<TipoDeSenal, string> = {
@@ -36,6 +29,23 @@ const COLOR: Record<TipoDeSenal, string> = {
   plataforma_nueva: "bg-acento",
   evasion: "bg-riesgo",
 };
+
+const VINCULO: Record<string, string> = {
+  madre: "Madre",
+  padre: "Padre",
+  tia_tio: "Tía o tío",
+  hermano_a: "Hermano o hermana",
+  abuelo_a: "Abuelo o abuela",
+  otro: "Otro",
+};
+
+/** `YYYY-MM-DD` en la hora local del que mira, no en UTC. */
+function diaLocal(iso: string): string {
+  const d = new Date(iso);
+  const mes = `${d.getMonth() + 1}`.padStart(2, "0");
+  const dia = `${d.getDate()}`.padStart(2, "0");
+  return `${d.getFullYear()}-${mes}-${dia}`;
+}
 
 export default function EnlaceDeFamilia({ params }: { params: { token: string } }) {
   const [datos, setDatos] = useState<Respuesta | null>(null);
@@ -78,9 +88,8 @@ export default function EnlaceDeFamilia({ params }: { params: { token: string } 
     );
   }
 
-  /* Señales agrupadas por día, que es como se mira la persistencia.
-     ⚠ Por día LOCAL, no UTC: una señal de las 22 en Argentina cae al día
-     siguiente en UTC, y correría toda la línea de tiempo un día. */
+  /* Señales agrupadas por día LOCAL, que es como se mira la persistencia.
+     En UTC, una señal de las 22 caería al día siguiente y correría la línea. */
   const porDia = new Map<string, SenalDeRed[]>();
   for (const s of datos.senales) {
     const dia = diaLocal(s.fecha);
@@ -94,10 +103,10 @@ export default function EnlaceDeFamilia({ params }: { params: { token: string } 
     <main className="mx-auto max-w-2xl px-6 py-14">
       <header className="border-b border-borde pb-8">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-apagado">AntiGro</p>
-        <h1 className="mt-3 text-2xl font-bold text-tinta">{datos.nombre}</h1>
+        <h1 className="mt-3 text-2xl font-bold text-tinta">{datos.familia.nombre}</h1>
         <p className="mt-2 text-sm leading-relaxed text-tenue">
           Últimos {datos.ventana.dias} días. Se ve cuándo pasó algo y de qué tipo era. No se ve
-          —ni se guarda— nada de lo que el chico escribió.
+          —ni se guarda— nada de lo que {datos.chico?.nombre ?? "el chico"} escribió.
         </p>
         {datos.fuente.simulada && (
           <p className="mt-3 inline-block rounded bg-atencionSuave px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-atencion">
@@ -106,13 +115,62 @@ export default function EnlaceDeFamilia({ params }: { params: { token: string } 
         )}
       </header>
 
+      {/* Quiénes están en el sistema */}
+      <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+          Quiénes están
+        </h2>
+
+        {datos.chico && (
+          <p className="mt-3 text-sm text-tinta">
+            {datos.chico.nombre}, {datos.chico.edad} años.{" "}
+            <span className="text-apagado">
+              La edad no es un dato de ficha: cambia el peso de cada señal y cambia el texto que
+              se le escribe.
+            </span>
+          </p>
+        )}
+
+        <ul className="mt-4 flex flex-col gap-2">
+          {datos.adultos.map((a) => (
+            <li key={a.nombre} className="flex items-baseline gap-2 text-sm">
+              <span className="text-tinta">{a.nombre}</span>
+              <span className="text-apagado">— {VINCULO[a.vinculo] ?? a.vinculo}</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider text-apagado">
+                {a.canal}
+              </span>
+              {a.elegidoPorElChico && (
+                <span className="rounded bg-acentoSuave px-1.5 py-0.5 text-[10px] text-acento">
+                  elección de {datos.chico?.nombre ?? "el chico"}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+
+        {datos.familia.faltantes.length > 0 && (
+          <ul className="mt-4 flex flex-col gap-1 border-t border-borde pt-3">
+            {datos.familia.faltantes.map((f) => (
+              <li key={f} className="text-xs text-atencion">
+                {f}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* La línea de tiempo */}
       <section className="mt-8">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+          Qué vio la red
+        </h2>
+
         {dias.length === 0 ? (
-          <p className="text-sm text-tenue">
+          <p className="mt-3 text-sm text-tenue">
             Sin señales en estas tres semanas. Cuando no pasa nada, el sistema no dice nada.
           </p>
         ) : (
-          <ul className="divide-y divide-borde">
+          <ul className="mt-3 divide-y divide-borde">
             {dias.map(([dia, senales]) => (
               <li key={dia} className="flex items-center gap-4 py-3">
                 <span className="w-20 shrink-0 font-mono text-xs text-apagado">

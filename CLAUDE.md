@@ -87,7 +87,7 @@ Rodrigo: su landing, sus secciones, sus herramientas, su panel, sus leads y su t
 | Dashboard por token | `src/app/familia/[token]/` + `src/app/api/familia/[token]/` |
 | NextAuth v5 con modo demo | `src/auth.ts`, `middleware.ts`, `/panel/login` |
 | Alta de familias | `src/app/api/panel/familias/route.ts` |
-| Esquema de Supabase | `supabase/schema.sql` — sólo `usuarios` y `familias`; el resto es fase 1 |
+| Esquema de Supabase | `supabase/schema.sql` |
 
 🔑 **La interfaz única de entrada vive en `src/lib/senales/`.** El motor pide señales y no sabe
 de dónde salen. `obtenerFuente()` prioriza NextDNS y cae al simulador **diciéndolo en pantalla**.
@@ -100,6 +100,27 @@ intenta colar texto de conversaciones. La regla 2 está en el tipo, no en un com
 cubre `/panel`** y el panel quedaba abierto. Además la página revalida la sesión por su cuenta.
 
 ⚠ `tsconfig.json` necesita `"target": "ES2020"` (heredado sin target, rompía al iterar `Map`).
+
+### El modelo de datos (fase 1, 14/8)
+
+Vive en `src/lib/datos/`, con el mismo criterio que las señales: **el sistema pide datos y no
+sabe si del otro lado hay Supabase o memoria.** `repositorio()` elige.
+
+- `tipos.ts` — Familia, Chico (edad y género), AdultoResponsable (con `elegidoPorElChico`),
+  Canal, Respuesta y ObservacionDelAdulto. `faltantesDeAlta()` dice qué le falta a una familia.
+- `memoria.ts` — el modo demo. Siembra la familia con token `demo`: Ana de 12, la madre y una
+  tía elegida por ella. **Es una sola instancia por proceso**, si no cada pedido perdería lo
+  cargado.
+- `supabase.ts` — misma interfaz contra Postgres. La traducción snake_case ⇄ camelCase vive
+  ahí y en ningún otro lado.
+
+🔴 **La regla de los dos adultos se valida en el alta, no en el formulario:**
+`POST /api/panel/familias` rechaza con 400 si hay menos de dos adultos o si ninguno lo eligió
+el chico. Verificado de punta a punta.
+
+📌 El **formulario** de alta no existe todavía: el alta entra por la API. Va con la fase 4.
+📌 `senales` se guarda con `id` de texto (viene de la fuente) y `upsert`, para que releer la
+misma ventana no duplique.
 
 ### IA
 

@@ -2,39 +2,64 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { Session } from "next-auth";
 import { auth } from "@/auth";
-import { baseDeDatos, generarToken } from "@/lib/supabase";
+import { repositorio, EDAD_MAXIMA, EDAD_MINIMA, MINIMO_ADULTOS } from "@/lib/datos";
 
-/** Alta y baja de familias. El chico y los adultos responsables entran en la fase 1. */
+/** Alta de familias: el chico con su edad y su género, y los adultos con su canal. */
 
 function esAdmin(sesion: Session | null) {
   return (sesion?.user as { rol?: string })?.rol === "admin";
 }
 
+const CanalSchema = z.object({
+  tipo: z.enum(["telegram", "correo", "whatsapp"]),
+  destino: z.string().min(1).max(254),
+});
+
+const ChicoSchema = z.object({
+  nombre: z.string().min(1).max(80),
+  edad: z
+    .number()
+    .int()
+    .min(EDAD_MINIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`)
+    .max(EDAD_MAXIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`),
+  genero: z.enum(["nena", "varon", "otro"]),
+  canal: CanalSchema,
+});
+
+const AdultoSchema = z.object({
+  nombre: z.string().min(1).max(80),
+  vinculo: z.enum(["madre", "padre", "tia_tio", "hermano_a", "abuelo_a", "otro"]),
+  elegidoPorElChico: z.boolean(),
+  canal: CanalSchema,
+});
+
 const AltaSchema = z.object({
   nombre: z.string().min(1).max(100),
-  nextdns_profile_id: z.string().max(50).optional(),
   notas: z.string().max(500).optional(),
+  nextdnsProfileId: z.string().max(50).optional(),
+  chicos: z.array(ChicoSchema).min(1, "Hay que cargar al menos un chico."),
+  adultos: z
+    .array(AdultoSchema)
+    // 🔴 No es una validación de formulario: es la regla del producto.
+    .min(MINIMO_ADULTOS, `Hacen falta al menos ${MINIMO_ADULTOS} adultos responsables.`)
+    .refine(
+      (adultos) => adultos.some((a) => a.elegidoPorElChico),
+      "Uno de los adultos lo tiene que elegir el chico. El 43% no habla de esto con sus padres.",
+    ),
 });
 
-const BajaSchema = z.object({
-  id: z.string(),
-  activo: z.boolean(),
-});
-
-const FAMILIAS_DEMO = [
-  { id: "demo-1", nombre: "Familia de prueba", token: "demo", activo: true, notas: "", created_at: new Date().toISOString() },
-];
+const BajaSchema = z.object({ id: z.string(), activo: z.boolean() });
 
 export async function GET() {
   if (!esAdmin(await auth())) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const db = baseDeDatos();
-  if (!db) return NextResponse.json({ familias: FAMILIAS_DEMO, demo: true });
-
-  const { data } = await db.from("familias").select("*").order("created_at", { ascending: false });
-  return NextResponse.json({ familias: data ?? [], demo: false });
+  const repo = repositorio();
+  return NextResponse.json({
+    familias: await repo.listarFamilias(),
+    demo: repo.clase === "memoria",
+  });
 }
 
 export async function POST(req: Request) {
@@ -43,20 +68,24 @@ export async function POST(req: Request) {
   }
 
   const parsed = AltaSchema.safeParse(await req.json());
-  if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Datos inválidos", detalle: parsed.error.issues.map((i) => i.message) },
+      { status: 400 },
+    );
+  }
 
-  const token = generarToken();
-  const db = baseDeDatos();
-  if (!db) return NextResponse.json({ familia: { ...parsed.data, token }, demo: true });
+  const repo = repositorio();
+  const alta = await repo.crearFamilia(parsed.data);
 
-  const { data, error } = await db
-    .from("familias")
-    .insert({ ...parsed.data, token })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ familia: data, demo: false });
+  return NextResponse.json({
+    familia: alta.familia,
+    chicos: alta.chicos.length,
+    adultos: alta.adultos.length,
+    // El enlace que se le pasa a los adultos. Es lo único que necesitan.
+    enlace: `/familia/${alta.familia.token}`,
+    demo: repo.clase === "memoria",
+  });
 }
 
 export async function PATCH(req: Request) {
@@ -67,10 +96,7 @@ export async function PATCH(req: Request) {
   const parsed = BajaSchema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
 
-  const db = baseDeDatos();
-  if (!db) return NextResponse.json({ ok: true, demo: true });
-
-  const { id, activo } = parsed.data;
-  await db.from("familias").update({ activo }).eq("id", id);
-  return NextResponse.json({ ok: true, demo: false });
+  const repo = repositorio();
+  await repo.cambiarEstado(parsed.data.id, parsed.data.activo);
+  return NextResponse.json({ ok: true, demo: repo.clase === "memoria" });
 }
