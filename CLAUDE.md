@@ -235,8 +235,14 @@ sistema **no es una alerta: es el cuestionario a los adultos.** Sirve para dos c
 1. Consigue el dato que a la red le falta. Hay cambios que el sistema no va a ver nunca y los
    adultos sí, y con eso el motor pasa a tener un elemento más y contundente.
 2. **Los pone en alerta sin decirlo.** Quizá vieron esos cambios y los archivaron como "cosas
-   de la edad"; las preguntas los hacen mirar de nuevo. Si después llega una alerta, ya venían
-   atentos.
+   de la edad" — **y los archivaron ahí por desconocimiento del grooming**, no por descuido.
+   Nadie mira lo que no sabe que hay que mirar.
+3. 🔑 **Enseña mientras pregunta.** Cada pregunta le está diciendo al adulto qué mirar, en forma
+   de pregunta y no de sermón: *"¿apareció algo que no sabés de dónde salió?"* le enseña que los
+   regalos son parte del mecanismo, sin nombrarlo ni alarmarlo. Es la misma lógica que la regla 4
+   con el chico —la explicación inicial ya es la primera intervención— pero del lado del adulto.
+
+Si después llega una alerta, ya venían atentos.
 
 ⚠ **Por eso el pedido del cuestionario NO puede sonar a que se detectó algo.** Tiene que leerse
 como rutina. Si dice "notamos algo", es una alarma con pasos de más, y vuelve el problema del
