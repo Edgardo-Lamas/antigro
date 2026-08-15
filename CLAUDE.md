@@ -79,7 +79,7 @@ Rodrigo — **se presenta la app, no el negocio.**
 
 ### Cómo quedó armado el repo (fase 0, 14/8)
 
-Repo: `Edgardo-Lamas/antigroo`. El motor se clonó de `rodos-3` y se dejó afuera todo lo de
+Repo: `Edgardo-Lamas/antigro`. El motor se clonó de `rodos-3` y se dejó afuera todo lo de
 Rodrigo: su landing, sus secciones, sus herramientas, su panel, sus leads y su tracker.
 
 | Se trajo | Dónde vive ahora |
