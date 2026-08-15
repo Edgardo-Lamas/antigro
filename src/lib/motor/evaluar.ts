@@ -17,6 +17,8 @@ import type { SenalDeRed, TipoDeSenal } from "@/lib/senales/tipos";
 import { NOMBRE_DE_SENAL } from "@/lib/senales/tipos";
 import type { Chico } from "@/lib/datos/tipos";
 import {
+  APRENDIZAJE_DIAS,
+  CLASE_DE_SENAL,
   MEDIA_VENTANA_DIAS,
   PESO_POR_TIPO,
   VENTANA_DIAS,
@@ -84,6 +86,11 @@ export interface Lectura {
   estado: Estado;
   /** 0 a 1 — las dos entradas ya combinadas. */
   puntaje: number;
+  /**
+   * Si ya se sabe qué es "lo habitual" en este chico. Mientras no, sólo pesan
+   * las señales absolutas y el sistema lo dice en vez de disimularlo.
+   */
+  lineaDeBase: { lista: boolean; diasObservados: number; faltan: number };
   /** Sólo lo que vio la red, para poder mostrar cada entrada por separado. */
   puntajeRed: number;
   /** Lo que aportaron los adultos. */
@@ -116,9 +123,17 @@ export function diaLocal(fecha: Date | string): string {
 /**
  * Carga de un día: se combinan las señales como probabilidades, no sumando.
  * Tres señales flojas no equivalen a una fuerte, y sumar haría que sí.
+ *
+ * ⚠ Mientras la línea de base no exista, las señales **relativas** no cuentan:
+ * decir "saltó el volumen" sin saber cuál era su volumen habitual es inventar.
+ * Las **absolutas** cuentan igual, desde el primer día.
  */
-function cargaDelDia(senales: SenalDeRed[]): number {
-  const restante = senales.reduce(
+function cargaDelDia(senales: SenalDeRed[], lineaDeBaseLista: boolean): number {
+  const cuentan = lineaDeBaseLista
+    ? senales
+    : senales.filter((s) => CLASE_DE_SENAL[s.tipo] === "absoluta");
+
+  const restante = cuentan.reduce(
     (acc, s) => acc * (1 - Math.min(1, s.intensidad * PESO_POR_TIPO[s.tipo])),
     1,
   );
@@ -152,9 +167,21 @@ export interface Consulta {
   hasta: Date;
   /** Lo último que contestaron los adultos. Sin esto, el motor mira con un ojo. */
   observaciones?: Record<string, number>;
+  /**
+   * Cuántos días de actividad se llevan observados de este chico desde el alta.
+   * Es lo que decide si ya se puede hablar de "lo habitual en él".
+   */
+  diasObservados?: number;
 }
 
-export function evaluar({ chico, senales, hasta, observaciones }: Consulta): Lectura {
+export function evaluar({
+  chico,
+  senales,
+  hasta,
+  observaciones,
+  diasObservados = VENTANA_DIAS,
+}: Consulta): Lectura {
+  const lineaDeBaseLista = diasObservados >= APRENDIZAJE_DIAS;
   const inicio = new Date(hasta.getTime() - (VENTANA_DIAS - 1) * DIA_MS);
 
   /* Un casillero por día, incluso los días sin nada: los silencios son parte
@@ -175,7 +202,7 @@ export function evaluar({ chico, senales, hasta, observaciones }: Consulta): Lec
     const delDia = porDia.get(clave) ?? [];
     dias.push({
       dia: clave,
-      carga: cargaDelDia(delDia),
+      carga: cargaDelDia(delDia, lineaDeBaseLista),
       tipos: [...new Set(delDia.map((s) => s.tipo))],
     });
   }
@@ -286,6 +313,21 @@ export function evaluar({ chico, senales, hasta, observaciones }: Consulta): Lec
     porQue.push(`Lo que se repitió: ${tipos.map((t) => NOMBRE_DE_SENAL[t].toLowerCase()).join(", ")}.`);
   }
 
+  if (!lineaDeBaseLista) {
+    porQue.push(
+      `El sistema todavía está aprendiendo cómo es un día normal para ${
+        chico.edad >= 14 ? "él o ella" : "este chico"
+      }: lleva ${diasObservados} de los ${APRENDIZAJE_DIAS} días que necesita. ` +
+        "Hasta entonces no puede decir que algo se desvía de lo habitual, porque " +
+        "todavía no sabe qué es lo habitual.",
+    );
+    porQue.push(
+      "Lo que sí mira desde el primer día: la actividad de madrugada, que desordena " +
+        "el descanso por sí sola, y los intentos de saltar el filtro, que son un acto " +
+        "deliberado y no dependen de ninguna comparación.",
+    );
+  }
+
   /* La segunda entrada, dicha por separado: son dos miradas, no una. */
   if (adultos.respondidas === 0) {
     porQue.push(
@@ -313,6 +355,11 @@ export function evaluar({ chico, senales, hasta, observaciones }: Consulta): Lec
   return {
     estado,
     puntaje,
+    lineaDeBase: {
+      lista: lineaDeBaseLista,
+      diasObservados,
+      faltan: Math.max(0, APRENDIZAJE_DIAS - diasObservados),
+    },
     puntajeRed,
     adultos,
     dias,

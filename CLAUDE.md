@@ -201,6 +201,38 @@ Lo saca él con `/newbot` en @BotFather; **yo no puedo: hace falta una cuenta de
 ⚠ **La cuenta de Resend es de Rodrigo y no tiene dominio verificado:** sólo puede enviar a
 `rodos.si3.0@gmail.com`. Para el video, el canal que se muestra es Telegram.
 
+### Dos vías en paralelo, y el punto ciego que las hizo falta (14/8)
+
+🔴 **Lo encontró Edgardo:** el que contrata este sistema muchas veces lo contrata **porque ya
+sospecha algo**. Si el chico ya está dentro del proceso cuando arranca el aprendizaje, un
+sistema que sólo detecta CAMBIOS aprende el abuso como lo normal de esa casa y no alerta nunca.
+
+Por eso hay dos clases de señal, y **corren en paralelo, no se reemplazan** (`CLASE_DE_SENAL`):
+
+| Clase | Cuáles | Cuándo funciona |
+|---|---|---|
+| **Absoluta** | Madrugada · evasión del filtro | **Desde el día uno.** No se comparan contra nada |
+| **Relativa** | Salto de volumen · plataforma nueva | Cuando ya existe la línea de base |
+
+La madrugada es absoluta porque desordena el descanso por sí sola: al otro día no descansó para
+la escuela. La evasión, porque es un acto deliberado — da igual si es el día 2 o el 200.
+
+📌 **`APRENDIZAJE_DIAS = 14` ESTÁ PENDIENTE DE INVESTIGACIÓN.** Hay dos razones defendibles
+(la conducta cambia entre semana y fin de semana; la detección de anomalías por conducta fija 7
+días de piso y 30 de confiabilidad), pero **ninguna fuente es sobre grooming ni sobre menores**.
+Si un padre pregunta "¿por qué 14?", "nos pareció" no es una respuesta. Ver el comentario en
+`pesos.ts` para las fuentes y el razonamiento completo.
+
+⚠ **El punto ciego se achicó, no desapareció.** Un chico ya acosado cuyas únicas señales sean
+volumen y plataforma nueva sigue sin disparar alerta durante el aprendizaje. Candidata para
+sumar a la vía absoluta: chat con desconocidos en chicos de 7 a 10 — ahí la EDAD hace de
+referencia en lugar de la historia.
+
+🔴 **Sólo se avisa con patrón sostenido.** El estado "hay un cambio" no le escribe a nadie: ni
+a los adultos ni al chico. Cualquier chico se queda una noche hasta tarde por algo puntual, y
+alarmar por eso gasta la atención de los adultos y —peor— la confianza del chico, que es el
+activo del que depende todo el producto.
+
 ## Modelo de datos
 
 - **Familia**

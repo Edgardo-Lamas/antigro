@@ -63,9 +63,13 @@ function yaSeAviso(
 export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
   const { chico, adultos, lectura, textos, ahora } = aviso;
 
-  // 🔴 En calma no sale nada. El silencio es la respuesta correcta y es la
-  // más difícil de programar.
-  if (lectura.estado === "en_calma") return [];
+  /* 🔴 Sólo se avisa con el patrón sostenido. Un cambio que todavía no se
+     sostiene NO sale a nadie — ni a los adultos ni al chico.
+     Cualquier chico se queda una noche hasta tarde hablando con un compañero
+     por algo puntual. Alarmar por eso gasta dos cosas que después hacen falta:
+     la atención de los adultos y, sobre todo, la confianza del chico, que es
+     el activo del que depende todo el producto. */
+  if (lectura.estado !== "patron_sostenido") return [];
 
   const repo = repositorio();
   const desde = new Date(ahora.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString();

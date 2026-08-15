@@ -27,6 +27,8 @@ const Params = z.object({
   barrido: z.coerce.boolean().default(false),
   /** Qué contestaron los adultos. Es la segunda entrada del motor. */
   adultos: z.enum(["sin_responder", "bajo", "alto"]).default("sin_responder"),
+  /** Días observados desde el alta. Decide si la línea de base ya existe. */
+  observados: z.coerce.number().int().min(0).max(365).default(VENTANA_DIAS),
 });
 
 /** Respuestas de ejemplo del cuestionario, para poder mover la segunda entrada. */
@@ -64,7 +66,7 @@ export async function GET(req: Request) {
     );
   }
 
-  const { escenario, dia, edad, genero, chicoId, barrido, adultos } = parsed.data;
+  const { escenario, dia, edad, genero, chicoId, barrido, adultos, observados } = parsed.data;
   const chico = { edad, genero };
   const observaciones = RESPUESTAS[adultos];
 
@@ -91,7 +93,7 @@ export async function GET(req: Request) {
     const dias = [];
     for (let n = 0; n < VENTANA_DIAS; n++) {
       const { hasta, senales } = await leerHasta(n);
-      const l = evaluar({ chico, senales, hasta, observaciones });
+      const l = evaluar({ chico, senales, hasta, observaciones, diasObservados: observados });
       dias.push({
         dia: n + 1,
         estado: l.estado,
@@ -99,6 +101,7 @@ export async function GET(req: Request) {
         diasConSenal: l.diasConSenal,
         diasSostenidos: l.diasSostenidos,
         evasiones: l.evasionesRecientes,
+        base: l.lineaDeBase.lista,
       });
     }
     return NextResponse.json({ escenario, chico, adultos, dias });
@@ -110,6 +113,6 @@ export async function GET(req: Request) {
     chico,
     dia: dia + 1,
     de: VENTANA_DIAS,
-    lectura: evaluar({ chico, senales, hasta, observaciones }),
+    lectura: evaluar({ chico, senales, hasta, observaciones, diasObservados: observados }),
   });
 }

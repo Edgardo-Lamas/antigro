@@ -69,6 +69,57 @@ export function factorGenero(genero: Genero): number {
   return genero === "nena" ? 1 : 0.94;
 }
 
+/* ── Dos vías, en paralelo ───────────────────────────────────────────────── */
+
+/**
+ * 🔑 **El punto ciego que esto resuelve** (lo encontró Edgardo el 14/8):
+ * el que contrata este sistema muchas veces lo contrata porque YA sospecha algo.
+ * Si el chico ya está dentro del proceso cuando arranca el aprendizaje, un
+ * sistema que sólo detecta CAMBIOS aprende el abuso como si fuera lo normal de
+ * esa casa, y no alerta nunca.
+ *
+ * Por eso hay dos clases de señal, y corren en paralelo:
+ *
+ * - `absoluta` — no se compara contra nada. Conectarse de madrugada todos los
+ *   días es desordenado en sí mismo: al otro día no descansó para la escuela.
+ *   Intentar saltar el filtro es un acto deliberado, sea el día 2 o el 200.
+ *   **Funcionan desde el minuto uno.**
+ * - `relativa` — "saltó el volumen", "apareció una plataforma nueva". Sólo
+ *   significan algo contra la conducta previa del propio chico, así que
+ *   esperan a que la línea de base exista.
+ */
+export type ClaseDeSenal = "absoluta" | "relativa";
+
+export const CLASE_DE_SENAL: Record<TipoDeSenal, ClaseDeSenal> = {
+  // Desordena el descanso: es dañino por sí mismo, no por ser distinto.
+  madrugada: "absoluta",
+  // Acto deliberado de esquivar el control. No hay historia que lo relativice.
+  evasion: "absoluta",
+  // "Saltó" sólo tiene sentido contra el volumen habitual de ese chico.
+  volumen: "relativa",
+  // "Nueva" está definido contra lo que aparecía antes. Sin antes, no hay nueva.
+  plataforma_nueva: "relativa",
+};
+
+/**
+ * 📌 **PENDIENTE DE INVESTIGACIÓN — no fijar este número sin fuente.**
+ *
+ * Cuántos días hay que observar antes de poder afirmar "esto se desvía de lo
+ * habitual en este chico". Hoy está en 14 por dos razones defendibles, pero
+ * **ninguna fuente es sobre grooming ni sobre menores**:
+ *
+ * 1. La conducta cambia entre días de semana y fin de semana (los fines de
+ *    semana suman ~30 min/día de pantalla en chicos y chicas). Con una sola
+ *    semana hay una muestra de cada día, y no se puede separar "los martes
+ *    siempre usa mucho" de "este martes estuvo raro". Hacen falta dos de cada.
+ * 2. La detección de anomalías por conducta en redes fija 7 días como piso
+ *    absoluto y 30 como el punto en que es confiable (Microsoft Sentinel).
+ *
+ * ⚠ Si un padre pregunta "¿por qué 14?", la respuesta honesta incluye que no
+ * hay un estudio específico del dominio que fije el número. Investigar.
+ */
+export const APRENDIZAJE_DIAS = 14;
+
 /* ── La ventana ──────────────────────────────────────────────────────────── */
 
 /**
