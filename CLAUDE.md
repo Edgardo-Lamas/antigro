@@ -139,6 +139,12 @@ en palabras para una persona con la edad que tiene. Tres piezas:
 en `Redaccion.rechazado`, para poder mostrar en pantalla lo que el sistema frenó. Un prompt que
 pide no afirmar es una intención; esto es una verificación.
 
+🔴 **Regla nacida del primer mensaje real (14/8):** el modelo escribió *"un salto en el volumen
+de **mensajes**"*. El sistema no ve mensajes — ve consultas de red, dominios y horarios, y
+contar mensajes implica verlos. Ahí se cae la regla 2 entera. Ahora el control lo frena y el
+prompt aclara qué significa cada señal. **Lección: el control se prueba contra salidas reales,
+no contra las que uno imagina.**
+
 ⚠ **Las reglas entienden la negación, regla por regla.** "No leemos lo que escribís" y "todavía
 no hay nada confirmado" son lo que el sistema TIENE que decir; "no estás a salvo" sigue
 prohibida. Sin esto el control frena los textos correctos (pasó, y estaba mal).
@@ -296,6 +302,9 @@ publicación, se confirma antes.
 - Rama por fase, `npm run typecheck` antes de cada commit.
 - Verificación visual en **`localhost:3007`**, no en el 3000: en el 3000 hay un service worker
   de un proyecto viejo que sirve su caché por encima de lo que devuelva el servidor.
+- ⚠ **El repositorio en memoria va colgado de `globalThis`**, no de una variable de módulo:
+  Next le puede dar a cada ruta su propia copia y quedan dos verdades distintas (el webhook
+  vinculaba a alguien y la página de la familia lo seguía viendo sin vincular).
 - ⚠ **No correr `npm run build` con el `npm run dev` levantado:** comparten `.next` y el build
   le voltea los chunks al servidor de desarrollo (`Cannot find module './vendor-chunks/next.js'`).
   Si pasa: matar el dev, `rm -rf .next`, y levantarlo de nuevo.

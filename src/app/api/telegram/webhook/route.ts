@@ -71,8 +71,10 @@ export async function POST(req: Request) {
       ? `Listo, ${vinculacion.nombre}. Desde acá te vamos a escribir si algo cambia. ` +
           "Y para que quede claro: no leemos tus conversaciones, ni las de nadie. " +
           "Vemos horarios y cuánto se usa, nada más."
-      : `Listo, ${vinculacion.nombre}. Quedaste conectado como adulto responsable. ` +
-          "Si el sistema tiene algo para decir, te llega por acá.",
+      // Sin marca de género: no está cargado, y "conectado" a una tía queda
+      // mal por una razón que se puede evitar escribiéndolo de otra forma.
+      : `Listo, ${vinculacion.nombre}. Ya estás en el sistema como adulto responsable. ` +
+          "Si hay algo que decir sobre la actividad de red, te llega por acá.",
   );
 
   return NextResponse.json({ ok: true, vinculado: vinculacion.quien });

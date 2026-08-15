@@ -71,6 +71,16 @@ const AFIRMACIONES_PROHIBIDAS: ReglaDeTexto[] = [
     motivo: "🔴 Sugiere que se leyó contenido. El sistema no lee conversaciones.",
     negarLoHaceCorrecto: true,
   },
+  {
+    /* 🔴 Salió en el primer mensaje real, el 14/8: el modelo escribió "un salto
+       en el volumen de MENSAJES". El sistema no ve mensajes — ve consultas de
+       red, dominios y horarios. Contar mensajes implica verlos, y ahí se cae la
+       regla 2 entera. La señal se llama "salto de volumen", sin complemento. */
+    patron: /\b(volumen|cantidad|n[úu]mero)\s+de\s+(mensajes|chats|conversaciones)\b/i,
+    motivo:
+      "🔴 Atribuye al sistema ver mensajes. Ve volumen de actividad de red, no de mensajes.",
+    negarLoHaceCorrecto: true,
+  },
 ];
 
 /** Palabras que dan vuelta el sentido, buscadas justo antes de la frase. */

@@ -14,12 +14,23 @@ import type { Repositorio } from "./repositorio";
 export * from "./tipos";
 export * from "./repositorio";
 
-let enMemoria: RepositorioEnMemoria | null = null;
+/**
+ * 🔴 El repositorio en memoria va colgado de `globalThis`, no de una variable
+ * de módulo.
+ *
+ * Motivo, y costó encontrarlo: Next le puede dar a cada ruta su propia copia
+ * del módulo (y en desarrollo lo recarga en cada cambio). Con una variable de
+ * módulo, el webhook vinculaba a una persona en SU memoria y la página de la
+ * familia seguía viéndola sin vincular — dos endpoints, dos verdades distintas.
+ */
+const CLAVE = Symbol.for("antigro.repositorio.memoria");
+type Global = typeof globalThis & { [CLAVE]?: RepositorioEnMemoria };
 
 export function repositorio(): Repositorio {
   const db = baseDeDatos();
   if (db) return new RepositorioSupabase(db);
 
-  if (!enMemoria) enMemoria = new RepositorioEnMemoria();
-  return enMemoria;
+  const g = globalThis as Global;
+  if (!g[CLAVE]) g[CLAVE] = new RepositorioEnMemoria();
+  return g[CLAVE];
 }
