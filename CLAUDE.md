@@ -153,6 +153,24 @@ gana y el `.env.local` queda ignorado. El síntoma es un 401 con una clave que a
 
 ---
 
+### Las salidas (fase 3, 14/8)
+
+Viven en `src/lib/mensajeria/`. Misma idea que las señales y el almacenamiento: **el sistema
+arma qué decir y a quién; por dónde sale es problema de la capa.**
+
+🔑 **Si el canal que pidió la familia no está configurado, NO se cambia de canal.** Se usa el
+transporte de **ensayo**, que registra el mensaje entero y devuelve `entregado: false` con
+`ensayo: true`. Nunca se finge una entrega, y la demo no depende de ningún proveedor.
+
+🔴 **No se repite el aviso.** `avisar()` deduce del registro fechado si ya se avisó hoy a ese
+destinatario. No hay marca aparte: si el registro es la fuente de verdad para decidir, también
+lo es para no repetir. Verificado — la segunda corrida del mismo día omite los tres avisos.
+
+📌 **Falta el token del bot de Telegram** (`TELEGRAM_BOT_TOKEN`). Lo saca él con `/newbot` en
+@BotFather; **yo no puedo: hace falta una cuenta de Telegram.**
+⚠ **La cuenta de Resend es de Rodrigo y no tiene dominio verificado:** sólo puede enviar a
+`rodos.si3.0@gmail.com`. Para el video, el canal que se muestra es Telegram.
+
 ## Modelo de datos
 
 - **Familia**
