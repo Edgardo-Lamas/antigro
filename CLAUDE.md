@@ -166,8 +166,32 @@ transporte de **ensayo**, que registra el mensaje entero y devuelve `entregado: 
 destinatario. No hay marca aparte: si el registro es la fuente de verdad para decidir, también
 lo es para no repetir. Verificado — la segunda corrida del mismo día omite los tres avisos.
 
-📌 **Falta el token del bot de Telegram** (`TELEGRAM_BOT_TOKEN`). Lo saca él con `/newbot` en
-@BotFather; **yo no puedo: hace falta una cuenta de Telegram.**
+### La vinculación — por qué una familia no configura nada
+
+🔴 **AntiGro tiene UN bot para todo el sistema.** La familia no crea ningún bot y no genera
+ninguna clave: cada persona se conecta apretando **"Iniciar"** una vez, desde un enlace o un QR.
+
+⚠ **Por qué hace falta un código y no alcanza con cargar el número:** Telegram no deja
+escribirle a nadie por teléfono. Sólo se puede responder a un `chat_id`, y ese número aparece
+recién cuando la persona le habla al bot. El código es lo que permite saber **cuál** de todas
+las personas es la que acaba de escribir.
+
+| Pieza | Dónde |
+|---|---|
+| Código, enlace y lectura del `/start` | `src/lib/mensajeria/vinculacion.ts` |
+| Lo que recibe el "Iniciar" | `POST /api/telegram/webhook` |
+| Guardado del `chat_id` | `repositorio().vincularPorCodigo()` |
+
+- Los códigos **no llevan caracteres confundibles** (sin 0/O, sin 1/I/L): se dictan por teléfono.
+- **Sirven una sola vez.** En Supabase lo garantiza el `.is("vinculado_en", null)` del update.
+- El webhook **exige el secreto** de Telegram (`TELEGRAM_WEBHOOK_SECRET`). Es un endpoint
+  público: sin eso, cualquiera que descubra la URL prueba códigos hasta pegarle a uno.
+- A quien todavía no vinculó **no se le disimula**: el aviso sale marcado `sinVincular` con su
+  código a la vista. Un adulto que cree que va a recibir avisos y no los recibe está peor que
+  uno que sabe que le falta un clic.
+
+📌 **Falta el token del bot de Telegram** (`TELEGRAM_BOT_TOKEN` y `TELEGRAM_BOT_USERNAME`).
+Lo saca él con `/newbot` en @BotFather; **yo no puedo: hace falta una cuenta de Telegram.**
 ⚠ **La cuenta de Resend es de Rodrigo y no tiene dominio verificado:** sólo puede enviar a
 `rodos.si3.0@gmail.com`. Para el video, el canal que se muestra es Telegram.
 
@@ -270,7 +294,11 @@ publicación, se confirma antes.
 ## Reglas de trabajo
 
 - Rama por fase, `npm run typecheck` antes de cada commit.
-- Verificación visual en `localhost:3000`.
+- Verificación visual en **`localhost:3007`**, no en el 3000: en el 3000 hay un service worker
+  de un proyecto viejo que sirve su caché por encima de lo que devuelva el servidor.
+- ⚠ **No correr `npm run build` con el `npm run dev` levantado:** comparten `.next` y el build
+  le voltea los chunks al servidor de desarrollo (`Cannot find module './vendor-chunks/next.js'`).
+  Si pasa: matar el dev, `rm -rf .next`, y levantarlo de nuevo.
 - **El modo demo tiene que seguir andando siempre:** es lo que permite que el jurado entre sin
   cuenta. Es un criterio de 25 puntos.
 - Registro cordial y voseo en todo texto de cara al usuario. Nada de jerga sin traducir.
