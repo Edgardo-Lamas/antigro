@@ -7,6 +7,7 @@ import {
   TIPOS_DE_SENAL,
   type TipoDeSenal,
 } from "@/lib/senales";
+import { estadoDeLosCanales } from "@/lib/mensajeria";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ const ESCENARIO = "persistente";
 
 export default async function Home() {
   const fuentes = await estadoDeLasFuentes(ESCENARIO);
+  const canales = await estadoDeLosCanales();
 
   // Prueba de que la interfaz única funciona: se le piden tres semanas de
   // señales a la fuente activa, sin saber cuál es.
@@ -73,6 +75,24 @@ export default async function Home() {
             </div>
           ))}
 
+          {canales.map((c) => (
+            <div key={c.canal} className="flex items-baseline justify-between gap-4 px-5 py-4">
+              <div>
+                <p className="text-sm font-medium text-tinta">Canal · {c.nombre}</p>
+                <p className="mt-0.5 text-xs text-apagado">
+                  {c.estado.disponible ? (c.estado.detalle ?? "Conectado") : c.estado.motivo}
+                </p>
+              </div>
+              <span
+                className={`shrink-0 rounded px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${
+                  c.estado.disponible ? "bg-acentoSuave text-acento" : "bg-borde text-apagado"
+                }`}
+              >
+                {c.estado.disponible ? "conectado" : "en ensayo"}
+              </span>
+            </div>
+          ))}
+
           <div className="flex items-baseline justify-between gap-4 px-5 py-4">
             <div>
               <p className="text-sm font-medium text-tinta">Base de datos</p>
@@ -122,8 +142,8 @@ export default async function Home() {
 
       <footer className="mt-16 border-t border-borde pt-6">
         <p className="text-xs text-apagado">
-          Fase 0 — fundaciones. La lectura, el simulador manejable y las alertas llegan en las
-          fases siguientes.
+          Las señales entran por una interfaz única, el motor decide con la regla de persistencia,
+          la IA lo escribe y un control lo revisa antes de que salga. La cara visible es la fase 4.
         </p>
       </footer>
     </main>
