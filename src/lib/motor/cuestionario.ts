@@ -1,0 +1,179 @@
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL CUESTIONARIO DEL ADULTO — la segunda entrada
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  La red aporta el **cuándo**. Los adultos aportan el **cómo está**.
+ *
+ *  🔴 Advertencia de procedencia, y va en serio:
+ *  El estudio del Ministerio de Justicia publica cifras de **prevalencia**, no
+ *  una lista de indicadores conductuales validados. La literatura internacional
+ *  de indicadores existe, pero según el `CLAUDE.md` **no está verificada en
+ *  fuente primaria**.
+ *
+ *  Por eso cada pregunta declara de dónde sale, y hay dos clases:
+ *
+ *  - `estudio` — se apoya en una cifra citable del estudio nacional.
+ *  - `observable` — le pregunta al adulto por un **hecho que puede ver**, sin
+ *    afirmar que ese hecho sea un signo de grooming. Es la diferencia entre
+ *    "¿esconde la pantalla?" (un hecho) y "esconder la pantalla indica
+ *    grooming" (una afirmación que no podemos sostener).
+ *
+ *  ⚠ Ninguna pregunta de esta lista puede presentarse en el video como
+ *  "indicador validado". Se presentan como lo que son: lo que un adulto ve.
+ */
+
+export type ProcedenciaDelIndicador =
+  | { clase: "estudio"; cita: string }
+  | { clase: "observable"; nota: string };
+
+export interface Indicador {
+  id: string;
+  pregunta: string;
+  /** Para el adulto que duda de qué se le está preguntando. */
+  ayuda: string;
+  /** 📌 Decisión de producto. Cuánto mueve la aguja respecto de los demás. */
+  peso: number;
+  procedencia: ProcedenciaDelIndicador;
+}
+
+/** Escala de respuesta. La misma para todas, para no confundir al que contesta. */
+export const ESCALA = [
+  { valor: 0, etiqueta: "No / nunca" },
+  { valor: 1, etiqueta: "Alguna vez" },
+  { valor: 2, etiqueta: "Varias veces" },
+  { valor: 3, etiqueta: "Seguido" },
+] as const;
+
+export const VALOR_MAXIMO = 3;
+
+export const INDICADORES: Indicador[] = [
+  {
+    id: "desconocidos",
+    pregunta: "¿Sabés si habla por internet con gente que no conoce en persona?",
+    ayuda: "Juegos en línea, grupos, gente que apareció hace poco.",
+    peso: 1,
+    procedencia: {
+      clase: "estudio",
+      cita: "El 56,4% de los chicos de 9 a 17 habla con desconocidos (Grooming Argentina, n=4.276, citado en el estudio nacional 2023).",
+    },
+  },
+  {
+    id: "pedido_de_fotos",
+    pregunta: "¿Sabés si alguna vez le pidieron una foto suya?",
+    ayuda: "Cualquiera, no sólo las que uno se imagina.",
+    peso: 1.4,
+    procedencia: {
+      clase: "estudio",
+      cita: "El 35,4% recibió un pedido de fotos desnudo o con poca ropa (Grooming Argentina, n=4.276, citado en el estudio nacional 2023).",
+    },
+  },
+  {
+    id: "sabe_que_es_grooming",
+    pregunta: "¿Hablaron alguna vez con él o ella sobre qué es el grooming?",
+    ayuda: "Si nunca se habló del tema, la respuesta es «no».",
+    // Se invierte al puntuar: acá el riesgo está en el NO.
+    peso: 0.9,
+    procedencia: {
+      clase: "estudio",
+      cita: "El 63% de los chicos no sabe qué es el grooming, y el 43% no habla del tema con sus padres (estudio nacional 2023).",
+    },
+  },
+  {
+    id: "cambio_de_animo",
+    pregunta: "¿Notaste que cambia de ánimo después de estar con el teléfono?",
+    ayuda: "Queda callado, irritable o angustiado al dejarlo, y antes no pasaba.",
+    peso: 1.2,
+    procedencia: {
+      clase: "observable",
+      nota: "Hecho observable. No hay fuente primaria verificada que lo valide como indicador de grooming.",
+    },
+  },
+  {
+    id: "esconde_pantalla",
+    pregunta: "¿Esconde la pantalla o cambia de aplicación cuando te acercás?",
+    ayuda: "Que un adolescente quiera privacidad es normal. Lo que se pregunta es si es nuevo.",
+    peso: 1,
+    procedencia: {
+      clase: "observable",
+      nota: "Hecho observable. ⚠ La privacidad adolescente es esperable: por sí solo no dice nada.",
+    },
+  },
+  {
+    id: "se_aisla",
+    pregunta: "¿Dejó actividades o amistades que antes le importaban?",
+    ayuda: "Deportes, salidas, amigos de siempre.",
+    peso: 1.2,
+    procedencia: {
+      clase: "observable",
+      nota: "Hecho observable. No hay fuente primaria verificada que lo valide como indicador de grooming.",
+    },
+  },
+  {
+    id: "regalos",
+    pregunta: "¿Apareció algo que no sabés de dónde salió?",
+    ayuda: "Crédito para juegos, saldo, una cuenta paga, un objeto.",
+    peso: 1.3,
+    procedencia: {
+      clase: "observable",
+      nota: "Hecho observable. No hay fuente primaria verificada que lo valide como indicador de grooming.",
+    },
+  },
+  {
+    id: "horarios",
+    pregunta: "¿Usa el teléfono a horas en que antes dormía?",
+    ayuda: "De madrugada, o apenas se despierta.",
+    peso: 0.9,
+    procedencia: {
+      clase: "observable",
+      nota: "Hecho observable. Se cruza con lo que ve la red, que mira exactamente lo mismo desde el otro lado.",
+    },
+  },
+];
+
+/** Los indicadores que se invierten: el riesgo está en la respuesta baja. */
+const INVERTIDOS = new Set(["sabe_que_es_grooming"]);
+
+export interface AporteDeLosAdultos {
+  /** 0 a 1. */
+  puntaje: number;
+  /** Cuántas preguntas contestaron. */
+  respondidas: number;
+  /** Lo que más pesó, para poder mostrarlo. */
+  loQueMasPeso: string[];
+}
+
+/**
+ * Convierte las respuestas del cuestionario en un aporte de 0 a 1.
+ * Sin respuestas devuelve 0: **la ausencia de datos no es una señal de calma.**
+ * El motor lo trata como "no sabemos", no como "está todo bien".
+ */
+export function evaluarObservaciones(respuestas: Record<string, number>): AporteDeLosAdultos {
+  let acumulado = 0;
+  let maximo = 0;
+  let respondidas = 0;
+  const conPeso: { texto: string; valor: number }[] = [];
+
+  for (const indicador of INDICADORES) {
+    const cruda = respuestas[indicador.id];
+    if (cruda === undefined || cruda === null) continue;
+
+    respondidas++;
+    const valor = INVERTIDOS.has(indicador.id) ? VALOR_MAXIMO - cruda : cruda;
+    const aporte = (valor / VALOR_MAXIMO) * indicador.peso;
+
+    acumulado += aporte;
+    maximo += indicador.peso;
+
+    if (valor >= 2) conPeso.push({ texto: indicador.pregunta, valor: aporte });
+  }
+
+  return {
+    puntaje: maximo === 0 ? 0 : Math.min(1, acumulado / maximo),
+    respondidas,
+    loQueMasPeso: conPeso
+      .sort((a, b) => b.valor - a.valor)
+      .slice(0, 3)
+      .map((c) => c.texto),
+  };
+}

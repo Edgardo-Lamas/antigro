@@ -25,7 +25,34 @@ const Params = z.object({
   genero: z.enum(["nena", "varon", "otro"]).default("nena"),
   chicoId: z.string().default("demo"),
   barrido: z.coerce.boolean().default(false),
+  /** Qué contestaron los adultos. Es la segunda entrada del motor. */
+  adultos: z.enum(["sin_responder", "bajo", "alto"]).default("sin_responder"),
 });
+
+/** Respuestas de ejemplo del cuestionario, para poder mover la segunda entrada. */
+const RESPUESTAS: Record<string, Record<string, number>> = {
+  sin_responder: {},
+  bajo: {
+    desconocidos: 1,
+    pedido_de_fotos: 0,
+    sabe_que_es_grooming: 3,
+    cambio_de_animo: 0,
+    esconde_pantalla: 1,
+    se_aisla: 0,
+    regalos: 0,
+    horarios: 1,
+  },
+  alto: {
+    desconocidos: 3,
+    pedido_de_fotos: 2,
+    sabe_que_es_grooming: 0,
+    cambio_de_animo: 3,
+    esconde_pantalla: 2,
+    se_aisla: 2,
+    regalos: 1,
+    horarios: 3,
+  },
+};
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -37,8 +64,9 @@ export async function GET(req: Request) {
     );
   }
 
-  const { escenario, dia, edad, genero, chicoId, barrido } = parsed.data;
+  const { escenario, dia, edad, genero, chicoId, barrido, adultos } = parsed.data;
   const chico = { edad, genero };
+  const observaciones = RESPUESTAS[adultos];
 
   // El comienzo de la historia queda fijo. El reloj sólo corre el final.
   const fin = new Date();
@@ -63,7 +91,7 @@ export async function GET(req: Request) {
     const dias = [];
     for (let n = 0; n < VENTANA_DIAS; n++) {
       const { hasta, senales } = await leerHasta(n);
-      const l = evaluar({ chico, senales, hasta });
+      const l = evaluar({ chico, senales, hasta, observaciones });
       dias.push({
         dia: n + 1,
         estado: l.estado,
@@ -73,7 +101,7 @@ export async function GET(req: Request) {
         evasiones: l.evasionesRecientes,
       });
     }
-    return NextResponse.json({ escenario, chico, dias });
+    return NextResponse.json({ escenario, chico, adultos, dias });
   }
 
   const { hasta, senales } = await leerHasta(dia);
@@ -82,6 +110,6 @@ export async function GET(req: Request) {
     chico,
     dia: dia + 1,
     de: VENTANA_DIAS,
-    lectura: evaluar({ chico, senales, hasta }),
+    lectura: evaluar({ chico, senales, hasta, observaciones }),
   });
 }

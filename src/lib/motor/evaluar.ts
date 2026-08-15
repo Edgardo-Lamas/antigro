@@ -23,6 +23,7 @@ import {
   factorEdad,
   factorGenero,
 } from "./pesos";
+import { evaluarObservaciones, type AporteDeLosAdultos } from "./cuestionario";
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 
@@ -52,6 +53,15 @@ const EVASIONES_PARA_HABLAR = 2;
 const PUNTAJE_PARA_ATENCION = 0.2;
 const PUNTAJE_PARA_HABLAR = 0.45;
 
+/**
+ * Techo del aporte de los adultos. No llega a 1 a propósito: el cuestionario
+ * es una impresión, no una medición, y no puede disparar solo una alerta.
+ */
+const APORTE_MAXIMO_ADULTOS = 0.7;
+
+/** A partir de acá se considera que las dos entradas están coincidiendo. */
+const COINCIDENCIA_FUERTE = 0.55;
+
 /* ── Estado ──────────────────────────────────────────────────────────────── */
 
 export type Estado = "en_calma" | "atencion" | "patron_sostenido";
@@ -72,8 +82,12 @@ export interface DiaDeLaVentana {
 
 export interface Lectura {
   estado: Estado;
-  /** 0 a 1. */
+  /** 0 a 1 — las dos entradas ya combinadas. */
   puntaje: number;
+  /** Sólo lo que vio la red, para poder mostrar cada entrada por separado. */
+  puntajeRed: number;
+  /** Lo que aportaron los adultos. */
+  adultos: AporteDeLosAdultos;
   dias: DiaDeLaVentana[];
   diasConSenal: number;
   /** Hace cuántos días viene sosteniéndose, sin cortarse. */
@@ -136,9 +150,11 @@ export interface Consulta {
   senales: SenalDeRed[];
   /** Hasta qué momento se mira. Moverlo es lo que hace el reloj acelerado. */
   hasta: Date;
+  /** Lo último que contestaron los adultos. Sin esto, el motor mira con un ojo. */
+  observaciones?: Record<string, number>;
 }
 
-export function evaluar({ chico, senales, hasta }: Consulta): Lectura {
+export function evaluar({ chico, senales, hasta, observaciones }: Consulta): Lectura {
   const inicio = new Date(hasta.getTime() - (VENTANA_DIAS - 1) * DIA_MS);
 
   /* Un casillero por día, incluso los días sin nada: los silencios son parte
@@ -180,25 +196,61 @@ export function evaluar({ chico, senales, hasta }: Consulta): Lectura {
     (s) => s.tipo === "evasion" && new Date(s.fecha) >= desdeEvasion && new Date(s.fecha) <= hasta,
   );
 
-  /* Puntaje: la carga reciente, ajustada por edad y género. */
+  /* Lo que ve la red, ajustado por edad y género. */
   const ajuste = factorEdad(chico.edad) * factorGenero(chico.genero);
-  const puntaje = Math.min(1, media(recientes) * ajuste);
+  const puntajeRed = Math.min(1, media(recientes) * ajuste);
+
+  /* Lo que ven los adultos — la segunda entrada. */
+  const adultos = evaluarObservaciones(observaciones ?? {});
+
+  /**
+   * Las dos entradas se combinan como probabilidades, no promediando: una
+   * entrada floja no puede bajar a la otra. Si la red no vio nada, el aporte
+   * de los adultos sigue contando; si los adultos no contestaron, la red
+   * sigue contando sola.
+   */
+  const puntaje = 1 - (1 - puntajeRed) * (1 - adultos.puntaje * APORTE_MAXIMO_ADULTOS);
+
+  /**
+   * 🔑 Acá está la tesis del producto. Cuando dos entradas independientes
+   * coinciden, hace falta menos evidencia de una sola: si los adultos ya
+   * están viendo cambios, no tiene sentido esperar los ocho días completos
+   * para decírselo. Nunca baja de cuatro días: la persistencia sigue mandando.
+   */
+  const diasExigidos =
+    adultos.puntaje >= COINCIDENCIA_FUERTE
+      ? Math.max(4, DIAS_SOSTENIDOS_MINIMOS - 3)
+      : DIAS_SOSTENIDOS_MINIMOS;
 
   /* ── El estado. La persistencia manda: sin racha no se habla. ── */
   let estado: Estado = "en_calma";
 
   if (evasiones.length >= EVASIONES_PARA_HABLAR) {
     estado = "patron_sostenido";
-  } else if (diasSostenidos >= DIAS_SOSTENIDOS_MINIMOS && puntaje >= PUNTAJE_PARA_HABLAR) {
+  } else if (diasSostenidos >= diasExigidos && puntaje >= PUNTAJE_PARA_HABLAR) {
     estado = "patron_sostenido";
   } else if (conSenal.length >= 2 && puntaje >= PUNTAJE_PARA_ATENCION) {
     estado = "atencion";
   }
 
+  /**
+   * 🔴 Si los adultos están marcando cosas y la red no vio nada, el sistema
+   * NO se queda callado: lo que cuenta un adulto no necesita que una red lo
+   * confirme para merecer una conversación. Pero tampoco sube a "patrón
+   * sostenido" — eso lo tiene que sostener el registro, no una impresión.
+   */
+  const soloLosAdultos = estado === "en_calma" && adultos.puntaje >= COINCIDENCIA_FUERTE;
+  if (soloLosAdultos) estado = "atencion";
+
   /* ── Por qué ── */
   const porQue: string[] = [];
 
-  if (estado === "en_calma") {
+  if (soloLosAdultos) {
+    porQue.push(
+      "Esto no sale de la red: la red no vio nada fuera de lo habitual. " +
+        "Sale de lo que están marcando los adultos, y con eso alcanza para hablar con el chico.",
+    );
+  } else if (estado === "en_calma") {
     porQue.push(
       conSenal.length === 0
         ? "No hubo ningún día fuera de lo habitual en estas tres semanas."
@@ -234,6 +286,23 @@ export function evaluar({ chico, senales, hasta }: Consulta): Lectura {
     porQue.push(`Lo que se repitió: ${tipos.map((t) => NOMBRE_DE_SENAL[t].toLowerCase()).join(", ")}.`);
   }
 
+  /* La segunda entrada, dicha por separado: son dos miradas, no una. */
+  if (adultos.respondidas === 0) {
+    porQue.push(
+      "Nadie contestó el cuestionario todavía. Esto es sólo lo que ve la red, con un ojo de los dos.",
+    );
+  } else {
+    if (adultos.loQueMasPeso.length > 0) {
+      porQue.push(`Lo que marcaron los adultos: ${adultos.loQueMasPeso.join(" · ")}`);
+    }
+    if (adultos.puntaje >= COINCIDENCIA_FUERTE && diasSostenidos > 0) {
+      porQue.push(
+        "Lo que ve la red y lo que ven los adultos están apuntando a lo mismo. " +
+          "Cuando eso pasa, el sistema no espera a tener toda la evidencia de un solo lado.",
+      );
+    }
+  }
+
   /* ── 🔴 Lo que no se ve. Va siempre. ── */
   const loQueNoSeVe = [
     "No se leyó ni se guardó nada de lo que escribió. El sistema ve horarios y volúmenes, no conversaciones.",
@@ -244,6 +313,8 @@ export function evaluar({ chico, senales, hasta }: Consulta): Lectura {
   return {
     estado,
     puntaje,
+    puntajeRed,
+    adultos,
     dias,
     diasConSenal: conSenal.length,
     diasSostenidos,
