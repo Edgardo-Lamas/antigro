@@ -1,0 +1,482 @@
+# -*- coding: utf-8 -*-
+"""Arma el HTML de presentación de AntiGro y lo imprime a PDF con Chrome headless.
+
+Las barras del gráfico NO están dibujadas a mano: salen de correr el motor real
+del proyecto contra los cuatro escenarios del simulador (`/api/motor/lectura?barrido=1`).
+"""
+import json, subprocess, pathlib
+
+BASE = pathlib.Path(__file__).parent
+serie = json.load(open(BASE / "serie.json"))
+
+COLOR = {"en_calma": "var(--gris)", "atencion": "var(--ambar)", "patron_sostenido": "var(--petroleo)"}
+
+
+def pista(clave, alto_mm=8.6):
+    """Una fila de 21 barras: alto proporcional al puntaje real que devolvió el motor."""
+    return "".join(
+        f'<i style="height:{max(0.7, x["p"] * alto_mm):.2f}mm;background:{COLOR[x["e"]]}"></i>'
+        for x in serie[clave]
+    )
+
+
+def dia_habla(clave):
+    for x in serie[clave]:
+        if x["e"] == "patron_sostenido":
+            return x["d"]
+    return None
+
+
+ESCENARIOS = [
+    ("normal", "Semana normal", "Lo que se ve en la enorme mayoría de las casas."),
+    ("cambio_leve", "Cambio leve", "Unos días distintos que después vuelven a lo de siempre."),
+    ("persistente", "Patrón que persiste", "El cambio se sostiene y se profundiza semana a semana."),
+    ("evasion", "Intento de saltar el filtro", "Aparece VPN, proxy o DNS alternativo."),
+    ("persistente_alto", "El mismo patrón, con los adultos ya marcando cambios",
+     "Las dos miradas coinciden."),
+]
+
+filas = []
+for clave, nombre, desc in ESCENARIOS:
+    d = dia_habla(clave)
+    badge = (f'<span class="badge badge-hab">habla el día {d}</span>' if d
+             else '<span class="badge badge-cal">nunca habla</span>')
+    destacada = " destacada" if clave == "persistente_alto" else ""
+    filas.append(f"""
+      <div class="fila{destacada}">
+        <div>
+          <div class="fila-nom">{nombre}</div>
+          <div class="fila-desc">{desc}</div>
+        </div>
+        <div class="barras">{pista(clave)}</div>
+        <div>{badge}</div>
+      </div>""")
+
+HTML = f"""<!doctype html>
+<html lang="es-AR"><head><meta charset="utf-8">
+<title>AntiGro — Documento de presentación</title>
+<style>
+  @page {{ size: A4; margin: 0; }}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  :root {{
+    --tinta: #14181C; --tinta-suave: #464F58; --apagado: #7B848D;
+    --linea: #DDD7CD; --linea-fina: #EBE6DE; --papel: #FCFAF7;
+    --petroleo: #0B5457; --petroleo-claro: #E3EDEC;
+    --ambar: #A9752A; --ambar-claro: #F5EDE0; --gris: #C9C3B9;
+  }}
+  html {{ -webkit-print-color-adjust: exact; print-color-adjust: exact; }}
+  body {{
+    font-family: Charter, "Iowan Old Style", Palatino, Georgia, serif;
+    color: var(--tinta); background: var(--papel);
+    font-size: 8.7pt; line-height: 1.46; -webkit-font-smoothing: antialiased;
+  }}
+  .page {{
+    width: 210mm; height: 297mm; padding: 12mm 16mm 10mm;
+    background: var(--papel); overflow: hidden;
+    page-break-after: always; display: flex; flex-direction: column;
+  }}
+  .page:last-child {{ page-break-after: auto; }}
+
+  h1 {{ font-family: "Avenir Next", "Helvetica Neue", sans-serif; font-size: 28pt;
+       font-weight: 600; letter-spacing: -.025em; line-height: 1; color: var(--petroleo); }}
+  h2 {{ font-family: "Avenir Next", "Helvetica Neue", sans-serif; font-size: 11.5pt;
+       font-weight: 600; letter-spacing: -.012em; margin-bottom: 2.2mm; }}
+  .kicker {{ font-family: "Avenir Next", "Helvetica Neue", sans-serif; font-size: 6.3pt;
+       font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--apagado); }}
+  p {{ margin-bottom: 2.1mm; max-width: 162mm; }}
+  p:last-child {{ margin-bottom: 0; }}
+  strong {{ font-weight: 600; }}
+  .lede {{ font-size: 10pt; line-height: 1.42; color: var(--tinta-suave); }}
+  .nota {{ font-size: 6.9pt; line-height: 1.38; color: var(--apagado); max-width: none; }}
+  .sec {{ margin-top: 3.3mm; }}
+  .regla-fuerte {{ border: 0; border-top: 1.6pt solid var(--petroleo); margin: 2mm 0 2.8mm; }}
+
+  .cinta {{ display: flex; justify-content: space-between; align-items: baseline; }}
+  .pie {{ margin-top: auto; padding-top: 2mm; border-top: .35pt solid var(--linea);
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-family: "Avenir Next", sans-serif; font-size: 6.7pt; color: var(--apagado); letter-spacing: .04em; }}
+
+  /* cifras */
+  .cifras {{ display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 3mm; }}
+  .cifra {{ padding: 1.8mm 4mm 1.8mm 0; border-top: .35pt solid var(--linea); }}
+  .cifra:nth-child(-n+3) {{ border-top: 1pt solid var(--tinta); }}
+  .cifra .n {{ font-family: "Avenir Next", sans-serif; font-size: 16.5pt; font-weight: 500;
+    letter-spacing: -.03em; color: var(--petroleo); line-height: 1; display: block; margin-bottom: 1.3mm; }}
+  .cifra .t {{ font-size: 7.4pt; line-height: 1.3; color: var(--tinta-suave); }}
+
+  /* dato → decisión */
+  .par {{ display: grid; grid-template-columns: 60mm 1fr; gap: 6mm;
+    padding: 2.3mm 0; border-top: .35pt solid var(--linea-fina); align-items: start; }}
+  .par:first-child {{ border-top: .8pt solid var(--tinta); }}
+  .par .dato {{ font-size: 7.9pt; line-height: 1.32; color: var(--tinta-suave); }}
+  .par .dato b {{ font-family: "Avenir Next", sans-serif; font-weight: 600;
+    color: var(--petroleo); font-size: 8.5pt; }}
+  .par .dec {{ font-size: 7.9pt; line-height: 1.36; }}
+  .par .dec::before {{ content: "→"; color: var(--ambar); font-family: "Avenir Next", sans-serif;
+    margin-right: 2.2mm; font-weight: 600; }}
+
+  /* flujo */
+  .flujo {{ margin-top: 3.6mm; }}
+  .flujo-fila {{ display: grid; gap: 2.6mm; }}
+  .f3 {{ grid-template-columns: repeat(3, 1fr); }}
+  .f2 {{ grid-template-columns: repeat(2, 1fr); }}
+  .caja {{ border: .5pt solid var(--linea); border-top: 1.4pt solid var(--petroleo);
+    padding: 2.3mm 2.8mm; background: #fff; }}
+  .caja .et {{ font-family: "Avenir Next", sans-serif; font-size: 6pt; font-weight: 600;
+    letter-spacing: .13em; text-transform: uppercase; color: var(--apagado); display: block; margin-bottom: 1.2mm; }}
+  .caja .tt {{ font-family: "Avenir Next", sans-serif; font-size: 8pt; font-weight: 600;
+    margin-bottom: .9mm; display: block; line-height: 1.2; }}
+  .caja .dd {{ font-size: 7.2pt; line-height: 1.3; color: var(--tinta-suave); }}
+  .banda {{ background: var(--petroleo); color: #fff; padding: 2.4mm 4mm; margin: 1.8mm 0;
+    display: flex; align-items: baseline; gap: 4mm; }}
+  .banda .tt {{ font-family: "Avenir Next", sans-serif; font-size: 8.4pt; font-weight: 600; white-space: nowrap; }}
+  .banda .dd {{ font-size: 7.3pt; line-height: 1.3; color: #CFE0DF; }}
+  .flecha {{ text-align: center; color: var(--linea); font-size: 7pt; line-height: 1;
+    margin: 1.2mm 0; letter-spacing: .3em; }}
+
+  /* señales */
+  .senales {{ display: grid; grid-template-columns: 1fr 1fr; gap: 0 7mm; margin-top: 2.2mm; }}
+  .senal {{ padding: 1.35mm 0; border-top: .35pt solid var(--linea-fina); }}
+  .senal:nth-child(-n+2) {{ border-top: .8pt solid var(--tinta); }}
+  .senal .n {{ font-family: "Avenir Next", sans-serif; font-size: 7.9pt; font-weight: 600;
+    display: block; margin-bottom: .7mm; }}
+  .senal .d {{ font-size: 7.2pt; line-height: 1.32; color: var(--tinta-suave); }}
+  .senal.fuerte .n {{ color: var(--petroleo); }}
+
+  /* gráfico */
+  .grafico {{ margin-top: 3.2mm; }}
+  .fila {{ display: grid; grid-template-columns: 53mm 1fr 21mm; gap: 4mm;
+    align-items: end; padding: 1.9mm 0; border-top: .35pt solid var(--linea-fina); }}
+  .fila:first-child {{ border-top: .8pt solid var(--tinta); }}
+  .fila.destacada {{ background: var(--petroleo-claro); margin: 0 -3mm; padding: 1.9mm 3mm; }}
+  .fila-nom {{ font-family: "Avenir Next", sans-serif; font-size: 7.5pt; font-weight: 600;
+    line-height: 1.2; margin-bottom: .7mm; }}
+  .fila-desc {{ font-size: 6.6pt; line-height: 1.26; color: var(--apagado); }}
+  .barras {{ display: flex; align-items: flex-end; gap: .9mm; height: 8.6mm;
+    border-bottom: .5pt solid var(--linea); }}
+  .barras i {{ flex: 1; display: block; }}
+  .badge {{ font-family: "Avenir Next", sans-serif; font-size: 6.7pt; font-weight: 600;
+    padding: .9mm 1.7mm; display: inline-block; white-space: nowrap; }}
+  .badge-hab {{ background: var(--petroleo); color: #fff; }}
+  .badge-cal {{ background: var(--linea-fina); color: var(--apagado); }}
+  .eje {{ display: grid; grid-template-columns: 53mm 1fr 21mm; gap: 4mm; margin-top: 1mm;
+    font-family: "Avenir Next", sans-serif; font-size: 6.3pt; color: var(--apagado); }}
+  .eje-dias {{ display: flex; justify-content: space-between; }}
+  .leyenda {{ display: flex; gap: 5mm; margin-top: 2.4mm; align-items: center;
+    font-family: "Avenir Next", sans-serif; font-size: 6.8pt; color: var(--tinta-suave); }}
+  .leyenda span {{ display: flex; align-items: center; gap: 1.3mm; }}
+  .leyenda b {{ width: 2.5mm; height: 2.5mm; display: inline-block; }}
+
+  /* reglas numeradas — flex, no grid: en grid cada <strong> se vuelve un ítem */
+  .reglas {{ counter-reset: r; margin-top: 2.8mm; }}
+  .r {{ counter-increment: r; display: flex; gap: 2.4mm; align-items: baseline;
+    padding: 1.8mm 0; border-top: .35pt solid var(--linea-fina); font-size: 7.8pt; line-height: 1.34; }}
+  .r:first-child {{ border-top: .8pt solid var(--tinta); }}
+  .r > span {{ flex: 1; }}
+  .r::before {{ content: counter(r); font-family: "Avenir Next", sans-serif; font-weight: 600;
+    font-size: 8.6pt; color: var(--petroleo); flex: 0 0 4mm; }}
+
+  /* límites */
+  .limites {{ width: 100%; border-collapse: collapse; margin-top: 2.8mm; }}
+  .limites td {{ padding: 1.9mm 0; border-top: .35pt solid var(--linea-fina);
+    font-size: 7.8pt; line-height: 1.32; vertical-align: top; }}
+  .limites tr:first-child td {{ border-top: .8pt solid var(--tinta); }}
+  .limites td:first-child {{ width: 56mm; padding-right: 6mm;
+    font-family: "Avenir Next", sans-serif; font-weight: 600; }}
+  .limites td:last-child {{ color: var(--tinta-suave); }}
+
+  .fuentes {{ font-size: 7.3pt; line-height: 1.38; color: var(--tinta-suave); margin-top: 2.6mm; }}
+  .fuentes li {{ margin-bottom: 1.5mm; list-style: none; padding-left: 3.4mm; text-indent: -3.4mm; }}
+  .fuentes li::before {{ content: "— "; color: var(--apagado); }}
+
+  .cita {{ border-left: 1.6pt solid var(--ambar); padding: .4mm 0 .4mm 4mm; margin: 2.4mm 0;
+    font-size: 8.1pt; line-height: 1.38; font-style: italic; color: var(--tinta-suave); }}
+  .cita .aut {{ display: block; font-style: normal; margin-top: 1.1mm;
+    font-family: "Avenir Next", sans-serif; font-size: 6.9pt; color: var(--apagado); }}
+  .contacto {{ border-top: 1.6pt solid var(--petroleo); margin-top: 4mm; padding-top: 2.4mm;
+    display: flex; justify-content: space-between; align-items: baseline; }}
+  .contacto .q {{ font-family: "Avenir Next", sans-serif; font-size: 9.2pt; font-weight: 600; }}
+  .contacto .m {{ font-family: "Avenir Next", sans-serif; font-size: 8.3pt; color: var(--petroleo); }}
+  .corrobora {{ border: .5pt solid var(--linea); border-left: 1.6pt solid var(--petroleo);
+    background: #fff; padding: 2.2mm 3.4mm; margin-top: 2.6mm; }}
+  .corrobora .tt {{ font-family: "Avenir Next", sans-serif; font-size: 8.2pt; font-weight: 600;
+    display: block; margin-bottom: 1.2mm; }}
+  .corrobora .cuerpo {{ font-size: 7.6pt; line-height: 1.36; color: var(--tinta-suave); }}
+  .corrobora b {{ font-family: "Avenir Next", sans-serif; font-weight: 600; color: var(--petroleo); }}
+  .destacado {{ background: var(--ambar-claro); border-left: 1.6pt solid var(--ambar);
+    padding: 2.5mm 4mm; margin-top: 2.8mm; font-size: 7.9pt; line-height: 1.38; }}
+  .destacado p {{ max-width: none; }}
+</style></head><body>
+
+<!-- ═══════════ PÁGINA 1 — el problema ═══════════ -->
+<div class="page">
+  <div class="cinta"><span class="kicker">Documento de presentación</span><span class="kicker">Agosto de 2026</span></div>
+  <hr class="regla-fuerte">
+
+  <h1>AntiGro</h1>
+  <p class="lede" style="margin-top:2.6mm; max-width:150mm">
+    Percibe las señales de que un chico puede estar siendo acosado en internet.
+    <em>Sin leer un solo mensaje suyo.</em>
+  </p>
+
+  <p style="margin-top:3.6mm">
+    AntiGro observa la actividad de red de un chico —horarios, volumen, tipo de sitio— y avisa a los
+    adultos responsables cuando aparece un cambio que <strong>se sostiene en el tiempo</strong>.
+    No lee conversaciones, no guarda mensajes y no rastrea ubicación. Y el chico sabe que el sistema
+    existe desde el primer día.
+  </p>
+
+  <div class="sec">
+    <span class="kicker">El problema</span>
+    <h2 style="margin-top:1.5mm">Argentina es el segundo país de América Latina con más casos de ciberacoso infantil</h2>
+    <p>
+      Sólo detrás de México, según UNESCO y el CIPDH. Las cifras que siguen son del
+      <strong>Estudio nacional sobre acoso sexual a niños, niñas y adolescentes mediante TIC</strong>,
+      del Ministerio de Justicia y Derechos Humanos de la Nación (Dirección Nacional de Política
+      Criminal, 2023).
+    </p>
+    <div class="cifras">
+      <div class="cifra"><span class="n">56,4%</span><span class="t">de los chicos de 9 a 17 años habla por internet con gente que no conoce en persona</span></div>
+      <div class="cifra"><span class="n">35,4%</span><span class="t">recibió un pedido de fotos desnudo o con poca ropa</span></div>
+      <div class="cifra"><span class="n">63%</span><span class="t">no sabe qué es el grooming</span></div>
+      <div class="cifra"><span class="n">43%</span><span class="t">no habla del tema con sus padres</span></div>
+      <div class="cifra"><span class="n">60%</span><span class="t">de los hechos no se denuncia, por vergüenza o falta de información</span></div>
+      <div class="cifra"><span class="n">90%</span><span class="t">de las víctimas sufre acoso cotidiano, sostenido durante meses</span></div>
+    </div>
+    <div class="corrobora">
+      <span class="tt">Y una segunda fuente, dos años después, dice lo mismo</span>
+      <span class="cuerpo">El <strong>Informe Grooming LATAM</strong> (2025: <b>28.360</b> encuestas
+      anónimas a chicos de 9 a 17 años en 14 países) mide <b>72,8%</b> que no sabe qué es el grooming y
+      <b>60%</b> que habla con desconocidos. Dos estudios independientes, con dos años y dos muestras
+      distintas, apuntan a lo mismo. Y agrega una cifra que el argentino no tenía: <b>33,3%</b> recibió
+      una propuesta de noviazgo dentro de un juego en línea.</span>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">El punto de partida, y es incómodo</span>
+    <h2 style="margin-top:1.5mm">Ningún control parental protege del grooming. Ni AntiGro ni ninguno.</h2>
+    <p>
+      El <strong>74,3% de los casos se perpetra por WhatsApp</strong>, cifrado y permitido en cualquier casa:
+      para un filtro de contenidos, un pedido de fotos a un chico de doce años y la tarea del colegio son el
+      mismo evento. Y los indicadores de grooming que la investigación tiene documentados son
+      <strong>conversacionales</strong>: se detectan leyendo mensajes.
+    </p>
+    <p>
+      Nosotros decidimos no leerlos —no se puede y no se debe—. Así que AntiGro no busca la conversación:
+      <strong>busca el rastro que el acoso deja alrededor de la conversación</strong>, y cruza tres fuentes
+      independientes en lugar de confiar en una sola.
+    </p>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">Ese rastro son cuatro cosas, y nada más que cuatro</span>
+    <div class="senales">
+      <div class="senal"><span class="n">Salto marcado de volumen</span>
+        <span class="d">Contra la línea de base del propio chico, no contra un promedio ajeno. Un chico que siempre usó mucho el teléfono no arranca en rojo.</span></div>
+      <div class="senal"><span class="n">Actividad corrida a la madrugada</span>
+        <span class="d">En horas en las que antes no había. Desordena el descanso por sí sola: al otro día no descansó para la escuela.</span></div>
+      <div class="senal"><span class="n">Plataforma nueva</span>
+        <span class="d">Aparece un servicio o un sitio de chat con desconocidos que antes no estaba.</span></div>
+      <div class="senal fuerte"><span class="n">Intento de saltar el filtro</span>
+        <span class="d">VPN, proxy o DNS alternativo. Es la señal más fuerte que puede ver una red, es un acto deliberado, y hoy no la mira nadie.</span></div>
+    </div>
+    <p class="nota" style="margin-top:2.2mm">
+      Nada de esto incluye contenido: una señal dice <em>cuándo</em> pasó algo y <em>de qué tipo</em> era, nunca
+      qué se dijo ni con quién. La restricción no vive en un manual, está escrita en el código: rechaza con un
+      error cualquier intento de cargar texto de una conversación.
+    </p>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">Lo que AntiGro no hace — decidido, no pendiente</span>
+    <div class="senales">
+      <div class="senal"><span class="n">Leer conversaciones</span>
+        <span class="d">No es una limitación que vayamos a resolver más adelante: es el producto.</span></div>
+      <div class="senal"><span class="n">Rastrear la ubicación</span>
+        <span class="d">Family Link y Apple ya lo hacen, gratis. No es lo que falta.</span></div>
+      <div class="senal"><span class="n">Entregar el historial de navegación</span>
+        <span class="d">Lugares y tipo de sitio, sí. Una lista de por dónde anduvo, no.</span></div>
+      <div class="senal"><span class="n">Reemplazar al adulto, a la escuela o a la Justicia</span>
+        <span class="d">Cuando la respuesta correcta es un adulto o la Línea 137, el sistema lo dice.</span></div>
+    </div>
+  </div>
+
+  <div class="pie"><span>AntiGro · Documento de presentación</span><span>1 / 3</span></div>
+</div>
+
+<!-- ═══════════ PÁGINA 2 — la solución ═══════════ -->
+<div class="page">
+  <div class="cinta"><span class="kicker">La solución</span><span class="kicker">AntiGro</span></div>
+  <hr class="regla-fuerte">
+
+  <div>
+    <span class="kicker">Cómo está armado</span>
+    <h2 style="margin-top:1.5mm">Tres entradas, una lectura, dos salidas</h2>
+    <div class="flujo">
+      <div class="flujo-fila f3">
+        <div class="caja"><span class="et">Entrada 1</span><span class="tt">Señales de red</span>
+          <span class="dd">Aportan el <em>cuándo</em>. Las cuatro señales de la página anterior. Nunca contenido.</span></div>
+        <div class="caja"><span class="et">Entrada 2</span><span class="tt">Los adultos responsables</span>
+          <span class="dd">Aportan el <em>cómo está</em>. Nueve preguntas sobre hechos que ellos ven y la red no puede ver.</span></div>
+        <div class="caja"><span class="et">Entrada 3</span><span class="tt">Las estadísticas</span>
+          <span class="dd">Aportan <em>cuánto pesa cada cosa</em>. De ahí salen la edad, el género y las bandas de mensaje.</span></div>
+      </div>
+      <div class="flecha">▼ &nbsp;&nbsp; ▼ &nbsp;&nbsp; ▼</div>
+      <div class="banda"><span class="tt">Una lectura</span>
+        <span class="dd">Qué se vio, hace cuánto se sostiene y —siempre, sobre todo cuando alerta— qué es lo que el sistema <em>no</em> puede ver.</span></div>
+      <div class="flecha">▼ &nbsp;&nbsp; ▼</div>
+      <div class="flujo-fila f2">
+        <div class="caja"><span class="et">Salida 1</span><span class="tt">A dos adultos responsables, como mínimo</span>
+          <span class="dd">Y uno de los dos lo elige el chico. Con el contexto completo: qué se vio, desde cuándo, y qué es lo que no se sabe.</span></div>
+        <div class="caja"><span class="et">Salida 2</span><span class="tt">Al propio chico, en su canal</span>
+          <span class="dd">Con el texto de su banda de edad y la derivación que corresponde: un adulto de confianza, la Línea 137, la app GAPP.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">De cada dato, una decisión</span>
+    <h2 style="margin-top:1.5mm">Nada de lo que hace el sistema salió de una ocurrencia</h2>
+    <div style="margin-top:3.2mm">
+      <div class="par">
+        <div class="dato"><b>74,3%</b> de los casos pasa por WhatsApp, cifrado.</div>
+        <div class="dec">No intentamos leer la conversación. El sistema mira horarios, volumen y tipo de plataforma: el rastro que queda alrededor.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>90%</b> de las víctimas sufre acoso cotidiano sostenido durante meses.</div>
+        <div class="dec">El sistema no alerta por un evento: mide días sostenidos. Un pico aislado es ruido, y alarmar por ruido gasta la confianza del chico.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>63%</b> de los chicos no sabe qué es el grooming.</div>
+        <div class="dec">La conversación de alta con el chico es la primera intervención, no un trámite. Esa charla ya resuelve parte del problema antes de que el sistema haga nada.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>43%</b> no habla del tema con sus padres.</div>
+        <div class="dec">Dos adultos responsables como mínimo, y uno lo elige el chico: una tía, un hermano mayor. No es redundancia técnica, es alguien a quien de verdad le va a escribir.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>60%</b> no se denuncia, por vergüenza o falta de información.</div>
+        <div class="dec">El sistema deriva siempre y por nombre: adulto de confianza, Línea 137, app GAPP de Grooming Argentina. Nunca deja al adulto solo con el aviso.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>80%</b> de las víctimas de acoso virtual infantil son nenas, y el grueso tiene entre 11 y 15 años.</div>
+        <div class="dec">La edad y el género ajustan el peso de las señales y el texto del mensaje, con un margen deliberadamente angosto. Si el ajuste fuera agresivo, el sistema tardaría más en hablar de los varones — y son justamente los que menos denuncian.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>33,3%</b> recibió una propuesta de noviazgo dentro de un juego en línea.</div>
+        <div class="dec">Es una de las nueve preguntas del cuestionario. Un adulto puede ver esa propuesta y leerla como un noviazgo de chicos — y es una de las formas documentadas en que empieza el proceso.</div>
+      </div>
+      <div class="par">
+        <div class="dato"><b>40%</b> de los adultos no conoce las herramientas de control parental que ya existen.</div>
+        <div class="dec">El cuestionario enseña mientras pregunta. «¿Apareció algo que no sabés de dónde salió?» le está diciendo al adulto que los regalos son parte del mecanismo, sin nombrarlo y sin alarmarlo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">Las cinco reglas que no se negocian</span>
+    <div class="reglas">
+      <div class="r"><span>El sistema <strong>nunca afirma</strong> que un chico está siendo acosado, ni que está a salvo. Señala, nombra y deriva.</span></div>
+      <div class="r"><span><strong>No se lee el contenido de las conversaciones.</strong> Nunca. Es la línea que separa esto de un espía.</span></div>
+      <div class="r"><span><strong>El chico sabe que AntiGro existe desde el minuto cero.</strong> Un chico que sabe que hay una red que lo cuida es un aliado; uno que se siente espiado es un adversario.</span></div>
+      <div class="r"><span><strong>La explicación inicial al chico es la primera intervención</strong>, no un trámite legal.</span></div>
+      <div class="r"><span><strong>No se alerta por un evento. Se alerta por persistencia.</strong></span></div>
+    </div>
+  </div>
+
+  <div class="pie"><span>AntiGro · Documento de presentación</span><span>2 / 3</span></div>
+</div>
+
+<!-- ═══════════ PÁGINA 3 — la prueba, los límites, el estado ═══════════ -->
+<div class="page">
+  <div class="cinta"><span class="kicker">Cómo se comporta · en qué se basa · estado</span><span class="kicker">AntiGro</span></div>
+  <hr class="regla-fuerte">
+
+  <div>
+    <span class="kicker">El corazón del sistema</span>
+    <h2 style="margin-top:1.5mm">No se alerta por un evento. Se alerta por persistencia.</h2>
+    <p>
+      Cuatro historias de tres semanas, procesadas por el motor real de AntiGro. Cada barra es un día;
+      la altura es cuánto se apartó de lo habitual para ese chico.
+    </p>
+
+    <div class="grafico">
+      {"".join(filas)}
+      <div class="eje"><span></span><span class="eje-dias"><span>día 1</span><span>día 7</span><span>día 14</span><span>día 21</span></span><span></span></div>
+    </div>
+
+    <div class="leyenda">
+      <span><b style="background:var(--gris)"></b> Sin novedad</span>
+      <span><b style="background:var(--ambar)"></b> Hay un cambio, y el sistema no le escribe a nadie</span>
+      <span><b style="background:var(--petroleo)"></b> El patrón se sostiene: recién acá habla</span>
+    </div>
+
+    <div class="destacado">
+      <p><strong>La última fila es la tesis del producto.</strong> Es el mismo caso que el tercero, pero con los
+      adultos ya marcando cambios en el cuestionario. Cuando dos miradas independientes apuntan a lo mismo, el
+      sistema no espera a tener toda la evidencia de un solo lado: <strong>habla tres días antes</strong> (y nunca
+      baja de cuatro días sostenidos: la persistencia sigue mandando). Y lo más difícil de construir no fue la
+      alerta, fue el silencio: las dos primeras filas son chicos a los que el sistema nunca les escribe.</p>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">En qué se basa</span>
+    <ul class="fuentes">
+      <li><strong>Estudio nacional sobre acoso sexual a NNyA mediante TIC</strong> — Ministerio de Justicia y
+        Derechos Humanos de la Nación, Dirección Nacional de Política Criminal, 2023. Recopila UNESCO/CIPDH,
+        Grooming Argentina (n=4.276), Argentina Cibersegura, ESET y Google.</li>
+      <li><strong>Informe Grooming LATAM</strong> — Red Grooming LATAM, presentado en mayo de 2025.
+        n≈28.360 encuestas anónimas a NNyA de 9 a 17 años en 14 países, relevamiento 2024/2025. Es la fuente
+        más grande y más reciente de las dos, y la que fija la franja más vulnerable entre los 9 y los 13 años.</li>
+      <li><strong>Marco legal:</strong> Ley 26.904 (grooming, delito desde 2013, art. 131 del Código Penal) y
+        Ley 27.590 «Mica Ortega», que crea el Programa Nacional de Prevención y Concientización del Grooming.
+        <strong>Derivación:</strong> Línea 137 y app GAPP de Grooming Argentina. Y el Ministerio Público de la
+        Provincia de Buenos Aires, que recomienda a los adultos observar los cambios de humor y los horarios
+        de conexión — dos de las preguntas del cuestionario.</li>
+      <li><strong>Una aclaración de procedencia, porque importa:</strong> los pesos con los que el motor pondera cada
+        señal son <em>decisiones de producto informadas por esas cifras</em>, no coeficientes publicados por el estudio,
+        y la distinción está anotada en el código dato por dato.</li>
+      <li><strong>Y una que preferimos decir antes de que la pregunten:</strong> el sistema <strong>no espera una
+        cantidad fija de días</strong> para saber qué es «lo habitual» en un chico. Fijar un número —14, 30— habría sido
+        inventar una certeza que no existe: eso depende de cada chico, y son adolescentes que cambian todo el tiempo.
+        En su lugar, la confianza crece con lo que el sistema va observando, baja si la conducta de ese chico es
+        errática, y <strong>se muestra en pantalla en vez de esconderse</strong>. Las dos señales que no dependen de
+        ninguna comparación —la madrugada y los intentos de saltar el filtro— funcionan desde el primer día.</li>
+    </ul>
+  </div>
+
+  <div class="sec">
+    <span class="kicker">Estado y hacia dónde va</span>
+    <p style="margin-top:1.8mm">
+      <strong>Sistema en desarrollo.</strong> El motor de análisis, la mensajería —Telegram, correo y WhatsApp
+      detrás de una misma interfaz— y la vinculación de canales están funcionando y probados contra dispositivos
+      reales. Los textos de las alertas los redacta un modelo de lenguaje, pero <strong>el modelo no decide
+      nada</strong>: decide el motor con el registro fechado, y lo generado pasa por un control automático que,
+      si no lo aprueba, lo reemplaza por un texto fijo escrito de antemano.
+    </p>
+    <p>
+      Cada lectura queda registrada con su fecha. Agregado y anonimizado, eso produce algo que hoy no existe:
+      cuántos días pasan entre la primera señal y el patrón sostenido, con qué frecuencia lo que ve la red
+      coincide con lo que ven los adultos, y a qué edad empiezan a aparecer ciertas conductas.
+    </p>
+    <div class="cita">«Argentina carece de datos concretos respecto de casuística por jurisdicciones.»
+      <span class="aut">Hernán Navarro, director de Grooming Argentina — marzo de 2026</span></div>
+    <p>Un sistema que observa de forma continua, sin leer una sola conversación, puede empezar a llenar ese hueco.</p>
+  </div>
+
+  <div class="contacto"><span class="q">Edgardo Lamas</span><span class="m">lamasedgardo2024@gmail.com</span></div>
+  <div class="pie"><span>AntiGro · Documento de presentación</span><span>3 / 3</span></div>
+</div>
+
+</body></html>
+"""
+
+(BASE / "antigro.html").write_text(HTML, encoding="utf-8")
+CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+salida = BASE / "AntiGro-presentacion.pdf"
+subprocess.run([CHROME, "--headless", "--disable-gpu", "--no-pdf-header-footer",
+                f"--print-to-pdf={salida}", f"file://{BASE / 'antigro.html'}"],
+               check=True, capture_output=True)
+print("PDF:", salida)
