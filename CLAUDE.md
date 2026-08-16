@@ -9,6 +9,65 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN (cierre del 2026-08-16)
+
+**Todo lo de abajo está en producción y verificado.** `antigro.vercel.app` sirve el último
+deploy; el pie de la home dice el commit, así que se comprueba de un vistazo qué se está mirando.
+
+### Lo que quedó andando hoy
+
+| | |
+|---|---|
+| **Supabase** | Provisionado **por el Marketplace de Vercel** (`supabase-beige-flower`), esquema aplicado, producción usándolo |
+| **El cupo del QR** | Arreglado y **verificado con un teléfono real**: QR → Iniciar → cupo 1/3 → aviso entregado |
+| **El panel de la familia** | `/entrar` + `/mi-familia`: informe del motor, quiénes están, QR por referente, baja con motivo |
+| **El asistente** | Escrito y probado contra *"decime que no es nada"* — no tranquiliza |
+| **El bot** | Ya se llama **AntiGro** (tenía una pe de más) |
+
+### ⬜ Lo que sigue, en este orden
+
+1. **El asistente, segunda vuelta** — es lo que él pidió seguir al cerrar:
+   - 🔴 **La conversación no se guarda.** Se recarga el panel y se perdió. Para un padre que
+     pregunta a las 2 de la mañana y vuelve al día siguiente, eso es perder el hilo de una
+     conversación difícil. Es lo primero.
+   - ⏱ **La espera.** El modelo tarda ~13 s medidos. **No se transmite mientras escribe a
+     propósito** (ver más abajo): el costo de esa decisión es que el padre mira "Pensando…" un
+     rato. Se puede mejorar lo que se muestra mientras espera, no la espera.
+   - 📌 El asistente no ve el cuestionario más que resumido dentro de la lectura.
+2. **El alta desde el panel.** Hoy una familia entra por API.
+3. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
+   🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que dispara
+   el sistema no es una alerta, es el cuestionario.*
+4. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil — ver el hallazgo del 16/8 más abajo.
+   Recomendación: tres teléfonos filmados, nunca un escaneo en vivo.
+5. **El trailer, AL FINAL.** 🔴 Lo decidió él al cerrar el 16/8: *"el trailer lo vemos al final,
+   recién cuando tengamos el sistema operativo y podamos decidir qué usar para el video"*. No
+   empezarlo antes. El guion actual todavía es el de Criterio Térmico.
+
+### ⚠ Dos cosas que le tocan a él, no al código
+
+- **Leer las respuestas del asistente con calma.** Va a ser lo más citado del producto y es el
+  único que puede decir si el registro está bien.
+- **Activar la verificación en dos pasos de Telegram.** Ese bot es el canal por donde AntiGro
+  entrega todo.
+
+### 🔑 Por qué el asistente NO transmite mientras escribe
+
+Lo natural en un chat es que el texto aparezca palabra por palabra. Acá **no se puede**: el
+control tiene que ver el texto **entero** antes de que salga. Transmitiendo, una frase que no
+debía decirse ya estaría en la pantalla del padre cuando el control la frena. Se eligió esperar
+y estar seguro. **No "arreglar" esto agregando streaming sin volver a discutirlo.**
+
+### Cuentas para probar
+
+- Panel de la familia: `mariana@ejemplo.ar` o `carla@ejemplo.ar`, clave `familia2026`.
+  ⚠ Es la familia **inventada** (Ana, Mariana y Carla no existen).
+- Panel de administración: la cuenta de siempre, ya cargada en `usuarios`.
+  🔴 Si algún día se enchufa una base nueva, el panel vuelve a quedar cerrado: `auth.ts` usa
+  `ADMIN_EMAIL`/`ADMIN_PASSWORD` **sólo cuando no hay base**.
+
+---
+
 ## 🔴 Las reglas que no se negocian
 
 1. **El sistema NUNCA afirma que un chico está siendo acosado, ni que está a salvo.**
@@ -261,8 +320,19 @@ lectores no prueban la inversión. Salió así en el primer intento y se corrigi
 Verificado el 15/8 con el webhook simulado: tres cupos se llenan, **el cuarto se rechaza**,
 apretar "Iniciar" dos veces **no consume otro lugar**, `/chau` libera el correcto, y con historia
 en calma **no se manda nada** (misma regla que `avisar()`). Con chats falsos el envío falla y lo
-reporta como *no salió · chat not found* — **no finge**. 📌 Falta la única prueba que necesita un
-teléfono: escanear con un Telegram real.
+reporta como *no salió · chat not found* — **no finge**.
+
+✅ **Y el 16/8 quedó probado con un teléfono real, en producción, de punta a punta:**
+QR → Telegram → «Iniciar» → webhook → Supabase (cupo 1/3, rol *madre*) → motor (patrón
+sostenido) → la IA escribe → el control aprueba → **entregado**.
+
+🔴 **Hallazgo de esa prueba, y es de producto, no de código: escanear el QR con la cámara abre
+`t.me` en el NAVEGADOR, no en la app.** Ahí Telegram no sabe quién sos y pide número de teléfono
+y código de verificación. Le pasó a Edgardo, que ya tenía cuenta y había construido el bot.
+**Un jurado no va a completar eso, y con razón.** La demo por QR supone que el otro ya tiene
+Telegram abierto en ese aparato, y con desconocidos ese supuesto no se sostiene.
+✅ La página ya lo avisa antes de que alguien escanee. ⚠ **Para el video: nunca un escaneo en
+vivo** — se filma, con teléfonos ya logueados.
 
 ### Dos vías en paralelo, y el punto ciego que las hizo falta (14/8)
 
