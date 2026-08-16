@@ -18,6 +18,7 @@ import type {
   ObservacionDelAdulto,
   Respuesta,
   SenalRegistrada,
+  TurnoDeCharla,
 } from "./tipos";
 import { dentroDe, type AltaDeFamilia, type Repositorio } from "./repositorio";
 
@@ -96,6 +97,9 @@ export class RepositorioEnMemoria implements Repositorio {
   private senales: SenalRegistrada[] = [];
   private respuestas: Respuesta[] = [];
   private observaciones: ObservacionDelAdulto[] = [];
+  /* ⚠ Se pierde al reiniciar, como todo lo demás de este repositorio. En el
+     modo demo eso está bien; en producción hay base y la charla persiste. */
+  private charla: TurnoDeCharla[] = [];
 
   constructor() {
     const semilla = sembrar();
@@ -233,6 +237,23 @@ export class RepositorioEnMemoria implements Repositorio {
     return this.observaciones
       .filter((o) => o.chicoId === chicoId && dentroDe(o.fecha, desde, hasta))
       .sort((a, b) => a.fecha.localeCompare(b.fecha));
+  }
+
+  async guardarCharla(turnos: Omit<TurnoDeCharla, "id">[]): Promise<void> {
+    this.charla.push(...turnos.map((t) => ({ ...t, id: nuevoId("turno") })));
+  }
+
+  async charlaDe(familiaId: string, adultoId: string, limite: number) {
+    // El orden es el de inserción, que acá es exactamente el cronológico.
+    return this.charla
+      .filter((t) => t.adultoId === adultoId && t.familiaId === familiaId)
+      .slice(-limite);
+  }
+
+  async borrarCharla(familiaId: string, adultoId: string): Promise<void> {
+    this.charla = this.charla.filter(
+      (t) => !(t.adultoId === adultoId && t.familiaId === familiaId),
+    );
   }
 }
 

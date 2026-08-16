@@ -2,9 +2,14 @@
 --  AntiGro — Esquema Supabase
 --  Pegar en: Supabase → SQL Editor → New query → Run
 --
---  🔴 Acá no hay ninguna columna de contenido de conversaciones, y no la va
---  a haber. Lo que se guarda es quién es cada uno, por dónde se le escribe,
---  qué señales llegaron y qué dijo el sistema.
+--  🔴 De las conversaciones DEL CHICO no se guarda una sola palabra, y no se
+--  va a guardar: eso es la regla 2 y es la línea que separa esto de un espía.
+--  Lo que se guarda es quién es cada uno, por dónde se le escribe, qué
+--  señales llegaron y qué dijo el sistema.
+--
+--  ⚠ Una sola tabla guarda texto de una charla, la 11 (`charlas`), y es la de
+--  un ADULTO preguntándole al asistente. Está explicada ahí abajo. Si algún
+--  día aparece una segunda tabla con texto, tiene que justificarse igual.
 -- ================================================================
 
 
@@ -244,6 +249,48 @@ alter table adultos add column if not exists baja_motivo text
     ('se_mudo', 'fallecio', 'perdio_el_telefono', 'lo_cambio_el_chico', 'otro'));
 
 create index if not exists adultos_activo_idx on adultos (familia_id, activo);
+
+-- ─── 11. LA CHARLA DEL ADULTO CON EL ASISTENTE ───────────────────
+--  🔴 **Esta tabla SÍ guarda texto de una conversación, y hay que leer por
+--  qué antes de mirarla con desconfianza.** Lo que el sistema nunca lee ni
+--  guarda es lo que escribió EL CHICO — esa es la regla 2 y sigue intacta.
+--  Acá vive otra cosa: lo que un adulto responsable le preguntó al asistente
+--  sobre el informe que ya tiene delante, y lo que el asistente le contestó.
+--  El chico no escribe acá y no aparece nombrado más que como lo nombra su
+--  propio padre.
+--
+--  🔑 Por qué se guarda. El padre pregunta a las dos de la mañana, cierra el
+--  navegador, y vuelve al otro día. Sin esta tabla vuelve a empezar de cero
+--  la conversación más difícil que va a tener, y el asistente no se acuerda
+--  de nada de lo que ya le dijo. Perder el hilo justo ahí no es una molestia:
+--  es el momento exacto en que el sistema deja de acompañar.
+--
+--  ⚠ Es de cada ADULTO, no de la familia. El informe lo ven los dos; esto no.
+--  Una madre puede preguntarle al asistente algo que todavía no habló con el
+--  padre, y eso no tiene por qué aparecerle a nadie más.
+--
+--  🔑 Y se borra entero de un toque, con un `delete` de verdad. Las señales y
+--  las observaciones no se pueden borrar porque de ahí sale la lectura; esto
+--  no entra a ningún cálculo, es del adulto, y se va cuando él quiere.
+
+create table if not exists charlas (
+  id         uuid primary key default gen_random_uuid(),
+  familia_id uuid not null references familias(id) on delete cascade,
+  adulto_id  uuid not null references adultos(id)  on delete cascade,
+  fecha      timestamptz not null default now(),
+  quien      text not null check (quien in ('adulto', 'asistente')),
+  texto      text not null,
+  -- Sólo en los turnos del asistente: si lo escribió el modelo o si lo frenó
+  -- el control y salió el respaldo. Que quede guardado es lo que permite
+  -- mirar después cuántas veces frenó de más.
+  origen     text check (origen is null or origen in ('ia', 'respaldo')),
+  created_at timestamptz default now()
+);
+
+create index if not exists charlas_adulto_fecha_idx on charlas (adulto_id, fecha);
+
+alter table charlas enable row level security;
+
 
 -- Ninguna tabla tiene políticas para anon: todo pasa por el servidor con
 -- service role, y el token de familia se valida ahí.

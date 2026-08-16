@@ -6,9 +6,13 @@
  *  Todo lo demás cuelga de acá. El cuestionario del adulto no se puede escribir
  *  antes que esto: su forma depende de qué se guarda por chico.
  *
- *  🔴 Acá no se guarda contenido de conversaciones. Lo que se guarda es: quién
- *  es cada uno, por dónde se le escribe, qué señales llegaron y qué dijo el
- *  sistema. Nada de lo que el chico escribió.
+ *  🔴 De lo que escribió el chico no se guarda una palabra. Lo que se guarda
+ *  es: quién es cada uno, por dónde se le escribe, qué señales llegaron y qué
+ *  dijo el sistema.
+ *
+ *  ⚠ Hay UNA excepción y está explicada donde vive: `TurnoDeCharla`, que es un
+ *  adulto preguntándole al asistente. No es la conversación del chico y no la
+ *  toca.
  */
 
 import type { SenalDeRed } from "@/lib/senales/tipos";
@@ -196,6 +200,43 @@ export interface Respuesta {
    */
   senalesQueLaSostienen: string[];
   entregado: boolean;
+}
+
+/* ── La charla del adulto con el asistente ───────────────────────────────── */
+
+/**
+ * Un turno de la charla entre un adulto responsable y el asistente.
+ *
+ * 🔴 **Esto SÍ es contenido de una conversación, y hay que decir con todas las
+ * letras por qué no contradice la regla 2.** Lo que el sistema nunca lee ni
+ * guarda es lo que escribió **el chico**. Esto es otra cosa: lo que un adulto
+ * le preguntó al sistema sobre sí mismo y sobre lo que ya le mostró la
+ * pantalla, y lo que el sistema le contestó. El chico no escribe acá.
+ *
+ * 🔑 **Por qué se guarda, aunque sea texto sensible.** Un padre pregunta a las
+ * dos de la mañana, cierra el navegador y vuelve al otro día. Si la charla se
+ * perdió, vuelve a arrancar de cero la conversación más difícil que va a tener
+ * — y encima el asistente ya no se acuerda de lo que le dijo. Perder el hilo
+ * ahí no es una molestia de producto: es el momento exacto en que el sistema
+ * deja de acompañar.
+ *
+ * ⚠ **Es del adulto, no de la familia.** Cada cuenta ve la suya. La madre
+ * puede escribirle al asistente algo que todavía no habló con el padre, y el
+ * informe —que sí ven los dos— no cambia por eso.
+ *
+ * 🔑 **Y se puede borrar entero, en un toque.** Lo que no se puede borrar es el
+ * registro fechado de señales, porque de ahí sale la lectura. Esto no: es del
+ * adulto y se va cuando él quiere.
+ */
+export interface TurnoDeCharla {
+  id: string;
+  familiaId: string;
+  adultoId: string;
+  fecha: string;
+  quien: "adulto" | "asistente";
+  texto: string;
+  /** Sólo en los turnos del asistente: si lo escribió el modelo o el respaldo. */
+  origen?: "ia" | "respaldo";
 }
 
 /**

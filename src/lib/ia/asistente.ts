@@ -48,8 +48,14 @@ const MODELO = "claude-opus-5";
  */
 const MAX_TOKENS = 2048;
 
-/** Cuántos turnos anteriores se le pasan. Alcanza para no repetir y no infla el pedido. */
-const TURNOS_DE_MEMORIA = 12;
+/**
+ * Cuántos turnos anteriores se le pasan al modelo. Alcanza para no repetir y no
+ * infla el pedido.
+ *
+ * 📌 La pantalla muestra bastantes más: que el asistente no tenga presente algo
+ * de hace tres días no quiere decir que el adulto no pueda releerlo.
+ */
+export const TURNOS_DE_MEMORIA = 12;
 
 export interface TurnoDelAsistente {
   quien: "adulto" | "asistente";
@@ -304,6 +310,23 @@ export async function responderAlAdulto(entrada: {
 
     const veredicto = revisarRespuestaDelAsistente(texto);
     if (!veredicto.aprobado) {
+      /* 🔴 **Queda escrito en el registro del servidor, y no es opcional.**
+         La lección del 16/8 fue que un patrón que frena de más es tan malo
+         como uno que no frena, y sin ver el texto frenado eso es invisible:
+         desde afuera un asistente demasiado estricto y uno roto se parecen —
+         los dos contestan el respaldo. Acá quedan el motivo y la frase que lo
+         disparó, que es lo único con lo que después se puede afinar el patrón.
+
+         ⚠ Va al registro del servidor, no a la pantalla del adulto: es texto
+         que justamente se decidió no mostrarle. */
+      console.warn(
+        "[asistente] el control frenó una respuesta ·",
+        veredicto.motivos.join(" · "),
+        "\n────────\n",
+        texto,
+        "\n────────",
+      );
+
       return {
         texto: respaldo(entrada.chico.nombre),
         origen: "respaldo",

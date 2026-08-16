@@ -15,6 +15,7 @@ import type {
   ObservacionDelAdulto,
   Respuesta,
   SenalRegistrada,
+  TurnoDeCharla,
 } from "./tipos";
 
 export interface AltaDeFamilia {
@@ -86,6 +87,34 @@ export interface Repositorio {
 
   registrarObservacion(o: Omit<ObservacionDelAdulto, "id">): Promise<ObservacionDelAdulto>;
   observacionesDe(chicoId: string, desde: string, hasta: string): Promise<ObservacionDelAdulto[]>;
+
+  /* La charla con el asistente */
+
+  /**
+   * Guarda los turnos de una charla. Se llama con la pregunta y la respuesta
+   * juntas: guardar la pregunta antes de contestar dejaría preguntas colgadas
+   * cada vez que se corte una llamada al modelo.
+   */
+  guardarCharla(turnos: Omit<TurnoDeCharla, "id">[]): Promise<void>;
+
+  /**
+   * Los últimos `limite` turnos de ese adulto, en orden cronológico.
+   *
+   * 🔐 Pide la familia además del adulto, igual que `darDeBajaAdulto`: así el
+   * repositorio mismo se niega a devolver la charla de alguien de otra casa,
+   * sin depender de que quien llame se haya acordado de comprobarlo.
+   */
+  charlaDe(familiaId: string, adultoId: string, limite: number): Promise<TurnoDeCharla[]>;
+
+  /**
+   * Borra la charla entera de ese adulto.
+   *
+   * 🔑 Es un borrado de verdad, no una baja blanda como la de los adultos. La
+   * diferencia tiene un porqué: las observaciones son entrada del motor y
+   * borrarlas cambiaría lecturas ya hechas; esto no entra a ningún cálculo, es
+   * del adulto, y cuando pide que se vaya se tiene que ir.
+   */
+  borrarCharla(familiaId: string, adultoId: string): Promise<void>;
 }
 
 /** Ventana de tiempo, en ISO. */

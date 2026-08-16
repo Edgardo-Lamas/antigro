@@ -93,15 +93,102 @@ function vaNegada(texto: string, indice: number): boolean {
   return NEGACIONES.test(texto.slice(Math.max(0, indice - VENTANA_DE_NEGACION), indice));
 }
 
-function infracciones(texto: string): string[] {
+/* ── Decir una frase no es lo mismo que nombrarla ─────────────────────────── */
+
+/**
+ * 🔴 **La trampa del 16/8, un piso más abajo.** Aquella vez el patrón contra
+ * tranquilizar frenaba cualquier «quedate». Se ajustó para exigir la palabra
+ * que hace el daño… y en la primera prueba real del día siguiente frenó esto:
+ *
+ *     Si te dijera **"quedate tranquila"**, te lo estaría diciendo con voz de
+ *     sistema, y esa frase, dicha en la casa equivocada, hace que alguien deje
+ *     de mirar.
+ *
+ * El asistente estaba **citando la frase prohibida para negarse a decirla**, que
+ * es exactamente lo que el prompt le pide que haga. El control la leyó como si
+ * la estuviera diciendo y tiró al respaldo la mejor respuesta del día.
+ *
+ * 🔑 **La distinción es entre usar una frase y nombrarla**, y no alcanza con
+ * mirar las comillas: en este producto las comillas también traen lo más útil
+ * que escribe el asistente —la frase que el padre le va a decir al chico— y ahí
+ * sí es una frase que se dice. Por eso hacen falta las dos cosas juntas: que
+ * esté entrecomillada **y** que lo de antes diga que no la está diciendo.
+ */
+const MARCO_DE_MENCION =
+  /\b(no|nunca|jam[áa]s|ni|sin|tampoco|ning[úu]n[ao]?|si\s+(yo\s+)?te\s+(la\s+|lo\s+)?dij(era|ese)|en\s+(vez|lugar)\s+de|m[áa]s\s+que)\b/i;
+
+/** Los tramos entrecomillados del texto, con comillas rectas, curvas y latinas. */
+const COMILLAS = /"[^"]{0,500}"|«[^»]{0,500}»|[“][^”]{0,500}[”]/g;
+
+/** Dónde empieza la oración en la que cae este índice. */
+function arranqueDeLaOracion(texto: string, indice: number): number {
+  const antes = texto.slice(0, indice);
+  const corte = Math.max(
+    antes.lastIndexOf("."),
+    antes.lastIndexOf("!"),
+    antes.lastIndexOf("?"),
+    antes.lastIndexOf("\n"),
+  );
+  return corte + 1;
+}
+
+function dentroDeUnaCita(texto: string, indice: number): boolean {
+  for (const tramo of texto.matchAll(COMILLAS)) {
+    const arranca = tramo.index ?? 0;
+    if (indice > arranca && indice < arranca + tramo[0].length) return true;
+  }
+  return false;
+}
+
+/**
+ * ¿Está nombrando la frase, en vez de diciéndola?
+ *
+ * Hacen falta las dos cosas: que esté **entrecomillada** y que en la **misma
+ * oración**, antes, haya algo que la desactive —una negación o un condicional—.
+ *
+ * ⚠ El límite es la oración, no una cantidad de caracteres. Con una ventana
+ * fija, *«No sé qué decirte. Quedate tranquila.»* quedaría perdonada por un
+ * «no» que pertenece a otra frase.
+ *
+ * ⚠ **El agujero que queda, escrito para que se vea:** *«no sé qué decirte,
+ * pero "quedate tranquila"»* pasa, porque la negación y la cita están en la
+ * misma oración. Se aceptó a sabiendas. El modelo no está tratando de burlar
+ * el control —lo tiene prohibido en el prompt— y el error que sí apareció dos
+ * veces en pruebas reales es el otro: frenar una respuesta buena. Un asistente
+ * que contesta el respaldo cuando el padre pregunta lo que más le duele no es
+ * un asistente prudente, es uno roto.
+ */
+function laNombraSinDecirla(texto: string, indice: number): boolean {
+  if (!dentroDeUnaCita(texto, indice)) return false;
+  return MARCO_DE_MENCION.test(texto.slice(arranqueDeLaOracion(texto, indice), indice));
+}
+
+/**
+ * Aplica una lista de reglas y devuelve los motivos por los que no pasa.
+ *
+ * 📌 Recorre **todas** las apariciones de cada patrón, no la primera. Con
+ * `exec` una sola vez, una cita legítima al principio tapaba una infracción de
+ * verdad más abajo: alcanzaba con nombrar la frase antes de decirla.
+ */
+function revisar(texto: string, reglas: ReglaDeTexto[]): string[] {
   const motivos: string[] = [];
-  for (const regla of AFIRMACIONES_PROHIBIDAS) {
-    const encontrado = regla.patron.exec(texto);
-    if (!encontrado) continue;
-    if (regla.negarLoHaceCorrecto && vaNegada(texto, encontrado.index)) continue;
-    motivos.push(regla.motivo);
+
+  for (const regla of reglas) {
+    const patron = new RegExp(regla.patron.source, `${regla.patron.flags.replace("g", "")}g`);
+
+    for (const encontrado of texto.matchAll(patron)) {
+      const indice = encontrado.index ?? 0;
+      if (regla.negarLoHaceCorrecto && vaNegada(texto, indice)) continue;
+      if (laNombraSinDecirla(texto, indice)) continue;
+      motivos.push(regla.motivo);
+      break;
+    }
   }
   return motivos;
+}
+
+function infracciones(texto: string): string[] {
+  return revisar(texto, AFIRMACIONES_PROHIBIDAS);
 }
 
 /* ── 2. Cifras ───────────────────────────────────────────────────────────── */
@@ -253,14 +340,7 @@ const TRANQUILIZAR_O_ESTIMAR: ReglaDeTexto[] = [
  * a nadie.
  */
 export function revisarRespuestaDelAsistente(texto: string): Veredicto {
-  const motivos: string[] = infracciones(texto);
-
-  for (const regla of TRANQUILIZAR_O_ESTIMAR) {
-    const encontrado = regla.patron.exec(texto);
-    if (!encontrado) continue;
-    if (regla.negarLoHaceCorrecto && vaNegada(texto, encontrado.index)) continue;
-    motivos.push(regla.motivo);
-  }
+  const motivos: string[] = [...infracciones(texto), ...revisar(texto, TRANQUILIZAR_O_ESTIMAR)];
 
   const inventadas = cifrasInventadas(texto);
   if (inventadas.length > 0) {

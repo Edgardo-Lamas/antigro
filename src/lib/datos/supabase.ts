@@ -18,6 +18,7 @@ import type {
   ObservacionDelAdulto,
   Respuesta,
   SenalRegistrada,
+  TurnoDeCharla,
 } from "./tipos";
 import type { AltaDeFamilia, Repositorio } from "./repositorio";
 
@@ -63,6 +64,16 @@ type FilaAdulto = {
   baja_motivo: AdultoResponsable["bajaMotivo"] | null;
 };
 
+type FilaCharla = {
+  id: string;
+  familia_id: string;
+  adulto_id: string;
+  fecha: string;
+  quien: TurnoDeCharla["quien"];
+  texto: string;
+  origen: TurnoDeCharla["origen"] | null;
+};
+
 /** Fila ⇄ Canal. El destino puede venir vacío: en Telegram llega al vincular. */
 const aCanal = (f: {
   canal_tipo: Canal["tipo"];
@@ -95,6 +106,16 @@ const aChico = (c: FilaChico): Chico => ({
   canal: aCanal(c),
   activo: c.activo,
   creado: c.created_at,
+});
+
+const aTurno = (t: FilaCharla): TurnoDeCharla => ({
+  id: t.id,
+  familiaId: t.familia_id,
+  adultoId: t.adulto_id,
+  fecha: t.fecha,
+  quien: t.quien,
+  texto: t.texto,
+  origen: t.origen ?? undefined,
 });
 
 const aAdulto = (a: FilaAdulto): AdultoResponsable => ({
@@ -409,5 +430,41 @@ export class RepositorioSupabase implements Repositorio {
       fecha: o.fecha,
       respuestas: o.respuestas ?? {},
     }));
+  }
+
+  async guardarCharla(turnos: Omit<TurnoDeCharla, "id">[]): Promise<void> {
+    if (turnos.length === 0) return;
+    await this.db.from("charlas").insert(
+      turnos.map((t) => ({
+        familia_id: t.familiaId,
+        adulto_id: t.adultoId,
+        fecha: t.fecha,
+        quien: t.quien,
+        texto: t.texto,
+        origen: t.origen ?? null,
+      })),
+    );
+  }
+
+  async charlaDe(familiaId: string, adultoId: string, limite: number): Promise<TurnoDeCharla[]> {
+    /* Se piden los ÚLTIMOS, así que la consulta va al revés y la lista se da
+       vuelta acá. Pedir los primeros y cortar dejaría al adulto mirando el
+       arranque de una charla vieja en vez de lo que acaba de preguntar. */
+    const { data } = await this.db
+      .from("charlas")
+      .select("*")
+      .eq("familia_id", familiaId)
+      .eq("adulto_id", adultoId)
+      .order("fecha", { ascending: false })
+      .limit(limite)
+      .returns<FilaCharla[]>();
+
+    return (data ?? []).map(aTurno).reverse();
+  }
+
+  async borrarCharla(familiaId: string, adultoId: string): Promise<void> {
+    // 🔐 Los dos filtros van en el DELETE. Con uno solo, un adultoId de otra
+    // casa borraría filas que no son suyas.
+    await this.db.from("charlas").delete().eq("familia_id", familiaId).eq("adulto_id", adultoId);
   }
 }

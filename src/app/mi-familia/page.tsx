@@ -8,6 +8,7 @@ import {
   QrCode,
   Send,
   ShieldOff,
+  Trash2,
   UserMinus,
   MessageCircle,
 } from "lucide-react";
@@ -380,6 +381,21 @@ function TextoDelAsistente({ texto }: { texto: string }) {
         const limpia = linea.trim();
         if (!limpia) return null;
 
+        /* 🔑 La cita no es adorno de markdown: cuando el asistente escribe con
+           `>` es porque le está dando al padre la frase para decirle al chico,
+           y eso es lo más útil que contesta. Sin dibujarla se veía el signo
+           colgando adelante de la única línea que el padre va a copiar. */
+        if (/^>\s?/.test(limpia)) {
+          return (
+            <p
+              key={i}
+              className="border-l-2 border-acento pl-3 text-sm leading-relaxed text-tinta"
+            >
+              {conNegritas(limpia.replace(/^>\s?/, ""), `c${i}`)}
+            </p>
+          );
+        }
+
         const vinieta = /^[-•]\s+/.test(limpia);
         const numerada = /^\d+\.\s+/.test(limpia);
         const cuerpo = limpia.replace(/^[-•]\s+/, "").replace(/^(\d+)\.\s+/, "");
@@ -406,16 +422,89 @@ function TextoDelAsistente({ texto }: { texto: string }) {
 }
 
 /**
+ * La espera.
+ *
+ * 🔴 **El asistente no transmite mientras escribe, y es a propósito:** el
+ * control tiene que ver el texto entero antes de que salga. El costo de esa
+ * decisión lo paga el padre mirando una pantalla quieta unos quince segundos,
+ * y ese rato hay que llenarlo con algo verdadero.
+ *
+ * 🔑 Así que lo que se muestra mientras espera es exactamente el motivo por el
+ * que espera. No es una excusa: es la única parte del producto donde la
+ * garantía se explica justo cuando se está cumpliendo.
+ *
+ * ⚠ Los segundos se cuentan de verdad. Una barra de progreso acá sería una
+ * mentira chiquita —nadie sabe cuánto falta— y este es el peor sistema donde
+ * acostumbrar a nadie a creerle a un número inventado.
+ */
+function Esperando() {
+  const [segundos, setSegundos] = useState(0);
+
+  useEffect(() => {
+    const reloj = setInterval(() => setSegundos((s) => s + 1), 1000);
+    return () => clearInterval(reloj);
+  }, []);
+
+  return (
+    <li className="rounded-md border border-borde bg-fondo px-3.5 py-3">
+      <div className="flex items-center gap-2">
+        <LoaderCircle size={12} className="animate-spin text-acento" />
+        <span className="text-xs text-tenue">Escribiendo la respuesta entera</span>
+        <span className="ml-auto font-mono text-[10px] text-apagado">{segundos}s</span>
+      </div>
+      <p className="mt-2 text-[11px] leading-relaxed text-apagado">
+        Tarda porque la escribe completa antes de mostrártela: el control la revisa entera
+        antes de que salga. Si te fuera apareciendo palabra por palabra, cuando una frase no
+        debiera haberse dicho ya la habrías leído.
+      </p>
+    </li>
+  );
+}
+
+interface TurnoEnPantalla {
+  quien: "adulto" | "asistente";
+  texto: string;
+  origen?: string | null;
+  fecha?: string;
+}
+
+/**
  * El asistente — el que contesta «¿y ahora qué hago?».
  *
  * 🔑 Vive acá adentro y no en una pantalla aparte: el padre lo consulta con el
  * informe a la vista, que es cuando le sirve. Sacarlo a otra dirección sería
  * pedirle que se acuerde de que existe justo cuando está preocupado.
+ *
+ * 🔴 **La charla se guarda y se retoma.** Un padre pregunta a las dos de la
+ * mañana, cierra el navegador y vuelve al otro día: si se perdió, vuelve a
+ * empezar de cero la conversación más difícil que va a tener. Es de él —el otro
+ * adulto no la ve— y la borra cuando quiere.
  */
 function Asistente({ chico }: { chico?: string }) {
-  const [turnos, setTurnos] = useState<{ quien: "adulto" | "asistente"; texto: string; origen?: string }[]>([]);
+  const [turnos, setTurnos] = useState<TurnoEnPantalla[]>([]);
   const [pregunta, setPregunta] = useState("");
   const [pensando, setPensando] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [confirmandoBorrado, setConfirmandoBorrado] = useState(false);
+
+  /* Lo que ya se habló, apenas se abre el panel. */
+  useEffect(() => {
+    let vigente = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/mi-familia/asistente", { cache: "no-store" });
+        if (res.ok && vigente) setTurnos((await res.json()).turnos ?? []);
+      } catch {
+        /* Sin charla previa se arranca de cero, que es lo que pasaba siempre
+           antes. No vale la pena molestar al adulto con un error por esto. */
+      } finally {
+        if (vigente) setCargando(false);
+      }
+    })();
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
   /* 📌 Arranques sugeridos. No son decoración: un padre preocupado muchas veces
      no sabe qué preguntar, y una caja de texto vacía es una pared. */
@@ -429,16 +518,18 @@ function Asistente({ chico }: { chico?: string }) {
     const limpio = texto.trim();
     if (!limpio || pensando) return;
 
-    const historia = turnos.map((t) => ({ quien: t.quien, texto: t.texto }));
+    /* 📌 La historia ya no viaja en el pedido: la tiene el servidor. Desde el
+       navegador sale la pregunta y nada más. */
     setTurnos((t) => [...t, { quien: "adulto", texto: limpio }]);
     setPregunta("");
     setPensando(true);
+    setConfirmandoBorrado(false);
 
     try {
       const res = await fetch("/api/mi-familia/asistente", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pregunta: limpio, historia }),
+        body: JSON.stringify({ pregunta: limpio }),
       });
       const d = await res.json();
       setTurnos((t) => [
@@ -459,6 +550,17 @@ function Asistente({ chico }: { chico?: string }) {
     }
   }
 
+  async function borrar() {
+    setTurnos([]);
+    setConfirmandoBorrado(false);
+    await fetch("/api/mi-familia/asistente", { method: "DELETE" }).catch(() => undefined);
+  }
+
+  /* Si el último turno guardado no es de hoy, se dice: el que vuelve al otro
+     día tiene que ver de cuándo es lo que está leyendo. */
+  const ultima = turnos.length > 0 ? turnos[turnos.length - 1]?.fecha : undefined;
+  const deOtroDia = ultima ? diaLocal(ultima) !== diaLocal(new Date().toISOString()) : false;
+
   return (
     <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
       <div className="flex items-center gap-2">
@@ -466,66 +568,112 @@ function Asistente({ chico }: { chico?: string }) {
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
           Preguntale al asistente
         </h2>
+        {turnos.length > 0 && !confirmandoBorrado && (
+          <button
+            onClick={() => setConfirmandoBorrado(true)}
+            className="ml-auto flex items-center gap-1.5 text-[11px] text-apagado transition hover:text-riesgo"
+          >
+            <Trash2 size={11} /> Borrar la charla
+          </button>
+        )}
       </div>
 
-      {turnos.length === 0 && (
+      {cargando ? (
+        <div className="mt-4 flex items-center gap-2 text-xs text-apagado">
+          <LoaderCircle size={12} className="animate-spin" /> Buscando lo que ya hablaron…
+        </div>
+      ) : (
         <>
-          <p className="mt-2.5 text-sm leading-relaxed text-tenue">
-            Te explica el informe, te ordena las opciones y te dice cómo abrir la conversación
-            con {chico ?? "el chico"}.{" "}
-            <span className="text-apagado">
-              No te va a decir que no es nada, ni que sí: eso no lo puede saber, y decírtelo
-              sería mentirte con cara de sistema.
-            </span>
-          </p>
+          {turnos.length === 0 && (
+            <>
+              <p className="mt-2.5 text-sm leading-relaxed text-tenue">
+                Te explica el informe, te ordena las opciones y te dice cómo abrir la
+                conversación con {chico ?? "el chico"}.{" "}
+                <span className="text-apagado">
+                  No te va a decir que no es nada, ni que sí: eso no lo puede saber, y decírtelo
+                  sería mentirte con cara de sistema.
+                </span>
+              </p>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {ARRANQUES.map((a) => (
-              <button
-                key={a}
-                onClick={() => preguntar(a)}
-                className="rounded-full border border-borde px-3 py-1.5 text-xs text-tenue transition hover:border-acento hover:text-acento"
-              >
-                {a}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {turnos.length > 0 && (
-        <ul className="mt-4 flex flex-col gap-4">
-          {turnos.map((t, i) => (
-            <li key={i} className={t.quien === "adulto" ? "flex justify-end" : ""}>
-              <div
-                className={
-                  t.quien === "adulto"
-                    ? "max-w-[85%] rounded-lg bg-acentoSuave px-3.5 py-2.5 text-sm text-tinta"
-                    : "max-w-[95%]"
-                }
-              >
-                {t.quien === "adulto" ? (
-                  <p className="text-sm leading-relaxed text-tinta">{t.texto}</p>
-                ) : (
-                  <TextoDelAsistente texto={t.texto} />
-                )}
-                {/* 🔑 Cuando contesta el respaldo se dice. Que se vea el momento
-                    en que el control frenó al modelo es lo que hace verificable
-                    la promesa, en vez de una frase en un README. */}
-                {t.origen === "respaldo" && (
-                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-atencion">
-                    texto de respaldo · el control no dejó pasar lo que escribió el modelo
-                  </p>
-                )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {ARRANQUES.map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => preguntar(a)}
+                    className="rounded-full border border-borde px-3 py-1.5 text-xs text-tenue transition hover:border-acento hover:text-acento"
+                  >
+                    {a}
+                  </button>
+                ))}
               </div>
-            </li>
-          ))}
-          {pensando && (
-            <li className="flex items-center gap-2 text-xs text-apagado">
-              <LoaderCircle size={12} className="animate-spin" /> Pensando…
-            </li>
+            </>
           )}
-        </ul>
+
+          {/* 🔴 Que la charla se guarda, y que es suya, se dice acá y no en una
+              política que nadie lee. Es texto de una conversación difícil: el
+              que la escribe tiene derecho a saber dónde queda. */}
+          {turnos.length > 0 && !confirmandoBorrado && (
+            <p className="mt-2.5 text-[11px] leading-relaxed text-apagado">
+              {deOtroDia ? "Retomás la charla donde la dejaste. " : ""}
+              Queda guardada para vos: el otro adulto responsable no la ve, y la borrás cuando
+              quieras.
+            </p>
+          )}
+
+          {confirmandoBorrado && (
+            <div className="mt-3 rounded-md border border-borde bg-fondo px-3.5 py-3">
+              <p className="text-xs leading-relaxed text-tenue">
+                Se borra la charla entera y no se puede recuperar. El informe de{" "}
+                {chico ?? "el chico"} no se toca: eso sale del registro de señales, no de acá.
+              </p>
+              <div className="mt-2.5 flex gap-2">
+                <button
+                  onClick={borrar}
+                  className="rounded-md bg-riesgo px-3 py-1.5 text-xs font-semibold text-fondo"
+                >
+                  Borrarla
+                </button>
+                <button
+                  onClick={() => setConfirmandoBorrado(false)}
+                  className="rounded-md border border-borde px-3 py-1.5 text-xs text-tenue"
+                >
+                  Dejarla
+                </button>
+              </div>
+            </div>
+          )}
+
+          {(turnos.length > 0 || pensando) && (
+            <ul className="mt-4 flex flex-col gap-4">
+              {turnos.map((t, i) => (
+                <li key={i} className={t.quien === "adulto" ? "flex justify-end" : ""}>
+                  <div
+                    className={
+                      t.quien === "adulto"
+                        ? "max-w-[85%] rounded-lg bg-acentoSuave px-3.5 py-2.5 text-sm text-tinta"
+                        : "max-w-[95%]"
+                    }
+                  >
+                    {t.quien === "adulto" ? (
+                      <p className="text-sm leading-relaxed text-tinta">{t.texto}</p>
+                    ) : (
+                      <TextoDelAsistente texto={t.texto} />
+                    )}
+                    {/* 🔑 Cuando contesta el respaldo se dice. Que se vea el
+                        momento en que el control frenó al modelo es lo que hace
+                        verificable la promesa, en vez de una frase en un README. */}
+                    {t.origen === "respaldo" && (
+                      <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-atencion">
+                        texto de respaldo · el control no dejó pasar lo que escribió el modelo
+                      </p>
+                    )}
+                  </div>
+                </li>
+              ))}
+              {pensando && <Esperando />}
+            </ul>
+          )}
+        </>
       )}
 
       <form

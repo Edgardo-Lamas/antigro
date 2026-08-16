@@ -21,26 +21,32 @@ deploy; el pie de la home dice el commit, así que se comprueba de un vistazo qu
 | **Supabase** | Provisionado **por el Marketplace de Vercel** (`supabase-beige-flower`), esquema aplicado, producción usándolo |
 | **El cupo del QR** | Arreglado y **verificado con un teléfono real**: QR → Iniciar → cupo 1/3 → aviso entregado |
 | **El panel de la familia** | `/entrar` + `/mi-familia`: informe del motor, quiénes están, QR por referente, baja con motivo |
-| **El asistente** | Escrito y probado contra *"decime que no es nada"* — no tranquiliza |
+| **El asistente** | Escrito, probado contra *"decime que no es nada"*, y **la charla ya se guarda y se retoma** |
 | **El bot** | Ya se llama **AntiGro** (tenía una pe de más) |
+
+### ✅ La segunda vuelta del asistente — hecha el 16/8 a la noche
+
+**La charla se guarda y se retoma**, es de cada adulto, y se borra de un toque. El detalle en
+la sección del asistente, más abajo. Lo que salió de ahí y no estaba previsto:
+
+- 🔴 **El control frenaba de más, y de la peor manera:** el asistente escribía *Si te dijera
+  "quedate tranquila"…* para **negarse** a decirlo, y el control lo leía como si lo estuviera
+  diciendo. Tiraba al respaldo la mejor respuesta del día, y justo ante la pregunta que un padre
+  asustado hace primero. Ahora la regla distingue **decir una frase de nombrarla**.
+- ✅ **Quedaron doce casos escritos:** `npm run probar-reglas`. Tres veces el mismo tipo de error
+  y ninguna la encontró el typecheck — **toda regla nueva entra con su caso que pasa y su caso
+  que se frena.**
+- 📌 El asistente sigue sin ver el cuestionario más que resumido dentro de la lectura.
 
 ### ⬜ Lo que sigue, en este orden
 
-1. **El asistente, segunda vuelta** — es lo que él pidió seguir al cerrar:
-   - 🔴 **La conversación no se guarda.** Se recarga el panel y se perdió. Para un padre que
-     pregunta a las 2 de la mañana y vuelve al día siguiente, eso es perder el hilo de una
-     conversación difícil. Es lo primero.
-   - ⏱ **La espera.** El modelo tarda ~13 s medidos. **No se transmite mientras escribe a
-     propósito** (ver más abajo): el costo de esa decisión es que el padre mira "Pensando…" un
-     rato. Se puede mejorar lo que se muestra mientras espera, no la espera.
-   - 📌 El asistente no ve el cuestionario más que resumido dentro de la lectura.
-2. **El alta desde el panel.** Hoy una familia entra por API.
-3. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
+1. **El alta desde el panel.** Hoy una familia entra por API.
+2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que dispara
    el sistema no es una alerta, es el cuestionario.*
-4. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil — ver el hallazgo del 16/8 más abajo.
+3. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil — ver el hallazgo del 16/8 más abajo.
    Recomendación: tres teléfonos filmados, nunca un escaneo en vivo.
-5. **El trailer, AL FINAL.** 🔴 Lo decidió él al cerrar el 16/8: *"el trailer lo vemos al final,
+4. **El trailer, AL FINAL.** 🔴 Lo decidió él al cerrar el 16/8: *"el trailer lo vemos al final,
    recién cuando tengamos el sistema operativo y podamos decidir qué usar para el video"*. No
    empezarlo antes. El guion actual todavía es el de Criterio Térmico.
 
@@ -672,6 +678,12 @@ judicial.** AntiGro no denuncia — equipa al que denuncia.
 - **Canales configurables al contratar:** Telegram, correo, WhatsApp. La capa de mensajería es
   indiferente al canal.
 - **Registro de señales y respuestas con fecha** — sin esto no se puede medir persistencia.
+- **La charla del adulto con el asistente** (tabla `charlas`, agregada el 16/8 a la noche).
+  🔴 Es la **única** tabla con texto de una conversación, y no contradice la regla 2: lo que
+  nunca se guarda es lo que escribió **el chico**. Esto es un adulto preguntándole al sistema.
+  Es **de cada adulto** —el informe lo ven los dos, esto no— y **se borra entero de un toque**,
+  con `delete` de verdad. Se puede borrar porque no entra a ningún cálculo; las señales y las
+  observaciones no se pueden, porque de ahí sale la lectura.
 
 ---
 
@@ -810,8 +822,68 @@ pantalla aparte: el padre lo consulta con el informe a la vista, que es cuando l
 |---|---|
 | El corpus, el prompt estable y el respaldo | `src/lib/ia/asistente.ts` |
 | El control (`revisarRespuestaDelAsistente`) | `src/lib/ia/reglas.ts` |
-| La ruta | `POST /api/mi-familia/asistente` |
+| Los casos del control | `src/lib/ia/reglas.prueba.ts` · `npm run probar-reglas` |
+| La ruta (`GET` la charla · `POST` pregunta · `DELETE` la borra) | `/api/mi-familia/asistente` |
 | La pantalla y el dibujo del markdown | `src/app/mi-familia/page.tsx` |
+| Dónde vive la charla | tabla `charlas` (esquema, sección 11) |
+
+### ✅ La charla se guarda y se retoma (16/8, a la noche)
+
+**Era lo primero de la segunda vuelta y ya está.** Un padre pregunta a las dos de la mañana,
+cierra el navegador y vuelve al otro día: antes volvía a arrancar de cero la conversación más
+difícil que va a tener, y el asistente no se acordaba de nada.
+
+- **Es de cada adulto, no de la familia.** El informe lo ven los dos; esto no. Verificado con
+  las dos cuentas: Carla ve la suya, Mariana ve cero.
+- **Se borra entero de un toque**, con confirmación en la propia pantalla y un `delete` de
+  verdad. Que la charla se guarda, y que es suya, se dice **en la pantalla** y no en una
+  política que nadie lee.
+- 🔴 **La historia dejó de venir del navegador: sale de la base.** Antes viajaba en el pedido
+  y, si bien no podía fabricar hallazgos, sí permitía inventarle al asistente turnos que nunca
+  dijo —*"vos me dijiste que no era nada"*— y arrancar desde ahí. **Del cliente hoy sale sólo
+  la pregunta**, igual que la lectura ya se recalculaba en el servidor.
+- 📌 El modelo ve los últimos 12 turnos; la pantalla trae 60. Que el asistente no tenga presente
+  algo de hace tres días no quiere decir que el adulto no pueda releerlo.
+
+### ⏱ La espera dice por qué espera
+
+El modelo tarda entre 10 y 18 segundos medidos, y **no transmite mientras escribe a propósito**
+(ver arriba). Ese rato ya no dice "Pensando…": dice que la respuesta se escribe entera porque el
+control tiene que verla completa antes de que salga, y cuenta los segundos de verdad.
+
+🔑 Es la única parte del producto donde la garantía se explica justo en el momento en que se
+está cumpliendo. ⚠ Nada de barra de progreso: nadie sabe cuánto falta, y este es el peor sistema
+donde acostumbrar a alguien a creerle a un número inventado.
+
+### 🔴 Decir una frase no es lo mismo que nombrarla — el error del 16/8 a la noche
+
+**Es la tercera vez que el control frena de más, y la peor.** El asistente escribió:
+
+> No te lo puedo decir… Si te dijera **"quedate tranquila"**, te lo estaría diciendo con voz de
+> sistema, y esa frase, dicha en la casa equivocada, es la que hace que alguien deje de mirar.
+
+Estaba **citando la frase prohibida para negarse a decirla**, que es exactamente lo que el prompt
+le pide. El control la leyó como si la estuviera diciendo y tiró al respaldo la mejor respuesta
+del día — ante *"decime que no es nada"*, que es la primera pregunta de un padre asustado.
+Después apareció una segunda forma: *Con eso no se construye un "quedate tranquila"*.
+
+**Cómo quedó:** una frase se perdona sólo si está **entrecomillada** y en la **misma oración**,
+antes, hay algo que la desactiva (una negación o un condicional). El límite es la oración y no
+una cantidad de caracteres: *«No sé qué decirte. Quedate tranquila.»* tiene que seguir frenándose.
+Y ahora se miran **todas** las apariciones de cada patrón, no la primera: alcanzaba con nombrar
+la frase antes de decirla para que la segunda pasara sin que nadie la mirara.
+
+⚠ **El agujero que queda, escrito para que se vea:** *«no sé qué decirte, pero "quedate
+tranquila"»* pasa. Se aceptó a sabiendas — el modelo no está tratando de burlar el control, y el
+error que sí apareció dos veces en pruebas reales es el otro.
+
+📌 **Lo que el control frena queda en el registro del servidor**, con el motivo y el texto
+entero. Sin eso, desde afuera un asistente demasiado estricto y uno roto se parecen: los dos
+contestan el respaldo.
+
+📌 **La cita se dibuja como cita.** Cuando el asistente escribe con `>` es porque le está dando
+al padre la frase para decirle al chico — lo más útil que contesta— y se veía el signo colgando
+adelante de la única línea que el padre va a copiar.
 
 🔴 **La lectura se recalcula en el servidor en cada pregunta.** El navegador ya la tiene y sería
 más barato mandarla en el pedido — no se hace: quien controle el navegador controlaría entonces
@@ -832,6 +904,10 @@ tranquilizar era `\bqueda(te|se|\s+tranquil)`, que frena **cualquier** «quedate
 «quedate con esto»— y tiró al respaldo una respuesta correcta. Apareció en la primera prueba
 real, no en el typecheck. **Un patrón que frena de más es tan malo como uno que no frena:** un
 asistente que cae al respaldo seguido es un asistente que nadie consulta.
+
+🔴 **Y volvió a pasar esa misma noche, dos veces más.** Por eso ahora existe
+`npm run probar-reglas`: **toda regla nueva entra con su caso que pasa y su caso que se frena.**
+La mitad de arriba de esa lista importa tanto como la de abajo.
 
 📌 **Las cifras del informe LATAM se agregaron a `CIFRAS_CITABLES`.** Sin eso, citar el informe
 que el propio proyecto documenta caía al respaldo como si fuera una invención.
@@ -1063,6 +1139,9 @@ publicación, se confirma antes.
 ## Reglas de trabajo
 
 - Rama por fase, `npm run typecheck` antes de cada commit.
+- 🔴 **Si se tocó `reglas.ts`, además `npm run probar-reglas`.** Tres veces se frenó de más una
+  respuesta buena y ninguna la encontró el typecheck: aparecen con el modelo contestando, de a
+  una y por casualidad. Toda regla nueva entra con su caso que pasa y su caso que se frena.
 - Verificación visual en **`localhost:3007`**, no en el 3000: en el 3000 hay un service worker
   de un proyecto viejo que sirve su caché por encima de lo que devuelva el servidor.
 - ⚠ **El repositorio en memoria va colgado de `globalThis`**, no de una variable de módulo:
