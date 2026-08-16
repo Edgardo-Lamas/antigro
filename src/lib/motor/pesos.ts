@@ -187,10 +187,20 @@ export function factorGenero(genero: Genero): number {
  *
  * Por eso hay dos clases de señal, y corren en paralelo:
  *
- * - `absoluta` — no se compara contra nada. Conectarse de madrugada todos los
- *   días es desordenado en sí mismo: al otro día no descansó para la escuela.
- *   Intentar saltar el filtro es un acto deliberado, sea el día 2 o el 200.
+ * - `absoluta` — **no se compara contra la historia de ese chico.** Intentar
+ *   saltar el filtro es un acto deliberado, sea el día 2 o el 200. La madrugada
+ *   se compara contra la EDAD (`factorMadrugada`), que es un dato que el
+ *   sistema tiene desde el alta y no necesita aprender.
  *   **Funcionan desde el minuto uno.**
+ *
+ *   🔴 **Acá decía "es desordenado en sí mismo: al otro día no descansó para la
+ *   escuela", y estaba mal.** Lo volteó Edgardo el 16/8: el chico puede estar de
+ *   vacaciones, o ir al turno tarde y dormir hasta el mediodía — en los dos
+ *   casos descansó bien. **El sistema no conoce los horarios de esa casa**, así
+ *   que el descanso no lo puede afirmar. Y no hacía falta: lo que sostiene a
+ *   estas dos señales no es el daño que causan, es que **no dependen de conocer
+ *   al chico**, que es exactamente lo que falta cuando el abuso empezó antes
+ *   que el sistema.
  * - `relativa` — "saltó el volumen", "apareció una plataforma nueva". Sólo
  *   significan algo contra la conducta previa del propio chico, así que **pesan
  *   por cuánto alcanzó a desplegarse la lectura** (`alcanceDeLaLectura`, en
@@ -199,7 +209,7 @@ export function factorGenero(genero: Genero): number {
 export type ClaseDeSenal = "absoluta" | "relativa";
 
 export const CLASE_DE_SENAL: Record<TipoDeSenal, ClaseDeSenal> = {
-  // Desordena el descanso: es dañino por sí mismo, no por ser distinto.
+  // Se compara contra la EDAD, no contra la historia de este chico.
   madrugada: "absoluta",
   // Acto deliberado de esquivar el control. No hay historia que lo relativice.
   evasion: "absoluta",

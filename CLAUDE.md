@@ -353,8 +353,57 @@ Por eso hay dos clases de señal, y **corren en paralelo, no se reemplazan** (`C
 | **Absoluta** | Madrugada · evasión del filtro | **Siempre el 100%, desde el día uno.** No se comparan contra nada |
 | **Relativa** | Salto de volumen · plataforma nueva | Por el **alcance** de la lectura, que crece con el perfil |
 
-La madrugada es absoluta porque desordena el descanso por sí sola: al otro día no descansó para
-la escuela. La evasión, porque es un acto deliberado — da igual si es el día 2 o el 200.
+La evasión es absoluta porque es un acto deliberado — da igual si es el día 2 o el 200. La
+madrugada, porque **se compara contra la EDAD y no contra la historia de ese chico**.
+
+### 🔴 «Desordena el descanso» era falso — lo volteó Edgardo el 16/8
+
+Durante dos días el sistema dijo, en el informe, en el prompt del asistente y en el PDF que ya
+circuló, que la actividad de madrugada *"desordena el descanso por sí sola: al otro día no
+descansó para la escuela"*. Su objeción, y es correcta:
+
+> *"¿qué tal si el chico está de vacaciones, al otro día hasta cualquier hora y descansa bien, o
+> si el chico va a la escuela por la tarde, duerme hasta el mediodía? En los dos casos está
+> descansado."*
+
+🔑 **El sistema no conoce los horarios de esa casa.** Ve la hora de la actividad y nada más.
+Afirmar el descanso era **afirmar algo que no se ve** — la misma familia de error que el "volumen
+de mensajes" del 14/8, y encima escrita por nosotros y no por el modelo.
+
+⚠ **Y no hacía falta.** Lo que sostiene a la madrugada como absoluta nunca fue el daño que causa:
+es que **no depende de conocer al chico**, porque la referencia es la edad. Eso es justo lo que
+importa cuando el abuso empezó antes que el sistema. La justificación vieja era una
+racionalización de una decisión que ya estaba bien tomada por otro motivo.
+
+📌 **Ahora, cuando hubo madrugada, el informe dice el límite en voz alta:** que no sabe si está de
+vacaciones, si entra a la mañana o si va al turno tarde.
+
+### 🔎 Lo que se chequeó el 16/8 y NO se pudo confirmar
+
+Edgardo planteó la hipótesis con la honestidad de marcarla como tal: *"supongo (debemos chequear
+y confirmar) tomamos ese dato porque se supone que es donde más atacan los depredadores"*.
+**Se chequeó y no se confirmó.** La
+[guía para padres del Ministerio de Justicia](https://www.argentina.gob.ar/justicia/convosenlaweb/situaciones/guia-para-padres-familias-y-docentes-grooming)
+no menciona horarios de conexión ni hábitos de sueño, y no apareció estadística que sostenga que
+el contacto se concentra de madrugada. 🔴 **Así que no se afirma en ningún lado.** Reemplazar una
+justificación sin fuente por otra sin fuente habría sido el mismo error con mejor cara.
+
+Lo que **sí** tiene respaldo, y es de nivel `organismo` (sin cifra detrás): el
+[MPBA](https://www.mpba.gov.ar/grooming) incluye *"observar cambios de humor y horarios de
+conexión"* en su lista oficial de recomendaciones a adultos. Alcanza para mirar el horario. No
+alcanza para explicar por qué.
+
+### 🔴 El asistente explicaba DOS de las cuatro señales al revés
+
+Salió de tirar del hilo anterior. El prompt estable decía *"las dos primeras se comparan contra la
+historia del propio chico"* enumerando volumen y **madrugada**, y *"las dos últimas no se comparan
+contra nada"* enumerando **plataforma nueva** y evasión. El código dice lo contrario: absolutas
+son madrugada y evasión; relativas, volumen y plataforma nueva.
+
+⚠ O sea que a un padre le venía explicando mal la mitad del mecanismo, y con la autoridad del
+sistema. **Ninguna prueba lo iba a encontrar**: el control mira lo que el asistente afirma, no si
+el corpus describe bien el motor. Lección: cuando cambie `CLASE_DE_SENAL`, se revisa el prompt en
+el mismo commit.
 
 ### 🔴 El perfil y la ventana son DOS cosas (rediseñado el 15/8/2026)
 

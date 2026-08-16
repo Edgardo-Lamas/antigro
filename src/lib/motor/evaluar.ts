@@ -472,10 +472,23 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
         `${quien}, y con eso pesa lo que compara contra su propia conducta previa. ` +
         "No espera una cantidad fija de días: va viendo más a medida que lo conoce.",
     );
+    /* 🔴 Acá decía que la madrugada "desordena el descanso por sí sola". Lo
+       corrigió Edgardo el 16/8 y tenía razón: **el sistema no sabe a qué hora
+       se levanta ese chico.** Puede estar de vacaciones, o ir al turno tarde y
+       dormir hasta el mediodía; en los dos casos descansó bien. Afirmar el
+       descanso era afirmar algo que no se ve — la misma familia de error que
+       el "volumen de mensajes" del 14/8.
+
+       🔑 El motivo verdadero por el que estas dos valen desde el día uno es
+       otro, y es más fuerte: **no se comparan contra la historia del chico.**
+       La evasión porque es un acto deliberado; la madrugada porque se compara
+       contra la EDAD (ver `factorMadrugada`). Y eso importa justamente cuando
+       el chico ya venía siendo acosado antes del alta: ahí su historia trae el
+       problema adentro y una lectura que sólo mire cambios no lo ve nunca. */
     porQue.push(
-      "Lo que sí mira desde el primer día, sin depender de nada de esto: la actividad de " +
-        "madrugada, que desordena el descanso por sí sola, y los intentos de saltar el filtro, " +
-        "que son un acto deliberado y no se comparan contra ninguna historia.",
+      "Lo que sí mira desde el primer día, sin depender de nada de esto: la actividad en horarios " +
+        "que para su edad son de madrugada, y los intentos de saltar el filtro. Ninguna de las dos " +
+        "se compara contra su historia, así que valen igual desde el primer día.",
     );
   }
 
@@ -522,9 +535,30 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
       "Esto no dice que esté pasando algo. Dice que hay un cambio que se sostuvo y que conviene mirar.",
   };
 
+  /**
+   * 🔴 **El horario del chico, que el sistema no conoce. Lo trajo Edgardo el
+   * 16/8 y desarmó una afirmación que veníamos haciendo mal.**
+   *
+   * El sistema ve la hora de la actividad y nada más. No sabe si el chico está
+   * de vacaciones, si entra al colegio a las 7 o si va al turno tarde y duerme
+   * hasta el mediodía. Con el mismo dato de las 2 de la mañana, en un caso el
+   * chico durmió ocho horas y en el otro se levantó a las 6.
+   *
+   * Va sólo cuando hubo madrugada: decirlo siempre sería ruido, y una lista de
+   * límites que nadie lee no protege a nadie.
+   */
+  const huboMadrugada = senales.some((s) => s.tipo === "madrugada");
+
   const loQueNoSeVe = [
     "No se leyó ni se guardó nada de lo que escribió. El sistema ve horarios y volúmenes, no conversaciones.",
     "El 74,3% de los casos pasa por WhatsApp, que va cifrado: nada de eso aparece acá.",
+    ...(huboMadrugada
+      ? [
+          "El sistema ve a qué hora hubo actividad, pero no conoce los horarios de esta casa: no " +
+            "sabe si está de vacaciones, si entra al colegio a la mañana o si va al turno tarde. " +
+            "Que haya habido actividad tarde no dice, por sí solo, que haya descansado mal.",
+        ]
+      : []),
     ...advertenciasDelPerfil(perfil, hasta),
     cierre[estado],
   ];
