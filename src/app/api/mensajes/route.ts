@@ -49,7 +49,8 @@ export async function GET(req: Request) {
     hasta: hasta.toISOString(),
   });
 
-  const lectura = evaluar({ chico: { edad, genero }, senales, hasta });
+  // Endpoint de demo: no hay ficha de chico, así que el reloj hace de alta.
+  const lectura = evaluar({ chico: { edad, genero }, senales, hasta, diasObservados: dia + 1 });
 
   const [paraLosAdultos, paraElChico] = await Promise.all([
     redactarLecturaParaAdultos({ nombreDelChico: nombre, edad, lectura }),

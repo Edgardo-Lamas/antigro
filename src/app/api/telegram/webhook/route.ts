@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { repositorio } from "@/lib/datos";
 import { codigoDeUnStart } from "@/lib/mensajeria/vinculacion";
 import { TransporteTelegram } from "@/lib/mensajeria";
+import { CODIGO_DEMO, CUPO, nombreDelRol, soltarCupo, tomarCupo } from "@/lib/mensajeria/cupo-demo";
 
 /**
  * Lo que Telegram le pega a AntiGro cuando alguien aprieta "Iniciar".
@@ -47,6 +48,48 @@ export async function POST(req: Request) {
     bot.enviar({ canal: "telegram", destino: String(chatId), texto: mensaje });
 
   const codigo = codigoDeUnStart(texto);
+
+  /* ── 🔐 El cupo de la demo, ANTES de tocar ninguna familia ─────────────────
+     Se resuelve acá y se corta: este código sale de una página pública y no
+     puede, bajo ninguna circunstancia, terminar buscándose entre los códigos
+     de una familia real. Que no pueda colisionar por su forma ya lo garantiza
+     `CODIGO_DEMO`; que ni siquiera se intente lo garantiza este `return`. */
+  if (codigo === CODIGO_DEMO) {
+    const quien = actualizacion.message?.from?.first_name?.trim() || "Hola";
+    const resultado = tomarCupo(String(chatId), quien);
+
+    if (!resultado.ok) {
+      await responder(
+        `Por ahora hay ${CUPO} personas probando la demostración y es el máximo que ` +
+          "se conectan a la vez. En un rato se libera un lugar: volvé a escanear el " +
+          "código y entrás.",
+      );
+      return NextResponse.json({ ok: true, cupo: "lleno" });
+    }
+
+    const { cupo, yaEstaba } = resultado;
+    await responder(
+      yaEstaba
+        ? `Ya estabas conectado, ${cupo.nombre}. Seguís en el lugar de ${nombreDelRol(cupo.rol)}.`
+        : `Listo, ${cupo.nombre}. Estás viendo la demostración de AntiGro desde el lugar de ` +
+            `${nombreDelRol(cupo.rol)}.\n\n` +
+            "Cuando en la página se pida el aviso, te va a llegar acá el texto que le " +
+            "llegaría a esa persona. Ana, Mariana y Carla son inventadas: no hay ninguna " +
+            "chica real detrás de esto.\n\n" +
+            "Si querés soltar el lugar para que lo use otro, escribí /chau.",
+    );
+    return NextResponse.json({ ok: true, cupo: cupo.rol });
+  }
+
+  if (/^\/chau\b/i.test(texto.trim())) {
+    const solto = soltarCupo(String(chatId));
+    await responder(
+      solto
+        ? "Listo, soltaste el lugar. Gracias por probarlo."
+        : "No tenías ningún lugar tomado.",
+    );
+    return NextResponse.json({ ok: true, solto });
+  }
 
   if (!codigo) {
     await responder(

@@ -4,10 +4,12 @@
  * Es el canal con el que se demuestra el sistema: no exige verificación de
  * empresa ni plantillas aprobadas, y el chico ya lo tiene instalado.
  *
- * 📌 Falta el token del bot. Se saca en dos minutos hablándole a @BotFather
- * dentro de Telegram (`/newbot`) y se completa `TELEGRAM_BOT_TOKEN`. Hasta
- * entonces este transporte se reporta como no disponible y los envíos caen
- * en modo ensayo, sin fingir nada.
+ * ✅ El bot existe: `@AntiGroArBot`. Es **el único canal real** del sistema hoy
+ * — el correo se reporta en ensayo por falta de dominio verificado (ver
+ * `correo.ts`) y WhatsApp saliente exige la API oficial de Meta.
+ *
+ * Si faltara el token, este transporte se reporta no disponible y los envíos
+ * caen en modo ensayo, sin fingir nada.
  */
 
 import type { Envio, EstadoDeTransporte, ResultadoDeEnvio, Transporte } from "./tipos";
