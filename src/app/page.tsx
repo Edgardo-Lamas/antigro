@@ -24,6 +24,20 @@ export const dynamic = "force-dynamic";
 /** El escenario con el que se consulta el estado de las fuentes. No pinta nada. */
 const ESCENARIO = "persistente";
 
+/**
+ * Qué versión es esta pantalla: el commit y el día en que se publicó.
+ *
+ * `VERCEL_GIT_COMMIT_SHA` la pone Vercel en cada build. En local no existe, y
+ * ahí dice «local» — que también es la respuesta correcta.
+ */
+function version(): string {
+  /* ⚠ Va el commit y NADA de fechas. La página es dinámica, así que un
+     `new Date()` acá daría la hora de la visita y no la del deploy: diría "hoy"
+     aunque estuvieras mirando algo de la semana pasada. Sería exactamente la
+     mentira que este sello viene a evitar. */
+  return process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local";
+}
+
 export default async function Home() {
   const fuentes = await estadoDeLasFuentes(ESCENARIO);
   const canales = await estadoDeLosCanales();
@@ -142,11 +156,21 @@ export default async function Home() {
         </p>
       </section>
 
-      <footer className="mt-12 border-t border-borde pt-6">
+      <footer className="mt-12 flex flex-wrap items-baseline justify-between gap-3 border-t border-borde pt-6">
         <p className="max-w-3xl text-xs leading-relaxed text-apagado">
           El motor decide con el registro fechado, la IA lo pone en palabras y un control revisa lo
           que escribió antes de que salga. Si el control no lo aprueba, sale un texto fijo escrito
           de antemano.
+        </p>
+
+        {/* 🔑 El sello de versión, y no es un adorno de programador.
+            El 16/8 se perdió media hora discutiendo si una pantalla estaba
+            publicada o no: Vercel deja viva la dirección de CADA deploy, así
+            que es facilísimo estar mirando una foto de hace horas y jurar que
+            "sigue igual". Con esto se sabe de un vistazo qué se está mirando,
+            sin abrir una terminal ni preguntarle a nadie. */}
+        <p className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-apagado">
+          versión {version()}
         </p>
       </footer>
     </main>
