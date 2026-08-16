@@ -645,6 +645,25 @@ que lo cubra. Verificado en el navegador el 16/8.
 tía vio algo que la madre no — y ese es el motivo por el que el sistema exige un segundo adulto.
 Promediar borraría el único dato nuevo que hay ahí.
 
+### 🔴 La trampa que apareció al probar en producción (16/8) — `middleware.ts` no se compilaba
+
+**`/mi-familia` sin sesión devolvía 200 en vez de mandar al logueo.** El motivo: este proyecto usa
+carpeta `src/`, y **con `src/` Next busca el middleware en `src/middleware.ts`**. Estaba en la
+raíz desde la fase 0, así que **nunca se compiló** — el manifiesto salía con `"middleware": {}`.
+
+🔑 **Lo importante no es el archivo mal puesto: es que no se notó durante dos días.** `/panel`
+parecía protegido porque redirige igual, pero eso lo hacía la comprobación *dentro de la página*,
+no el middleware. La segunda línea de defensa era la única que había, y nadie lo sabía.
+
+⚠ **Cómo se comprueba, y conviene hacerlo cada vez que se toque:**
+`cat .next/server/middleware-manifest.json` — si `middleware` viene vacío, no existe. En el build
+tiene que aparecer la línea `ƒ Middleware`.
+
+✅ Arreglado: el archivo se movió a `src/middleware.ts` y `/mi-familia` tiene además su propia
+comprobación en `layout.tsx`, igual que `/panel`.
+📌 **No hubo dato expuesto:** las rutas de API comprueban la sesión por su cuenta y devolvían 401.
+Lo que quedaba abierto era la pantalla, que sin datos mostraba su estado de error.
+
 ⚠ **Cuentas de prueba de la familia inventada** (Ana, Mariana y Carla no existen):
 `mariana@ejemplo.ar` y `carla@ejemplo.ar`, clave `familia2026`.
 
