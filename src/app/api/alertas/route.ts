@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { repositorio } from "@/lib/datos";
-import { evaluar, VENTANA_DIAS } from "@/lib/motor";
+import { diasDeObservacion, evaluar, VENTANA_DIAS } from "@/lib/motor";
 import { FuenteSimulador, type Escenario } from "@/lib/senales";
 import { redactarLecturaParaAdultos, redactarMensajeAlChico } from "@/lib/ia";
 import { avisar, estadoDeLosCanales } from "@/lib/mensajeria";
@@ -59,7 +59,13 @@ export async function POST(req: Request) {
   });
   await repo.registrarSenales(senales);
 
-  const lectura = evaluar({ chico, senales, hasta: ahora });
+  // 🔑 Hace cuántos días miramos a este chico sale del ALTA, no de las señales.
+  const lectura = evaluar({
+    chico,
+    senales,
+    hasta: ahora,
+    diasObservados: diasDeObservacion(chico.creado, ahora),
+  });
 
   /* ── La IA escribe sólo si el motor decidió que hay algo que decir ── */
   const [paraLosAdultos, paraElChico] = await Promise.all([

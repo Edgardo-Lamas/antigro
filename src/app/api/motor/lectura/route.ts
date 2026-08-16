@@ -27,8 +27,12 @@ const Params = z.object({
   barrido: z.coerce.boolean().default(false),
   /** Qué contestaron los adultos. Es la segunda entrada del motor. */
   adultos: z.enum(["sin_responder", "bajo", "alto"]).default("sin_responder"),
-  /** Días observados desde el alta. Decide si la línea de base ya existe. */
-  observados: z.coerce.number().int().min(0).max(365).default(VENTANA_DIAS),
+  /**
+   * 📌 Override de los días de historia del perfil. Sin esto se usa el día del
+   * reloj: en el día 1 el sistema lleva un día mirando a este chico, no
+   * veintiuno. Queda para poder simular un perfil viejo sin fabricar meses.
+   */
+  observados: z.coerce.number().int().min(0).max(365).optional(),
 });
 
 /** Respuestas de ejemplo del cuestionario, para poder mover la segunda entrada. */
@@ -36,6 +40,7 @@ const RESPUESTAS: Record<string, Record<string, number>> = {
   sin_responder: {},
   bajo: {
     desconocidos: 1,
+    noviazgo_en_juego: 0,
     pedido_de_fotos: 0,
     sabe_que_es_grooming: 3,
     cambio_de_animo: 0,
@@ -46,6 +51,7 @@ const RESPUESTAS: Record<string, Record<string, number>> = {
   },
   alto: {
     desconocidos: 3,
+    noviazgo_en_juego: 2,
     pedido_de_fotos: 2,
     sabe_que_es_grooming: 0,
     cambio_de_animo: 3,
@@ -93,7 +99,8 @@ export async function GET(req: Request) {
     const dias = [];
     for (let n = 0; n < VENTANA_DIAS; n++) {
       const { hasta, senales } = await leerHasta(n);
-      const l = evaluar({ chico, senales, hasta, observaciones, diasObservados: observados });
+      // 🔑 En el día n del reloj, el sistema lleva n+1 días mirando a este chico.
+      const l = evaluar({ chico, senales, hasta, observaciones, diasObservados: observados ?? n + 1 });
       dias.push({
         dia: n + 1,
         estado: l.estado,
@@ -101,7 +108,8 @@ export async function GET(req: Request) {
         diasConSenal: l.diasConSenal,
         diasSostenidos: l.diasSostenidos,
         evasiones: l.evasionesRecientes,
-        base: l.lineaDeBase.lista,
+        alcance: Number(l.alcance.valor.toFixed(3)),
+        diasDePerfil: l.perfil.diasObservados,
       });
     }
     return NextResponse.json({ escenario, chico, adultos, dias });
@@ -113,6 +121,6 @@ export async function GET(req: Request) {
     chico,
     dia: dia + 1,
     de: VENTANA_DIAS,
-    lectura: evaluar({ chico, senales, hasta, observaciones, diasObservados: observados }),
+    lectura: evaluar({ chico, senales, hasta, observaciones, diasObservados: observados ?? dia + 1 }),
   });
 }

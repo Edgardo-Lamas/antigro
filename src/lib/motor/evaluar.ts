@@ -14,18 +14,27 @@
  */
 
 import type { SenalDeRed, TipoDeSenal } from "@/lib/senales/tipos";
+import { esCruce, nombreDeLugar, puertaDe } from "@/lib/senales/plataformas";
 import { NOMBRE_DE_SENAL } from "@/lib/senales/tipos";
 import type { Chico } from "@/lib/datos/tipos";
 import {
-  APRENDIZAJE_DIAS,
   CLASE_DE_SENAL,
   MEDIA_VENTANA_DIAS,
   PESO_POR_TIPO,
   VENTANA_DIAS,
   factorEdad,
+  factorMadrugada,
   factorGenero,
 } from "./pesos";
+import {
+  advertenciasDelPerfil,
+  alcanceDeLaLectura,
+  construirPerfil,
+  type AlcanceDeLaLectura,
+  type PerfilDelChico,
+} from "./perfil";
 import { evaluarObservaciones, type AporteDeLosAdultos } from "./cuestionario";
+import { hastaDondeSeVio } from "./modus-operandi";
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 
@@ -53,7 +62,27 @@ const EVASIONES_PARA_HABLAR = 2;
  * mirando, no lo que dice. El umbral que importa es el de abajo.
  */
 const PUNTAJE_PARA_ATENCION = 0.2;
+
 const PUNTAJE_PARA_HABLAR = 0.45;
+
+/**
+ * 🔴 **Medido el 15/8/2026, y sirve para no volver a equivocarse de perilla.**
+ *
+ * Al pasar del interruptor a la rampa de confianza, el escenario persistente
+ * pasó a avisar el día 20 en vez del 17. La reacción intuitiva es bajar
+ * `PUNTAJE_PARA_HABLAR`, y **es la perilla equivocada**: el día 17 el puntaje ya
+ * es 0,478, o sea que pasa el umbral holgado. Lo que ata es `diasSostenidos`,
+ * que ese día va 5 de los 8 que hacen falta.
+ *
+ * El motivo real es `CARGA_MINIMA_DIA`: con las señales relativas atenuadas, los
+ * primeros días flojos de la escalada ya no llegan a 0,25 y no cuentan como
+ * "día con señal", así que la racha arranca más tarde.
+ *
+ * 📌 **Y eso es el comportamiento correcto, no un defecto:** mientras el sistema
+ * conoce poco al chico, una desviación floja no alcanza para contar un día en
+ * contra. La racha empieza cuando la desviación es inequívoca. Si alguna vez se
+ * decide que tres días es demasiado tarde, la perilla es ésta y no el umbral.
+ */
 
 /**
  * Techo del aporte de los adultos. No llega a 1 a propósito: el cuestionario
@@ -86,11 +115,15 @@ export interface Lectura {
   estado: Estado;
   /** 0 a 1 — las dos entradas ya combinadas. */
   puntaje: number;
+  /** Lo que el sistema sabe de este chico. Se acumula, no vive en la ventana. */
+  perfil: PerfilDelChico;
   /**
-   * Si ya se sabe qué es "lo habitual" en este chico. Mientras no, sólo pesan
-   * las señales absolutas y el sistema lo dice en vez de disimularlo.
+   * 🔑 Cuánto alcanzó a desplegarse la lectura, de 0 a 1. **No es cuánta
+   * protección hay**: las señales absolutas funcionan desde el día uno y no
+   * dependen de esto. Es cuánto pesa lo que se compara contra la historia del
+   * propio chico, que es lo único que necesita conocerlo primero.
    */
-  lineaDeBase: { lista: boolean; diasObservados: number; faltan: number };
+  alcance: AlcanceDeLaLectura;
   /** Sólo lo que vio la red, para poder mostrar cada entrada por separado. */
   puntajeRed: number;
   /** Lo que aportaron los adultos. */
@@ -124,20 +157,62 @@ export function diaLocal(fecha: Date | string): string {
  * Carga de un día: se combinan las señales como probabilidades, no sumando.
  * Tres señales flojas no equivalen a una fuerte, y sumar haría que sí.
  *
- * ⚠ Mientras la línea de base no exista, las señales **relativas** no cuentan:
- * decir "saltó el volumen" sin saber cuál era su volumen habitual es inventar.
- * Las **absolutas** cuentan igual, desde el primer día.
+ * 🔑 **Las señales relativas se atenúan por la confianza, no se apagan.** Decir
+ * "saltó el volumen" sin saber cuál era su volumen habitual es inventar; pero
+ * decir que no vale nada hasta un día fijo del calendario también lo es. Con
+ * confianza 0,3 la señal cuenta un 30%: el sistema duda en voz baja en vez de
+ * taparse los ojos.
+ *
+ * ⚠ Las **absolutas** (madrugada, evasión) no se tocan: valen desde el día uno,
+ * porque no se comparan contra nada.
  */
-function cargaDelDia(senales: SenalDeRed[], lineaDeBaseLista: boolean): number {
-  const cuentan = lineaDeBaseLista
-    ? senales
-    : senales.filter((s) => CLASE_DE_SENAL[s.tipo] === "absoluta");
-
-  const restante = cuentan.reduce(
-    (acc, s) => acc * (1 - Math.min(1, s.intensidad * PESO_POR_TIPO[s.tipo])),
-    1,
-  );
+function cargaDelDia(senales: SenalDeRed[], confianza: number, edad: number): number {
+  const restante = senales.reduce((acc, s) => {
+    const atenuacion = CLASE_DE_SENAL[s.tipo] === "relativa" ? confianza : 1;
+    /* 🔑 La madrugada es absoluta, pero **se compara contra la EDAD**: a las 2
+       de la mañana una nena de 9 y un pibe de 16 no son lo mismo. Ver
+       `factorMadrugada` — se corre la hora de referencia, no se baja el peso. */
+    const porEdad =
+      s.tipo === "madrugada" ? factorMadrugada(edad, new Date(s.fecha).getHours()) : 1;
+    const aporte = Math.min(1, s.intensidad * PESO_POR_TIPO[s.tipo] * atenuacion * porEdad);
+    return acc * (1 - aporte);
+  }, 1);
   return 1 - restante;
+}
+
+/**
+ * Busca el cruce contacto abierto → requiere entrega dentro de la ventana. Ver el comentario
+ * largo en el llamador: la señal es la secuencia, no el destino.
+ *
+ * Devuelve los nombres para poder decirlo en criollo, o `null` si no pasó.
+ */
+function detectarTraslado(
+  senales: SenalDeRed[],
+): { desde: string; hacia: string } | null {
+  const lugares = senales
+    .filter((s) => s.tipo === "plataforma_nueva" && typeof s.contexto?.dominio === "string")
+    .map((s) => ({
+      fecha: s.fecha,
+      dominio: String(s.contexto!.dominio),
+      puerta: puertaDe(String(s.contexto!.dominio)),
+    }))
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+
+  const primerAbierto = lugares.find((l) => l.puerta === "contacto_abierto");
+  if (!primerAbierto) return null;
+
+  /* El destino tiene que aparecer DESPUÉS del lugar abierto: al revés no es un
+     cruce. Que use WhatsApp desde antes no dice nada — lo que dice algo es que
+     entregue su contacto después de conocer a alguien en un lugar abierto. */
+  const posterior = lugares.find(
+    (l) => l.fecha > primerAbierto.fecha && esCruce(primerAbierto.puerta, l.puerta),
+  );
+  if (!posterior) return null;
+
+  return {
+    desde: nombreDeLugar(primerAbierto.dominio),
+    hacia: nombreDeLugar(posterior.dominio),
+  };
 }
 
 /** Racha de días con carga, contando hacia atrás desde el final de la ventana. */
@@ -168,44 +243,66 @@ export interface Consulta {
   /** Lo último que contestaron los adultos. Sin esto, el motor mira con un ojo. */
   observaciones?: Record<string, number>;
   /**
-   * Cuántos días de actividad se llevan observados de este chico desde el alta.
-   * Es lo que decide si ya se puede hablar de "lo habitual en él".
+   * 🔴 **Hace cuántos días el sistema mira a este chico. Sale del alta de la
+   * familia, NO de las señales**, porque para una fuente de señales "no hubo
+   * desviaciones" y "todavía no lo miramos" son indistinguibles: en los dos
+   * casos no llega nada. Deducirlo de las señales hacía que un chico tranquilo
+   * pareciera tener tres semanas de historia el primer día (bug del 15/8/2026).
    */
-  diasObservados?: number;
+  diasObservados: number;
 }
 
-export function evaluar({
-  chico,
-  senales,
-  hasta,
-  observaciones,
-  diasObservados = VENTANA_DIAS,
-}: Consulta): Lectura {
-  const lineaDeBaseLista = diasObservados >= APRENDIZAJE_DIAS;
+export function evaluar({ chico, senales, hasta, observaciones, diasObservados }: Consulta): Lectura {
   const inicio = new Date(hasta.getTime() - (VENTANA_DIAS - 1) * DIA_MS);
 
   /* Un casillero por día, incluso los días sin nada: los silencios son parte
      del patrón tanto como los picos. */
-  const dias: DiaDeLaVentana[] = [];
   const porDia = new Map<string, SenalDeRed[]>();
+  let primeraFecha: Date | null = null;
 
   for (const s of senales) {
     const f = new Date(s.fecha);
-    if (f < inicio || f > hasta) continue;
+    if (f > hasta) continue;
+    if (!primeraFecha || f < primeraFecha) primeraFecha = f;
     const clave = diaLocal(f);
     porDia.set(clave, [...(porDia.get(clave) ?? []), s]);
   }
 
-  for (let i = 0; i < VENTANA_DIAS; i++) {
-    const fecha = new Date(inicio.getTime() + i * DIA_MS);
-    const clave = diaLocal(fecha);
-    const delDia = porDia.get(clave) ?? [];
-    dias.push({
-      dia: clave,
-      carga: cargaDelDia(delDia, lineaDeBaseLista),
-      tipos: [...new Set(delDia.map((s) => s.tipo))],
-    });
+  /**
+   * 🔑 **EL PERFIL SE ARMA CON TODA LA HISTORIA, NO CON LA VENTANA.**
+   *
+   * Esto es lo que separa las dos cosas que antes estaban mezcladas: el perfil
+   * es lo que el sistema sabe del chico y no tiene tope; la ventana de abajo es
+   * sólo el tramo reciente que se está evaluando, y existe para medir
+   * persistencia. Si la fuente entrega seis meses, el perfil usa seis meses.
+   *
+   * La carga acá va **cruda** (sin atenuar): es la materia prima del perfil, y
+   * atenuarla con el alcance que sale del propio perfil sería morderse la cola.
+   */
+  const arranque = primeraFecha ?? inicio;
+  const historia: { dia: string; carga: number }[] = [];
+  for (let t = new Date(diaLocal(arranque) + "T00:00:00").getTime(); t <= hasta.getTime(); t += DIA_MS) {
+    const clave = diaLocal(new Date(t));
+    historia.push({ dia: clave, carga: cargaDelDia(porDia.get(clave) ?? [], 1, chico.edad) });
   }
+
+  const perfil = construirPerfil(historia, diasObservados);
+  const alcance = alcanceDeLaLectura(perfil);
+
+  /* ── La ventana: sólo el tramo reciente, y sólo para medir persistencia ── */
+  const claves: string[] = [];
+  for (let i = 0; i < VENTANA_DIAS; i++) {
+    claves.push(diaLocal(new Date(inicio.getTime() + i * DIA_MS)));
+  }
+
+  const dias: DiaDeLaVentana[] = claves.map((clave) => {
+    const delDia = porDia.get(clave) ?? [];
+    return {
+      dia: clave,
+      carga: cargaDelDia(delDia, alcance.valor, chico.edad),
+      tipos: [...new Set(delDia.map((s) => s.tipo))],
+    };
+  });
 
   const conSenal = dias.filter((d) => d.carga >= CARGA_MINIMA_DIA);
   const diasSostenidos = rachaSostenida(dias);
@@ -313,18 +410,72 @@ export function evaluar({
     porQue.push(`Lo que se repitió: ${tipos.map((t) => NOMBRE_DE_SENAL[t].toLowerCase()).join(", ")}.`);
   }
 
-  if (!lineaDeBaseLista) {
+  /**
+   * 🔑 **EL TRASLADO — de un juego a la mensajería privada.**
+   *
+   * Idea de Edgardo (15/8/2026): *"el flujo de Roblox al celular ya te está
+   * diciendo que pasaron a otra instancia"*. Y es lo único de todo el fenómeno
+   * que un filtro de red puede ver sin leer nada: **no el sitio, la secuencia.**
+   *
+   * El patrón que describen los casos es empezar en un juego con chat y seguir
+   * en WhatsApp o Discord, donde el control es menor. Ninguna lista negra sirve
+   * acá —el destino es la app más usada del país—, pero el MOVIMIENTO entre
+   * clases de lugar sí es observable.
+   *
+   * ⚠ Sola no dice casi nada: millones de chicos juegan y después chatean. Por
+   * eso no suma puntaje por su cuenta — entra como contexto de una lectura que
+   * ya se sostiene por otro lado. Es exactamente lo que decía Edgardo: *"cada uno
+   * de estos datos, solos o sueltos, no dicen nada; pero juntándolos dicen
+   * mucho"*.
+   */
+  const traslado = detectarTraslado(claves.flatMap((c) => porDia.get(c) ?? []));
+  if (traslado) {
     porQue.push(
-      `El sistema todavía está aprendiendo cómo es un día normal para ${
-        chico.edad >= 14 ? "él o ella" : "este chico"
-      }: lleva ${diasObservados} de los ${APRENDIZAJE_DIAS} días que necesita. ` +
-        "Hasta entonces no puede decir que algo se desvía de lo habitual, porque " +
-        "todavía no sabe qué es lo habitual.",
+      `La actividad se corrió de ${traslado.desde}, donde cualquiera puede escribirle, a ` +
+        `${traslado.hacia}, donde hace falta que él haya entregado su contacto. Dicho sin ` +
+        "vueltas: le dio su número o su usuario a alguien que conoció en un lugar abierto. " +
+        "Por sí solo no significa nada —todos los chicos hacen eso— pero acompaña a lo demás.",
+    );
+  }
+
+  /**
+   * 🔑 **HASTA DÓNDE SE VIO EL PROCESO — la parte de sabueso.**
+   *
+   * Idea de Edgardo: mirar también cómo actúa el acosador, no sólo al chico.
+   * El grooming no es un evento: es una secuencia con etapas descritas y
+   * validadas (Sexual Grooming Model — ver `modus-operandi.ts`), y una secuencia
+   * se puede reconocer a mitad de camino. Eso es anticipar en vez de constatar.
+   *
+   * ⚠ **No es un diagnóstico y no suma puntaje.** Que la huella esté no prueba
+   * que la etapa ocurrió. Ordena el relato de la alerta; no la decide.
+   */
+  const etapa = hastaDondeSeVio(tipos);
+  if (etapa && estado !== "en_calma") {
+    porQue.push(
+      `Lo que se ve encaja con una etapa descrita del proceso: ${etapa.nombre.toLowerCase()} — ` +
+        `${etapa.queHace} ⚠ Que la huella esté no prueba que eso esté pasando; es la forma que ` +
+        "tendría si estuviera pasando.",
+    );
+  }
+
+  /**
+   * 🔴 **Acá se le contesta al padre la pregunta difícil, y sin un número
+   * inventado.** Antes esto decía "lleva 9 de los 14 días que necesita", que era
+   * indefendible: no hay 14 días que sirvan para todos los chicos. Ahora dice
+   * cuánto conoce a SU hijo y por qué.
+   */
+  if (alcance.valor < 0.85) {
+    const quien = chico.edad >= 14 ? "él o ella" : "este chico";
+    porQue.push(
+      `La protección está desde el primer día, pero todavía se está desplegando: el sistema ` +
+        `lleva ${perfil.diasObservados} día${perfil.diasObservados === 1 ? "" : "s"} conociendo a ` +
+        `${quien}, y con eso pesa lo que compara contra su propia conducta previa. ` +
+        "No espera una cantidad fija de días: va viendo más a medida que lo conoce.",
     );
     porQue.push(
-      "Lo que sí mira desde el primer día: la actividad de madrugada, que desordena " +
-        "el descanso por sí sola, y los intentos de saltar el filtro, que son un acto " +
-        "deliberado y no dependen de ninguna comparación.",
+      "Lo que sí mira desde el primer día, sin depender de nada de esto: la actividad de " +
+        "madrugada, que desordena el descanso por sí sola, y los intentos de saltar el filtro, " +
+        "que son un acto deliberado y no se comparan contra ninguna historia.",
     );
   }
 
@@ -345,21 +496,44 @@ export function evaluar({
     }
   }
 
-  /* ── 🔴 Lo que no se ve. Va siempre. ── */
+  /**
+   * ── 🔴 Lo que no se ve. Va siempre, sobre todo cuando alerta. ──
+   *
+   * 🔑 Las advertencias del perfil entran acá y no en `porQue` por una razón:
+   * `porQue` explica lo que el sistema afirma, y esto es lo contrario — es lo
+   * que el sistema **no puede** afirmar. De Edgardo: *"el acosador se esconde y
+   * sólo podemos ver/imaginar sus consecuencias"*.
+   */
+  /**
+   * 🔴 El cierre depende del estado. Estaba fijo, y en calma decía «hay un
+   * cambio que se sostuvo» sobre una lectura donde no hubo ningún cambio: el
+   * sistema se contradecía a sí mismo en la misma pantalla.
+   *
+   * ⚠ El de calma **no dice que el chico esté a salvo** (regla 1). Dice qué
+   * fue lo que no apareció, que es lo único que el sistema puede sostener.
+   */
+  const cierre: Record<Estado, string> = {
+    en_calma:
+      "Esto no dice que el chico esté a salvo. Dice que en este tramo no apareció nada que se " +
+      "apartara de lo habitual en él, con las dos señales que la red alcanza a ver.",
+    atencion:
+      "Esto no dice que esté pasando algo. Dice que apareció un cambio y que conviene mirar.",
+    patron_sostenido:
+      "Esto no dice que esté pasando algo. Dice que hay un cambio que se sostuvo y que conviene mirar.",
+  };
+
   const loQueNoSeVe = [
     "No se leyó ni se guardó nada de lo que escribió. El sistema ve horarios y volúmenes, no conversaciones.",
     "El 74,3% de los casos pasa por WhatsApp, que va cifrado: nada de eso aparece acá.",
-    "Esto no dice que esté pasando algo. Dice que hay un cambio que se sostuvo y que conviene mirar.",
+    ...advertenciasDelPerfil(perfil, hasta),
+    cierre[estado],
   ];
 
   return {
     estado,
     puntaje,
-    lineaDeBase: {
-      lista: lineaDeBaseLista,
-      diasObservados,
-      faltan: Math.max(0, APRENDIZAJE_DIAS - diasObservados),
-    },
+    perfil,
+    alcance,
     puntajeRed,
     adultos,
     dias,

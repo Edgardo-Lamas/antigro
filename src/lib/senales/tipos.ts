@@ -58,6 +58,17 @@ export interface SenalDeRed {
    * 0 a 1 — cuánto se desvía de la línea base **del propio chico**,
    * no de un promedio ajeno. Un chico que siempre usó mucho el teléfono no
    * arranca en rojo.
+   *
+   * 🔴 **Contrato para cualquier fuente que implemente esta interfaz, y sale de
+   * una observación de Edgardo del 15/8/2026: la línea base tiene que ser MÓVIL,
+   * nunca congelada.** Son adolescentes y cambian todo el tiempo: un chico que
+   * en marzo se dormía a las 22 y en agosto se duerme a las 24 no está en
+   * riesgo, está creciendo. Una base aprendida una sola vez convierte el
+   * crecimiento normal en anomalía y llena de falsos positivos al sistema.
+   *
+   * Se calcula contra las últimas semanas, pesando más lo reciente. El motor no
+   * puede verificarlo —le llega la intensidad ya calculada—, así que **esto se
+   * respeta en la fuente o el sistema miente sin que nadie se entere.**
    */
   intensidad: number;
   /** Metadatos sin contenido. Ver `sanearContexto()`. */

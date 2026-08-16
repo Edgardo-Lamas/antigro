@@ -11,9 +11,12 @@
  *  de indicadores existe, pero según el `CLAUDE.md` **no está verificada en
  *  fuente primaria**.
  *
- *  Por eso cada pregunta declara de dónde sale, y hay dos clases:
+ *  Por eso cada pregunta declara de dónde sale, y hay tres clases:
  *
- *  - `estudio` — se apoya en una cifra citable del estudio nacional.
+ *  - `estudio` — se apoya en una cifra citable.
+ *  - `organismo` — un organismo oficial recomienda mirar eso, **pero sin una
+ *    cifra detrás**. Vale más que nuestra intuición y menos que un porcentaje,
+ *    y por eso no se puede presentar como si fuera una medición.
  *  - `observable` — le pregunta al adulto por un **hecho que puede ver**, sin
  *    afirmar que ese hecho sea un signo de grooming. Es la diferencia entre
  *    "¿esconde la pantalla?" (un hecho) y "esconder la pantalla indica
@@ -25,6 +28,7 @@
 
 export type ProcedenciaDelIndicador =
   | { clase: "estudio"; cita: string }
+  | { clase: "organismo"; cita: string }
   | { clase: "observable"; nota: string };
 
 export interface Indicador {
@@ -59,6 +63,17 @@ export const INDICADORES: Indicador[] = [
     },
   },
   {
+    id: "noviazgo_en_juego",
+    pregunta: "¿Sabés si alguien le propuso «ser su novio o novia» en un juego o en una app?",
+    ayuda: "Pasa seguido en los juegos en línea, y muchas veces con alguien que no conoce en persona.",
+    // 🔑 Pesa como los regalos: las dos son etapas del mecanismo, no del daño.
+    peso: 1.3,
+    procedencia: {
+      clase: "estudio",
+      cita: "El 33,3% recibió una propuesta de noviazgo dentro de un juego en línea (Informe Grooming LATAM, n≈28.360 de 9 a 17 años en 14 países, relevamiento 2024/2025).",
+    },
+  },
+  {
     id: "pedido_de_fotos",
     pregunta: "¿Sabés si alguna vez le pidieron una foto suya?",
     ayuda: "Cualquiera, no sólo las que uno se imagina.",
@@ -85,8 +100,8 @@ export const INDICADORES: Indicador[] = [
     ayuda: "Queda callado, irritable o angustiado al dejarlo, y antes no pasaba.",
     peso: 1.2,
     procedencia: {
-      clase: "observable",
-      nota: "Hecho observable. No hay fuente primaria verificada que lo valide como indicador de grooming.",
+      clase: "organismo",
+      cita: "El Ministerio Público de la Provincia de Buenos Aires (Procuración General de la SCBA) recomienda a los adultos «observar cambios de humor y horarios de conexión». https://www.mpba.gov.ar/grooming",
     },
   },
   {
@@ -125,8 +140,8 @@ export const INDICADORES: Indicador[] = [
     ayuda: "De madrugada, o apenas se despierta.",
     peso: 0.9,
     procedencia: {
-      clase: "observable",
-      nota: "Hecho observable. Se cruza con lo que ve la red, que mira exactamente lo mismo desde el otro lado.",
+      clase: "organismo",
+      cita: "El Ministerio Público de la Provincia de Buenos Aires (Procuración General de la SCBA) recomienda a los adultos «observar cambios de humor y horarios de conexión». https://www.mpba.gov.ar/grooming — 🔑 Además se cruza con lo que ve la red, que mira exactamente lo mismo desde el otro lado.",
     },
   },
 ];
