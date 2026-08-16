@@ -731,9 +731,50 @@ referentes). Es contenido para el PDF y el guion, no código.
 
 ---
 
-## ⬜ LO PRÓXIMO — el asistente para los adultos
+## ✅ EL ASISTENTE PARA LOS ADULTOS — escrito el 16/8/2026
 
-**Definido con Edgardo el 15/8/2026. Nada escrito todavía: acá está lo que se decidió.**
+**Definido con Edgardo el 15/8, construido el 16/8.** Vive dentro de `/mi-familia`, no en una
+pantalla aparte: el padre lo consulta con el informe a la vista, que es cuando le sirve.
+
+| Pieza | Dónde |
+|---|---|
+| El corpus, el prompt estable y el respaldo | `src/lib/ia/asistente.ts` |
+| El control (`revisarRespuestaDelAsistente`) | `src/lib/ia/reglas.ts` |
+| La ruta | `POST /api/mi-familia/asistente` |
+| La pantalla y el dibujo del markdown | `src/app/mi-familia/page.tsx` |
+
+🔴 **La lectura se recalcula en el servidor en cada pregunta.** El navegador ya la tiene y sería
+más barato mandarla en el pedido — no se hace: quien controle el navegador controlaría entonces
+qué "vio" el sistema y podría hacerle decir al asistente cualquier cosa. Del cliente sólo viene
+la pregunta y los turnos previos.
+
+🔑 **Sin RAG: el corpus entero va en el `system` y se cachea.** Es la lección de Criterio Térmico
+aplicada de entrada, y encima sale más barato — el material viaja en cada pedido pero se paga una
+vez.
+
+🔴 **El control agrega lo que faltaba: tranquilizar y estimar probabilidad.** Diagnosticar ya lo
+frenaba `AFIRMACIONES_PROHIBIDAS`. Verificado el 16/8 con la pregunta que un padre real va a
+hacer —*"decime que no es nada, por favor"*—: el asistente **no la tranquiliza**, explica por qué
+no puede, y ofrece enseguida lo que sí. Esa respuesta la leyó Edgardo antes que nadie.
+
+⚠ **Trampa del 16/8, y vale para cualquier regla que se agregue:** el primer patrón contra
+tranquilizar era `\bqueda(te|se|\s+tranquil)`, que frena **cualquier** «quedate» —incluido
+«quedate con esto»— y tiró al respaldo una respuesta correcta. Apareció en la primera prueba
+real, no en el typecheck. **Un patrón que frena de más es tan malo como uno que no frena:** un
+asistente que cae al respaldo seguido es un asistente que nadie consulta.
+
+📌 **Las cifras del informe LATAM se agregaron a `CIFRAS_CITABLES`.** Sin eso, citar el informe
+que el propio proyecto documenta caía al respaldo como si fuera una invención.
+
+🔐 **El markdown del modelo se dibuja armando elementos de React, nunca con
+`dangerouslySetInnerHTML`.** El texto viene de un modelo; pasarlo como HTML sería dejar que lo
+que escriba se ejecute en la pantalla del padre.
+
+⬜ **Sin decidir:** si el chico tiene el suyo más adelante, y qué se le puede decir a un menor.
+
+---
+
+### Lo que se decidió el 15/8, y no hay que volver a discutir
 
 ### Por qué
 

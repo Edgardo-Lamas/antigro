@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
-import { LoaderCircle, LogOut, QrCode, ShieldOff, UserMinus, MessageCircle } from "lucide-react";
+import {
+  LoaderCircle,
+  LogOut,
+  QrCode,
+  Send,
+  ShieldOff,
+  UserMinus,
+  MessageCircle,
+} from "lucide-react";
 import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senales/tipos";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
@@ -239,18 +247,7 @@ export default function MiFamilia() {
       </section>
 
       {/* ── El asistente ───────────────────────────────────────────────── */}
-      <section className="mt-8 rounded-lg border border-dashed border-borde px-5 py-5">
-        <div className="flex items-center gap-2">
-          <MessageCircle size={15} className="text-apagado" />
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-apagado">
-            El asistente
-          </h2>
-        </div>
-        <p className="mt-2.5 text-sm leading-relaxed text-tenue">
-          Acá va a estar para explicarte el informe, ordenarte las opciones y decirte cómo abrir
-          la conversación. <span className="text-apagado">Todavía no está escrito.</span>
-        </p>
-      </section>
+      <Asistente chico={datos.chico?.nombre} />
 
       {/* ── Quiénes están ──────────────────────────────────────────────── */}
       <section className="mt-8">
@@ -349,6 +346,213 @@ export default function MiFamilia() {
 /* ═══════════════════════════════════════════════════════════════════════════
    PIEZAS
    ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Dibuja el texto del asistente con el poco markdown que usa: negrita y listas.
+ *
+ * 🔐 **Se arman elementos de React, nunca HTML.** El texto viene de un modelo, y
+ * pasarlo por `dangerouslySetInnerHTML` sería dejar que lo que escriba el
+ * modelo se ejecute en la pantalla del padre. Acá lo peor que puede pasar es
+ * que se vea un asterisco de más.
+ *
+ * 📌 Se hace a mano y sin librería porque el markdown que aparece en la
+ * práctica son tres cosas. Traer un intérprete entero para eso sería sumar
+ * dependencia y superficie por nada.
+ */
+function conNegritas(linea: string, clave: string) {
+  return linea.split(/(\*\*[^*]+\*\*)/g).map((parte, i) =>
+    parte.startsWith("**") && parte.endsWith("**") ? (
+      <strong key={`${clave}-${i}`} className="font-semibold text-tinta">
+        {parte.slice(2, -2)}
+      </strong>
+    ) : (
+      <span key={`${clave}-${i}`}>{parte.replace(/\*/g, "")}</span>
+    ),
+  );
+}
+
+function TextoDelAsistente({ texto }: { texto: string }) {
+  const lineas = texto.split("\n");
+
+  return (
+    <div className="flex flex-col gap-2.5">
+      {lineas.map((linea, i) => {
+        const limpia = linea.trim();
+        if (!limpia) return null;
+
+        const vinieta = /^[-•]\s+/.test(limpia);
+        const numerada = /^\d+\.\s+/.test(limpia);
+        const cuerpo = limpia.replace(/^[-•]\s+/, "").replace(/^(\d+)\.\s+/, "");
+
+        if (vinieta || numerada) {
+          return (
+            <p key={i} className="flex gap-2 pl-1 text-sm leading-relaxed text-tinta">
+              <span className="shrink-0 text-acento">
+                {numerada ? `${limpia.match(/^(\d+)\./)![1]}.` : "·"}
+              </span>
+              <span>{conNegritas(cuerpo, `l${i}`)}</span>
+            </p>
+          );
+        }
+
+        return (
+          <p key={i} className="text-sm leading-relaxed text-tinta">
+            {conNegritas(limpia, `p${i}`)}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
+ * El asistente — el que contesta «¿y ahora qué hago?».
+ *
+ * 🔑 Vive acá adentro y no en una pantalla aparte: el padre lo consulta con el
+ * informe a la vista, que es cuando le sirve. Sacarlo a otra dirección sería
+ * pedirle que se acuerde de que existe justo cuando está preocupado.
+ */
+function Asistente({ chico }: { chico?: string }) {
+  const [turnos, setTurnos] = useState<{ quien: "adulto" | "asistente"; texto: string; origen?: string }[]>([]);
+  const [pregunta, setPregunta] = useState("");
+  const [pensando, setPensando] = useState(false);
+
+  /* 📌 Arranques sugeridos. No son decoración: un padre preocupado muchas veces
+     no sabe qué preguntar, y una caja de texto vacía es una pared. */
+  const ARRANQUES = [
+    "¿Qué significa este informe?",
+    "¿Cómo le hablo del tema sin que se cierre?",
+    "¿Qué mirar además de lo que ve el sistema?",
+  ];
+
+  async function preguntar(texto: string) {
+    const limpio = texto.trim();
+    if (!limpio || pensando) return;
+
+    const historia = turnos.map((t) => ({ quien: t.quien, texto: t.texto }));
+    setTurnos((t) => [...t, { quien: "adulto", texto: limpio }]);
+    setPregunta("");
+    setPensando(true);
+
+    try {
+      const res = await fetch("/api/mi-familia/asistente", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pregunta: limpio, historia }),
+      });
+      const d = await res.json();
+      setTurnos((t) => [
+        ...t,
+        {
+          quien: "asistente",
+          texto: res.ok ? d.texto : "No pude contestarte ahora. Probá de nuevo en un momento.",
+          origen: d.origen,
+        },
+      ]);
+    } catch {
+      setTurnos((t) => [
+        ...t,
+        { quien: "asistente", texto: "No pude contestarte ahora. Probá de nuevo en un momento." },
+      ]);
+    } finally {
+      setPensando(false);
+    }
+  }
+
+  return (
+    <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+      <div className="flex items-center gap-2">
+        <MessageCircle size={15} className="text-acento" />
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+          Preguntale al asistente
+        </h2>
+      </div>
+
+      {turnos.length === 0 && (
+        <>
+          <p className="mt-2.5 text-sm leading-relaxed text-tenue">
+            Te explica el informe, te ordena las opciones y te dice cómo abrir la conversación
+            con {chico ?? "el chico"}.{" "}
+            <span className="text-apagado">
+              No te va a decir que no es nada, ni que sí: eso no lo puede saber, y decírtelo
+              sería mentirte con cara de sistema.
+            </span>
+          </p>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {ARRANQUES.map((a) => (
+              <button
+                key={a}
+                onClick={() => preguntar(a)}
+                className="rounded-full border border-borde px-3 py-1.5 text-xs text-tenue transition hover:border-acento hover:text-acento"
+              >
+                {a}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {turnos.length > 0 && (
+        <ul className="mt-4 flex flex-col gap-4">
+          {turnos.map((t, i) => (
+            <li key={i} className={t.quien === "adulto" ? "flex justify-end" : ""}>
+              <div
+                className={
+                  t.quien === "adulto"
+                    ? "max-w-[85%] rounded-lg bg-acentoSuave px-3.5 py-2.5 text-sm text-tinta"
+                    : "max-w-[95%]"
+                }
+              >
+                {t.quien === "adulto" ? (
+                  <p className="text-sm leading-relaxed text-tinta">{t.texto}</p>
+                ) : (
+                  <TextoDelAsistente texto={t.texto} />
+                )}
+                {/* 🔑 Cuando contesta el respaldo se dice. Que se vea el momento
+                    en que el control frenó al modelo es lo que hace verificable
+                    la promesa, en vez de una frase en un README. */}
+                {t.origen === "respaldo" && (
+                  <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-atencion">
+                    texto de respaldo · el control no dejó pasar lo que escribió el modelo
+                  </p>
+                )}
+              </div>
+            </li>
+          ))}
+          {pensando && (
+            <li className="flex items-center gap-2 text-xs text-apagado">
+              <LoaderCircle size={12} className="animate-spin" /> Pensando…
+            </li>
+          )}
+        </ul>
+      )}
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          preguntar(pregunta);
+        }}
+        className="mt-4 flex gap-2"
+      >
+        <input
+          value={pregunta}
+          onChange={(e) => setPregunta(e.target.value)}
+          placeholder="Escribí tu pregunta"
+          className="flex-1 rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento"
+        />
+        <button
+          type="submit"
+          disabled={pensando || !pregunta.trim()}
+          className="flex items-center gap-1.5 rounded-md bg-acento px-3.5 py-2 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+        >
+          {pensando ? <LoaderCircle size={13} className="animate-spin" /> : <Send size={13} />}
+          Preguntar
+        </button>
+      </form>
+    </section>
+  );
+}
 
 /**
  * 🔑 Acá se ve por qué nadie tiene que crear un bot: cada persona se conecta

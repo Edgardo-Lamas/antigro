@@ -107,11 +107,24 @@ function infracciones(texto: string): string[] {
 /* ── 2. Cifras ───────────────────────────────────────────────────────────── */
 
 /**
- * Las únicas cifras que el sistema tiene derecho a decir, todas del estudio
- * nacional 2023. Cualquier otro porcentaje en un texto generado es un dato
- * inventado, y en este dominio un dato inventado hunde al producto entero.
+ * Las únicas cifras que el sistema tiene derecho a decir. Cualquier otro
+ * porcentaje en un texto generado es un dato inventado, y en este dominio un
+ * dato inventado hunde al producto entero.
+ *
+ * Dos fuentes: el **estudio nacional 2023** (Ministerio de Justicia) y el
+ * **Informe Grooming LATAM 2024/2025** (n≈28.360, 14 países), incorporado el
+ * 15/8. ⚠ Las del LATAM se agregaron el 16/8 al escribir el asistente: sin
+ * esto, citar el informe que el propio proyecto documenta caía al respaldo
+ * como si fuera una invención.
  */
-const CIFRAS_CITABLES = ["74,3", "74.3", "80", "56,4", "56.4", "35,4", "35.4", "63", "43", "60", "90", "40"];
+const CIFRAS_CITABLES = [
+  // Estudio nacional 2023
+  "74,3", "74.3", "80", "56,4", "56.4", "35,4", "35.4", "63", "43", "60", "90", "40",
+  // Informe Grooming LATAM 2024/2025
+  "72,8", "72.8", "33,3", "33.3", "64,9", "64.9", "25,5", "25.5",
+  "62,2", "62.2", "12,3", "12.3", "57,9", "57.9", "36,8", "36.8", "21,1", "21.1",
+  "4,4", "4.4",
+];
 
 function cifrasInventadas(texto: string): string[] {
   const encontradas = texto.match(/\b\d{1,3}(?:[.,]\d)?\s*%/g) ?? [];
@@ -163,6 +176,100 @@ export function revisarMensajeAlChico(texto: string, banda: BandaDeEdad): Veredi
   if (texto.trim().length < 40) {
     motivos.push("Demasiado corto para decir algo útil.");
   }
+
+  return { aprobado: motivos.length === 0, motivos };
+}
+
+/* ── 5. Lo que el asistente NO puede hacer, por más cálido que sea ───────── */
+
+/**
+ * 🔴 **Las tres cosas prohibidas: diagnosticar, tranquilizar y estimar
+ * probabilidad.** Diagnosticar ya lo frena `AFIRMACIONES_PROHIBIDAS`; estas
+ * reglas son para las otras dos.
+ *
+ * 🔑 **Por qué tranquilizar es lo más peligroso que puede hacer este producto:**
+ * un padre asustado va a pedir que le digan que no es nada, y es lo más humano
+ * del mundo dárselo. Pero *"por lo que veo no parece nada"*, dicha a la madre
+ * equivocada, **cierra un caso real** — y lo cierra con la autoridad de un
+ * sistema, que pesa más que una opinión. El asistente puede acompañar, ordenar
+ * y explicar; no puede bajarle el alerta a nadie.
+ *
+ * ⚠ Los patrones son ANGOSTOS a propósito. Uno amplio —bloquear
+ * "probablemente", por ejemplo— tiraría al respaldo frases legítimas como
+ * "probablemente te convenga hablar con ella antes", y un asistente que cae al
+ * respaldo todo el tiempo es un asistente que nadie usa. La línea va sobre la
+ * estimación del CASO, no sobre el adverbio.
+ */
+const TRANQUILIZAR_O_ESTIMAR: ReglaDeTexto[] = [
+  {
+    /* ⚠ El primer intento fue `\bqueda(te|se|\s+tranquil)`, y frenaba CUALQUIER
+       "quedate" — incluido "quedate con esto", que es una frase perfectamente
+       buena. Apareció en la primera prueba real: el modelo escribió una
+       respuesta correcta y el control la tiró al respaldo por una `t` y una `e`.
+       El patrón tiene que exigir la palabra que hace el daño. */
+    patron: /\b(qu[ée]da(te|se)|est[áa]te|and[áa])\s+tranquil|\bten[ée]\s+la\s+tranquilidad\b/i,
+    motivo: "🔴 Tranquiliza. El asistente acompaña; no le baja el alerta a nadie.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\bno\s+(te\s+)?preocup(es|arte|e)\b/i,
+    motivo: "🔴 Tranquiliza.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\bno\s+(parece|pinta|luce|suena)\s+(nada|grave|serio|preocupante|tan\s+grave)\b/i,
+    motivo: "🔴 Estima que no es nada. Eso, a la madre equivocada, cierra un caso real.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\b(es|parece|resulta|ser[íi]a)\s+(poco|muy|bastante|altamente)\s+probable\b/i,
+    motivo: "🔴 Estima probabilidad. El sistema no calcula chances de que haya acoso.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\bprobabilidad(es)?\s+de\s+que\b/i,
+    motivo: "🔴 Estima probabilidad.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\b(seguramente|lo\s+m[áa]s\s+probable\s+es\s+que)\s+(no\s+)?(sea|haya|est[ée]|pase)\b/i,
+    motivo: "🔴 Estima cómo va a resultar el caso.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\b(no\s+)?(hay|existe)\s+motivo\s+(para|de)\s+(preocupa|alarma)/i,
+    motivo: "🔴 Descarta el motivo de preocupación.",
+    negarLoHaceCorrecto: false,
+  },
+];
+
+/**
+ * El control del asistente.
+ *
+ * 🔑 Trabaja sobre las **afirmaciones**, no sobre el registro. Se puede
+ * escribir cálido sin aflojar un guardarraíl — son perillas independientes, y
+ * por eso no hay ninguna regla acá que penalice la calidez. Un asistente frío
+ * no es más seguro: es menos consultado, y uno que nadie consulta no protege
+ * a nadie.
+ */
+export function revisarRespuestaDelAsistente(texto: string): Veredicto {
+  const motivos: string[] = infracciones(texto);
+
+  for (const regla of TRANQUILIZAR_O_ESTIMAR) {
+    const encontrado = regla.patron.exec(texto);
+    if (!encontrado) continue;
+    if (regla.negarLoHaceCorrecto && vaNegada(texto, encontrado.index)) continue;
+    motivos.push(regla.motivo);
+  }
+
+  const inventadas = cifrasInventadas(texto);
+  if (inventadas.length > 0) {
+    motivos.push(`Cifras sin fuente: ${inventadas.map((c) => `${c}%`).join(", ")}.`);
+  }
+
+  // Es una conversación, no un aviso: el tope va más arriba que el de la lectura.
+  if (texto.trim().length < 20) motivos.push("Demasiado corto.");
+  if (texto.length > 3000) motivos.push(`Muy largo: ${texto.length} de 3000.`);
 
   return { aprobado: motivos.length === 0, motivos };
 }
