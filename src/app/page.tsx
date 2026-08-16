@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogIn } from "lucide-react";
+import { auth } from "@/auth";
 import { BAJADA, PRODUCTO } from "@/lib/config";
 import { hayBase } from "@/lib/supabase";
 import { estadoDeLasFuentes } from "@/lib/senales";
@@ -30,6 +31,23 @@ const ESCENARIO = "persistente";
  * `VERCEL_GIT_COMMIT_SHA` la pone Vercel en cada build. En local no existe, y
  * ahí dice «local» — que también es la respuesta correcta.
  */
+/**
+ * La puerta, según quién esté mirando.
+ *
+ * 🔑 Al que ya tiene la sesión abierta no se le vuelve a pedir la contraseña:
+ * se lo lleva derecho adentro. Mandar al logueo a alguien que ya está logueado
+ * es hacerle dar una vuelta para llegar al mismo lugar, y encima le hace dudar
+ * de si su cuenta sigue andando.
+ */
+async function laPuerta(): Promise<{ texto: string; destino: string }> {
+  const sesion = await auth();
+  const rol = (sesion?.user as { rol?: string } | undefined)?.rol;
+
+  if (rol === "adulto") return { texto: "Ir a mi familia", destino: "/mi-familia" };
+  if (rol === "admin") return { texto: "Ir al panel", destino: "/panel" };
+  return { texto: "Entrar a mi familia", destino: "/entrar" };
+}
+
 function version(): string {
   /* ⚠ Va el commit y NADA de fechas. La página es dinámica, así que un
      `new Date()` acá daría la hora de la visita y no la del deploy: diría "hoy"
@@ -41,6 +59,7 @@ function version(): string {
 export default async function Home() {
   const fuentes = await estadoDeLasFuentes(ESCENARIO);
   const canales = await estadoDeLosCanales();
+  const puerta = await laPuerta();
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
@@ -56,11 +75,11 @@ export default async function Home() {
           entra todo el que ya es cliente: si hay que buscarla, está mal hecha. */}
       <div className="flex justify-end pb-3">
         <Link
-          href="/entrar"
+          href={puerta.destino}
           className="flex items-center gap-2 rounded-md border border-acento/60 bg-acentoSuave px-4 py-2.5 text-sm font-semibold text-acento transition hover:border-acento hover:bg-acento hover:text-fondo"
         >
           <LogIn size={15} />
-          Entrar a mi familia
+          {puerta.texto}
         </Link>
       </div>
 
@@ -74,7 +93,7 @@ export default async function Home() {
         </p>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-apagado">
           Movés los controles y el motor vuelve a leer. No hace falta registrarse.{" "}
-          <Link href="/entrar" className="text-acento underline">
+          <Link href={puerta.destino} className="text-acento underline">
             Si ya tenés AntiGro en tu casa, entrá acá.
           </Link>
         </p>
