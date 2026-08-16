@@ -465,6 +465,8 @@ interface TurnoEnPantalla {
   quien: "adulto" | "asistente";
   texto: string;
   origen?: string | null;
+  /** Si salió el respaldo: lo frenó el control, o falló el pedido. */
+  causa?: string | null;
   fecha?: string;
 }
 
@@ -538,6 +540,7 @@ function Asistente({ chico }: { chico?: string }) {
           quien: "asistente",
           texto: res.ok ? d.texto : "No pude contestarte ahora. Probá de nuevo en un momento.",
           origen: d.origen,
+          causa: d.causa,
         },
       ]);
     } catch {
@@ -661,10 +664,20 @@ function Asistente({ chico }: { chico?: string }) {
                     )}
                     {/* 🔑 Cuando contesta el respaldo se dice. Que se vea el
                         momento en que el control frenó al modelo es lo que hace
-                        verificable la promesa, en vez de una frase en un README. */}
+                        verificable la promesa, en vez de una frase en un README.
+
+                        🔴 Y se dice CUÁL de las dos cosas pasó. Que el control
+                        frene es la promesa cumpliéndose; que se caiga la llamada
+                        es el sistema caído. Poner el cartel del control cuando
+                        en realidad falló el pedido es inventar la causa —y
+                        colgarse un mérito que no hubo. */}
                     {t.origen === "respaldo" && (
                       <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-atencion">
-                        texto de respaldo · el control no dejó pasar lo que escribió el modelo
+                        {t.causa === "control"
+                          ? "texto de respaldo · el control no dejó pasar lo que escribió el modelo"
+                          : t.causa === "falla"
+                            ? "texto de respaldo · no se pudo pedir la respuesta"
+                            : "texto de respaldo"}
                       </p>
                     )}
                   </div>

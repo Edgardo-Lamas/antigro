@@ -43,6 +43,17 @@ export interface Redaccion {
   texto: string;
   /** De dónde salió. Se muestra en pantalla: el jurado tiene que poder verlo. */
   origen: "ia" | "respaldo";
+  /**
+   * Qué pasó, cuando salió el respaldo.
+   *
+   * 🔴 **No son lo mismo y la pantalla no puede decir la que no fue.** Que el
+   * control frene una respuesta es una promesa cumpliéndose; que falle la
+   * llamada es el sistema caído. Mostrar "el control no dejó pasar lo que
+   * escribió el modelo" cuando en realidad se cayó la llamada es inventar una
+   * causa — el mismo error que el producto entero existe para no cometer, y
+   * encima se atribuiría un mérito que no hubo.
+   */
+  causa?: "control" | "falla";
   /** Por qué se cayó al respaldo, si es el caso. */
   motivos?: string[];
   /**

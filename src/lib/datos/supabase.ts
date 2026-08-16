@@ -72,6 +72,7 @@ type FilaCharla = {
   quien: TurnoDeCharla["quien"];
   texto: string;
   origen: TurnoDeCharla["origen"] | null;
+  causa: TurnoDeCharla["causa"] | null;
 };
 
 /** Fila ⇄ Canal. El destino puede venir vacío: en Telegram llega al vincular. */
@@ -116,6 +117,7 @@ const aTurno = (t: FilaCharla): TurnoDeCharla => ({
   quien: t.quien,
   texto: t.texto,
   origen: t.origen ?? undefined,
+  causa: t.causa ?? undefined,
 });
 
 const aAdulto = (a: FilaAdulto): AdultoResponsable => ({
@@ -442,6 +444,7 @@ export class RepositorioSupabase implements Repositorio {
         quien: t.quien,
         texto: t.texto,
         origen: t.origen ?? null,
+        causa: t.causa ?? null,
       })),
     );
   }

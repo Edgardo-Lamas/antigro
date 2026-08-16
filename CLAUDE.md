@@ -885,6 +885,31 @@ contestan el respaldo.
 al padre la frase para decirle al chico — lo más útil que contesta— y se veía el signo colgando
 adelante de la única línea que el padre va a copiar.
 
+### 🔴 El respaldo dice POR QUÉ no puede contestar más — lo corrigió Edgardo el 16/8
+
+> *"¿por qué no se le puede contestar más ampliamente? No es capricho, el sistema no tiene en un
+> día datos suficientes para analizar. Esto es una realidad y por eso no va a inventar."*
+
+Tenía razón en lo que importa: **una negativa sin motivo se lee como una política del producto, y
+una política se discute.** Un límite real, con el número adelante, se entiende — y entenderlo es
+lo que hace que el padre confíe en lo que el sistema **sí** dice.
+
+Ahora el respaldo trae la lectura y escribe *"el sistema lleva **1 día** conociendo a Ana… con
+eso alcanza para mirar, no para sacar conclusiones, y por eso el sistema no las inventa"*. El
+número sale del motor (`lectura.perfil.diasObservados`), así que la frase es cierta con un día y
+con trescientos.
+
+⚠ **Lo que ese texto NO hace es mentir sobre la causa de esa vez.** El respaldo salta porque
+falló la llamada o porque el control frenó lo que se escribió, y ninguna de las dos es la falta
+de historia. Por eso van separadas: primero que esta vez no se pudo, y aparte —porque es verdad
+siempre— cuánta historia hay. **Inventar la causa acá sería el error que el producto entero
+existe para no cometer.**
+
+📌 **Y el cartel de la pantalla dice cuál de las dos fue** (`causa`: `control` o `falla`, columna
+en `charlas` para que siga siendo cierto al recargar). Decía "el control no dejó pasar lo que
+escribió el modelo" incluso cuando se había caído la llamada: el mismo error una capa más
+arriba, y encima colgándose un mérito que no hubo.
+
 🔴 **La lectura se recalcula en el servidor en cada pregunta.** El navegador ya la tiene y sería
 más barato mandarla en el pedido — no se hace: quien controle el navegador controlaría entonces
 qué "vio" el sistema y podría hacerle decir al asistente cualquier cosa. Del cliente sólo viene

@@ -280,10 +280,15 @@ create table if not exists charlas (
   fecha      timestamptz not null default now(),
   quien      text not null check (quien in ('adulto', 'asistente')),
   texto      text not null,
-  -- Sólo en los turnos del asistente: si lo escribió el modelo o si lo frenó
-  -- el control y salió el respaldo. Que quede guardado es lo que permite
-  -- mirar después cuántas veces frenó de más.
+  -- Sólo en los turnos del asistente: si lo escribió el modelo o si salió el
+  -- respaldo. Que quede guardado es lo que permite mirar después cuántas
+  -- veces el control frenó de más.
   origen     text check (origen is null or origen in ('ia', 'respaldo')),
+  -- 🔴 Y si salió el respaldo, por qué. Que el control frene una respuesta es
+  -- la promesa cumpliéndose; que se caiga la llamada es el sistema caído. Sin
+  -- esta columna, al recargar el panel las dos se ven iguales y el sistema se
+  -- cuelga un mérito que no tuvo.
+  causa      text check (causa is null or causa in ('control', 'falla')),
   created_at timestamptz default now()
 );
 

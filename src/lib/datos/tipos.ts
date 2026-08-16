@@ -237,6 +237,16 @@ export interface TurnoDeCharla {
   texto: string;
   /** Sólo en los turnos del asistente: si lo escribió el modelo o el respaldo. */
   origen?: "ia" | "respaldo";
+  /**
+   * Y si salió el respaldo, por qué.
+   *
+   * 🔴 Se guarda para que la pantalla siga diciendo la verdad **después de
+   * recargar**. Que el control frene una respuesta es la promesa cumpliéndose;
+   * que se caiga la llamada es el sistema caído. Sin esta columna, al volver al
+   * otro día las dos se verían iguales y el sistema se estaría colgando un
+   * mérito que no tuvo.
+   */
+  causa?: "control" | "falla";
 }
 
 /**

@@ -216,11 +216,43 @@ function anthropic(): Anthropic | null {
  * 🔑 No es un mensaje de error: es la respuesta menos útil que el producto está
  * dispuesto a dar, y aun así deriva. Un asistente caído que dice "algo salió
  * mal" deja al adulto exactamente donde estaba antes de preguntar.
+ *
+ * 🔴 **Y dice POR QUÉ no puede contestar más ampliamente. Lo corrigió Edgardo el
+ * 16/8:** *"no es capricho, el sistema no tiene en un día datos suficientes
+ * para analizar. Esto es una realidad y por eso no va a inventar"*. Tenía razón
+ * en lo que importa: una negativa sin motivo se lee como una política del
+ * producto, y una política se discute. Un límite real, con el número adelante,
+ * se entiende — y entenderlo es lo que hace que el padre confíe en lo que el
+ * sistema **sí** dice.
+ *
+ * ⚠ **Lo que este texto NO hace es mentir sobre la causa de ESTA vez.** El
+ * respaldo salta porque falló la llamada o porque el control frenó lo que se
+ * escribió, y ninguna de esas dos cosas es la falta de historia. Así que van
+ * separadas: primero que esta vez no se pudo, y aparte —porque es verdad
+ * siempre y el adulto lo tiene que saber igual— cuánta historia hay y qué se
+ * puede afirmar con eso. Inventar la causa acá sería exactamente el error que
+ * el producto entero existe para no cometer.
  */
-function respaldo(nombreDelChico: string): string {
+function respaldo(nombreDelChico: string, lectura: Lectura | null): string {
+  const dias = lectura?.perfil.diasObservados ?? 0;
+
+  /* El límite real, con el número adelante. Es cierto con un día y con
+     trescientos: lo único que cambia es cuánto se puede afirmar. */
+  const cuantoSabe =
+    dias > 0
+      ? `Y hay algo que conviene que sepas igual, porque no es un capricho mío ni una manera ` +
+        `elegante de no contestarte: el sistema lleva **${dias} ${dias === 1 ? "día" : "días"}** ` +
+        `conociendo a ${nombreDelChico}. Todo lo que se compara contra su conducta previa se ` +
+        `apoya en esa historia, y cuanto más corta es, menos se puede afirmar. Lo que sí ` +
+        `funciona desde el primer día es la actividad de madrugada y los intentos de saltar el ` +
+        `filtro, porque no se comparan contra nada. Con eso alcanza para mirar; no alcanza para ` +
+        `sacar conclusiones, y por eso el sistema no las inventa.\n\n`
+      : "";
+
   return (
-    `Esta vez no te puedo contestar como corresponde, y prefiero decírtelo antes que ` +
+    `Esta vez no te puedo armar la respuesta como corresponde, y prefiero decírtelo antes que ` +
     `improvisar.\n\n` +
+    cuantoSabe +
     `Lo que sí te sirve ahora mismo: mirá el informe de ${nombreDelChico} —el "por qué" dice ` +
     `exactamente qué se vio y en qué días—, y si lo que estás sintiendo es que algo no está ` +
     `bien, no esperes a tener certeza. La ${RECURSOS.linea137.nombre} atiende las 24 horas al ` +
@@ -273,8 +305,9 @@ export async function responderAlAdulto(entrada: {
   const api = anthropic();
   if (!api) {
     return {
-      texto: respaldo(entrada.chico.nombre),
+      texto: respaldo(entrada.chico.nombre, entrada.lectura),
       origen: "respaldo",
+      causa: "falla",
       motivos: ["Sin clave de Anthropic configurada."],
     };
   }
@@ -328,8 +361,9 @@ export async function responderAlAdulto(entrada: {
       );
 
       return {
-        texto: respaldo(entrada.chico.nombre),
+        texto: respaldo(entrada.chico.nombre, entrada.lectura),
         origen: "respaldo",
+        causa: "control",
         motivos: veredicto.motivos,
         /* Se guarda lo que el control frenó: poder mostrar el texto rechazado es
            lo que convierte "le pusimos guardarraíles" en algo verificable. */
@@ -340,8 +374,9 @@ export async function responderAlAdulto(entrada: {
     return { texto, origen: "ia" };
   } catch (e) {
     return {
-      texto: respaldo(entrada.chico.nombre),
+      texto: respaldo(entrada.chico.nombre, entrada.lectura),
       origen: "respaldo",
+      causa: "falla",
       motivos: [e instanceof Error ? e.message : "Falló la llamada al modelo."],
     };
   }

@@ -74,6 +74,7 @@ export async function GET() {
       quien: t.quien,
       texto: t.texto,
       origen: t.origen ?? null,
+      causa: t.causa ?? null,
       fecha: t.fecha,
     })),
   });
@@ -181,6 +182,7 @@ export async function POST(req: Request) {
         quien: "asistente",
         texto: respuesta.texto,
         origen: respuesta.origen === "ia" ? "ia" : "respaldo",
+        causa: respuesta.causa,
       },
     ])
     /* Si falla el guardado, el adulto igual tiene que ver su respuesta: la
@@ -193,6 +195,10 @@ export async function POST(req: Request) {
        el modelo y cuándo lo frenó el control es lo que hace verificable la
        promesa, en vez de una frase en un README. */
     origen: respuesta.origen,
+    /* 🔴 Y con qué causa: que el control frene es la promesa cumpliéndose, que
+       falle la llamada es el sistema caído. Decir la que no fue sería inventar
+       —y encima colgarse un mérito que no hubo. */
+    causa: respuesta.causa ?? null,
     motivos: respuesta.motivos ?? null,
   });
 }
