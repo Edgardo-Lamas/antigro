@@ -11,25 +11,48 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN (cierre del 2026-08-16, de noche)
 
-### 🔴 LO PRIMERO: hay 5 commits SIN PUSHEAR y producción corre código viejo
+### ✅ Todo subido y EN PRODUCCIÓN — `antigro.vercel.app` sirve `ff8eb1e`
 
-Rama `fase-4-consola-y-observatorio`. `antigro.vercel.app` **no tiene nada de la sesión del 16 de
-noche**: ni la charla que se guarda, ni el respaldo nuevo, ni la corrección de la madrugada.
+Al cierre del 16/8 de noche quedó publicado todo: la charla que se guarda, el respaldo nuevo y la
+corrección de la madrugada. El pie de la home dice el commit, así que se comprueba de un vistazo
+qué se está mirando.
+
+### 🔴 Cómo se publica acá, porque NO es automático y se presta a confusión
+
+**La rama de trabajo es `fase-4-consola-y-observatorio` y NO es la rama de producción.** Un push
+acá genera **sólo un deploy de vista previa** (y encima protegido con el login de Vercel, así que
+`curl` devuelve 302 — hay que abrirlo en el navegador ya logueado). Producción se promueve **a
+mano**. La rama de producción es **`main`**, que existe en el remoto y **todavía no tiene nada de
+esto mergeado**.
+
+✅ **Cómo se hizo el 16/8, y conviene repetirlo así:**
 
 ```
-a001db4  Los cuatro temas parqueados para después del 23
-516a6f5  El PDF de presentación, regenerado
-fc18107  La madrugada no «desordena el descanso»
-0caf40f  El respaldo dice por qué no puede contestar más
-84c962f  El asistente se acuerda: la charla se guarda
+git push origin fase-4-consola-y-observatorio     # genera la vista previa
+npx vercel ls                                     # se copia la URL de la preview «Ready»
+npx vercel promote <url-de-la-preview> --yes      # la misma build pasa a producción
 ```
 
-✅ **Deployar es seguro: la base ya está adelante del código.** La tabla `charlas` con su columna
-`causa` se aplicó a producción el 16/8 y el código desplegado simplemente no la usa. Ese es el
-orden correcto (esquema primero, código después) y no hay nada que migrar antes de subir.
+🔑 **Promover la vista previa es mejor que `vercel --prod`:** se publica **exactamente el artefacto
+que ya se construyó y se verificó**, sin recompilar y sin riesgo de subir archivos locales que no
+están en el commit.
 
-**Preguntarle si lo sube antes de tocar otra cosa.** El pie de la home dice el commit, así que se
-comprueba de un vistazo qué se está mirando.
+### ⬜ Para que a futuro sea automático — pedido de Edgardo el 16/8
+
+**Lo que falta es una sola cosa: mergear a `main`.** La integración con Git ya está conectada
+(por eso el push genera la preview solo); lo único que pasa es que esta rama no es la de
+producción. Con el merge hecho, **cada push a `main` publica solo**.
+
+⚠ **Recomendación de cuándo hacerlo: no en los días previos al congelamiento.** Con producción
+automática, cualquier push a `main` sale en vivo al instante, incluido trabajo a medias. La forma
+sana es seguir trabajando en la rama de fase y **mergear a `main` cuando se quiere publicar** —
+eso ya es automático y encima deja la decisión de publicar donde tiene que estar.
+
+📌 Y hay algo que ordenar de paso: `main` viene quedando atrás desde el 15/8 (*"sin mergear a
+main — decide él"*). El merge cierra las dos cosas juntas.
+
+✅ **La base va adelante del código, que es el orden correcto.** La tabla `charlas` con su columna
+`causa` se aplicó a producción el 16/8, antes de publicar. Nada que migrar al deployar.
 
 ### Lo que quedó andando
 
