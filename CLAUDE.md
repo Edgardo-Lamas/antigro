@@ -9,19 +9,37 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
-## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN (cierre del 2026-08-16)
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN (cierre del 2026-08-16, de noche)
 
-**Todo lo de abajo está en producción y verificado.** `antigro.vercel.app` sirve el último
-deploy; el pie de la home dice el commit, así que se comprueba de un vistazo qué se está mirando.
+### 🔴 LO PRIMERO: hay 5 commits SIN PUSHEAR y producción corre código viejo
 
-### Lo que quedó andando hoy
+Rama `fase-4-consola-y-observatorio`. `antigro.vercel.app` **no tiene nada de la sesión del 16 de
+noche**: ni la charla que se guarda, ni el respaldo nuevo, ni la corrección de la madrugada.
+
+```
+a001db4  Los cuatro temas parqueados para después del 23
+516a6f5  El PDF de presentación, regenerado
+fc18107  La madrugada no «desordena el descanso»
+0caf40f  El respaldo dice por qué no puede contestar más
+84c962f  El asistente se acuerda: la charla se guarda
+```
+
+✅ **Deployar es seguro: la base ya está adelante del código.** La tabla `charlas` con su columna
+`causa` se aplicó a producción el 16/8 y el código desplegado simplemente no la usa. Ese es el
+orden correcto (esquema primero, código después) y no hay nada que migrar antes de subir.
+
+**Preguntarle si lo sube antes de tocar otra cosa.** El pie de la home dice el commit, así que se
+comprueba de un vistazo qué se está mirando.
+
+### Lo que quedó andando
 
 | | |
 |---|---|
 | **Supabase** | Provisionado **por el Marketplace de Vercel** (`supabase-beige-flower`), esquema aplicado, producción usándolo |
 | **El cupo del QR** | Arreglado y **verificado con un teléfono real**: QR → Iniciar → cupo 1/3 → aviso entregado |
 | **El panel de la familia** | `/entrar` + `/mi-familia`: informe del motor, quiénes están, QR por referente, baja con motivo |
-| **El asistente** | Escrito, probado contra *"decime que no es nada"*, y **la charla ya se guarda y se retoma** |
+| **El asistente** | Se acuerda de la charla, la retoma y la borra. Probado contra *"decime que no es nada"* |
+| **El observatorio** | Estadística propia con **lift**, sin esperar volumen. Ya funciona — falta **contarlo**, no construirlo |
 | **El bot** | Ya se llama **AntiGro** (tenía una pe de más) |
 
 ### ✅ La segunda vuelta del asistente — hecha el 16/8 a la noche
@@ -36,19 +54,33 @@ la sección del asistente, más abajo. Lo que salió de ahí y no estaba previst
 - ✅ **Quedaron doce casos escritos:** `npm run probar-reglas`. Tres veces el mismo tipo de error
   y ninguna la encontró el typecheck — **toda regla nueva entra con su caso que pasa y su caso
   que se frena.**
+- 🔴 **El respaldo ahora dice POR QUÉ no puede contestar más**, con los días del motor adelante.
+  Corrección suya, y desarmó de paso un cartel que mentía sobre la causa.
+- 🔴 **«La madrugada desordena el descanso» era falso y estaba en tres lados**, el PDF incluido.
+  Lo volteó él. Tirando de ese hilo apareció que el asistente explicaba **dos de las cuatro
+  señales al revés**.
 - 📌 El asistente sigue sin ver el cuestionario más que resumido dentro de la lectura.
 
 ### ⬜ Lo que sigue, en este orden
 
-1. **El alta desde el panel.** Hoy una familia entra por API.
+1. **El alta desde el panel.** Hoy una familia entra por API. **Acá arranca la próxima sesión** —
+   quedó dicho el 16/8 de noche: *"sí pero lo vemos en otra sesión"*.
+   🔑 Y ahora el alta carga algo más que nombre y edad: ver **el contexto del chico**, abajo.
 2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
+   ⚠ **Él pidió ir despacio con esto**, textual: *"con el cuestionario vamos despacio, decidimos
+   en un rato"*. No resolverlo de un saque.
    🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que dispara
    el sistema no es una alerta, es el cuestionario.*
-3. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil — ver el hallazgo del 16/8 más abajo.
+3. **El acuse de recibo y la escalada.** Planteado y **diseñado** el 16/8 — sección propia abajo.
+   Va después del alta y el cuestionario.
+4. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil — ver el hallazgo del 16/8 más abajo.
    Recomendación: tres teléfonos filmados, nunca un escaneo en vivo.
-4. **El trailer, AL FINAL.** 🔴 Lo decidió él al cerrar el 16/8: *"el trailer lo vemos al final,
+5. **El trailer, AL FINAL.** 🔴 Lo decidió él al cerrar el 16/8: *"el trailer lo vemos al final,
    recién cuando tengamos el sistema operativo y podamos decidir qué usar para el video"*. No
    empezarlo antes. El guion actual todavía es el de Criterio Térmico.
+
+📌 Y hay **cuatro temas parqueados con acuerdo para después del 23** — ver la sección
+«DESPUÉS DEL 23». No entran antes del congelamiento.
 
 ### ⚠ Dos cosas que le tocan a él, no al código
 
@@ -713,6 +745,118 @@ Canales reales verificados el 15/8: **UFECI** (Unidad Fiscal Especializada en Ci
 Equipo de Violencia Digital acompaña hasta la denuncia.
 📌 Y encaja con la conversación de partner: **Grooming Argentina ya articula con el sistema
 judicial.** AntiGro no denuncia — equipa al que denuncia.
+
+---
+
+## ⬜ EL CONTEXTO DEL CHICO — qué se carga en el alta, decidido el 16/8
+
+**Salió de la corrección de la madrugada:** el sistema no sabe a qué hora se levanta ese chico, y
+por eso no puede afirmar nada sobre su descanso. Edgardo cerró el hueco enseguida: *"la
+información del cuestionario debe darle al asistente información del chico, por ejemplo si va al
+colegio por la mañana, por la tarde, si es un colegio mixto, público, etc."*
+
+### 🔑 El turno escolar NO es una pregunta del cuestionario — es dato del alta
+
+Son dos cosas de naturaleza distinta y conviene no mezclarlas:
+
+| | Qué es | Dónde vive |
+|---|---|---|
+| **Cuestionario** | Observación **periódica**: *"¿con qué frecuencia viste X?"*, 0 a 3. Se vuelve a contestar | `observaciones` |
+| **Turno escolar** | Dato **fijo** del chico, como la edad y el género | El alta, junto al `Chico` |
+
+✅ **Y se enchufa solo en un mecanismo que ya existe y ya está probado.** Hoy `horaDeReferencia`
+corre la hora de la madrugada **según la edad** (22 h a los 10, 01 h a los 17). Si el chico entra
+al colegio a las 7, se corre para el otro lado; si va al turno tarde, también. **Mismo principio
+que ya funciona: se mueve la hora, no se toca el peso.** Ver `factorMadrugada` en `pesos.ts`.
+
+### Las vacaciones son un período, no una constante
+
+Un interruptor en el panel —*"estamos de vacaciones"*— es más honesto que deducirlo de un
+calendario. Sin eso, un chico de vacaciones acumula madrugadas que no significan lo mismo.
+
+### 🔴 Lo demás es CONTEXTO, nunca puntaje — acordado
+
+Colegio mixto o público, padres separados, chico que vive con tíos o abuelos: **no mueven ningún
+número.** Palabras de Edgardo: *"claro que lo que te dije debe sumar a contexto no puntaje. Ahí es
+donde el sistema debe ser un sabueso/inspector"*. El porqué completo está en la sección
+«DESPUÉS DEL 23», punto 2 — lo documentado no es la forma de la familia, es si el chico puede
+hablar con alguien.
+
+**Dónde sí sirve ese contexto, sin hacer daño:**
+
+- **El asistente**, para no dar consejo estúpido. Si el que pregunta es el abuelo, *"hablá con tu
+  hija"* no sirve.
+- **La escalada.** Si los padres están separados y viven en casas distintas, la segunda línea es
+  naturalmente la otra casa.
+- **El cuestionario**, que ya tiene la maquinaria: cada indicador lleva su `procedencia` y dice
+  cuando no hay fuente primaria. Si algún día un dato se gana un peso, entra por ahí y documentado.
+
+---
+
+## ⬜ EL ACUSE DE RECIBO Y LA ESCALADA — diseñado el 16/8, sin construir
+
+**Lo planteó Edgardo:** *"tenemos que crear un método que confirme que el padre recibió el
+alerta, y si no lo recibió actuar de alguna manera… supongamos que al padre le robaron el celular,
+o que muy atareado lo dejó pasar. Debería contestar al sistema de alguna manera, y si no hubo
+respuesta el sistema debería activar una segunda línea de alertas."*
+
+### 🔴 El agujero, medido
+
+**Hoy `Respuesta.entregado` significa «el transporte aceptó el mensaje».** Telegram devolvió `ok`.
+Si el teléfono está robado, apagado, o el padre deslizó la notificación sin leer, queda registrado
+como entregado igual. **No tenemos ni el dato para saber con qué frecuencia pasa.**
+
+### Las cuatro piezas, y cuál no existe
+
+| Pieza | Estado |
+|---|---|
+| **El acuse** | Botón bajo el aviso en Telegram (`callback_query`). ⚠ El webhook hoy **sólo escucha `message`**, no toques de botón. En correo, un enlace que pegue en nuestro servidor |
+| **Dónde se guarda** | `Respuesta` necesita `acusadoEn` + un token de un solo uso. Dos columnas |
+| **Un reloj** | 🔴 **No existe nada.** AntiGro nunca se despierta solo: todo pasa cuando alguien abre una página o cuando Telegram nos golpea. Hace falta un cron (**no hay `vercel.json` ni `vercel.ts`**) |
+| **La política** | Decidida abajo |
+
+### 🔑 La política: cuelga de la PERSISTENCIA, no de un cronómetro
+
+**Es la regla 5 aplicada a la insistencia.** *No se alerta por un evento, se alerta por
+persistencia* — y lo mismo vale para volver a golpear:
+
+- El aviso sale con patrón sostenido. Nadie acusa recibo.
+- **Si el patrón se sigue sosteniendo, el sistema escala.** La razón para insistir sigue viva.
+- **Si el patrón se cortó, no escala.** Perseguir a un padre por un aviso que ya no tiene sustento
+  es exactamente cómo se gana el silenciado.
+
+🔑 **Hay dos relojes y mezclarlos es la trampa:** el de *«¿lo vieron?»* corre en **horas**; el de
+*«¿sigue pasando?»* corre en **días**. La escalada cuelga del segundo; el primero sólo dispara la
+pregunta.
+
+⚠ **Una excepción:** la **evasión del filtro**. Es la señal más fuerte y es un acto deliberado. Un
+patrón sostenido *con evasión* y sin nadie que acuse recibo es el caso donde esperar un día entero
+se siente mal.
+
+### 🔴 Qué es la «segunda línea», que no es obvio
+
+**El aviso ya sale a los dos adultos como mínimo.** Que a uno le roben el celular no es el
+problema — el otro lo recibió. El caso que duele es que **ninguno de los dos acuse**. Tres
+candidatas, y no dan lo mismo:
+
+1. El **otro canal de la misma persona** (Telegram cayó → correo).
+2. Un mensaje **distinto** al otro adulto: *«a Mariana le avisamos hace ocho horas y no lo vio»*.
+3. El **referente que eligió el chico**, si es un tercero fuera de los dos.
+
+📌 **La escalera tiene techo, porque AntiGro no denuncia.** Arriba de todo está el panel
+diciéndolo fuerte y **el chico, que ya recibió lo suyo por su canal sin depender de ningún
+adulto** — eso ya está construido y es justamente contra este escenario.
+
+### ⚠ Toca una regla ya escrita, y tiene que ser consciente
+
+`avisar.ts` dice: *"no se repite el aviso — un sistema que manda la misma alerta todos los días se
+apaga solo, y el día que tenga algo nuevo para decir nadie lo va a leer"*. Escalar por silencio no
+es repetir a ciegas, pero roza esa regla: **que el cambio sea deliberado y quede escrito ahí.**
+
+### 📌 Recomendación de orden
+
+**El acuse primero, la escalada después.** El botón es barato y sin él estamos ciegos: no se puede
+diseñar la escalada sin saber cuántas veces pasa de verdad.
 
 ---
 
