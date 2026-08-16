@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BAJADA, PRODUCTO } from "@/lib/config";
 import { hayBase } from "@/lib/supabase";
 import { estadoDeLasFuentes } from "@/lib/senales";
@@ -28,6 +29,20 @@ export default async function Home() {
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
+      {/* 🔴 La puerta de la familia va ACÁ ARRIBA, a la vista desde el primer
+          segundo. Una pantalla de logueo que no está enlazada en ningún lado
+          obliga a saberse una dirección de memoria, y eso no es una molestia
+          de navegación: es una puerta sin picaporte. Quien ya es cliente entra
+          por acá y no tiene que aprender nada. */}
+      <div className="flex justify-end pb-2">
+        <Link
+          href="/entrar"
+          className="rounded-md border border-borde px-3.5 py-2 text-sm font-medium text-tenue transition hover:border-acento hover:text-acento"
+        >
+          Entrar a mi familia
+        </Link>
+      </div>
+
       <header className="pb-8">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-apagado">
           CoderCup AI · entrega 23 de agosto de 2026
@@ -37,7 +52,10 @@ export default async function Home() {
           {BAJADA}
         </p>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-apagado">
-          Movés los controles y el motor vuelve a leer. No hace falta registrarse.
+          Movés los controles y el motor vuelve a leer. No hace falta registrarse.{" "}
+          <Link href="/entrar" className="text-acento underline">
+            Si ya tenés AntiGro en tu casa, entrá acá.
+          </Link>
         </p>
       </header>
 
