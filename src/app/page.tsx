@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogIn } from "lucide-react";
 import { BAJADA, PRODUCTO } from "@/lib/config";
 import { hayBase } from "@/lib/supabase";
 import { estadoDeLasFuentes } from "@/lib/senales";
@@ -34,11 +35,17 @@ export default async function Home() {
           obliga a saberse una dirección de memoria, y eso no es una molestia
           de navegación: es una puerta sin picaporte. Quien ya es cliente entra
           por acá y no tiene que aprender nada. */}
-      <div className="flex justify-end pb-2">
+      {/* ⚠ Va con el color de identidad y no en gris, y eso NO es decoración.
+          El primer intento fue un recuadro `border-borde` con texto `text-tenue`
+          —gris sobre gris, arriba de una página larga— y era invisible en la
+          práctica aunque estuviera en el HTML. Esta es la puerta por la que
+          entra todo el que ya es cliente: si hay que buscarla, está mal hecha. */}
+      <div className="flex justify-end pb-3">
         <Link
           href="/entrar"
-          className="rounded-md border border-borde px-3.5 py-2 text-sm font-medium text-tenue transition hover:border-acento hover:text-acento"
+          className="flex items-center gap-2 rounded-md border border-acento/60 bg-acentoSuave px-4 py-2.5 text-sm font-semibold text-acento transition hover:border-acento hover:bg-acento hover:text-fondo"
         >
+          <LogIn size={15} />
           Entrar a mi familia
         </Link>
       </div>
