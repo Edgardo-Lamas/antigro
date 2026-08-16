@@ -714,6 +714,73 @@ Equipo de Violencia Digital acompaña hasta la denuncia.
 📌 Y encaja con la conversación de partner: **Grooming Argentina ya articula con el sistema
 judicial.** AntiGro no denuncia — equipa al que denuncia.
 
+---
+
+## 🗓 DESPUÉS DEL 23 — parqueado con acuerdo, no olvidado
+
+**Los cuatro los trajo Edgardo el 16/8 y él mismo los mandó a después de la presentación.** No
+entran antes del congelamiento del jueves 20; quedan escritos para no volver a pensarlos de cero.
+
+### 1. La investigación de verdad, por la vía policial-judicial
+
+🔑 **El dato es de una psicóloga que le comentó a Edgardo** que este material se consigue en
+**esferas policiales y judiciales**, no en la web abierta. Encaja con lo poco que encontramos: el
+único estudio de factores de riesgo que apareció está armado sobre **sentencias** (20 sentencias
+españolas, 65 víctimas —
+[Revista de Psicología, COP Madrid, 2023](https://journals.copmadrid.org/apj/art/apj2023a9)).
+
+⚠ **Reconocido el 16/8: la investigación que hicimos no alcanza.** Es de fuentes abiertas y de
+muestras chicas. Vale para sostener lo que el producto afirma hoy; no vale para fundar pesos
+nuevos.
+
+### 2. El perfil de vulnerabilidad — **contexto, nunca puntaje**
+
+Edgardo planteó usar escuela mixta o pública, padres separados, chico que vive con tíos o abuelos.
+**Acordado el 16/8: eso suma al contexto, no al puntaje** — palabras suyas: *"claro que lo que te
+dije debe sumar a contexto no puntaje. Ahí es donde el sistema debe ser un sabueso/inspector"*.
+
+🔴 **Y hay un motivo fuerte además del acuerdo: lo documentado no es la forma de la familia, es si
+el chico puede hablar con alguien.** El estudio de arriba enumera edad, sexo, tiempo en internet,
+discapacidad intelectual, historia previa de abuso, autoestima y **comunicación familiar
+deficiente** — y **no aborda** estructura familiar ni tipo de escuela. Un puntaje que suba porque
+el chico vive con la abuela convierte a AntiGro de *"percibe señales"* en *"clasifica chicos"*, le
+dice eso a una abuela con autoridad de sistema, y no tiene con qué respaldarlo.
+
+📌 El factor mejor documentado **ya está resuelto en el producto y sin puntuar a nadie**: el 43%
+que no habla del tema con sus padres es exactamente *"comunicación familiar deficiente"*, y la
+respuesta de AntiGro no es un score, es **el segundo adulto que elige el chico**.
+
+⬜ Dos factores documentados que hoy NO usamos y merecen discusión seria: **historia previa de
+abuso** —engancha con el punto ciego del 14/8, el chico que ya venía siendo acosado antes del
+alta— y **discapacidad intelectual**. Los dos son delicados de preguntar en un alta.
+
+### 3. El informe para que el padre denuncie
+
+**Preguntado por Edgardo el 16/8. NO existe, y no hay que confundirlo con el de la sección de
+abajo** (ese es AntiGro reportando un **dominio** a la UFECI; este es un padre yendo a denunciar
+por **su** hijo).
+
+🔑 Lo que lo haría útil no es una conclusión —el sistema no afirma, regla 1— sino **el registro
+fechado**: qué se observó, en qué días, y qué es lo que el sistema explícitamente NO puede ver.
+`senalesQueLaSostienen` existe justamente para que cada cosa dicha se pueda mostrar.
+⚠ Y un informe así **no es prueba** (mismo argumento que abajo): es una cronología que ordena la
+denuncia. Presentarlo como prueba quema la credibilidad ante la única oficina que hace falta.
+
+### 4. El mismo motor para bullying
+
+**Lo levantó Edgardo el 16/8:** *"si esto sale bien el mismo motor puede servir para casos de
+bullying"*.
+
+✅ **La arquitectura transfiere y ya está construida así:** tres entradas detrás de interfaces,
+persistencia en vez de eventos, el control sobre lo generado, dos adultos, el chico enterado.
+🔴 **Los números NO transfieren.** Los pesos salen de estudios de grooming y los indicadores del
+cuestionario tienen `procedencia` documentada para grooming. El bullying además pasa en buena
+parte **en la escuela**, donde la red no ve nada. Habría que volver a fundar pesos e indicadores.
+📌 Por eso el PDF de presentación **no dice nada de bullying**, y esa decisión se mantiene: se
+puede contar como dirección del proyecto, no como algo que ya hace.
+
+---
+
 ## Modelo de datos
 
 - **Familia**
