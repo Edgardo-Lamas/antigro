@@ -47,3 +47,34 @@ export function bandaDeEdad(edad: number): BandaDeEdad {
   if (edad <= 13) return "11-13";
   return "14-17";
 }
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────
+ *  EL REFERENTE DEL CHICO — quién lo elige (decidido con Edgardo el 16/8)
+ * ─────────────────────────────────────────────────────────────────────────
+ *
+ * 🔑 **El adulto de confianza fuera de los padres existe en TODAS las edades.**
+ * Eso no se discute y no depende de la edad: el 43% de los chicos no habla de
+ * estos temas con sus padres, así que el segundo adulto no es redundancia.
+ *
+ * 🔴 **Lo que sí depende de la edad es quién lo elige.** Lo planteó Edgardo:
+ * *"un chico de 7 años no tiene la capacidad de decidir ese tema"*. Tiene
+ * razón, y el sistema no puede fingir que una elección de un nene de 7 es
+ * equivalente a la de uno de 15.
+ *
+ * ⚠ **Este número es criterio de producto, no un dato.** No hay ninguna
+ * fuente del dominio que fije una edad para elegir un confidente, y no hay
+ * que citarlo como si la hubiera. Está en 11 porque es donde ya cortan las
+ * bandas del sistema —y porque el informe LATAM declara 9 a 13 como la franja
+ * más vulnerable, así que a esa altura el chico ya está adentro del problema
+ * que el referente viene a resolver.
+ *
+ * 📌 Es un valor por defecto, no un muro: existe el nene de 9 maduro y el de
+ * 13 que no quiere elegir a nadie. Los padres lo pueden mover en el alta.
+ */
+export const EDAD_PARA_ELEGIR_REFERENTE = 11;
+
+/** De 11 para arriba elige el chico; abajo, lo eligen los padres. */
+export function quienEligeAlReferente(edad: number): "el_chico" | "los_padres" {
+  return edad >= EDAD_PARA_ELEGIR_REFERENTE ? "el_chico" : "los_padres";
+}

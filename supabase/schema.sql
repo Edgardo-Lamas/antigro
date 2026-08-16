@@ -166,5 +166,84 @@ create index if not exists observaciones_chico_fecha_idx on observaciones (chico
 
 alter table observaciones enable row level security;
 
+
+-- ─── 8. EL CUPO DE LA DEMO ───────────────────────────────────────
+--  🔴 Esto NO estaba en la base y por eso el QR no funcionaba en producción.
+--  El cupo vivía en `globalThis`, y en Vercel cada ruta de API es una función
+--  distinta con su propia memoria: el webhook conectaba a alguien en SU
+--  memoria y la consola seguía mostrando 0 de 3. En local anda porque es un
+--  solo proceso. Es la misma trampa que ya nos habíamos comido con el
+--  repositorio en memoria, repetida acá.
+--
+--  🔑 El índice único sobre `rol` ES el cupo. Como hay exactamente tres roles,
+--  la base sola garantiza que no haya dos personas en el mismo lugar aunque
+--  dos escaneen el QR en el mismo segundo. Contando filas en la aplicación
+--  eso era una carrera; acá no puede pasar.
+
+create table if not exists cupo_demo (
+  chat_id text primary key,
+  rol     text not null check (rol in ('madre', 'tia', 'chico')),
+  nombre  text not null,
+  -- Última señal de vida. Un cupo tomado para siempre es un cupo perdido:
+  -- se vence solo a la media hora.
+  visto   timestamptz not null default now()
+);
+
+create unique index if not exists cupo_demo_rol_idx on cupo_demo (rol);
+
+alter table cupo_demo enable row level security;
+
+
+-- ─── 9. CUENTAS DE LOS ADULTOS RESPONSABLES ──────────────────────
+--  Decidido con Edgardo el 16/8: entran con usuario y contraseña **los dos
+--  adultos responsables**, cada uno con la suya. El chico y cualquier otro
+--  referente NO tienen cuenta: escanean el QR y reciben por su canal.
+--
+--  🔑 Las credenciales viven en UN solo lugar (`usuarios`) y el `rol` dice
+--  si es el panel de administración o el de una familia. Así NextAuth lee
+--  una sola tabla, y un adulto puede existir sin cuenta —la tía que sólo
+--  quiere el aviso por Telegram— sin ninguna fila fantasma.
+
+alter table usuarios drop constraint if exists usuarios_rol_check;
+alter table usuarios add constraint usuarios_rol_check
+  check (rol in ('admin', 'adulto'));
+
+alter table usuarios add column if not exists adulto_id uuid
+  references adultos(id) on delete cascade;
+
+-- Una cuenta por adulto, y ninguna cuenta de adulto sin adulto detrás.
+create unique index if not exists usuarios_adulto_idx on usuarios (adulto_id);
+
+alter table usuarios drop constraint if exists usuarios_adulto_coherente;
+alter table usuarios add constraint usuarios_adulto_coherente check (
+  (rol = 'admin'  and adulto_id is null) or
+  (rol = 'adulto' and adulto_id is not null)
+);
+
+
+-- ─── 10. LA BAJA Y EL CAMBIO DE UN ADULTO ────────────────────────
+--  🔴 El cambio NO lleva ninguna traba, y lo marcó Edgardo el 16/8: el
+--  referente se muda, fallece, pierde el teléfono, o el chico simplemente lo
+--  quiere cambiar. Ninguna de esas es una excepción rara: es la vida normal
+--  de una familia. Un sistema que dificulta el reemplazo termina con un
+--  referente que ya no existe, que es peor que no tener ninguno.
+--
+--  🔴 La baja es blanda, no un `delete`. Dos motivos: las observaciones que
+--  ese adulto cargó son entrada del motor y borrarlas cambiaría lecturas ya
+--  hechas; y el sistema tiene que poder decir después que esa persona estuvo.
+
+alter table adultos add column if not exists activo boolean not null default true;
+alter table adultos add column if not exists baja_en timestamptz;
+
+--  El motivo no es burocracia: «lo quiere cambiar el chico» y «perdió el
+--  teléfono» son dos hechos distintos, y el primero puede importar —un cambio
+--  de referente justo después de un aviso es algo que los adultos tienen que
+--  poder ver.
+alter table adultos add column if not exists baja_motivo text
+  check (baja_motivo is null or baja_motivo in
+    ('se_mudo', 'fallecio', 'perdio_el_telefono', 'lo_cambio_el_chico', 'otro'));
+
+create index if not exists adultos_activo_idx on adultos (familia_id, activo);
+
 -- Ninguna tabla tiene políticas para anon: todo pasa por el servidor con
 -- service role, y el token de familia se valida ahí.

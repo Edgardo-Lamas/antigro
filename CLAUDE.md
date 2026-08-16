@@ -217,6 +217,22 @@ un número.
 | El cupo, los roles y el vencimiento | `src/lib/mensajeria/cupo-demo.ts` |
 | QR (GET) y entrega real (POST) | `src/app/api/demo/telegram/route.ts` |
 | El código del QR, atajado primero | `POST /api/telegram/webhook` |
+| La tabla | `cupo_demo` (punto 8 de `supabase/schema.sql`) |
+
+🔴 **El cupo vivía en `globalThis` y en producción NO FUNCIONABA. Arreglado el 16/8.**
+Medido contra producción el 15/8: el escaneo entraba y la consola mostraba 0 de 3, siempre. En
+Vercel **cada ruta de API es una función distinta con su propia memoria**, así que el webhook
+tomaba el cupo en la suya y la consola miraba otra. En local andaba porque es un solo proceso —
+por eso pasó todas las pruebas. **Es la misma trampa que ya nos habíamos comido con el
+repositorio, repetida.** La regla que queda: *si dos rutas tienen que ver el mismo dato, el dato
+no puede vivir en memoria.*
+
+🔑 **Y el arreglo trajo algo que en memoria no se podía tener: el índice único sobre `rol` ES el
+cupo.** Como hay exactamente tres roles, la base sola impide que dos personas caigan en el mismo
+lugar aunque escaneen en el mismo segundo. Contar filas en la aplicación era una carrera; el
+`insert` prueba los roles libres de a uno y ante un 23505 pasa al siguiente en vez de pisar.
+📌 Sin base configurada sigue usando la memoria: en una sola máquina alcanza y el modo demo
+tiene que andar siempre.
 
 🔴 **Tres, y no es un número al azar: es el modelo del producto.** Dos adultos responsables —uno
 elegido por el chico— y el chico en su canal. Tres personas escanean el **mismo** QR y reciben
@@ -586,6 +602,82 @@ judicial.** AntiGro no denuncia — equipa al que denuncia.
 - **Canales configurables al contratar:** Telegram, correo, WhatsApp. La capa de mensajería es
   indiferente al canal.
 - **Registro de señales y respuestas con fecha** — sin esto no se puede medir persistencia.
+
+---
+
+## 🏠 EL PANEL DE LA FAMILIA — decidido con Edgardo el 16/8/2026
+
+**Lo trajo él, y es más que una pantalla de logueo: es el producto del lado del cliente.**
+Su planteo textual: *"debe existir un panel donde los padres reciben las notificaciones, los
+informes, está el asistente, tienen el código QR para incluir a los referentes, incluso darlos
+de baja"*.
+
+🔑 **Resuelve tres cosas que estaban sueltas de una sola vez:** el formulario de alta que quedó
+pendiente de la fase 4, dónde vive el asistente, y la versión real del QR (hoy sólo existe el
+de la demo). El asistente no es una pantalla aparte: **vive adentro del panel.**
+
+📌 `/familia/[token]` ya tiene la mitad: quiénes están, quién falta conectar, el código de
+vinculación de cada uno y la línea de tiempo. **Lo que no tiene:** la puerta con contraseña, el
+informe del motor (hoy vive sólo en la consola demo), el asistente, el QR y la baja.
+
+### Quién tiene cuenta
+
+| Quién | Entra con contraseña | Recibe por su canal |
+|---|---|---|
+| **Los dos adultos responsables** | ✅ sí, cada uno la suya | ✅ |
+| **El chico** | ❌ no | ✅ (texto distinto, por banda) |
+| Cualquier otro referente | ❌ no | ✅ |
+
+Las credenciales viven en **una sola tabla** (`usuarios`) y el `rol` dice si es el panel de
+administración o el de una familia. Así NextAuth lee un solo lugar, y un adulto puede existir
+sin cuenta —el que sólo quiere el aviso por Telegram— sin ninguna fila fantasma.
+
+⚠ Él eligió esto sabiendo el costo: el segundo adulto responsable **ve el informe completo de
+Ana**. Es coherente —es un adulto responsable, no un espectador— pero está elegido, no asumido.
+
+### 🔴 El referente del chico: existe siempre, pero no siempre lo elige él
+
+**Lo marcó Edgardo:** *"esa opción la van a usar los chicos más grandes, me parece que un chico
+de 7 años no tiene la capacidad de decidir ese tema, pero también creo que es una buena idea
+tener un referente fuera de los padres"*.
+
+- **El adulto fuera de los padres existe en TODAS las edades.** No depende de la edad, y es lo
+  que sostiene el 43% que no habla de estos temas con sus padres.
+- **Lo que depende de la edad es quién lo elige:** de 7 a 10 lo eligen los padres, de 11 en
+  adelante lo elige el chico. `EDAD_PARA_ELEGIR_REFERENTE` en `src/lib/config.ts`.
+- ⚠ **Ese 11 es criterio de producto, no un dato.** No hay fuente que fije una edad para elegir
+  un confidente y **no se cita como si la hubiera**. Está ahí porque es donde ya cortan las
+  bandas del sistema. Es un valor por defecto que los padres pueden mover en el alta.
+
+### 🔴 El cambio de referente no lleva ninguna traba
+
+**También suyo:** *"puede pasar que el referente del chico se muda, fallece, el chico lo quiere
+cambiar, pierde el teléfono, etc. Tiene que estar abierta esa posibilidad de cambio."*
+
+Ninguna de esas es una excepción rara: es la vida normal de una familia. **Un sistema que
+dificulta el reemplazo termina con un referente que ya no existe, que es peor que no tener
+ninguno.** Por eso:
+
+- La baja es **blanda** (`adultos.activo`), nunca un `delete`: las observaciones que ese adulto
+  cargó son entrada del motor, y borrarlas cambiaría lecturas ya hechas.
+- Se registra el **motivo** (`baja_motivo`). No es burocracia: «lo quiere cambiar el chico» y
+  «perdió el teléfono» son dos hechos distintos, y un cambio de referente justo después de un
+  aviso es algo que los adultos tienen que poder ver.
+- 🔑 **Si el chico lo había elegido, el chico se entera del cambio por su canal.** Ese segundo
+  adulto existe justamente porque el chico no habla con los padres; una baja silenciosa lo
+  convertiría en un sistema que trabaja *sobre* el chico y no *para* él.
+
+### La suscripción — el modelo se define, todavía no se cobra
+
+**Decidido el 16/8, con el código congelándose el jueves 20.** Se construye la cuenta y el
+panel entero; el precio y el plan quedan escritos, pero **nadie paga por ahora**. No hay
+checkout, no hay Mercado Pago, no hay estados de pago en la base.
+
+📌 `familias.activo` ya alcanza como estado del servicio: la página de la familia devuelve 403 y
+dice *"El servicio está pausado para esta familia"*. Eso es todo lo que la suscripción necesita
+hoy del lado de los datos.
+⚠ **Falta escribir el modelo en palabras** (qué incluye, por familia o por chico, cuántos
+referentes). Es contenido para el PDF y el guion, no código.
 
 ---
 

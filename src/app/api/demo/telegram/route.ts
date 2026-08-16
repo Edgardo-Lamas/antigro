@@ -14,6 +14,7 @@ import {
   nombreDelRol,
   renovar,
   ROLES,
+  type CupoTomado,
 } from "@/lib/mensajeria/cupo-demo";
 
 /**
@@ -35,9 +36,14 @@ export const maxDuration = 60;
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 
-/** Estado del cupo, para que la página lo muestre sin adornar. */
-function estadoDelCupo() {
-  const tomados = conectados();
+/**
+ * Estado del cupo, para que la página lo muestre sin adornar.
+ *
+ * 📌 Recibe los tomados en vez de buscarlos: desde que el cupo vive en la base,
+ * cada llamada sería una consulta, y una misma respuesta lo arma hasta dos
+ * veces. Se lee una vez por pedido y se pasa.
+ */
+function estadoDelCupo(tomados: CupoTomado[]) {
   return {
     tope: CUPO,
     usados: tomados.length,
@@ -58,12 +64,13 @@ function estadoDelCupo() {
 export async function GET() {
   const bot = nombreDelBot();
   const enlace = enlaceDeVinculacion(CODIGO_DEMO);
+  const cupo = estadoDelCupo(await conectados());
 
   if (!bot || !enlace) {
     return NextResponse.json({
       disponible: false,
       motivo: "Falta TELEGRAM_BOT_USERNAME",
-      cupo: estadoDelCupo(),
+      cupo,
     });
   }
 
@@ -84,7 +91,7 @@ export async function GET() {
     color: { dark: "#0D1117", light: "#FFFFFF" },
   });
 
-  return NextResponse.json({ disponible: true, bot, enlace, qr, cupo: estadoDelCupo() });
+  return NextResponse.json({ disponible: true, bot, enlace, qr, cupo });
 }
 
 const Envio = z.object({
@@ -102,12 +109,14 @@ export async function POST(req: Request) {
   }
   const { escenario, dia, edad, genero, nombre } = parsed.data;
 
-  const destinatarios = conectados();
+  const destinatarios = await conectados();
+  const cupo = estadoDelCupo(destinatarios);
+
   if (destinatarios.length === 0) {
     return NextResponse.json({
       enviado: false,
       motivo: "sin_conectados",
-      cupo: estadoDelCupo(),
+      cupo,
     });
   }
 
@@ -135,7 +144,7 @@ export async function POST(req: Request) {
       enviado: false,
       motivo: "sin_patron_sostenido",
       estado: lectura.estado,
-      cupo: estadoDelCupo(),
+      cupo,
     });
   }
 
@@ -153,7 +162,7 @@ export async function POST(req: Request) {
       enviado: false,
       motivo: "sin_texto",
       estado: lectura.estado,
-      cupo: estadoDelCupo(),
+      cupo,
     });
   }
 
@@ -175,7 +184,7 @@ export async function POST(req: Request) {
         destino: c.chatId,
         texto,
       });
-      renovar(c.chatId);
+      await renovar(c.chatId);
       return {
         rol: c.rol,
         paraQuien: nombreDelRol(c.rol),
@@ -191,6 +200,6 @@ export async function POST(req: Request) {
     estado: lectura.estado,
     entregas,
     origen: { adultos: paraLosAdultos.origen, chico: paraElChico.origen },
-    cupo: estadoDelCupo(),
+    cupo,
   });
 }

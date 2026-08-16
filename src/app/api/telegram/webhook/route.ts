@@ -56,7 +56,7 @@ export async function POST(req: Request) {
      `CODIGO_DEMO`; que ni siquiera se intente lo garantiza este `return`. */
   if (codigo === CODIGO_DEMO) {
     const quien = actualizacion.message?.from?.first_name?.trim() || "Hola";
-    const resultado = tomarCupo(String(chatId), quien);
+    const resultado = await tomarCupo(String(chatId), quien);
 
     if (!resultado.ok) {
       await responder(
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
   }
 
   if (/^\/chau\b/i.test(texto.trim())) {
-    const solto = soltarCupo(String(chatId));
+    const solto = await soltarCupo(String(chatId));
     await responder(
       solto
         ? "Listo, soltaste el lugar. Gracias por probarlo."
