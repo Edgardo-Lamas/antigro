@@ -503,6 +503,20 @@ function Entrega({
               del modelo: dos adultos responsables y el propio chico.
             </p>
 
+            {/* 🔴 Este aviso salió de probarlo con un teléfono de verdad el 16/8.
+                Escanear con la cámara abre `t.me` en el NAVEGADOR, no en la app, y
+                ahí Telegram no sabe quién sos: pide número de teléfono y código de
+                verificación. Le pasó a Edgardo, que ya tenía cuenta y había
+                construido el bot. A alguien que llega de afuera le pasa peor —
+                y un pedido de teléfono, en un sistema que promete cuidar chicos,
+                es la peor primera impresión posible. Decirlo antes cuesta dos
+                líneas; no decirlo cuesta la visita. */}
+            <p className="mt-2 text-xs leading-relaxed text-apagado">
+              Hace falta tener Telegram en el teléfono con el que escaneás. Si la cámara te lo abre
+              en el navegador y te pide el número, cerralo y abrí el enlace de acá abajo desde la
+              app: es el mismo código, sin ningún registro de por medio.
+            </p>
+
             <ul className="mt-3 space-y-1.5">
               {cupo?.lugares.map((l) => (
                 <li
