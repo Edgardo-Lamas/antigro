@@ -33,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const db = baseDeDatos()!;
         const { data: usuario, error } = await db
           .from("usuarios")
-          .select("id, email, nombre, rol, password_hash, activo")
+          .select("id, email, nombre, rol, password_hash, activo, adulto_id")
           .eq("email", email.toLowerCase())
           .single();
 
@@ -41,18 +41,58 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const ok = await bcrypt.compare(password, usuario.password_hash);
         if (!ok) return null;
 
-        return { id: usuario.id, email: usuario.email, name: usuario.nombre, rol: usuario.rol };
+        /* 🔴 A qué familia pertenece se resuelve ACÁ y viaja en la sesión.
+           El panel no puede preguntarle al navegador de quién son los datos
+           que va a mostrar: eso sería dejar que cualquiera lea el informe de
+           cualquier chico cambiando un identificador en la dirección. */
+        let familiaId: string | null = null;
+        if (usuario.rol === "adulto") {
+          if (!usuario.adulto_id) return null;
+
+          const { data: adulto } = await db
+            .from("adultos")
+            .select("familia_id, activo")
+            .eq("id", usuario.adulto_id)
+            .single();
+
+          /* 🔑 Si al adulto lo dieron de baja, la cuenta deja de abrir. Es la
+             consecuencia real de la baja: sin esto, quien se fue de la familia
+             seguiría entrando a ver a la criatura. */
+          if (!adulto || adulto.activo === false) return null;
+          familiaId = adulto.familia_id as string;
+        }
+
+        return {
+          id: usuario.id,
+          email: usuario.email,
+          name: usuario.nombre,
+          rol: usuario.rol,
+          adultoId: usuario.adulto_id ?? null,
+          familiaId,
+        };
       },
     }),
   ],
 
   callbacks: {
     jwt({ token, user }) {
-      if (user) token.rol = (user as { rol?: string }).rol;
+      if (user) {
+        const u = user as { rol?: string; adultoId?: string | null; familiaId?: string | null };
+        token.rol = u.rol;
+        token.adultoId = u.adultoId ?? null;
+        token.familiaId = u.familiaId ?? null;
+      }
       return token;
     },
     session({ session, token }) {
-      (session.user as { rol?: unknown }).rol = token.rol;
+      const u = session.user as {
+        rol?: unknown;
+        adultoId?: unknown;
+        familiaId?: unknown;
+      };
+      u.rol = token.rol;
+      u.adultoId = token.adultoId;
+      u.familiaId = token.familiaId;
       return session;
     },
   },

@@ -616,9 +616,40 @@ de baja"*.
 pendiente de la fase 4, dónde vive el asistente, y la versión real del QR (hoy sólo existe el
 de la demo). El asistente no es una pantalla aparte: **vive adentro del panel.**
 
-📌 `/familia/[token]` ya tiene la mitad: quiénes están, quién falta conectar, el código de
-vinculación de cada uno y la línea de tiempo. **Lo que no tiene:** la puerta con contraseña, el
-informe del motor (hoy vive sólo en la consola demo), el asistente, el QR y la baja.
+### ✅ Hecho el 16/8 — la puerta y el panel
+
+| Dirección | Qué |
+|---|---|
+| `/entrar` | La puerta de la familia. **No es `/panel/login`**, que es la de administración |
+| `/mi-familia` | El panel: informe, quiénes están, QR, baja |
+| `GET /api/mi-familia` | Los datos **+ la lectura del motor** |
+| `GET /api/mi-familia/qr?codigo=` | El QR de un referente |
+| `POST /api/mi-familia/adultos/baja` | La baja, con motivo y aviso al chico |
+
+🔴 **La familia sale de la SESIÓN, nunca de la dirección.** Si viniera del navegador, cambiar un
+identificador alcanzaría para leer el informe del chico de otra casa. Por eso `authorize()`
+resuelve el `familiaId` contra la base y lo mete en el token, y por eso `darDeBajaAdulto()` pide
+la familia además del adulto: el filtro va **dentro del UPDATE**, así el repositorio mismo se
+niega a tocar a alguien de otra casa sin depender de que quien llame se acuerde de comprobarlo.
+
+🔑 **Si al adulto lo dan de baja, su cuenta deja de abrir** (se comprueba en `authorize()`). Es la
+consecuencia real de la baja: sin eso, quien se fue de la familia seguiría entrando a ver a la
+criatura.
+
+🔑 **`faltantesDeAlta()` ahora cuenta sólo adultos ACTIVOS.** Es lo que hace visible el hueco: la
+baja no se traba nunca, pero la familia que queda con uno solo lo ve escrito en pantalla hasta
+que lo cubra. Verificado en el navegador el 16/8.
+
+📌 **Cuando dos adultos contestaron distinto el cuestionario, gana el que vio MÁS**
+(`loQueVieronLosAdultos` en `/api/mi-familia`). Si la madre marcó «nunca» y la tía «seguido», la
+tía vio algo que la madre no — y ese es el motivo por el que el sistema exige un segundo adulto.
+Promediar borraría el único dato nuevo que hay ahí.
+
+⚠ **Cuentas de prueba de la familia inventada** (Ana, Mariana y Carla no existen):
+`mariana@ejemplo.ar` y `carla@ejemplo.ar`, clave `familia2026`.
+
+⬜ **Falta:** el alta desde el panel, el cuestionario del adulto y el asistente (que ya tiene su
+lugar reservado en la pantalla, diciendo que todavía no está).
 
 ### Quién tiene cuenta
 

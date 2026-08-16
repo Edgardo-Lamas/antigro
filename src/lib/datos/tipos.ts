@@ -131,6 +131,29 @@ export const VINCULOS: { id: Vinculo; nombre: string }[] = [
  */
 export const MINIMO_ADULTOS = 2;
 
+/**
+ * Por qué se fue un adulto responsable.
+ *
+ * 🔴 Lo enumeró Edgardo el 16/8 y no es burocracia: «lo cambió el chico» y
+ * «perdió el teléfono» son dos hechos distintos, y el primero puede importar —
+ * un cambio de referente justo después de un aviso es algo que los otros
+ * adultos tienen que poder ver.
+ */
+export type MotivoDeBaja =
+  | "se_mudo"
+  | "fallecio"
+  | "perdio_el_telefono"
+  | "lo_cambio_el_chico"
+  | "otro";
+
+export const MOTIVOS_DE_BAJA: { id: MotivoDeBaja; texto: string }[] = [
+  { id: "lo_cambio_el_chico", texto: "Lo cambió el chico" },
+  { id: "se_mudo", texto: "Se mudó" },
+  { id: "perdio_el_telefono", texto: "Perdió el teléfono" },
+  { id: "fallecio", texto: "Falleció" },
+  { id: "otro", texto: "Otro motivo" },
+];
+
 export interface AdultoResponsable {
   id: string;
   familiaId: string;
@@ -139,6 +162,16 @@ export interface AdultoResponsable {
   elegidoPorElChico: boolean;
   canal: Canal;
   creado: string;
+
+  /**
+   * 🔴 **La baja es blanda, nunca un borrado.** Las observaciones que este
+   * adulto cargó son entrada del motor: borrarlas cambiaría lecturas que ya se
+   * hicieron. Y el sistema tiene que poder decir después que esta persona
+   * estuvo.
+   */
+  activo: boolean;
+  bajaEn?: string;
+  bajaMotivo?: MotivoDeBaja;
 }
 
 /* ── Registro fechado ────────────────────────────────────────────────────── */
@@ -187,14 +220,24 @@ export interface FamiliaCompleta {
   adultos: AdultoResponsable[];
 }
 
-/** Falta algo para que el sistema pueda trabajar con esta familia. */
+/**
+ * Falta algo para que el sistema pueda trabajar con esta familia.
+ *
+ * 🔴 **Cuenta sólo a los adultos activos.** Es lo que hace visible el hueco
+ * cuando alguien se da de baja: el cambio de referente nunca se traba —se muda,
+ * fallece, el chico lo quiere cambiar— pero la familia que queda con uno solo
+ * tiene que verlo escrito, porque un sistema con un único adulto no es el
+ * sistema que se le describió al chico en el alta.
+ */
 export function faltantesDeAlta(f: FamiliaCompleta): string[] {
   const faltantes: string[] = [];
+  const activos = f.adultos.filter((a) => a.activo);
+
   if (f.chicos.length === 0) faltantes.push("No hay ningún chico cargado.");
-  if (f.adultos.length < MINIMO_ADULTOS) {
+  if (activos.length < MINIMO_ADULTOS) {
     faltantes.push(`Hacen falta al menos ${MINIMO_ADULTOS} adultos responsables.`);
   }
-  if (f.adultos.length >= MINIMO_ADULTOS && !f.adultos.some((a) => a.elegidoPorElChico)) {
+  if (activos.length >= MINIMO_ADULTOS && !activos.some((a) => a.elegidoPorElChico)) {
     faltantes.push("Ninguno de los adultos lo eligió el chico.");
   }
   return faltantes;

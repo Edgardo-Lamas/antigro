@@ -58,6 +58,9 @@ type FilaAdulto = {
   codigo_vinculacion: string | null;
   vinculado_en: string | null;
   created_at: string;
+  activo: boolean | null;
+  baja_en: string | null;
+  baja_motivo: AdultoResponsable["bajaMotivo"] | null;
 };
 
 /** Fila ⇄ Canal. El destino puede venir vacío: en Telegram llega al vincular. */
@@ -102,6 +105,11 @@ const aAdulto = (a: FilaAdulto): AdultoResponsable => ({
   elegidoPorElChico: a.elegido_por_el_chico,
   canal: aCanal(a),
   creado: a.created_at,
+  // `?? true` para las filas anteriores a que existiera la columna: un adulto
+  // sin dato no es un adulto dado de baja.
+  activo: a.activo ?? true,
+  bajaEn: a.baja_en ?? undefined,
+  bajaMotivo: a.baja_motivo ?? undefined,
 });
 
 /* ── Repositorio ─────────────────────────────────────────────────────────── */
@@ -166,12 +174,25 @@ export class RepositorioSupabase implements Repositorio {
   }
 
   async familiaPorToken(token: string): Promise<FamiliaCompleta | null> {
-    const { data: fila } = await this.db
+    const { data } = await this.db
       .from("familias")
       .select("*")
       .eq("token", token)
       .maybeSingle<FilaFamilia>();
+    return this.completar(data);
+  }
 
+  async familiaPorId(id: string): Promise<FamiliaCompleta | null> {
+    const { data } = await this.db
+      .from("familias")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle<FilaFamilia>();
+    return this.completar(data);
+  }
+
+  /** Le cuelga los chicos y los adultos. Lo único que cambia es cómo se buscó. */
+  private async completar(fila: FilaFamilia | null): Promise<FamiliaCompleta | null> {
     if (!fila) return null;
     const familia = aFamilia(fila);
 
@@ -198,6 +219,24 @@ export class RepositorioSupabase implements Repositorio {
 
   async cambiarEstado(id: string, activo: boolean): Promise<void> {
     await this.db.from("familias").update({ activo }).eq("id", id);
+  }
+
+  async darDeBajaAdulto(
+    familiaId: string,
+    adultoId: string,
+    motivo: AdultoResponsable["bajaMotivo"] & string,
+  ): Promise<AdultoResponsable | null> {
+    const { data } = await this.db
+      .from("adultos")
+      .update({ activo: false, baja_en: new Date().toISOString(), baja_motivo: motivo })
+      .eq("id", adultoId)
+      // 🔐 El filtro por familia va en el UPDATE, no en una comprobación
+      // aparte: si el adulto es de otra casa, la consulta no toca ninguna fila.
+      .eq("familia_id", familiaId)
+      .select("*")
+      .maybeSingle<FilaAdulto>();
+
+    return data ? aAdulto(data) : null;
   }
 
   async vincularPorCodigo(codigo: string, destino: string) {

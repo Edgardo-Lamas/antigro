@@ -69,6 +69,7 @@ function sembrar(): {
         vinculo: "madre",
         elegidoPorElChico: false,
         canal: { tipo: "correo", destino: "demo-madre@ejemplo.ar" },
+        activo: true,
         creado: ahora,
       },
       {
@@ -79,6 +80,7 @@ function sembrar(): {
         vinculo: "tia_tio",
         elegidoPorElChico: true,
         canal: { tipo: "telegram", destino: "", codigo: "CARLA7" },
+        activo: true,
         creado: ahora,
       },
     ],
@@ -128,6 +130,7 @@ export class RepositorioEnMemoria implements Repositorio {
       canal: conCodigo(a.canal),
       id: nuevoId("adulto"),
       familiaId: familia.id,
+      activo: true,
       creado: ahora,
     }));
 
@@ -139,7 +142,15 @@ export class RepositorioEnMemoria implements Repositorio {
   }
 
   async familiaPorToken(token: string): Promise<FamiliaCompleta | null> {
-    const familia = this.familias.find((f) => f.token === token);
+    return this.completar(this.familias.find((f) => f.token === token));
+  }
+
+  async familiaPorId(id: string): Promise<FamiliaCompleta | null> {
+    return this.completar(this.familias.find((f) => f.id === id));
+  }
+
+  /** Le cuelga los chicos y los adultos. Lo único que cambia es cómo se buscó. */
+  private completar(familia: Familia | undefined): FamiliaCompleta | null {
     if (!familia) return null;
     return {
       familia,
@@ -150,6 +161,20 @@ export class RepositorioEnMemoria implements Repositorio {
 
   async listarFamilias(): Promise<Familia[]> {
     return [...this.familias].sort((a, b) => b.creado.localeCompare(a.creado));
+  }
+
+  async darDeBajaAdulto(
+    familiaId: string,
+    adultoId: string,
+    motivo: AdultoResponsable["bajaMotivo"] & string,
+  ): Promise<AdultoResponsable | null> {
+    const adulto = this.adultos.find((a) => a.id === adultoId && a.familiaId === familiaId);
+    if (!adulto) return null;
+
+    adulto.activo = false;
+    adulto.bajaEn = new Date().toISOString();
+    adulto.bajaMotivo = motivo;
+    return adulto;
   }
 
   async cambiarEstado(id: string, activo: boolean): Promise<void> {
