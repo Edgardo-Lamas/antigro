@@ -95,6 +95,39 @@ function curva(escenario: Escenario, dia: number): number {
   }
 }
 
+/**
+ * De qué lugar se trata cuando aparece una plataforma nueva.
+ *
+ * 🔑 **La secuencia no es decorativa: es el cruce.** El patrón documentado va de
+ * un lugar de CONTACTO ABIERTO —donde un desconocido puede escribirle— a uno que
+ * REQUIERE ENTREGA, donde el chico tuvo que dar su teléfono o su usuario. Por eso
+ * en los escenarios que escalan primero aparece el abierto y más adelante el otro:
+ * es lo que el motor tiene que detectar (`detectarTraslado` en `evaluar.ts`), y si
+ * el simulador no lo produjera, la detección no se podría ni probar.
+ *
+ * ⚠ Ninguna de estas plataformas está acusada de nada: son las más usadas por
+ * los chicos según el informe de Grooming LATAM. Roblox no es peligroso, es
+ * donde están. Lo que se mira es el movimiento entre clases de lugar.
+ */
+function dominioDelDia(escenario: Escenario, dia: number, azar: () => number): string {
+  /* ⚠ Snapchat NO va acá abajo aunque sea una app de mensajes: es un lugar de
+     contacto abierto —sugiere desconocidos— y es el más nombrado en los casos
+     del informe NSPCC. Ver la taxonomía en `plataformas.ts`. */
+  const abiertos = ["roblox.com", "freefire.garena.com", "minecraft.net", "snapchat.com"];
+  const requierenEntrega = ["whatsapp.net", "discord.com", "telegram.org"];
+
+  if (escenario === "normal" || escenario === "cambio_leve") {
+    return abiertos[Math.floor(azar() * abiertos.length)];
+  }
+  /* ⚠ El corte va en el día 13 y no en el 8 por un motivo medido: en estos
+     escenarios `plataforma_nueva` recién se emite desde el día 8 (antes la
+     intensidad no llega al umbral), así que cortando en el 8 la fase de juego
+     no existía nunca y el traslado no se podía formar. Juego del 8 al 12,
+     mensajería del 13 en adelante. */
+  if (dia >= 13) return requierenEntrega[Math.floor(azar() * requierenEntrega.length)];
+  return abiertos[Math.floor(azar() * abiertos.length)];
+}
+
 /** Qué tipos de señal aparecen en cada escenario, según el día. */
 function tiposDelDia(escenario: Escenario, dia: number, azar: () => number): TipoDeSenal[] {
   const tipos: TipoDeSenal[] = [];
@@ -108,10 +141,23 @@ function tiposDelDia(escenario: Escenario, dia: number, azar: () => number): Tip
   return tipos;
 }
 
-/** Franja horaria plausible para cada tipo. Metadato, no contenido. */
+/**
+ * Franja horaria plausible para cada tipo. Metadato, no contenido.
+ *
+ * 🔴 **La actividad nocturna va de 22:00 a 04:00, no de 01:00 a 04:00.**
+ * Antes la fuente emitía sólo la madrugada profunda, y eso era **la fuente
+ * decidiendo** qué es anómalo: un filtro de red ve una consulta a las 23:40 y no
+ * sabe si eso es tarde — depende de la edad del que está despierto, y la fuente
+ * no conoce la edad. Recortar ahí escondía justamente el caso que distingue a un
+ * chico de 9 de uno de 16 (ver `factorMadrugada` en `pesos.ts`).
+ *
+ * Es el mismo principio que sostiene toda la capa de señales: **la fuente
+ * reporta, el motor decide.**
+ */
 function horaDe(tipo: TipoDeSenal, azar: () => number): number {
-  if (tipo === "madrugada") return 1 + Math.floor(azar() * 4); // 01:00 – 04:00
-  return 16 + Math.floor(azar() * 7); // 16:00 – 22:00
+  // 22, 23, 0, 1, 2, 3, 4
+  if (tipo === "madrugada") return (22 + Math.floor(azar() * 7)) % 24;
+  return 16 + Math.floor(azar() * 6); // 16:00 – 21:00
 }
 
 export class FuenteSimulador implements FuenteDeSenales {
@@ -158,6 +204,12 @@ export class FuenteSimulador implements FuenteDeSenales {
               dia_de_la_ventana: dia,
               hora: fecha.getHours(),
               escenario: this.escenario,
+              /* Metadato, no contenido: el dominio consultado es exactamente lo
+                 que ve un filtro de red. `sanearContexto` deja pasar esto y
+                 rechazaría cualquier clave que huela a conversación. */
+              ...(tipo === "plataforma_nueva"
+                ? { dominio: dominioDelDia(this.escenario, dia, azar) }
+                : {}),
             },
             fuente: this.id,
           }),

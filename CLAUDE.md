@@ -196,10 +196,57 @@ las personas es la que acaba de escribir.
   código a la vista. Un adulto que cree que va a recibir avisos y no los recibe está peor que
   uno que sabe que le falta un clic.
 
-📌 **Falta el token del bot de Telegram** (`TELEGRAM_BOT_TOKEN` y `TELEGRAM_BOT_USERNAME`).
-Lo saca él con `/newbot` en @BotFather; **yo no puedo: hace falta una cuenta de Telegram.**
-⚠ **La cuenta de Resend es de Rodrigo y no tiene dominio verificado:** sólo puede enviar a
-`rodos.si3.0@gmail.com`. Para el video, el canal que se muestra es Telegram.
+✅ **El bot existe: `@AntiGroArBot`.** Token, username y secreto del webhook cargados.
+
+🔴 **El correo NO es un canal hoy, y la pantalla lo dice.** La cuenta de Resend es de Rodrigo y
+no tiene dominio verificado: con el remitente `onboarding@resend.dev` **sólo se le puede escribir
+a la casilla dueña de la cuenta**, cualquier otro destinatario lo rechaza Resend. Por eso
+`TransporteCorreo.estado()` devuelve **no disponible aunque la clave exista y sea válida**, y el
+canal figura *en ensayo* con el motivo entero a la vista. Decir "conectado" ahí sería fingir una
+entrega — justo lo que el sistema promete no hacer, en la pantalla que lo promete. Se habilita
+verificando un dominio y completando `CORREO_REMITENTE`. **Telegram es el único canal real.**
+
+### El QR de la demo y el cupo de tres (15/8)
+
+🔑 **Para que alguien crea que el sistema entrega, tiene que llegarle al teléfono.** La consola
+muestra un QR: se escanea, se aprieta "Iniciar", y el aviso llega. Sin instalar nada y sin dar
+un número.
+
+| Pieza | Dónde |
+|---|---|
+| El cupo, los roles y el vencimiento | `src/lib/mensajeria/cupo-demo.ts` |
+| QR (GET) y entrega real (POST) | `src/app/api/demo/telegram/route.ts` |
+| El código del QR, atajado primero | `POST /api/telegram/webhook` |
+
+🔴 **Tres, y no es un número al azar: es el modelo del producto.** Dos adultos responsables —uno
+elegido por el chico— y el chico en su canal. Tres personas escanean el **mismo** QR y reciben
+**tres textos distintos**: ahí se ve de un vistazo lo que separa esto de un control parental.
+
+🔐 **Y es el tope de seguridad.** El QR está en una página pública: sin cupo, cualquiera con un
+script conecta miles de chats y el bot manda lo que quiera el que lo encontró. Con tres, el peor
+caso es que tres desconocidos vean el mensaje de una chica inventada. Se libera solo a la media
+hora, o con `/chau` al bot.
+
+⚠ **El visitante NO se convierte en Ana.** Ocupa el lugar de un rol para ver qué le llegaría a
+esa persona; **la familia sembrada no se toca.** Si el QR escribiera dentro de ella, la demo
+quedaría distinta para el que entra después y con el canal de una "familia" ocupado por un
+desconocido. Y cada mensaje sale con un encabezado que dice que es una demostración y que Ana no
+existe: un texto así llegando sin marco es alarmante.
+
+🔐 **`CODIGO_DEMO = "DEMO-ANTIGRO"` no puede colisionar con el código de una familia real**, y no
+por convención: lleva guion y letras (O, I) que el generador de códigos **nunca emite** —su
+alfabeto las excluye para que se dicten sin confusión. Además el webhook lo resuelve y **corta
+con un `return` antes de buscar entre las familias**.
+
+🔴 **El QR va oscuro sobre CLARO** aunque la página sea oscura. Un QR en negativo queda lindo y
+**hay teléfonos que no lo leen**: el estándar asume módulos oscuros sobre fondo claro y varios
+lectores no prueban la inversión. Salió así en el primer intento y se corrigió mirándolo.
+
+Verificado el 15/8 con el webhook simulado: tres cupos se llenan, **el cuarto se rechaza**,
+apretar "Iniciar" dos veces **no consume otro lugar**, `/chau` libera el correcto, y con historia
+en calma **no se manda nada** (misma regla que `avisar()`). Con chats falsos el envío falla y lo
+reporta como *no salió · chat not found* — **no finge**. 📌 Falta la única prueba que necesita un
+teléfono: escanear con un Telegram real.
 
 ### Dos vías en paralelo, y el punto ciego que las hizo falta (14/8)
 
@@ -209,24 +256,57 @@ sistema que sólo detecta CAMBIOS aprende el abuso como lo normal de esa casa y 
 
 Por eso hay dos clases de señal, y **corren en paralelo, no se reemplazan** (`CLASE_DE_SENAL`):
 
-| Clase | Cuáles | Cuándo funciona |
+| Clase | Cuáles | Cuánto pesa |
 |---|---|---|
-| **Absoluta** | Madrugada · evasión del filtro | **Desde el día uno.** No se comparan contra nada |
-| **Relativa** | Salto de volumen · plataforma nueva | Cuando ya existe la línea de base |
+| **Absoluta** | Madrugada · evasión del filtro | **Siempre el 100%, desde el día uno.** No se comparan contra nada |
+| **Relativa** | Salto de volumen · plataforma nueva | Por el **alcance** de la lectura, que crece con el perfil |
 
 La madrugada es absoluta porque desordena el descanso por sí sola: al otro día no descansó para
 la escuela. La evasión, porque es un acto deliberado — da igual si es el día 2 o el 200.
 
-📌 **`APRENDIZAJE_DIAS = 14` ESTÁ PENDIENTE DE INVESTIGACIÓN.** Hay dos razones defendibles
-(la conducta cambia entre semana y fin de semana; la detección de anomalías por conducta fija 7
-días de piso y 30 de confiabilidad), pero **ninguna fuente es sobre grooming ni sobre menores**.
-Si un padre pregunta "¿por qué 14?", "nos pareció" no es una respuesta. Ver el comentario en
-`pesos.ts` para las fuentes y el razonamiento completo.
+### 🔴 El perfil y la ventana son DOS cosas (rediseñado el 15/8/2026)
+
+Había un `APRENDIZAJE_DIAS = 14` que era un **interruptor**: antes del día 14 las señales
+relativas valían cero, después el 100%. **Lo tiró Edgardo y tenía razón**, textual: *"cada chico,
+cada situación, es diferente, no hay manera de establecer una conducta 'x' en 5/10/14/30 días…
+son adolescentes, están permanentemente cambiando"*. Y lo que ordenó el diseño nuevo:
+
+> **"El sistema protege al chico desde el día uno. Pero esa protección se va desplegando con el
+> tiempo. No es un soldado listo para disparar, es un sistema que debe analizar, porque el
+> acosador se esconde y sólo podemos ver/imaginar sus consecuencias."**
+
+Lo que estaba mal de fondo: **el perfil y la ventana eran la misma cosa.** Todo se calculaba
+dentro de una caja de 21 días, así que el sistema nunca conocía al chico más allá de tres
+semanas. Ahora son dos piezas separadas:
+
+| Pieza | Dónde | Qué es |
+|---|---|---|
+| **El perfil** | `src/lib/motor/perfil.ts` | Lo que el sistema sabe del chico. **Sin tope de días** y con olvido: lo de hace dos meses pesa un cuarto que lo de esta semana |
+| **La ventana** | `VENTANA_DIAS` en `evaluar.ts` | Sólo el tramo reciente que se evalúa. Existe para medir persistencia, nada más |
+
+**El alcance** (`alcanceDeLaLectura`) es cuánto se desplegó la lectura, de 0 a 1, y multiplica a
+las señales relativas. Sale de dos cosas: la historia acumulada (`1 - e^(-días/7)`, sin escalón)
+y lo predecible que es ese chico. Medido en el escenario persistente: día 1 → 0,13 · día 5 →
+0,51 · día 14 → 0,72 · día 21 → 0,80. **En ningún día se prende nada.**
+
+🔑 **Que la evasión siga avisando el día 12 con el perfil recién nacido es la prueba de que la
+protección no espera al perfil:** es una señal absoluta y pesa el 100% desde el primer día.
+
+🔴 **`diasObservados` sale del ALTA del chico, nunca de las señales** (`diasDeObservacion`). Para
+una fuente de señales, "no hubo desviaciones" y "todavía no lo miramos" son indistinguibles: en
+los dos casos no llega nada. Deducirlo de las señales hacía que un chico tranquilo pareciera
+tener tres semanas de historia el primer día. Fue un bug real del 15/8.
+
+⚠ **Y lo que el perfil no puede resolver, se dice en vez de taparse** (`advertenciasDelPerfil`):
+si el chico ya venía siendo acosado cuando el sistema empezó a mirar, el perfil aprende ese daño
+como parte de lo habitual. Va siempre en `loQueNoSeVe`.
 
 ⚠ **El punto ciego se achicó, no desapareció.** Un chico ya acosado cuyas únicas señales sean
-volumen y plataforma nueva sigue sin disparar alerta durante el aprendizaje. Candidata para
-sumar a la vía absoluta: chat con desconocidos en chicos de 7 a 10 — ahí la EDAD hace de
-referencia en lugar de la historia.
+volumen y plataforma nueva sigue siendo difícil de ver mientras el perfil es joven: esas dos son
+relativas y pesan por el alcance. **Ya no quedan en cero como antes** —cuentan atenuadas desde el
+primer día— pero cuentan poco. Candidata para sumar a la vía absoluta: chat con desconocidos en
+chicos de 7 a 10 — ahí la EDAD hace de referencia en lugar de la historia, y la respalda el 4 de
+cada 10 que tiene su primer teléfono antes de los 9.
 
 🔑 **El cuestionario es la primera respuesta, no un formulario** (idea de Edgardo, 14/8).
 Ante una conducta anormal —un chico de 8 chateando, por ejemplo— lo primero que dispara el
@@ -253,6 +333,246 @@ a los adultos ni al chico. Cualquier chico se queda una noche hasta tarde por al
 alarmar por eso gasta la atención de los adultos y —peor— la confianza del chico, que es el
 activo del que depende todo el producto.
 
+### La home es la consola (fase 4, 15/8)
+
+🔴 **La demo no está abajo de una landing: la demo ES la home.** Un padre y un jurado quieren lo
+mismo al entrar — ver el sistema andando, sin cuenta. Decidido por Edgardo el 15/8.
+
+| Pieza | Dónde |
+|---|---|
+| La consola entera, cliente | `src/app/_demo/Consola.tsx` |
+| La cáscara y el estado de lo conectado | `src/app/page.tsx` |
+
+🔑 **El simulador sólo emite señales; quién decide es el motor**, con la misma regla de
+persistencia, el mismo perfil y el mismo alcance que correrían contra un NextDNS real. Lo único
+fabricado es de dónde salen los horarios y los dominios. **Eso va escrito al pie de la consola,
+no escondido:** es lo que hace que se le crea el resto.
+
+⚠ Los mensajes se piden **a demanda**, con un botón. Redactarlos llama al modelo, y hacerlo en
+cada movimiento del reloj sería lento y caro.
+
+Medido de punta a punta el 15/8, con el reloj en el día 21 y sin cuestionario contestado:
+
+| Escenario | Cuándo habla |
+|---|---|
+| Semana normal | Nunca. Puntaje 0,02 el día 21 |
+| Cambio leve | Nunca. Sube hasta 0,14 el día 10 y vuelve a bajar |
+| Patrón que persiste | `atencion` el día 14 · `patron_sostenido` el **día 20** |
+| Intento de saltar el filtro | `patron_sostenido` el **día 14**, con el perfil todavía joven |
+
+🎬 Los dos primeros son el momento del video: el sistema quedándose callado tres semanas.
+
+⚠ **Tres cosas que se cayeron recién al mirar la pantalla,** no en los tests — y que son el
+argumento de por qué hay que abrir el navegador:
+
+1. Un `**markdown**` crudo salía con los asteriscos a la vista en `porQue`. **Los textos del
+   motor son para leer, no para renderizar.**
+2. La advertencia del perfil nombraba la fecha en ISO (`2026-07-29`) y, peor, la sacaba de
+   `perfil.primerDia` — **el primer día con señal, no el alta.** Decía "lo conoce hace 21 días"
+   y en el renglón siguiente nombraba una fecha de hace 18. Es el mismo error de `diasObservados`
+   que ya se había corregido, sobreviviendo en otro lado. Ahora sale del alta y se dice en
+   criollo (`enCriollo` / `desdeCuando` en `perfil.ts`).
+3. El cierre de `loQueNoSeVe` estaba **fijo** y decía "hay un cambio que se sostuvo" incluso en
+   calma, donde no hubo ninguno. Ahora depende del estado, y **el de calma no dice que el chico
+   esté a salvo** (regla 1): dice qué fue lo que no apareció.
+
+### La madrugada se compara contra la EDAD (15/8)
+
+🔴 **A las 2 de la mañana, una nena de 9 y un pibe de 16 no son lo mismo.** Lo marcó Edgardo:
+*"si el chico comienza a tener hábitos nocturnos propios de su crecimiento… a los 15 es esperable
+el cambio"*. La madrugada pesaba 0,80 fijo y el sistema no sabía la edad del que estaba despierto.
+
+📊 **Tiene respaldo clínico, no es sentido común:** en la adolescencia hay un **retraso biológico
+de la secreción nocturna de melatonina**, y el punto medio del sueño se corre a lo largo de la
+segunda década. Es el sustrato del *síndrome de retraso de fase*, el trastorno circadiano más
+frecuente en adolescentes, definido como un corrimiento de **más de dos horas**. Fuentes:
+[AEP](https://www.aeped.es/enfamilia/salud-en-familia/sueno-en-adolescente-sindrome-retraso-fase)
+y [SEMA](https://www.adolescenciasema.org/adolescentes/si-eres-adolescente-este-es-tu-sitio/mi-sueno/el-sueno-en-la-adolescencia/).
+
+🔑 **No se atenúa el peso: se corre la hora de referencia** (`horaDeReferencia` / `factorMadrugada`
+en `pesos.ts`). Amortiguar el peso diría "en los grandes la madrugada importa menos", que es falso.
+Correr la hora dice lo que pasa: **en los grandes la madrugada empieza más tarde.** Referencias:
+≤10 → 22 h · 11-13 → 23 h · 14-15 → 24 h · 16-17 → 01 h. Piso 0,55, máximo a las 4 h de desvío.
+
+⚠ **Sigue siendo absoluta**: no se compara contra la historia, se compara contra la EDAD. Por eso
+funciona desde el día uno incluso con un chico ya acosado, que es lo que el perfil no puede
+resolver.
+
+🔴 **Y hubo que arreglar el simulador para que se notara:** emitía la madrugada sólo de 01 a 04, o
+sea **la fuente decidía qué es anómalo**. Un filtro ve una consulta a las 23:40 y no sabe si es
+tarde — depende de la edad, que la fuente no conoce. Ahora emite de 22 a 04 y decide el motor.
+
+Medido el 15/8, escenario persistente, puntaje al día 21: 7 años 0,668 · **11-13 años 0,698** (el
+pico, donde las dos fuentes coinciden) · 15 años 0,663 · **16-17 años 0,579**. La "atención" se
+corre del día 14 al 15 en los grandes y **el día de la ALERTA no se mueve para nadie** (día 20).
+Eso es el guardarraíl funcionando: atrasa, no apaga.
+
+### 🔴 Los lugares se clasifican por lo que PERMITEN, no por lo que son (15/8)
+
+**Corrección de Edgardo, y reescribió `src/lib/senales/plataformas.ts` entero:** *"el lugar
+peligroso no es WhatsApp; el lugar peligroso es de donde sale el contacto que luego lleva a
+WhatsApp"*.
+
+El modelo anterior clasificaba por lo que cada app **es** —juego, mensajería, red social— y eso
+metía a WhatsApp y a Discord en la misma bolsa. Pero WhatsApp es donde el chico habla con la
+madre: no es un lugar peligroso, **es el destino**.
+
+🔑 **Lo que divide a los lugares es UNA propiedad: si un desconocido puede empezar una
+conversación sin que el chico le entregue nada.**
+
+| Puerta | Qué significa | Ejemplos |
+|---|---|---|
+| `contacto_abierto` | Un desconocido llega solo | Roblox, Free Fire, **Snapchat**, TikTok, Instagram |
+| `requiere_entrega` | El chico tiene que dar su teléfono o usuario | WhatsApp, Telegram, Discord |
+| `sin_contacto` | Sin canal con desconocidos | YouTube |
+| `desconocida` | Fuera del radar — **lo que más se mira** | |
+
+➡ **Y de ahí sale la señal buena: el CRUCE.** Que aparezca WhatsApp no dice nada. Que aparezca
+*después* de un lugar de contacto abierto significa que **el chico entregó su teléfono a alguien
+que conoció ahí**. Es un hecho observable, no una interpretación.
+
+📊 **El dato que lo sostiene:** NSPCC, 45 fuerzas policiales del Reino Unido — 7.062 delitos de
+comunicación sexual con un menor en 2023-24, **+89% desde 2017-18**. De los 1.824 casos con medio
+identificado: **Snapchat 48%**, WhatsApp 12%, Facebook/Messenger 12%, Instagram 6%.
+https://www.nspcc.org.uk/about-us/news-opinion/2024/online-grooming-crimes-increase/
+
+⚠ **Y choca con nuestra otra fuente:** el Estudio nacional argentino (2023) da **74,3% WhatsApp**;
+el británico le da 12%. No es que uno esté mal — **el ranking de plataformas es propio de cada
+país**. Snapchat es masivo entre adolescentes británicos y marginal acá; WhatsApp es dominante en
+Argentina para todo.
+🔴 **Conclusión, y cierra el argumento del observatorio: una lista de plataformas peligrosas NO se
+puede importar.** Sirve la PROPIEDAD (contacto abierto vs. entrega), que no depende del país. El
+ranking hay que producirlo acá.
+
+Medido el 15/8: el cruce aparece en persistente (*"de Roblox, donde cualquiera puede escribirle, a
+Discord, donde hace falta que él haya entregado su contacto"*) y en evasión (Free Fire → WhatsApp),
+y **no aparece** en normal ni en cambio leve.
+
+### 🔑 El modus operandi — mirar al acosador, no sólo al chico (15/8)
+
+**De Edgardo:** *"también deberíamos saber cómo actúan estos depredadores; eso nos va a permitir
+anticipar medidas… convertir a AntiGro en un agente sabueso"*.
+
+🔴 **Cambia lo que el sistema es.** Hasta acá miraba **cambios en el chico** — eso es mirar la
+sombra. El grooming **no es un evento: es una secuencia con etapas**, y una secuencia se reconoce a
+mitad de camino. Ahí está el anticipar.
+
+📊 **Sexual Grooming Model (SGM)** — Winters & Jeglic 2017, ampliado a cinco etapas por Winters y
+col. 2020. **Validez de contenido establecida por panel de expertos; 77 conductas.** Vive mapeado
+en `src/lib/motor/modus-operandi.ts`.
+https://www.tandfonline.com/doi/full/10.1080/15564886.2021.1974994
+⚠ **Fuente secundaria** (publicaciones de los autores y resúmenes, no el paper completo). Citado
+con nombre y año para poder verificarlo; si va al video, se confirma antes.
+
+| Etapa | ¿La ve la red? | Con qué |
+|---|---|---|
+| 1. Selección de la víctima | Apenas | Plataforma de contacto abierto nueva |
+| 2. Acceso y aislamiento | **Sí, es su punto fuerte** | **El cruce** + madrugada |
+| 3. Desarrollo de la confianza | Mal | Sólo volumen sostenido |
+| 4. Desensibilización sexual | **NO. Nada** | — |
+| 5. Mantenimiento | **Sí, con claridad** | Evasión del filtro |
+
+🔴 **De cinco etapas, la red ve bien dos, ve mal dos y NO VE la quinta — que es donde el delito
+ocurre.** Eso no se disimula: **es el argumento entero del diseño de tres entradas.** Un producto
+que dijera que detecta grooming mirando el DNS estaría mintiendo y bastaría un perito para
+demostrarlo. Lo que AntiGro puede sostener es que reconoce **la forma del proceso** con lo que ve,
+y que pide ayuda para el resto — a los adultos por el cuestionario, y al propio chico, que es el
+único que estuvo en la etapa 4.
+
+📌 Por eso el cuestionario pregunta por regalos sin explicación y por el chico que se aísla: **son
+la etapa 3 vista desde la casa**, que es donde la red no llega.
+
+⚠ La etapa se nombra en la lectura pero **no suma puntaje**: que la huella esté no prueba que la
+etapa ocurrió. Ordena el relato de la alerta, no la decide. Medido: persistente llega a *desarrollo
+de la confianza*, evasión llega a *mantenimiento*.
+
+### El observatorio — estadísticas propias (15/8)
+
+🔴 **No existe un registro de "dónde se hace grooming"**, y conviene saber por qué antes de
+buscarlo: el grooming pasa en los lugares **más populares**, no en sitios oscuros. Lo que sí
+existe es de otro delito:
+
+| Registro | Qué tiene | Se puede usar |
+|---|---|---|
+| [IWF URL List](https://www.iwf.org.uk/our-technology/our-services/url-list/) | Material de abuso confirmado. **No grooming.** 260.699 URLs en 2025 | Sólo miembros, licencia paga |
+| [Project Arachnid](https://projectarachnid.ca/en/) | Ídem (CSAM) | API gratis, hay que pedirla |
+| [Google Safe Browsing](https://developers.google.com/safe-browsing) | Malware y phishing | Pública y gratis |
+| [Categorías NextDNS](https://github.com/nextdns/metadata) | Porno, apuestas, citas, juegos | Ya viene con el filtro |
+
+🔑 **Por eso el sistema produce su propio dato** (`src/lib/observatorio/`), y **no espera a tener
+volumen** — decisión de Edgardo: *"que se sepa que AntiGro busca ser efectivo, y es un argumento
+para posicionarnos mejor"*.
+
+🔴 **Y no esperar es correcto también técnicamente.** Yo objeté que con pocas familias el dato no
+vale; está mal, y lo desarma un hallazgo de la literatura: los acosadores **contactan a muchos
+chicos a la vez**. La revisión de estrategias de grooming pre y post internet (*Child Abuse &
+Neglect*, nov. 2021, [PubMed 34801848](https://pubmed.ncbi.nlm.nih.gov/34801848/)) lo llama
+**"spray and prey"**. ➡ Si un mismo acosador toca a muchos chicos a la vez, **el mismo lugar
+aparece en varios chicos a la vez**: el dato no necesita escala, necesita simultaneidad, y la
+simultaneidad la pone el atacante.
+
+**Las dos trampas, resueltas en el código:**
+
+1. 🔴 **Contar no sirve.** El dominio más frecuente antes de una alerta es WhatsApp, siempre,
+   porque está en todos los chicos. Contar aprendería que lo peligroso es lo popular. Se mide
+   **lift**: cuánto más aparece entre los alertados que en la población.
+2. 🔴 **La privacidad es la licencia para existir.** No se guarda "el chico A pasó por acá": se
+   guarda, por dominio, **cuántos chicos distintos** lo vieron. Un número, sin identidad. El tipo
+   `FilaDelObservatorio` está escrito para que guardar ids obligue a cambiarlo y se note.
+
+Verificado el 15/8 con `GET /api/observatorio?ejemplo=1` (100 chicos, 10 con alerta):
+**descarta WhatsApp (lift 1,0), Roblox (1,33) y TikTok**, y levanta `chat-libre-24.top` — 4 chicos,
+los 4 alertados, en 7 días — con **lift 10, simultáneo y fuera del radar**. Y se rotula solo como
+**"indicio"**, no como conclusión: un observatorio que informa sin decir sobre cuántos casos se
+apoya es peor que no tenerlo.
+
+#### 🔑 La homogeneidad del perfil — lo más fuerte que tiene el observatorio
+
+Idea de Edgardo: *"si el sistema detecta que en la misma dirección están conectados 10 chicos… y
+son todas nenas de 10 años, esto ya es un patrón grave"*.
+
+🔴 **Discrimina donde el volumen no puede.** Un lugar legítimo y popular tiene público **diverso**
+—Roblox tiene chicos de 7 a 17, varones y nenas—; un canal armado para captar tiene público
+**angosto**. La señal no es que haya muchos chicos: es que sean **todos parecidos**. Y sirve
+contra un dominio que nadie vio nunca: no hace falta saber qué es el sitio para notar que su
+público es imposible.
+
+⚠ **Lo que lo sostiene y lo que no.** Que las víctimas se concentran en un perfil está en las dos
+fuentes (80% nenas; franja 9-13). Que **cada acosador** persiga un perfil consistente es una
+inferencia razonable **no verificada en fuente**: no se afirma. El detector no depende de eso —
+mide contra la diversidad esperable de una plataforma, sea cual sea el motivo.
+
+🔴 **Guardarraíl más filoso que el resto:** un casillero de "nenas de 10" con un integrante es casi
+una identidad. Por eso el perfil **no se computa por debajo de `CHICOS_PARA_PERFIL = 5`**, y nunca
+se devuelven los casilleros: sólo el índice.
+
+Medido el 15/8 con el ejemplo: `amigos-secretos.click`, 10 chicos, **homogeneidad 100%**, y entra
+**aunque el lift sea apenas 2,0** porque 8 de los 10 todavía no tienen alerta. Ahí está el valor:
+**ve el patrón antes de que esos chicos lleguen a tener una alerta.** Roblox, con público diverso,
+sigue descartado.
+
+📌 **Falta la acumulación**: hoy `GET /api/observatorio` devuelve vacío y lo dice, porque hay una
+sola familia sembrada. La función `analizar()` ya está escrita y probada; lo que falta es el
+registro agregado, que necesita más de una casa para significar algo.
+
+#### ❓ Sin decidir: avisarle a las autoridades
+
+Planteado por Edgardo el 15/8. **Mi recomendación, para cuando se retome:**
+
+🔴 **Automático, no.** Por tres motivos: (1) choca con la regla 1 —el sistema no afirma—; (2) un
+falso positivo contra un servicio legítimo es irreversible; (3) un agregado de DNS **no es prueba**,
+y presentarlo como tal quema la credibilidad ante la única oficina que hace falta.
+
+✅ **Lo que sí:** el sistema **arma el informe**, una persona decide mandarlo, y el informe es sobre
+**un dominio y un patrón, nunca sobre un chico**. Esa distinción es la que lo vuelve defendible: se
+reporta infraestructura, no una criatura.
+
+Canales reales verificados el 15/8: **UFECI** (Unidad Fiscal Especializada en Ciberdelincuencia,
+`denunciasufeci@mpf.gov.ar`, (5411) 5071-0040) y **Línea 137 / WhatsApp 11-3133-1000**, donde el
+Equipo de Violencia Digital acompaña hasta la denuncia.
+📌 Y encaja con la conversación de partner: **Grooming Argentina ya articula con el sistema
+judicial.** AntiGro no denuncia — equipa al que denuncia.
+
 ## Modelo de datos
 
 - **Familia**
@@ -269,6 +589,78 @@ activo del que depende todo el producto.
 
 ---
 
+## ⬜ LO PRÓXIMO — el asistente para los adultos
+
+**Definido con Edgardo el 15/8/2026. Nada escrito todavía: acá está lo que se decidió.**
+
+### Por qué
+
+Hoy la alerta llega y **el padre queda solo con ella**. El informe dice *"hay un cambio que se
+sostuvo y conviene mirar"*, y el pensamiento siguiente de cualquier padre es *"¿y ahora qué
+hago?"*. Ahí el sistema se calla, y ese silencio se come el valor de todo lo demás. Además ahora
+hay mucho más para explicar: el alcance, por qué la madrugada pesa distinto a los 15 que a los 9,
+qué significa el cruce, qué etapa encaja.
+
+### Decidido
+
+| Qué | Decisión |
+|---|---|
+| **Con quién habla** | 🔴 **Sólo los adultos.** El chico no, por ahora |
+| **Recuperación** | 🔴 **Sin RAG.** Todo el corpus en el prompt estable, cacheado |
+| **Registro** | **Cálido.** Ver abajo: es un requisito, no una preferencia |
+
+🔴 **Sin RAG, y es la lección más cara de Criterio Térmico aplicada de entrada:** allá se
+descubrió el 14/8 que *la regla anti-invención NO protege contra material que existe pero el RAG
+no recuperó* — el modelo rellena con conocimiento general que suena bien y contradice la
+documentación. Acá el corpus es chico y cerrado (el objeto `Lectura` + las estadísticas + las
+recomendaciones del MPBA y la 137): **entra entero en el prompt estable.** Elimina de raíz una
+clase completa de error y encima sale más barato. Ver [[project-ct-asistente-calidad]].
+
+### 🔴 Dónde va la línea — la discusión que la definió
+
+Yo propuse "sólo material documentado" y **Edgardo lo corrigió con razón**: *"si es sólo material
+documentado va a ser algo frío… si la respuesta es fría el padre quizá no quiera volver a
+preguntar"*.
+
+**Un asistente frío no es más seguro: es menos consultado, y uno que nadie consulta no protege a
+nadie.** En este producto la frialdad es una falla, no una precaución.
+
+La línea NO va entre "documentado" y "criterio". Va entre **el dato y el acompañamiento**:
+
+- 🔴 **Nunca inventa** — cifras, normativa, qué vio el sistema, qué dice el informe. Sale del
+  objeto `Lectura` y del prompt estable. Si no está, lo dice.
+- 🔴 **Nunca hace tres cosas**, por más que sea lo cálido: **diagnosticar, tranquilizar, estimar
+  probabilidad.** Aunque el padre lo pida —y lo va a pedir— no puede decir *"por lo que veo no
+  parece nada"*: esa frase, dicha a la madre equivocada, cierra un caso real.
+- ✅ **Sí hace, y con calor:** explicar el informe en criollo, **ordenarle las opciones**, decirle
+  **cómo abrir la conversación**, qué conviene no decir, y cuándo la respuesta es llamar al 137 en
+  vez de seguir hablando con él.
+
+🔑 **Lo técnico que vuelve segura la calidez:** el control de `reglas.ts` trabaja sobre las
+**afirmaciones**, no sobre el registro. Se puede escribir cálido sin aflojar un guardarraíl — son
+perillas independientes, así que no hay que elegir.
+
+📌 **"Analizá la alerta y decime qué opciones tengo" NO es inventar.** La lectura ya trae los
+números hechos (días sostenidos, alcance, cruce, etapa): razonar sobre eso es trabajar con lo que
+hay. Es probablemente lo más útil que puede hacer.
+
+🔑 **Y un dato del propio proyecto que tiene que ordenar el consejo: el 43% de los chicos no habla
+de estos temas con sus padres.** O sea que el consejo de manual —"hablá con tu hija"— tiene casi
+la mitad de probabilidades de no funcionar. Por eso existe el segundo adulto elegido por el chico.
+El asistente tiene que **usar** eso, no repetir el consejo genérico.
+
+### ⚠ Antes de que lo vea nadie
+
+El asistente va a ser **lo más citado del producto**: si un padre repite algo que le dijo AntiGro,
+lo repite como si lo hubiera dicho el sistema. **Las primeras respuestas reales las lee Edgardo**,
+igual que el primer mensaje del 14/8 — que fue el que enseñó la regla del "volumen de mensajes".
+
+📌 Piezas que ya existen y se reusan: `src/lib/ia/reglas.ts` (el control, ya probado contra una
+invención real), `src/lib/ia/respaldo.ts` (los textos deterministas) y el objeto `Lectura`.
+📌 Sin decidir: si el chico tiene el suyo más adelante, y qué se le puede decir a un menor.
+
+---
+
 ## El simulador
 
 **No es un reemplazo de los datos reales: es la única forma honesta de mostrar esto.** Un
@@ -278,11 +670,15 @@ sistema no dice nada, y eso no se filma.
 🔑 **La entrada de datos va detrás de una interfaz única desde la fase 0**, para que el
 simulador de hoy y un NextDNS real de mañana entren por el mismo lugar.
 
-Tres controles:
+Tres controles — **hechos, en `src/app/_demo/Consola.tsx`**:
 1. **Perfil** — edad y género.
 2. **Escenario** — prearmados de un clic: semana normal · cambio leve · patrón que persiste ·
    intento de saltar el filtro.
-3. **Reloj** — comprime tres semanas en diez segundos. Es lo que hace visible la persistencia.
+3. **Reloj** — comprime tres semanas en unos segundos. Es lo que hace visible la persistencia.
+
+📌 Hay un cuarto control que no estaba en el plan: **qué contestaron los adultos** (sin
+responder · algunas cosas · bastantes). Es la segunda entrada del motor, y sin poder moverla el
+cuestionario no se ve por ningún lado.
 
 🎬 **El momento del video es el sistema quedándose callado:** día 1 sin alerta, día 5 sin
 alerta, y recién el día 18 aparece el aviso. Cualquiera programa algo que grite; lo que se nota
@@ -292,8 +688,13 @@ es un sistema que sabe cuándo no molestar.
 
 ## El mensaje al chico, por banda de edad
 
-Las bandas salen de los datos: el grueso de las víctimas está entre 11 y 15 años, con un
-segundo grupo importante entre 7 y 10.
+Las bandas salen de los datos: el grueso de las víctimas está entre 11 y 15 años (Ministerio,
+2023), la franja más vulnerable va de 9 a 13 (Grooming LATAM, 2025) y hay un segundo grupo
+importante entre 7 y 10.
+
+⚠ **Estas bandas de MENSAJE no son las bandas de `factorEdad`, y está bien que no lo sean.**
+Acá se decide *cómo se le habla*; en `pesos.ts` se decide *cuánto pesa*. Cambiar una no obliga a
+cambiar la otra.
 
 | Banda | Cómo se le habla | A quién se lo deriva |
 |---|---|---|
@@ -325,7 +726,9 @@ víctima posible.
 
 ## Las estadísticas que sostienen el motor
 
-Todas del **Estudio nacional sobre acoso sexual a NNyA mediante TIC**, Ministerio de Justicia y
+### Fuente 1 — Estudio nacional (Argentina, 2023)
+
+Del **Estudio nacional sobre acoso sexual a NNyA mediante TIC**, Ministerio de Justicia y
 Derechos Humanos de la Nación, Dirección Nacional de Política Criminal, 2023 — que a su vez
 recopila UNESCO/CIPDH, Grooming Argentina, Argentina Cibersegura, ESET y Google.
 
@@ -342,6 +745,61 @@ recopila UNESCO/CIPDH, Grooming Argentina, Argentina Cibersegura, ESET y Google.
 - Delito desde 2013: **Ley 26.904**, art. 131 CP, 6 meses a 4 años. Programa Nacional desde
   2020: **Ley 27.590 «Mica Ortega»**.
 - Recursos oficiales a los que se deriva: **Línea 137** y la app **GAPP** de Grooming Argentina.
+
+### Fuente 2 — Informe Grooming LATAM (14 países, 2024/2025) · **incorporada el 15/8/2026**
+
+Red Grooming LATAM (impulsada por Grooming Argentina), presentado en mayo de 2025.
+**n≈28.360 encuestas anónimas a NNyA de 9 a 17 años en 14 países.**
+https://groomingarg.org/informe-grooming-latam
+
+🔑 **Es más grande y más nueva que la fuente 1, y coincide con ella.** Dos estudios
+independientes, dos años y muestras distintas, misma dirección: eso es más fuerte que cualquiera
+de los dos solo.
+
+| | LATAM 2025 | Ministerio 2023 |
+|---|---|---|
+| No sabe qué es el grooming | **72,8%** | 63% |
+| Habla con desconocidos | **60,0%** | 56,4% |
+
+Cifras nuevas que no estaban en la fuente 1:
+- 🔴 **Franja más vulnerable: 9 a 13 años.** Es lo que corrigió `factorEdad`: antes los de 9 y
+  10 pesaban 0,94 y quedaban por debajo de los de 11 a 15. ⚠ **Pero la corrección arregla el
+  puntaje, no el momento:** medido, la edad cambia el día en que el sistema habla en 1 de 24
+  combinaciones. El detalle y la palanca correcta están comentados en `pesos.ts`.
+- 🔑 **33,3%** recibió una propuesta de noviazgo dentro de un juego en línea.
+- **64,9%** cree saber más de tecnología que sus padres o tutores.
+- **57,9%** pasa 5 horas o más por día conectado (5-6 h: 36,8% · 7+ h: 21,1%).
+- **4,4%** fue víctima de imágenes falsas hechas con IA.
+- Juegos más usados: Roblox y Free Fire. Apps: WhatsApp, TikTok, YouTube, Instagram.
+
+🔴 **Trampa de citación: el informe se contradice a sí mismo en tres lugares.** El gráfico del
+primer celular dice 25,5 / 62,2 / 12,3 y el texto debajo dice 28 / 63 / 9; el gráfico de apps no
+coincide con su lista numerada; el de juegos tampoco. **Citar el GRÁFICO, nunca el texto**, y
+siempre con fecha y n. Es material institucional de prensa, no un paper revisado.
+
+⚠ **Choca con el `docs/guion-trailer.md`**, que usa *"4 de cada 10 tiene su primer teléfono antes
+de los 9"* (Grooming Argentina vía Canal 12, 3/2026). Acá es 25,5%, pero **sobre 14 países**. No
+se contradicen —son universos distintos— pero si se usa el 40% hay que decir **"en Argentina"**.
+
+### Fuente 3 — MPBA · sin cifras, pero sirve
+
+[Ministerio Público de la Provincia de Buenos Aires](https://www.mpba.gov.ar/grooming). **No
+publica ninguna estadística** ni casuística bonaerense. Su valor es otro: su lista oficial de
+recomendaciones a adultos incluye *"observar cambios de humor y horarios de conexión"*, y eso
+respalda institucionalmente dos ítems del cuestionario que estaban sin fuente.
+
+📌 Por eso `cuestionario.ts` tiene ahora **tres** clases de procedencia y no dos: `estudio` (hay
+cifra), **`organismo`** (un organismo oficial lo recomienda, pero sin cifra detrás) y
+`observable` (sólo un hecho que el adulto puede ver).
+
+### 🔴 Lo que estas fuentes NO resuelven
+
+- **La ventana de observación: nada, y ya no hace falta.** La pregunta se disolvió: el sistema
+  no espera una cantidad fija de días. Ver el rediseño del perfil más arriba.
+- **Casuística por jurisdicción: nada.** El informe LATAM es regional y agregado, sin corte por
+  país ni provincia. La frase de Navarro sigue vigente — y ahora la sostiene su propio informe.
+- **Desconocimiento del grooming en ADULTOS: sigue faltando.** El 64,9% es lo que *creen los
+  chicos* sobre sus padres, no una medición sobre adultos. No sirve como reemplazo.
 
 ⚠ La parte académica internacional (indicadores conductuales, PAN12, detección por NLP) viene
 de búsqueda web y **no está verificada en fuente primaria**. Si va a un video o a una
