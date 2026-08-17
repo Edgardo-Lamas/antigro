@@ -100,15 +100,32 @@ cuenta, el alta no termina en ningún lado.
   la usa.
 - Cabeceras de seguridad puestas, y `next@14.2.35` ya está por encima del bypass de middleware.
 
-### ⚠ Lo que quedó pendiente de la auditoría, y le toca a él
+### ✅ Todo aplicado y verificado contra producción el 17/8
 
-1. **Correr el SQL nuevo** — la tabla `frecuencia` y la función `tomar_turno`, al final de
-   `supabase/schema.sql`. **Sin eso el límite deja pasar todo** (a propósito: tirar abajo el
-   asistente porque falta una migración sería peor). Avisa por consola y lo dice en la respuesta,
-   pero hay que correrlo.
-   🔑 La base va adelante del código, igual que con `charlas` el 16/8.
-2. **Borrar `.env.local.respaldo-16-08`.**
-3. **`npm audit fix`** (sin `--force`), y que haya días para verificarlo.
+| Qué | Cómo se comprobó |
+|---|---|
+| **Claves rotadas** | Se entró a producción con la nueva y con la publicada: **la publicada ya no entra, la nueva sí** |
+| **`frecuencia` + `tomar_turno`** | Aplicadas. Con tope 3: los pedidos 1-3 pasan, el 4 y el 5 se frenan, y una ventana vencida arranca de cero |
+| **RLS** | Encendido en las **diez** tablas, `frecuencia` incluida. `tomar_turno` por PostgREST con service role anda; con `anon` da 401 |
+| **Las rutas** | `/api/mensajes` 404 · `/api/familia/<token>` 404 · `/familia/<token>` 404 · `POST /api/alertas` sin sesión 401 |
+| **Lo que tiene que seguir andando** | home 200 · `/entrar` 200 · `/panel` y `/mi-familia` 307 · el QR de la demo devuelve su SVG |
+| **`npm audit fix`** | Sin `--force`. De 6 a 2: **las dos críticas se fueron**. Las que quedan son de `postcss` dentro de `next` y sólo se arreglan saltando a Next 16 |
+
+🔑 **Se pudo aplicar el SQL sin pasar por el panel de Supabase**, y conviene saberlo para la
+próxima: el MCP **no** sirve —ve un proyecto `antigro` que es `aqfqfhptwvkpavstjohn`, otro,
+pausado; el de producción es `xlwgwpojbmakzmlrzgmw`, el del Marketplace—. Lo que sí sirve es
+`POSTGRES_URL_NON_POOLING` de `.env.local`, con `pg`. ⚠ Hay que **sacarle el `?sslmode=require`**
+a la cadena: `pg` lo trata como `verify-full` y falla contra el certificado de Supabase.
+
+⚠ **Queda una sola cosa, y es de él: borrar `.env.local.respaldo-16-08`.** Está fuera de git y
+nunca se filtró, pero es una copia entera de los secretos en el Escritorio y, después de la
+rotación, con claves viejas adentro.
+
+📌 **El build tira un aviso, es previo a la auditoría y es inofensivo:** `bcryptjs` carga `crypto`,
+que el Edge Runtime no soporta, y el middleware arrastra `auth.ts` entero. **No se ejecuta nunca
+ahí** —`authorize()` sólo corre en el servidor, el middleware apenas lee el JWT— y el middleware
+anda (comprobado: `/panel` y `/mi-familia` devuelven 307). Sacarlo pide partir la configuración de
+auth en dos archivos, que es un refactor de la autenticación a cuatro días del congelamiento.
 
 ---
 
