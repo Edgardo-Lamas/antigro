@@ -43,7 +43,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const db = baseDeDatos()!;
         const { data: usuario, error } = await db
           .from("usuarios")
-          .select("id, email, nombre, rol, password_hash, activo, adulto_id")
+          .select("id, email, nombre, rol, password_hash, activo, familia_id, hogar")
           .eq("email", email.toLowerCase())
           .single();
 
@@ -51,25 +51,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const ok = await bcrypt.compare(password, usuario.password_hash);
         if (!ok) return null;
 
-        /* 🔴 A qué familia pertenece se resuelve ACÁ y viaja en la sesión.
+        /* ─────────────────────────────────────────────────────────────────
+           🔴 LA CREDENCIAL ES DEL HOGAR, NO DE UNA PERSONA (17/8)
+           ─────────────────────────────────────────────────────────────────
+
+           Hasta el 16/8 cada adulto tenía su cuenta, colgada de `adulto_id`.
+           Edgardo lo volteó con un argumento de la vida real: *"en la práctica
+           los padres no van a aceptar tener cada uno una clave diferente, es
+           decirles que cada uno se maneja por separado… se supone que son un
+           matrimonio y eso va a generar fricción"*.
+
+           🔑 Y hay una consecuencia técnica que va en la misma dirección: una
+           clave que los dos conocen no separa nada. Sostener cuentas distintas
+           habría dado la apariencia de una privacidad que no existía.
+
+           📌 Padres separados son DOS filas de la misma familia, con distinto
+           `hogar`: un solo panel, dos puertas. Ninguno puede dejar al otro
+           afuera cambiando la clave.
+
+           🔴 A qué familia pertenece se resuelve ACÁ y viaja en la sesión.
            El panel no puede preguntarle al navegador de quién son los datos
            que va a mostrar: eso sería dejar que cualquiera lea el informe de
            cualquier chico cambiando un identificador en la dirección. */
         let familiaId: string | null = null;
         if (usuario.rol === "adulto") {
-          if (!usuario.adulto_id) return null;
+          if (!usuario.familia_id) return null;
 
-          const { data: adulto } = await db
-            .from("adultos")
-            .select("familia_id, activo")
-            .eq("id", usuario.adulto_id)
+          /* 🔑 Si la familia se pausa, la cuenta deja de abrir. Antes esto
+             colgaba de la baja del adulto; ahora la puerta es de la casa, así
+             que lo que la cierra es que la casa deje de estar activa. */
+          const { data: familia } = await db
+            .from("familias")
+            .select("activo")
+            .eq("id", usuario.familia_id)
             .single();
 
-          /* 🔑 Si al adulto lo dieron de baja, la cuenta deja de abrir. Es la
-             consecuencia real de la baja: sin esto, quien se fue de la familia
-             seguiría entrando a ver a la criatura. */
-          if (!adulto || adulto.activo === false) return null;
-          familiaId = adulto.familia_id as string;
+          if (!familia || familia.activo === false) return null;
+          familiaId = usuario.familia_id as string;
         }
 
         return {
@@ -77,8 +95,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: usuario.email,
           name: usuario.nombre,
           rol: usuario.rol,
-          adultoId: usuario.adulto_id ?? null,
           familiaId,
+          /** Cuál de las dos casas. `null` cuando hay una sola, que es lo normal. */
+          hogar: (usuario.hogar as string | null) ?? null,
         };
       },
     }),
@@ -87,22 +106,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user) {
-        const u = user as { rol?: string; adultoId?: string | null; familiaId?: string | null };
+        const u = user as { rol?: string; familiaId?: string | null; hogar?: string | null };
         token.rol = u.rol;
-        token.adultoId = u.adultoId ?? null;
         token.familiaId = u.familiaId ?? null;
+        token.hogar = u.hogar ?? null;
       }
       return token;
     },
     session({ session, token }) {
       const u = session.user as {
         rol?: unknown;
-        adultoId?: unknown;
         familiaId?: unknown;
+        hogar?: unknown;
       };
       u.rol = token.rol;
-      u.adultoId = token.adultoId;
       u.familiaId = token.familiaId;
+      u.hogar = token.hogar;
       return session;
     },
   },

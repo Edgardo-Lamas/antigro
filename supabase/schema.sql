@@ -369,3 +369,144 @@ $$;
 -- Higiene: las claves que ya no se van a volver a mirar no tienen por qué
 -- quedar. No hace falta cron — se limpia solo cuando alguien pasa por acá.
 create index if not exists frecuencia_ventana_idx on frecuencia (ventana);
+
+
+-- ═════════════════════════════════════════════════════════════════
+--  12. EL HOGAR — rediseño del 17/8, y deja atrás varias cosas del 16
+-- ═════════════════════════════════════════════════════════════════
+--
+--  Lo trajo Edgardo entero y corrige tres supuestos que estaban mal:
+--
+--  🔴 **No hay privacidad entre padres.** Textual: *"es el hijo, los dos son
+--  igual de responsables, los dos van a querer saber cómo está. Es una locura
+--  pensar privacidad entre padres."* Lo privado es frente al REFERENTE, nunca
+--  entre los progenitores. El 16/8 se había construido al revés: la charla con
+--  el asistente era de cada adulto. Se da vuelta.
+--
+--  🔴 **Una clave por hogar, no una por persona.** *"En la práctica los padres
+--  no van a aceptar tener cada uno una clave diferente, es decirles que cada uno
+--  se maneja por separado."* Y hay una razón más dura que la fricción: una clave
+--  que los dos conocen no protege nada, así que sostener que la charla es
+--  privada sería prometer algo que el sistema no puede cumplir.
+--
+--  🔴 **El referente NO entra al panel.** Sabe que es parte del sistema y recibe
+--  los avisos, pero el panel es de los progenitores.
+--
+--  🔑 **Padres separados: UN panel con acceso desde cada casa.** *"No puede
+--  haber dos panel, uno en cada casa."* Los dos ven lo mismo —mismas alertas,
+--  mismo informe, misma charla—; lo único que hay dos es la puerta, para que
+--  ninguno pueda dejar al otro afuera cambiando la clave.
+--
+--  🔴 **Nada es obligatorio.** *"Tampoco podemos exigir padres y referentes,
+--  siempre sugerimos."* El mínimo de dos adultos deja de ser una exigencia. Y
+--  eso arregla de paso un cartel imposible: a un chico de 8 el referente lo
+--  eligen los padres, así que la marca «lo eligió el chico» va en `false` y la
+--  familia veía un faltante que no podía resolver nunca.
+--
+--  📌 *"No podemos pensar que solo existe un solo escenario: dos padres y un
+--  referente."*
+
+
+-- ── 12.1 · El adulto tiene ROL, y el rol dice si entra al panel ──
+--
+--  Hasta el 17/8 sólo existía `vinculo` (madre, tía, abuelo…), que describe el
+--  parentesco pero no dice nada del acceso. Son dos preguntas distintas: una
+--  abuela puede ser la tutora, y un padre puede ser el referente que eligió el
+--  chico. El acceso no se deduce del parentesco.
+
+alter table adultos add column if not exists rol text not null default 'progenitor'
+  check (rol in ('progenitor', 'referente'));
+
+--  Backfill: madre y padre son progenitores; el resto, referentes. Es sólo el
+--  punto de partida de las familias que ya existían — de acá en adelante lo
+--  elige el alta.
+update adultos set rol = case
+  when vinculo in ('madre', 'padre') then 'progenitor'
+  else 'referente'
+end
+where rol = 'progenitor' and vinculo not in ('madre', 'padre');
+
+create index if not exists adultos_rol_idx on adultos (familia_id, rol, activo);
+
+
+-- ── 12.2 · La credencial es del HOGAR, no de la persona ──
+--
+--  Antes cada adulto tenía su cuenta (`usuarios.adulto_id`). Ahora la cuenta es
+--  de la casa: `familia_id` + `hogar`. Un matrimonio es una fila; padres
+--  separados son dos filas de la MISMA familia, con distinto `hogar`.
+--
+--  🔑 `hogar` en null significa que hay una sola casa. No es un dato faltante:
+--  es el caso normal, y no hay que hacerle escribir «mi casa» a nadie.
+
+alter table usuarios add column if not exists familia_id uuid
+  references familias(id) on delete cascade;
+
+alter table usuarios add column if not exists hogar text;
+
+--  Se traslada lo que ya había: la familia sale del adulto al que colgaba.
+update usuarios u
+   set familia_id = a.familia_id
+  from adultos a
+ where u.adulto_id = a.id
+   and u.familia_id is null;
+
+--  Y se sueltan las reglas viejas antes de borrar la columna.
+drop index if exists usuarios_adulto_idx;
+alter table usuarios drop constraint if exists usuarios_adulto_coherente;
+alter table usuarios drop column if exists adulto_id;
+
+--  La regla nueva: una cuenta de familia sin familia no significa nada, y una
+--  de administración no pertenece a ninguna.
+alter table usuarios drop constraint if exists usuarios_familia_coherente;
+alter table usuarios add constraint usuarios_familia_coherente check (
+  (rol = 'admin'  and familia_id is null) or
+  (rol = 'adulto' and familia_id is not null)
+);
+
+--  Una sola puerta por casa. Dos filas de la misma familia sólo si son dos
+--  hogares distintos, que es exactamente el caso de los padres separados.
+create unique index if not exists usuarios_hogar_idx
+  on usuarios (familia_id, coalesce(hogar, ''));
+
+create index if not exists usuarios_familia_idx on usuarios (familia_id);
+
+
+-- ── 12.3 · La charla es de la familia, no de cada adulto ──
+--
+--  🔴 Es lo que se da vuelta del 16/8. El comentario de la sección 11 decía
+--  «Es de cada ADULTO, no de la familia. El informe lo ven los dos; esto no.»
+--  **Eso quedó sin efecto.** Entre padres no hay nada separado.
+
+alter table charlas alter column adulto_id drop not null;
+
+create index if not exists charlas_familia_fecha_idx on charlas (familia_id, fecha);
+
+
+-- ── 12.4 · El perfil de NextDNS es del CHICO, no de la casa ──
+--
+--  🔑 Sale de la otra mitad de la conversación del 17/8: si el chico vive una
+--  quincena en cada casa, un filtro instalado en el router deja de verlo en
+--  cuanto cruza la puerta. Por eso en Red Familiar se eligió NextDNS sobre
+--  Pi-hole y el filtro va en el DISPOSITIVO del chico —perfil de iOS, DNS
+--  privado en Android—: viaja con él, y encima sigue viéndolo en datos móviles,
+--  que es donde vive la señal de madrugada.
+--
+--  ➡ Si el filtro es del aparato del chico, el perfil es del chico. Estaba
+--  colgado de la familia, y así dos hermanos compartían perfil: sus señales se
+--  mezclaban en una sola lectura.
+
+alter table chicos add column if not exists nextdns_profile_id text;
+
+--  Lo que hubiera cargado a nivel familia se baja al chico, pero sólo si hay
+--  uno solo: con dos hermanos no hay forma de saber de quién era.
+update chicos c
+   set nextdns_profile_id = f.nextdns_profile_id
+  from familias f
+ where c.familia_id = f.id
+   and f.nextdns_profile_id is not null
+   and c.nextdns_profile_id is null
+   and (select count(*) from chicos h where h.familia_id = f.id) = 1;
+
+--  La de `familias` queda, vacía y sin uso, para no perder nada en la mudanza.
+comment on column familias.nextdns_profile_id is
+  'EN DESUSO desde el 17/8: el perfil pasó a chicos.nextdns_profile_id, porque el filtro va en el dispositivo del chico y no en el router de la casa.';

@@ -79,13 +79,43 @@ export function generarCodigo(largo = 6): string {
 export interface Familia {
   id: string;
   nombre: string;
-  /** El enlace privado por el que los adultos entran sin cuenta. */
+  /**
+   * Identificador interno de la familia.
+   *
+   * ⚠ **Ya no es una puerta.** Nació como «el enlace privado por el que los
+   * adultos entran sin cuenta», y esa pantalla se borró en la auditoría del
+   * 17/8: entregaba los códigos de vinculación a cualquiera que lo tuviera.
+   * Sigue siendo una credencial —con él se piden avisos por `/api/alertas`—,
+   * así que no se muestra entero ni se filma.
+   */
   token: string;
   activo: boolean;
-  /** Se completa el día que haya un NextDNS real. Hasta entonces, simulador. */
-  nextdnsProfileId?: string;
   notas?: string;
   creado: string;
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL HOGAR — la puerta al panel (rediseñado el 17/8)
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **Una clave por casa, no una por persona.** Lo trajo Edgardo: *"en la
+ * práctica los padres no van a aceptar tener cada uno una clave diferente, es
+ * decirles que cada uno se maneja por separado"*. Y hay una razón más dura que
+ * la fricción: **una clave que los dos conocen no protege nada**, así que
+ * prometer que algo es privado entre ellos sería mentir.
+ *
+ * 🔑 **Padres separados: UN panel con dos puertas.** No dos paneles. Los dos
+ * ven exactamente lo mismo; lo único que se duplica es la entrada, para que
+ * ninguno pueda dejar al otro afuera cambiando la clave.
+ *
+ * 📌 `hogar` en `null` **no es un dato faltante**: es la casa única, que es el
+ * caso normal. A nadie hay que hacerle escribir «mi casa».
+ */
+export interface Hogar {
+  /** Cómo se llama esa casa. `null` cuando hay una sola. */
+  nombre: string | null;
+  familiaId: string;
 }
 
 /* ── El chico ────────────────────────────────────────────────────────────── */
@@ -111,6 +141,21 @@ export interface Chico {
   genero: Genero;
   /** El canal del chico, separado del de los adultos. */
   canal: Canal;
+  /**
+   * 🔑 **El perfil de NextDNS es del CHICO, y desde el 17/8 no de la familia.**
+   *
+   * Sale de una pregunta de Edgardo que parecía de otro tema: si el chico vive
+   * una quincena en cada casa, ¿qué pasa con el filtro? La respuesta ya estaba
+   * resuelta en Red Familiar —por eso ahí se eligió NextDNS sobre Pi-hole—:
+   * **el filtro va en el dispositivo del chico, no en el router.** Así viaja
+   * con él entre las dos casas, y encima lo sigue viendo en datos móviles, que
+   * es donde vive la señal de madrugada.
+   *
+   * ➡ Si el filtro es del aparato del chico, el perfil es del chico. Colgado de
+   * la familia, dos hermanos compartían perfil y sus señales se mezclaban en
+   * una sola lectura.
+   */
+  nextdnsProfileId?: string;
   activo: boolean;
   creado: string;
 }
@@ -129,11 +174,41 @@ export const VINCULOS: { id: Vinculo; nombre: string }[] = [
 ];
 
 /**
- * 🔴 Mínimo dos, y no por redundancia técnica.
- * El 43% de los chicos no habla de estos temas con sus padres: por eso uno de
- * los dos lo elige el chico. Es alguien a quien de verdad le va a escribir.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  QUIÉN ENTRA AL PANEL — decidido el 17/8
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **El rol no se deduce del parentesco, y por eso es un campo aparte.** Una
+ * abuela puede ser la tutora; un padre puede ser el referente que eligió el
+ * chico. `vinculo` dice qué es de él; `rol` dice qué puede ver.
+ *
+ * | | Panel | Avisos | Sabe que existe el sistema |
+ * |---|---|---|---|
+ * | **Progenitor** | sí | sí | sí |
+ * | **Referente** | **no** | sí | sí |
+ *
+ * 🔴 **El referente queda afuera del panel, y lo marcó Edgardo:** el informe del
+ * chico es información privada de los padres. Pero *"el adulto responsable sí
+ * debe saber que es parte del sistema"* — no es un contacto de emergencia que
+ * se entera el día que suena el teléfono.
  */
-export const MINIMO_ADULTOS = 2;
+export type RolDeAdulto = "progenitor" | "referente";
+
+/**
+ * Cuántos adultos hacen que el sistema funcione mejor.
+ *
+ * 🔴 **Es una sugerencia, no un requisito, y el cambio es del 17/8.** Antes se
+ * exigían dos y a la familia que tenía uno el panel le decía que estaba
+ * incompleta. Palabras de Edgardo: *"tampoco podemos exigir padres y
+ * referentes, siempre sugerimos para que el sistema de protección del chico sea
+ * más completo"*.
+ *
+ * 🔑 Y tiene un fundamento que no cambió: el 43% de los chicos no habla de estos
+ * temas con sus padres. Por eso el referente sirve. Pero un hogar con un solo
+ * progenitor **no está incompleto: es otra forma de familia**, y decirle que le
+ * falta algo es a la vez falso y desalentador.
+ */
+export const ADULTOS_SUGERIDOS = 2;
 
 /**
  * Por qué se fue un adulto responsable.
@@ -163,6 +238,8 @@ export interface AdultoResponsable {
   familiaId: string;
   nombre: string;
   vinculo: Vinculo;
+  /** Qué puede ver. Ver `RolDeAdulto`: no se deduce del `vinculo`. */
+  rol: RolDeAdulto;
   elegidoPorElChico: boolean;
   canal: Canal;
   creado: string;
@@ -231,7 +308,14 @@ export interface Respuesta {
 export interface TurnoDeCharla {
   id: string;
   familiaId: string;
-  adultoId: string;
+  /**
+   * Quién lo escribió, cuando se sabe.
+   *
+   * 🔴 **La charla es de la FAMILIA y no se filtra por esto** — desde el 17/8 no
+   * hay nada separado entre padres. Queda como atribución, no como partición:
+   * saber quién preguntó puede servir para mostrarlo; decidir quién lo lee, no.
+   */
+  adultoId?: string;
   fecha: string;
   quien: "adulto" | "asistente";
   texto: string;
@@ -272,24 +356,92 @@ export interface FamiliaCompleta {
 }
 
 /**
- * Falta algo para que el sistema pueda trabajar con esta familia.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LO QUE EL SISTEMA SUGIERE — reescrito el 17/8
+ * ─────────────────────────────────────────────────────────────────────────────
  *
- * 🔴 **Cuenta sólo a los adultos activos.** Es lo que hace visible el hueco
- * cuando alguien se da de baja: el cambio de referente nunca se traba —se muda,
- * fallece, el chico lo quiere cambiar— pero la familia que queda con uno solo
- * tiene que verlo escrito, porque un sistema con un único adulto no es el
- * sistema que se le describió al chico en el alta.
+ * 🔴 **Antes esto se llamaba `faltantesDeAlta` y era una lista de reproches.**
+ * A un hogar con un solo progenitor le decía «hacen falta al menos 2 adultos
+ * responsables», que es a la vez falso —esa familia no está incompleta— y
+ * desalentador. Edgardo lo dio vuelta: *"siempre sugerimos para que el sistema
+ * de protección del chico sea más completo"*.
+ *
+ * 🔴 **Y arregla un cartel que era imposible de apagar.** La regla vieja pedía
+ * que algún adulto tuviera la marca «lo eligió el chico». Pero a los 8 años el
+ * referente lo eligen los padres —eso está decidido y es correcto—, así que esa
+ * marca va en `false` y la familia veía para siempre un faltante que sólo se
+ * resolvía haciendo justo lo que el sistema decidió que a esa edad no
+ * corresponde. Un cartel que no se puede apagar entrena a ignorar los carteles.
+ *
+ * 🔑 **Por eso cada sugerencia trae su porqué.** Un consejo sin motivo se lee
+ * como una exigencia disfrazada; con el motivo, el que decide no tomarlo
+ * decide informado, que es todo lo que el sistema puede pedir.
  */
-export function faltantesDeAlta(f: FamiliaCompleta): string[] {
-  const faltantes: string[] = [];
-  const activos = f.adultos.filter((a) => a.activo);
+export interface Sugerencia {
+  /** Qué convendría hacer. */
+  que: string;
+  /** Para qué sirve. Nunca va vacío. */
+  porQue: string;
+}
 
-  if (f.chicos.length === 0) faltantes.push("No hay ningún chico cargado.");
-  if (activos.length < MINIMO_ADULTOS) {
-    faltantes.push(`Hacen falta al menos ${MINIMO_ADULTOS} adultos responsables.`);
+/**
+ * 🔴 Esto SÍ impide trabajar, y por eso va aparte de las sugerencias: sin chico
+ * no hay nada que mirar. Es la única condición que queda dura.
+ */
+export function loQueImpideTrabajar(f: FamiliaCompleta): string[] {
+  return f.chicos.some((c) => c.activo) ? [] : ["No hay ningún chico cargado."];
+}
+
+export function sugerenciasParaLaFamilia(
+  f: FamiliaCompleta,
+  /** Ver `EDAD_PARA_ELEGIR_REFERENTE` en `config.ts`. */
+  edadParaElegirReferente: number,
+): Sugerencia[] {
+  const sugerencias: Sugerencia[] = [];
+  const activos = f.adultos.filter((a) => a.activo);
+  const progenitores = activos.filter((a) => a.rol === "progenitor");
+  const referentes = activos.filter((a) => a.rol === "referente");
+  const chico = f.chicos.find((c) => c.activo) ?? f.chicos[0];
+
+  /* Un solo progenitor NO es una falta: es otra forma de familia. Lo que sí
+     conviene es que no quede una sola persona sosteniendo todo. */
+  if (progenitores.length < ADULTOS_SUGERIDOS && referentes.length === 0) {
+    sugerencias.push({
+      que: "Sumar un adulto de confianza fuera de la casa.",
+      porQue:
+        "Recibe los mismos avisos, así no queda una sola persona pendiente. Y si " +
+        "alguna vez hace falta que alguien se acerque a hablar con " +
+        `${chico?.nombre ?? "el chico"}, hay alguien más a quien recurrir.`,
+    });
   }
-  if (activos.length >= MINIMO_ADULTOS && !activos.some((a) => a.elegidoPorElChico)) {
-    faltantes.push("Ninguno de los adultos lo eligió el chico.");
+
+  /* 🔑 El referente existe en todas las edades. Lo que cambia con la edad es
+     quién lo elige — y sólo se puede sugerir que lo elija el chico cuando el
+     chico tiene edad de elegir. */
+  if (
+    referentes.length > 0 &&
+    chico &&
+    chico.edad >= edadParaElegirReferente &&
+    !referentes.some((a) => a.elegidoPorElChico)
+  ) {
+    sugerencias.push({
+      que: `Preguntarle a ${chico.nombre} a quién elegiría.`,
+      porQue:
+        "El 43% de los chicos no habla de estos temas con sus padres. Un adulto que " +
+        "eligió él es alguien a quien de verdad le va a escribir.",
+    });
   }
-  return faltantes;
+
+  /* Que el chico no tenga canal no impide trabajar —el motor mira la red—,
+     pero deja sin la mitad del producto: la orientación que le llega a él. */
+  if (chico && !canalListo(chico.canal)) {
+    sugerencias.push({
+      que: `Conectar el canal de ${chico.nombre}.`,
+      porQue:
+        "Sin eso el sistema le avisa a los adultos y a él no. La orientación " +
+        "escrita para su edad es la mitad del producto.",
+    });
+  }
+
+  return sugerencias;
 }

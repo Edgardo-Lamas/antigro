@@ -61,17 +61,22 @@ const Pedido = z.object({
 const TOPE_ASISTENTE = 30;
 const VENTANA_ASISTENTE_SEG = 60 * 60;
 
-/** La sesión de un adulto responsable, o la razón por la que no hay respuesta. */
-async function adultoDeLaSesion() {
+/**
+ * La sesión del hogar, o la razón por la que no hay respuesta.
+ *
+ * 🔴 **Desde el 17/8 la credencial es del HOGAR, no de una persona**, así que
+ * acá ya no hay `adultoId`: hay familia y hogar. Lo trajo Edgardo —*"no puede
+ * existir dos cuentas en el mismo hogar"*—, y con eso se cae también la charla
+ * privada de cada adulto: entre padres no hay nada separado.
+ */
+async function hogarDeLaSesion() {
   const sesion = await auth();
   const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; adultoId?: string | null }
+    | { rol?: string; familiaId?: string | null; hogar?: string | null }
     | undefined;
 
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId || !usuario.adultoId) {
-    return null;
-  }
-  return { familiaId: usuario.familiaId, adultoId: usuario.adultoId };
+  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) return null;
+  return { familiaId: usuario.familiaId, hogar: usuario.hogar ?? null };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -79,10 +84,10 @@ async function adultoDeLaSesion() {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export async function GET() {
-  const yo = await adultoDeLaSesion();
+  const yo = await hogarDeLaSesion();
   if (!yo) return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
 
-  const turnos = await repositorio().charlaDe(yo.familiaId, yo.adultoId, TURNOS_EN_PANTALLA);
+  const turnos = await repositorio().charlaDe(yo.familiaId, TURNOS_EN_PANTALLA);
 
   return NextResponse.json({
     turnos: turnos.map((t) => ({
@@ -96,10 +101,13 @@ export async function GET() {
 }
 
 export async function DELETE() {
-  const yo = await adultoDeLaSesion();
+  const yo = await hogarDeLaSesion();
   if (!yo) return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
 
-  await repositorio().borrarCharla(yo.familiaId, yo.adultoId);
+  /* ⚠ Borra la charla de la CASA, no la de quien aprieta. Con una sola clave
+     por hogar no hay forma de que fuera de otro modo — y la pantalla lo dice
+     antes de borrar, para que nadie se lleve la sorpresa. */
+  await repositorio().borrarCharla(yo.familiaId);
   return NextResponse.json({ borrada: true });
 }
 
@@ -108,7 +116,7 @@ export async function DELETE() {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export async function POST(req: Request) {
-  const yo = await adultoDeLaSesion();
+  const yo = await hogarDeLaSesion();
   if (!yo) return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
 
   const parsed = Pedido.safeParse(await req.json().catch(() => ({})));
@@ -117,7 +125,7 @@ export async function POST(req: Request) {
   }
 
   const turno = await tomarTurno(
-    `asistente:${yo.adultoId}`,
+    `asistente:${yo.familiaId}`,
     VENTANA_ASISTENTE_SEG,
     TOPE_ASISTENTE,
   );
@@ -186,7 +194,7 @@ export async function POST(req: Request) {
   });
 
   /* ── Lo que ya se habló, desde la base ── */
-  const guardados = await repo.charlaDe(yo.familiaId, yo.adultoId, TURNOS_DE_MEMORIA);
+  const guardados = await repo.charlaDe(yo.familiaId, TURNOS_DE_MEMORIA);
   const historia: TurnoDelAsistente[] = guardados.map((t) => ({
     quien: t.quien,
     texto: t.texto,
@@ -209,14 +217,12 @@ export async function POST(req: Request) {
     .guardarCharla([
       {
         familiaId: yo.familiaId,
-        adultoId: yo.adultoId,
         fecha: preguntadaEn,
         quien: "adulto",
         texto: parsed.data.pregunta,
       },
       {
         familiaId: yo.familiaId,
-        adultoId: yo.adultoId,
         fecha: new Date().toISOString(),
         quien: "asistente",
         texto: respuesta.texto,

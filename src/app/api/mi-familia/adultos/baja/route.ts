@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { canalListo, faltantesDeAlta, MINIMO_ADULTOS, repositorio } from "@/lib/datos";
+import {
+  canalListo,
+  repositorio,
+  sugerenciasParaLaFamilia,
+} from "@/lib/datos";
+import { EDAD_PARA_ELEGIR_REFERENTE } from "@/lib/config";
 import { transporteDe } from "@/lib/mensajeria";
 
 /**
@@ -15,9 +20,13 @@ import { transporteDe } from "@/lib/mensajeria";
  *  Un sistema que dificulta el reemplazo termina con un referente que ya no
  *  existe, que es peor que no tener ninguno.
  *
- *  Por eso acá **no se niega la baja** aunque deje a la familia por debajo del
- *  mínimo de dos. Lo que se hace es decirlo: el hueco queda escrito en
- *  `faltantes` y la pantalla lo muestra hasta que se cubra.
+ *  Por eso acá **no se niega ninguna baja.** Lo que se hace es decir qué quedó:
+ *  vuelven las `sugerencias`, con el porqué de cada una.
+ *
+ *  🔴 **Y desde el 17/8 eso ya no es «te falta algo».** El mínimo de dos dejó de
+ *  ser una exigencia — *"tampoco podemos exigir padres y referentes, siempre
+ *  sugerimos"*. Una familia que queda con un solo adulto no está rota; le
+ *  conviene sumar otro, y el sistema le explica para qué.
  *
  *  🔑 **Y si al referente lo había elegido el chico, el chico se entera.** Ese
  *  segundo adulto existe justamente porque el 43% de los chicos no habla de
@@ -35,9 +44,7 @@ const Pedido = z.object({
 
 export async function POST(req: Request) {
   const sesion = await auth();
-  const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; adultoId?: string | null }
-    | undefined;
+  const usuario = sesion?.user as { rol?: string; familiaId?: string | null } | undefined;
 
   if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
@@ -49,12 +56,15 @@ export async function POST(req: Request) {
   }
   const { adultoId, motivo } = parsed.data;
 
-  /* Nadie se da de baja a sí mismo desde acá. No es una regla moral: quien se
-     borra solo se queda sin cuenta en el mismo movimiento y sin manera de
-     deshacerlo. Si se quiere ir, lo da de baja el otro adulto. */
-  if (adultoId === usuario.adultoId) {
-    return NextResponse.json({ error: "no_podes_darte_de_baja_solo" }, { status: 400 });
-  }
+  /* 🔴 Acá había una traba —«nadie se da de baja a sí mismo»— y se sacó el
+     17/8. Existía porque la cuenta colgaba de la persona: borrarse era quedarse
+     sin acceso en el mismo movimiento. Desde que la clave es del HOGAR eso no
+     puede pasar: dar de baja a un adulto no toca ninguna puerta.
+
+     🔑 Y no se pone ninguna en su lugar. Es la regla de Edgardo: el referente
+     se muda, fallece, pierde el teléfono o el chico lo quiere cambiar, y
+     *"tiene que estar abierta esa posibilidad de cambio"*. Lo que el sistema
+     hace no es frenar: es decir qué quedó, con el motivo escrito. */
 
   const repo = repositorio();
   const antes = await repo.familiaPorId(usuario.familiaId);
@@ -130,11 +140,13 @@ export async function POST(req: Request) {
       id: dadoDeBaja.id,
       nombre: dadoDeBaja.nombre,
       motivo: dadoDeBaja.bajaMotivo,
+      rol: objetivo.rol,
       elegidoPorElChico: objetivo.elegidoPorElChico,
     },
     avisoAlChico,
     adultosActivos: activos.length,
-    minimo: MINIMO_ADULTOS,
-    faltantes: despues ? faltantesDeAlta(despues) : [],
+    /* Sugerencias, no faltantes: lo que quedó se dice con su porqué, sin
+       decirle a nadie que su familia está incompleta. */
+    sugerencias: despues ? sugerenciasParaLaFamilia(despues, EDAD_PARA_ELEGIR_REFERENTE) : [],
   });
 }

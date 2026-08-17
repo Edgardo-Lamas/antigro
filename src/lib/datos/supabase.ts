@@ -29,7 +29,6 @@ type FilaFamilia = {
   nombre: string;
   token: string;
   activo: boolean;
-  nextdns_profile_id: string | null;
   notas: string | null;
   created_at: string;
 };
@@ -44,6 +43,9 @@ type FilaChico = {
   canal_destino: string | null;
   codigo_vinculacion: string | null;
   vinculado_en: string | null;
+  // 🔑 El perfil es del chico desde el 17/8: el filtro va en su dispositivo,
+  // no en el router de la casa. Ver `Chico` en tipos.ts.
+  nextdns_profile_id: string | null;
   activo: boolean;
   created_at: string;
 };
@@ -53,6 +55,7 @@ type FilaAdulto = {
   familia_id: string;
   nombre: string;
   vinculo: AdultoResponsable["vinculo"];
+  rol: AdultoResponsable["rol"] | null;
   elegido_por_el_chico: boolean;
   canal_tipo: Canal["tipo"];
   canal_destino: string | null;
@@ -67,7 +70,7 @@ type FilaAdulto = {
 type FilaCharla = {
   id: string;
   familia_id: string;
-  adulto_id: string;
+  adulto_id: string | null;
   fecha: string;
   quien: TurnoDeCharla["quien"];
   texto: string;
@@ -93,7 +96,6 @@ const aFamilia = (f: FilaFamilia): Familia => ({
   nombre: f.nombre,
   token: f.token,
   activo: f.activo,
-  nextdnsProfileId: f.nextdns_profile_id ?? undefined,
   notas: f.notas ?? undefined,
   creado: f.created_at,
 });
@@ -105,6 +107,7 @@ const aChico = (c: FilaChico): Chico => ({
   edad: c.edad,
   genero: c.genero,
   canal: aCanal(c),
+  nextdnsProfileId: c.nextdns_profile_id ?? undefined,
   activo: c.activo,
   creado: c.created_at,
 });
@@ -112,7 +115,7 @@ const aChico = (c: FilaChico): Chico => ({
 const aTurno = (t: FilaCharla): TurnoDeCharla => ({
   id: t.id,
   familiaId: t.familia_id,
-  adultoId: t.adulto_id,
+  adultoId: t.adulto_id ?? undefined,
   fecha: t.fecha,
   quien: t.quien,
   texto: t.texto,
@@ -125,6 +128,9 @@ const aAdulto = (a: FilaAdulto): AdultoResponsable => ({
   familiaId: a.familia_id,
   nombre: a.nombre,
   vinculo: a.vinculo,
+  // `?? "progenitor"` para filas anteriores a la columna. La migración las
+  // corrige por `vinculo`; esto es sólo la red por si algo quedó sin pasar.
+  rol: a.rol ?? "progenitor",
   elegidoPorElChico: a.elegido_por_el_chico,
   canal: aCanal(a),
   creado: a.created_at,
@@ -149,7 +155,6 @@ export class RepositorioSupabase implements Repositorio {
         nombre: alta.nombre,
         token: generarToken(),
         notas: alta.notas ?? null,
-        nextdns_profile_id: alta.nextdnsProfileId ?? null,
       })
       .select()
       .single<FilaFamilia>();
@@ -168,6 +173,7 @@ export class RepositorioSupabase implements Repositorio {
           canal_tipo: c.canal.tipo,
           canal_destino: exigeVinculacion(c.canal.tipo) ? null : c.canal.destino,
           codigo_vinculacion: exigeVinculacion(c.canal.tipo) ? generarCodigo() : null,
+          nextdns_profile_id: c.nextdnsProfileId ?? null,
         })),
       )
       .select()
@@ -180,6 +186,7 @@ export class RepositorioSupabase implements Repositorio {
           familia_id: familia.id,
           nombre: a.nombre,
           vinculo: a.vinculo,
+          rol: a.rol,
           elegido_por_el_chico: a.elegidoPorElChico,
           canal_tipo: a.canal.tipo,
           canal_destino: exigeVinculacion(a.canal.tipo) ? null : a.canal.destino,
@@ -439,7 +446,7 @@ export class RepositorioSupabase implements Repositorio {
     await this.db.from("charlas").insert(
       turnos.map((t) => ({
         familia_id: t.familiaId,
-        adulto_id: t.adultoId,
+        adulto_id: t.adultoId ?? null,
         fecha: t.fecha,
         quien: t.quien,
         texto: t.texto,
@@ -449,7 +456,7 @@ export class RepositorioSupabase implements Repositorio {
     );
   }
 
-  async charlaDe(familiaId: string, adultoId: string, limite: number): Promise<TurnoDeCharla[]> {
+  async charlaDe(familiaId: string, limite: number): Promise<TurnoDeCharla[]> {
     /* Se piden los ÚLTIMOS, así que la consulta va al revés y la lista se da
        vuelta acá. Pedir los primeros y cortar dejaría al adulto mirando el
        arranque de una charla vieja en vez de lo que acaba de preguntar. */
@@ -457,7 +464,6 @@ export class RepositorioSupabase implements Repositorio {
       .from("charlas")
       .select("*")
       .eq("familia_id", familiaId)
-      .eq("adulto_id", adultoId)
       .order("fecha", { ascending: false })
       .limit(limite)
       .returns<FilaCharla[]>();
@@ -465,9 +471,9 @@ export class RepositorioSupabase implements Repositorio {
     return (data ?? []).map(aTurno).reverse();
   }
 
-  async borrarCharla(familiaId: string, adultoId: string): Promise<void> {
-    // 🔐 Los dos filtros van en el DELETE. Con uno solo, un adultoId de otra
-    // casa borraría filas que no son suyas.
-    await this.db.from("charlas").delete().eq("familia_id", familiaId).eq("adulto_id", adultoId);
+  async borrarCharla(familiaId: string): Promise<void> {
+    // 🔐 El filtro por familia no es opcional: sin él, un `delete` sobre
+    // `charlas` se lleva puestas las de todas las casas.
+    await this.db.from("charlas").delete().eq("familia_id", familiaId);
   }
 }

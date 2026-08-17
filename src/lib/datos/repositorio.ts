@@ -21,7 +21,7 @@ import type {
 export interface AltaDeFamilia {
   nombre: string;
   notas?: string;
-  nextdnsProfileId?: string;
+  /** 🔑 Va por chico: el perfil vive en su dispositivo. Ver `Chico`. */
   chicos: Omit<Chico, "id" | "familiaId" | "activo" | "creado">[];
   // Un alta nunca crea a alguien ya dado de baja: los campos de la baja no se
   // piden, se completan el día que la haya.
@@ -98,23 +98,27 @@ export interface Repositorio {
   guardarCharla(turnos: Omit<TurnoDeCharla, "id">[]): Promise<void>;
 
   /**
-   * Los últimos `limite` turnos de ese adulto, en orden cronológico.
+   * Los últimos `limite` turnos de la charla de esa familia, en orden
+   * cronológico.
    *
-   * 🔐 Pide la familia además del adulto, igual que `darDeBajaAdulto`: así el
-   * repositorio mismo se niega a devolver la charla de alguien de otra casa,
-   * sin depender de que quien llame se haya acordado de comprobarlo.
+   * 🔴 **Es de la FAMILIA, no de cada adulto, y eso cambió el 17/8.** Hasta el
+   * 16 cada adulto tenía la suya, con el argumento de que una madre podía
+   * preguntarle algo al asistente que todavía no había hablado con el padre.
+   * Edgardo lo volteó: *"no puede haber privacidad entre padres, es el hijo,
+   * los dos son igual de responsables"*. Y con una sola clave por hogar esa
+   * privacidad no existía igual — sostenerla era prometer algo imposible.
    */
-  charlaDe(familiaId: string, adultoId: string, limite: number): Promise<TurnoDeCharla[]>;
+  charlaDe(familiaId: string, limite: number): Promise<TurnoDeCharla[]>;
 
   /**
-   * Borra la charla entera de ese adulto.
+   * Borra la charla entera de la familia.
    *
    * 🔑 Es un borrado de verdad, no una baja blanda como la de los adultos. La
    * diferencia tiene un porqué: las observaciones son entrada del motor y
    * borrarlas cambiaría lecturas ya hechas; esto no entra a ningún cálculo, es
-   * del adulto, y cuando pide que se vaya se tiene que ir.
+   * de la familia, y cuando pide que se vaya se tiene que ir.
    */
-  borrarCharla(familiaId: string, adultoId: string): Promise<void>;
+  borrarCharla(familiaId: string): Promise<void>;
 }
 
 /** Ventana de tiempo, en ISO. */

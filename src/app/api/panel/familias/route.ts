@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { Session } from "next-auth";
 import { auth } from "@/auth";
-import { repositorio, EDAD_MAXIMA, EDAD_MINIMA, MINIMO_ADULTOS } from "@/lib/datos";
+import { repositorio, EDAD_MAXIMA, EDAD_MINIMA } from "@/lib/datos";
 
 /** Alta de familias: el chico con su edad y su género, y los adultos con su canal. */
 
@@ -24,11 +24,18 @@ const ChicoSchema = z.object({
     .max(EDAD_MAXIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`),
   genero: z.enum(["nena", "varon", "otro"]),
   canal: CanalSchema,
+  /** 🔑 Del chico, no de la familia: el filtro va en su dispositivo. */
+  nextdnsProfileId: z.string().max(50).optional(),
 });
 
 const AdultoSchema = z.object({
   nombre: z.string().min(1).max(80),
   vinculo: z.enum(["madre", "padre", "tia_tio", "hermano_a", "abuelo_a", "otro"]),
+  /**
+   * 🔴 Quién entra al panel. No se deduce del `vinculo`: una abuela puede ser
+   * la tutora y un padre puede ser el referente que eligió el chico.
+   */
+  rol: z.enum(["progenitor", "referente"]),
   elegidoPorElChico: z.boolean(),
   canal: CanalSchema,
 });
@@ -36,16 +43,27 @@ const AdultoSchema = z.object({
 const AltaSchema = z.object({
   nombre: z.string().min(1).max(100),
   notas: z.string().max(500).optional(),
-  nextdnsProfileId: z.string().max(50).optional(),
   chicos: z.array(ChicoSchema).min(1, "Hay que cargar al menos un chico."),
-  adultos: z
-    .array(AdultoSchema)
-    // 🔴 No es una validación de formulario: es la regla del producto.
-    .min(MINIMO_ADULTOS, `Hacen falta al menos ${MINIMO_ADULTOS} adultos responsables.`)
-    .refine(
-      (adultos) => adultos.some((a) => a.elegidoPorElChico),
-      "Uno de los adultos lo tiene que elegir el chico. El 43% no habla de esto con sus padres.",
-    ),
+  /**
+   * ─────────────────────────────────────────────────────────────────────────
+   * 🔴 ACÁ SE EXIGÍAN DOS ADULTOS, Y SE SACÓ EL 17/8
+   * ─────────────────────────────────────────────────────────────────────────
+   *
+   * La regla vieja pedía un mínimo de dos y que alguno tuviera la marca «lo
+   * eligió el chico». Las dos se cayeron, por dos motivos distintos:
+   *
+   * 1. Un hogar con un solo progenitor **no está incompleto**: es otra forma
+   *    de familia, y el alta no puede negarse a darla. *"Tampoco podemos
+   *    exigir padres y referentes, siempre sugerimos."*
+   * 2. A un chico de 8 el referente lo eligen los padres, así que esa marca va
+   *    en `false` con todo derecho. Exigirla dejaba afuera exactamente a las
+   *    familias más chicas.
+   *
+   * 🔑 Lo que sí hace el sistema es sugerir, con el porqué escrito. Ver
+   * `sugerenciasParaLaFamilia`, y `ADULTOS_SUGERIDOS` en `tipos.ts`, que ahora
+   * es un consejo y no una puerta.
+   */
+  adultos: z.array(AdultoSchema).min(1, "Hay que cargar al menos un adulto."),
 });
 
 const BajaSchema = z.object({ id: z.string(), activo: z.boolean() });

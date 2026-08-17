@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { MINIMO_ADULTOS, repositorio } from "@/lib/datos";
+import { ADULTOS_SUGERIDOS, repositorio } from "@/lib/datos";
 
 export const dynamic = "force-dynamic";
 
@@ -67,15 +67,28 @@ export default async function Panel() {
         </h2>
         <ul className="mt-3 flex flex-col gap-2 text-sm leading-relaxed text-tenue">
           <li>Al menos un chico, con su edad y su género — son datos del motor.</li>
-          <li>
-            Al menos {MINIMO_ADULTOS} adultos responsables, cada uno con su canal.
-          </li>
-          <li>
-            Que <strong className="text-tinta">uno de los adultos lo elija el chico</strong>. El
-            43% no habla de estos temas con sus padres: el segundo adulto no es redundancia
-            técnica, es alguien a quien de verdad le va a escribir.
-          </li>
+          <li>Al menos un adulto, con su canal.</li>
           <li>El canal del chico, separado del de los adultos.</li>
+        </ul>
+
+        {/* 🔴 Esta lista era más larga hasta el 17/8: exigía {ADULTOS_SUGERIDOS}
+            adultos y que uno lo eligiera el chico. Las dos se sacaron. Un hogar
+            con un solo progenitor no está incompleto, y a los 8 años el
+            referente lo eligen los padres, así que esa marca va en false con
+            todo derecho — exigirla dejaba afuera a las familias más chicas. */}
+        <h2 className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+          Qué sugiere, sin exigirlo
+        </h2>
+        <ul className="mt-3 flex flex-col gap-2 text-sm leading-relaxed text-tenue">
+          <li>
+            Llegar a {ADULTOS_SUGERIDOS} adultos, para que no quede una sola persona
+            pendiente.
+          </li>
+          <li>
+            Que <strong className="text-tinta">al referente lo elija el chico</strong>, cuando
+            tiene edad de elegir. El 43% no habla de estos temas con sus padres: alguien que
+            eligió él es alguien a quien de verdad le va a escribir.
+          </li>
         </ul>
         <p className="mt-4 border-t border-borde pt-3 text-xs text-apagado">
           El formulario de alta se arma en la fase 4. Hoy el alta entra por{" "}

@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { canalListo, faltantesDeAlta, repositorio } from "@/lib/datos";
+import {
+  canalListo,
+  loQueImpideTrabajar,
+  repositorio,
+  sugerenciasParaLaFamilia,
+} from "@/lib/datos";
 import { enlaceDeVinculacion } from "@/lib/mensajeria/vinculacion";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
 import { evaluar, VENTANA_DIAS } from "@/lib/motor";
-import { quienEligeAlReferente } from "@/lib/config";
+import { EDAD_PARA_ELEGIR_REFERENTE, quienEligeAlReferente } from "@/lib/config";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -76,7 +81,7 @@ function loQueVieronLosAdultos(
 export async function GET(req: Request) {
   const sesion = await auth();
   const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; adultoId?: string | null; name?: string | null }
+    | { rol?: string; familiaId?: string | null; hogar?: string | null; name?: string | null }
     | undefined;
 
   if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
@@ -130,10 +135,18 @@ export async function GET(req: Request) {
   const eleccion = chico ? quienEligeAlReferente(chico.edad) : null;
 
   return NextResponse.json({
-    yo: { nombre: usuario.name ?? null, adultoId: usuario.adultoId ?? null },
+    /* 🔴 Ya no viaja un `adultoId`: la sesión es de la CASA, no de una persona.
+       Ver `auth.ts`. Lo que sí viaja es cuál de las dos casas, para que el
+       panel lo pueda decir cuando los padres están separados. */
+    yo: { nombre: usuario.name ?? null, hogar: usuario.hogar ?? null },
     familia: {
       nombre: datos.familia.nombre,
-      faltantes: faltantesDeAlta(datos),
+      /* 🔴 Antes acá iban «faltantes» y era una lista de reproches: a un hogar
+         con un solo progenitor le decía que estaba incompleto. Ahora son
+         sugerencias con su porqué, y lo único que quedó duro es no tener
+         chico, que sí impide trabajar. */
+      impedimentos: loQueImpideTrabajar(datos),
+      sugerencias: sugerenciasParaLaFamilia(datos, EDAD_PARA_ELEGIR_REFERENTE),
     },
     chico: chico
       ? {
@@ -153,6 +166,9 @@ export async function GET(req: Request) {
       id: a.id,
       nombre: a.nombre,
       vinculo: a.vinculo,
+      /* 🔑 Quién entra al panel y quién no. El referente recibe los avisos y
+         sabe que está en el sistema, pero el informe es de los progenitores. */
+      rol: a.rol,
       elegidoPorElChico: a.elegidoPorElChico,
       canal: a.canal.tipo,
       vinculado: canalListo(a.canal),
@@ -162,8 +178,10 @@ export async function GET(req: Request) {
          que una persona haya estado es parte de la historia de esa familia. */
       activo: a.activo,
       bajaMotivo: a.bajaMotivo ?? null,
-      /** El que está mirando la pantalla: no se puede dar de baja solo. */
-      soyYo: a.id === usuario.adultoId,
+      /* 🔴 Ya no existe «soy yo»: con una clave por hogar, la pantalla no sabe
+         cuál de los dos padres la está mirando, y no puede inventarlo. Lo que
+         sí se protege es que no se den de baja a los dos progenitores — ver
+         `/api/mi-familia/adultos/baja`. */
     })),
     lectura,
     almacenamiento: repo.clase,

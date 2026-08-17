@@ -40,15 +40,23 @@ interface Persona {
 interface Adulto extends Persona {
   id: string;
   vinculo: string;
+  /** 🔑 Quién entra al panel. El referente recibe avisos, pero no entra. */
+  rol: "progenitor" | "referente";
   elegidoPorElChico: boolean;
   canal: string;
-  soyYo: boolean;
   activo?: boolean;
 }
 
+interface Sugerencia {
+  que: string;
+  porQue: string;
+}
+
 interface Respuesta {
-  yo: { nombre: string | null; adultoId: string | null };
-  familia: { nombre: string; faltantes: string[] };
+  /* 🔴 Sin `adultoId`: desde el 17/8 la clave es del HOGAR, así que la pantalla
+     NO sabe cuál de los dos padres la está mirando — y no puede inventarlo. */
+  yo: { nombre: string | null; hogar: string | null };
+  familia: { nombre: string; impedimentos: string[]; sugerencias: Sugerencia[] };
   chico: {
     id: string;
     nombre: string;
@@ -183,16 +191,39 @@ export default function MiFamilia() {
         </p>
       )}
 
-      {/* ── Lo que falta para que el sistema trabaje completo ───────────── */}
-      {datos.familia.faltantes.length > 0 && (
+      {/* ── Lo que de verdad impide trabajar ────────────────────────────── */}
+      {datos.familia.impedimentos.length > 0 && (
         <section className="mt-6 rounded-lg border border-atencion/40 bg-atencionSuave px-5 py-4">
           <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-atencion">
             Falta algo
           </h2>
           <ul className="mt-2.5 flex flex-col gap-1">
-            {datos.familia.faltantes.map((f) => (
+            {datos.familia.impedimentos.map((f) => (
               <li key={f} className="text-sm text-atencion">
                 {f}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* ── Lo que conviene, que NO es lo mismo ──────────────────────────
+          🔴 Hasta el 17/8 esto y lo de arriba eran la misma lista, en el mismo
+          cartel naranja de alerta. A un hogar con un solo progenitor le decía
+          «hacen falta al menos 2 adultos responsables», que es falso: esa
+          familia no está incompleta. Ahora se ve distinto porque ES distinto —
+          gris, no naranja— y cada consejo viene con su porqué. Un consejo sin
+          motivo se lee como una exigencia disfrazada. */}
+      {datos.familia.sugerencias.length > 0 && (
+        <section className="mt-6 rounded-lg border border-borde bg-superficie px-5 py-4">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-apagado">
+            Esto lo haría más completo
+          </h2>
+          <ul className="mt-2.5 flex flex-col gap-3">
+            {datos.familia.sugerencias.map((s) => (
+              <li key={s.que}>
+                <p className="text-sm text-tinta">{s.que}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-tenue">{s.porQue}</p>
               </li>
             ))}
           </ul>
@@ -633,9 +664,13 @@ function Asistente({ chico }: { chico?: string }) {
 
           {confirmandoBorrado && (
             <div className="mt-3 rounded-md border border-borde bg-fondo px-3.5 py-3">
+              {/* ⚠ Dice «de la casa» a propósito. La charla es de la familia
+                  desde el 17/8, así que el que borra le borra la conversación
+                  al otro también. Enterarse después sería la peor forma. */}
               <p className="text-xs leading-relaxed text-tenue">
-                Se borra la charla entera y no se puede recuperar. El informe de{" "}
-                {chico ?? "el chico"} no se toca: eso sale del registro de señales, no de acá.
+                Se borra la charla entera de la casa —también lo que preguntó el otro— y no se
+                puede recuperar. El informe de {chico ?? "el chico"} no se toca: eso sale del
+                registro de señales, no de acá.
               </p>
               <div className="mt-2.5 flex gap-2">
                 <button
@@ -830,7 +865,12 @@ function Referente({
             elección de {chico ?? "el chico"}
           </span>
         )}
-        {adulto.soyYo && <span className="text-[10px] text-apagado">(vos)</span>}
+        {/* 🔑 Se dice quién entra acá y quién no, porque es lo que un padre
+            necesita saber para decidir a quién suma. El referente recibe los
+            mismos avisos; lo que no ve es este panel. */}
+        <span className="rounded border border-borde px-1.5 py-0.5 text-[10px] text-apagado">
+          {adulto.rol === "progenitor" ? "entra al panel" : "sólo recibe avisos"}
+        </span>
       </div>
 
       <Conexion persona={adulto} />
@@ -838,7 +878,7 @@ function Referente({
       {/* 🔴 El cambio no lleva traba: se muda, fallece, pierde el teléfono, o
           el chico lo quiere cambiar. Lo que lleva es motivo — y aviso al chico
           si era su elección. */}
-      {!adulto.soyYo && !abriendoBaja && (
+      {!abriendoBaja && (
         <button
           onClick={() => setAbriendoBaja(true)}
           className="flex w-fit items-center gap-1.5 text-xs text-apagado transition hover:text-riesgo"

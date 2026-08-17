@@ -68,6 +68,10 @@ function sembrar(): {
         familiaId,
         nombre: "Mariana",
         vinculo: "madre",
+        // 🔑 La que entra al panel. La familia sembrada tiene un solo
+        // progenitor a propósito: es el caso que el sistema trataba como
+        // incompleto hasta el 17/8, y ahora tiene que verse bien.
+        rol: "progenitor",
         elegidoPorElChico: false,
         canal: { tipo: "correo", destino: "demo-madre@ejemplo.ar" },
         activo: true,
@@ -79,6 +83,9 @@ function sembrar(): {
         familiaId,
         nombre: "Carla",
         vinculo: "tia_tio",
+        // 🔴 Referente: recibe los avisos y sabe que está en el sistema, pero
+        // NO entra al panel. El informe del chico es de los padres.
+        rol: "referente",
         elegidoPorElChico: true,
         canal: { tipo: "telegram", destino: "", codigo: "CARLA7" },
         activo: true,
@@ -115,7 +122,6 @@ export class RepositorioEnMemoria implements Repositorio {
       nombre: alta.nombre,
       token: generarToken(),
       activo: true,
-      nextdnsProfileId: alta.nextdnsProfileId,
       notas: alta.notas,
       creado: ahora,
     };
@@ -243,17 +249,14 @@ export class RepositorioEnMemoria implements Repositorio {
     this.charla.push(...turnos.map((t) => ({ ...t, id: nuevoId("turno") })));
   }
 
-  async charlaDe(familiaId: string, adultoId: string, limite: number) {
+  async charlaDe(familiaId: string, limite: number) {
     // El orden es el de inserción, que acá es exactamente el cronológico.
-    return this.charla
-      .filter((t) => t.adultoId === adultoId && t.familiaId === familiaId)
-      .slice(-limite);
+    // 🔴 Es de la familia, no de cada adulto: entre padres no hay privacidad.
+    return this.charla.filter((t) => t.familiaId === familiaId).slice(-limite);
   }
 
-  async borrarCharla(familiaId: string, adultoId: string): Promise<void> {
-    this.charla = this.charla.filter(
-      (t) => !(t.adultoId === adultoId && t.familiaId === familiaId),
-    );
+  async borrarCharla(familiaId: string): Promise<void> {
+    this.charla = this.charla.filter((t) => t.familiaId !== familiaId);
   }
 }
 
