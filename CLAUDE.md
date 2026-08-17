@@ -9,6 +9,130 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — cierre del 2026-08-17
+
+**Fue un día largo y cambió cosas de fondo. Leer este bloque entero antes de tocar nada.**
+
+### Dónde está todo
+
+| | |
+|---|---|
+| **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
+| **En producción** | `7ddd5db`, promovido y verificado |
+| **Último commit** | `c0a659f` (sólo documentación, por eso no se promovió) |
+| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación, todo en verde |
+
+### 🗺 El mapa, para no buscar
+
+**Pantallas** — `/` es la consola de demostración (la home ES la demo) · `/entrar` + `/mi-familia`
+es el panel de los padres · `/panel` es la administración.
+
+| Dónde | Qué hay |
+|---|---|
+| `src/lib/motor/` | **Decide.** `evaluar.ts` es el corazón; `pesos.ts` los números; `perfil.ts`, `modus-operandi.ts` y `cuestionario.ts` alrededor |
+| `src/lib/senales/` | **De dónde salen los datos.** Interfaz única: `nextdns.ts` o `simulador.ts`, y el sistema no sabe cuál |
+| `src/lib/datos/` | **Dónde se guardan.** Interfaz única otra vez: `supabase.ts` o `memoria.ts`. `tipos.ts` es el modelo |
+| `src/lib/ia/` | **Escribe.** `redactar.ts` los avisos, `asistente.ts` la charla, `reglas.ts` el control, `respaldo.ts` lo determinista |
+| `src/lib/mensajeria/` | **Entrega.** Telegram, correo, WhatsApp y el transporte de ensayo. `avisar.ts` decide a quién |
+| `src/lib/instalacion.ts` | **Qué instala la familia** y en qué aparato (17/8) |
+| `src/lib/limite.ts` | **El límite de frecuencia**, en Postgres (17/8) |
+| `src/lib/observatorio/` | Estadística propia con *lift*. Anda; falta contarlo, no construirlo |
+| `*.prueba.ts` | Las tres tandas. Se corren con `npm run probar` |
+
+🔑 **Las dos interfaces únicas —señales y datos— son lo que sostiene el modo demo.** Sin NextDNS y
+sin Supabase el sistema anda igual y **lo dice en pantalla**. No romperlas.
+
+### 🔴 Cómo se publica, porque NO es automático
+
+```
+git push origin fase-4-consola-y-observatorio     # genera la vista previa
+npx vercel ls                                     # se copia la URL «Ready»
+npx vercel promote <url-de-la-preview> --yes      # esa misma build pasa a producción
+```
+
+🔑 **Promover la preview es mejor que `vercel --prod`:** publica el artefacto ya construido y
+verificado, sin recompilar.
+⚠ **El alias tarda hasta un minuto en cambiar.** Comprobar enseguida da resultados viejos y
+confunde — pasó dos veces el 17/8. Esperar y volver a mirar.
+⬜ Para que sea automático falta **una sola cosa: mergear a `main`**. ⚠ No antes del congelamiento:
+ahí cualquier push sale en vivo, trabajo a medias incluido.
+
+### 🔑 Cómo se aplica SQL a producción — costó encontrarlo
+
+**El MCP de Supabase NO sirve acá.** Ve un proyecto `antigro` que es `aqfqfhptwvkpavstjohn` —otro,
+pausado—; el de producción es `xlwgwpojbmakzmlrzgmw`, el del Marketplace de Vercel, y esa cuenta
+no está en el MCP.
+
+Lo que sí sirve: `POSTGRES_URL_NON_POOLING` de `.env.local`, con `pg`.
+⚠ **Hay que sacarle el `?sslmode=require`** — `pg` lo lee como `verify-full` y falla contra el
+certificado de Supabase.
+🔑 **Todo dentro de una transacción.** El 17/8 una migración frenó a mitad de camino y se revirtió
+entera: a mitad, el esquema no es coherente con ninguna versión del código.
+✅ **La base va adelante del código**, salvo cuando la migración es destructiva — ahí va el código
+primero, listo para promover, y se achica la ventana.
+
+### Cuentas para probar
+
+🔴 **Las claves NO se escriben acá, y este archivo es la razón:** el repositorio es público y hasta
+el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
+
+- **Panel de la familia:** `mariana@ejemplo.ar`. Clave en `.env.local` (`CUENTAS_DE_PRUEBA_CLAVE`).
+  ⚠ **Carla ya NO tiene cuenta** — es la referente, y desde el 17/8 el referente no entra al panel.
+  Es la familia **inventada**: Ana, Mariana y Carla no existen.
+- **Panel de administración:** `ADMIN_EMAIL` con `ADMIN_PASSWORD`, los dos en `.env.local`.
+
+### Qué pasó el 17/8, en orden
+
+1. **🔐 La auditoría** — la pidió él. El repo público tenía las claves de producción adentro, tres
+   rutas llamaban a Opus 5 sin sesión y no había un solo límite de frecuencia. Todo cerrado y
+   verificado. → sección «LA AUDITORÍA DEL 17/8».
+2. **🏠 El hogar** — una clave por casa, el referente afuera del panel, sin privacidad entre padres,
+   nada obligatorio. Deja atrás varias decisiones del 16. → sección «EL HOGAR».
+3. **📡 La instalación** — qué se instala y dónde. Va en el aparato del chico, no en el router.
+   → sección «LA INSTALACIÓN».
+4. **✅ Dos tandas de pruebas nuevas**, `probar-sugerencias` y `probar-instalacion`, por la misma
+   regla de siempre: cada regla entra con su caso que pasa y su caso que se frena.
+
+### ⬜ Lo que sigue, en este orden
+
+1. **El alta desde el panel.** Es lo próximo y es lo más grande que queda. Hoy una familia entra
+   por API, y **el alta no crea ninguna cuenta**, así que queda afuera de su propio panel.
+   Ahora tiene que resolver, todo junto:
+   - 🔴 **Crear la credencial del hogar** en `usuarios` (`familia_id` + `hogar`).
+   - 🔴 **Preguntar si el chico vive en una casa o en dos.** Esa pregunta ordena el formulario
+     entero: con dos, son dos credenciales de la misma familia.
+   - 🔴 **El rol de cada adulto** — progenitor o referente. No se deduce del parentesco.
+   - 🔴 **El contexto del chico** — el turno escolar, que corre la hora de la madrugada igual que
+     la edad. Ver «EL CONTEXTO DEL CHICO».
+   - 🔴 **Mostrar la instalación** y en qué aparato. Ya está construida, hay que engancharla.
+2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
+   ⚠ **Él pidió ir despacio**, textual: *"con el cuestionario vamos despacio"*. No resolverlo de
+   un saque. 🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que
+   dispara el sistema no es una alerta, es el cuestionario.*
+3. **El acuse de recibo y la escalada.** Diseñado el 16/8, sin construir — sección propia abajo.
+4. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
+5. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
+   operativo."* No empezarlo antes. El guion que hay todavía es el de Criterio Térmico.
+
+📌 Y hay **cuatro temas parqueados con acuerdo para después del 23** — ver «DESPUÉS DEL 23».
+
+### ⚠ Lo que le toca a él, no al código
+
+- 🔴 **Decidir si saca una cuenta de NextDNS antes del jueves.** Sin perfil real la instalación
+  queda explicada pero **no demostrable en el video**, y la pantalla lo dice con todas las letras.
+- **Leer las respuestas del asistente con calma.** Es el único que puede decir si el registro está
+  bien, y va a ser lo más citado del producto.
+- **Activar la verificación en dos pasos de Telegram.** Ese bot es por donde AntiGro entrega todo.
+
+### 🔑 Por qué el asistente NO transmite mientras escribe
+
+Lo natural en un chat es que el texto aparezca palabra por palabra. Acá **no se puede**: el control
+tiene que ver el texto **entero** antes de que salga. Transmitiendo, una frase que no debía decirse
+ya estaría en la pantalla del padre cuando el control la frena. **No "arreglar" esto agregando
+streaming sin volver a discutirlo.**
+
+---
+
 ## 🏠 EL HOGAR — rediseño del 17/8, y deja atrás varias cosas del 16
 
 **Lo trajo Edgardo entero, corrigiendo el modelo que habíamos construido el día anterior.**
@@ -170,7 +294,7 @@ la instalación, no un consejo del final**, justamente porque el fallo es silenc
 
 ---
 
-## 🔐 LA AUDITORÍA DEL 2026-08-17 — leer esto antes que nada
+## 🔐 LA AUDITORÍA DEL 17/8 — qué estaba abierto y cómo se cerró
 
 La pidió Edgardo antes de seguir construyendo: *"qué te parece si hacemos una auditoría, debug,
 seguridades, código muerto"*. Fue la decisión correcta y encontró algo grave.
@@ -294,52 +418,14 @@ auth en dos archivos, que es un refactor de la autenticación a cuatro días del
 
 ---
 
-## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN (cierre del 2026-08-16, de noche)
+## 📌 El cierre del 16/8 — histórico
 
-### ✅ Todo subido y EN PRODUCCIÓN — `antigro.vercel.app` sirve `ff8eb1e`
+⚠ **Esto ya no es «lo próximo»: quedó atrás con el 17/8.** Se conserva porque explica de dónde
+salieron varias decisiones, pero **si algo de acá contradice al bloque de arriba, gana el de
+arriba.** Cómo se publica, las cuentas y lo que sigue viven ahora en «PARA ARRANCAR LA PRÓXIMA
+SESIÓN».
 
-Al cierre del 16/8 de noche quedó publicado todo: la charla que se guarda, el respaldo nuevo y la
-corrección de la madrugada. El pie de la home dice el commit, así que se comprueba de un vistazo
-qué se está mirando.
-
-### 🔴 Cómo se publica acá, porque NO es automático y se presta a confusión
-
-**La rama de trabajo es `fase-4-consola-y-observatorio` y NO es la rama de producción.** Un push
-acá genera **sólo un deploy de vista previa** (y encima protegido con el login de Vercel, así que
-`curl` devuelve 302 — hay que abrirlo en el navegador ya logueado). Producción se promueve **a
-mano**. La rama de producción es **`main`**, que existe en el remoto y **todavía no tiene nada de
-esto mergeado**.
-
-✅ **Cómo se hizo el 16/8, y conviene repetirlo así:**
-
-```
-git push origin fase-4-consola-y-observatorio     # genera la vista previa
-npx vercel ls                                     # se copia la URL de la preview «Ready»
-npx vercel promote <url-de-la-preview> --yes      # la misma build pasa a producción
-```
-
-🔑 **Promover la vista previa es mejor que `vercel --prod`:** se publica **exactamente el artefacto
-que ya se construyó y se verificó**, sin recompilar y sin riesgo de subir archivos locales que no
-están en el commit.
-
-### ⬜ Para que a futuro sea automático — pedido de Edgardo el 16/8
-
-**Lo que falta es una sola cosa: mergear a `main`.** La integración con Git ya está conectada
-(por eso el push genera la preview solo); lo único que pasa es que esta rama no es la de
-producción. Con el merge hecho, **cada push a `main` publica solo**.
-
-⚠ **Recomendación de cuándo hacerlo: no en los días previos al congelamiento.** Con producción
-automática, cualquier push a `main` sale en vivo al instante, incluido trabajo a medias. La forma
-sana es seguir trabajando en la rama de fase y **mergear a `main` cuando se quiere publicar** —
-eso ya es automático y encima deja la decisión de publicar donde tiene que estar.
-
-📌 Y hay algo que ordenar de paso: `main` viene quedando atrás desde el 15/8 (*"sin mergear a
-main — decide él"*). El merge cierra las dos cosas juntas.
-
-✅ **La base va adelante del código, que es el orden correcto.** La tabla `charlas` con su columna
-`causa` se aplicó a producción el 16/8, antes de publicar. Nada que migrar al deployar.
-
-### Lo que quedó andando
+### Lo que quedó andando el 16/8
 
 | | |
 |---|---|
@@ -352,8 +438,8 @@ main — decide él"*). El merge cierra las dos cosas juntas.
 
 ### ✅ La segunda vuelta del asistente — hecha el 16/8 a la noche
 
-**La charla se guarda y se retoma**, es de cada adulto, y se borra de un toque. El detalle en
-la sección del asistente, más abajo. Lo que salió de ahí y no estaba previsto:
+**La charla se guarda y se retoma** y se borra de un toque.
+🔴 **«Es de cada adulto» quedó SIN EFECTO el 17/8**: es de la familia. Ver «EL HOGAR». Lo que salió de ahí y no estaba previsto:
 
 - 🔴 **El control frenaba de más, y de la peor manera:** el asistente escribía *Si te dijera
   "quedate tranquila"…* para **negarse** a decirlo, y el control lo leía como si lo estuviera
@@ -368,61 +454,6 @@ la sección del asistente, más abajo. Lo que salió de ahí y no estaba previst
   Lo volteó él. Tirando de ese hilo apareció que el asistente explicaba **dos de las cuatro
   señales al revés**.
 - 📌 El asistente sigue sin ver el cuestionario más que resumido dentro de la lectura.
-
-### ⬜ Lo que sigue, en este orden
-
-1. **El alta desde el panel.** Hoy una familia entra por API. **Acá arranca la próxima sesión.**
-   🔑 Y ahora carga bastante más que nombre y edad — ver **el contexto del chico**, abajo, y la
-   sección del HOGAR arriba de todo:
-   - 🔴 **Tiene que crear la cuenta del hogar** en `usuarios`. Hoy no crea ninguna, así que una
-     familia dada de alta queda afuera de su propio panel.
-   - 🔴 **Preguntar si el chico vive en una casa o en dos.** Esa pregunta ordena el formulario
-     entero: con dos, se crean dos credenciales de la misma familia.
-   - 🔴 **El rol de cada adulto** (progenitor o referente), que no se deduce del parentesco.
-   - 🔴 **Qué hay que instalar y en qué aparato** — ver el perfil de NextDNS, arriba.
-2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
-   ⚠ **Él pidió ir despacio con esto**, textual: *"con el cuestionario vamos despacio, decidimos
-   en un rato"*. No resolverlo de un saque.
-   🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que dispara
-   el sistema no es una alerta, es el cuestionario.*
-3. **El acuse de recibo y la escalada.** Planteado y **diseñado** el 16/8 — sección propia abajo.
-   Va después del alta y el cuestionario.
-4. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil — ver el hallazgo del 16/8 más abajo.
-   Recomendación: tres teléfonos filmados, nunca un escaneo en vivo.
-5. **El trailer, AL FINAL.** 🔴 Lo decidió él al cerrar el 16/8: *"el trailer lo vemos al final,
-   recién cuando tengamos el sistema operativo y podamos decidir qué usar para el video"*. No
-   empezarlo antes. El guion actual todavía es el de Criterio Térmico.
-
-📌 Y hay **cuatro temas parqueados con acuerdo para después del 23** — ver la sección
-«DESPUÉS DEL 23». No entran antes del congelamiento.
-
-### ⚠ Dos cosas que le tocan a él, no al código
-
-- **Leer las respuestas del asistente con calma.** Va a ser lo más citado del producto y es el
-  único que puede decir si el registro está bien.
-- **Activar la verificación en dos pasos de Telegram.** Ese bot es el canal por donde AntiGro
-  entrega todo.
-
-### 🔑 Por qué el asistente NO transmite mientras escribe
-
-Lo natural en un chat es que el texto aparezca palabra por palabra. Acá **no se puede**: el
-control tiene que ver el texto **entero** antes de que salga. Transmitiendo, una frase que no
-debía decirse ya estaría en la pantalla del padre cuando el control la frena. Se eligió esperar
-y estar seguro. **No "arreglar" esto agregando streaming sin volver a discutirlo.**
-
-### Cuentas para probar
-
-🔴 **Las claves NO se escriben acá, y este archivo es la razón por la que hay que decirlo.**
-Hasta el 17/8 estaban las tres en este mismo lugar, y **el repositorio es público**: cualquiera
-que lo abriera entraba al panel de administración de producción. Ver «LA AUDITORÍA DEL 17/8».
-
-- Panel de la familia: `mariana@ejemplo.ar` o `carla@ejemplo.ar`. La clave está en `.env.local`,
-  que está fuera de git. ⚠ Es la familia **inventada** (Ana, Mariana y Carla no existen).
-- Panel de administración: `ADMIN_EMAIL`, con la clave de `ADMIN_PASSWORD`.
-  🔴 Si algún día se enchufa una base nueva, el panel vuelve a quedar cerrado: `auth.ts` usa
-  `ADMIN_EMAIL`/`ADMIN_PASSWORD` **sólo cuando no hay base** — y desde el 17/8, **si esas dos
-  variables no están, no entra nadie**. Antes tenía un usuario y una clave escritos como valor
-  por defecto, y de ahí salió el problema.
 
 ---
 
@@ -501,7 +532,7 @@ Rodrigo: su landing, sus secciones, sus herramientas, su panel, sus leads y su t
 
 | Se trajo | Dónde vive ahora |
 |---|---|
-| Dashboard por token | `src/app/familia/[token]/` + `src/app/api/familia/[token]/` |
+| ~~Dashboard por token~~ | 🔴 **BORRADO el 17/8**: entregaba los códigos de vinculación sin sesión. Lo reemplazan `/entrar` + `/mi-familia` |
 | NextAuth v5 con modo demo | `src/auth.ts`, `middleware.ts`, `/panel/login` |
 | Alta de familias | `src/app/api/panel/familias/route.ts` |
 | Esquema de Supabase | `supabase/schema.sql` |
@@ -523,10 +554,13 @@ cubre `/panel`** y el panel quedaba abierto. Además la página revalida la sesi
 Vive en `src/lib/datos/`, con el mismo criterio que las señales: **el sistema pide datos y no
 sabe si del otro lado hay Supabase o memoria.** `repositorio()` elige.
 
-- `tipos.ts` — Familia, Chico (edad y género), AdultoResponsable (con `elegidoPorElChico`),
-  Canal, Respuesta y ObservacionDelAdulto. `faltantesDeAlta()` dice qué le falta a una familia.
-- `memoria.ts` — el modo demo. Siembra la familia con token `demo`: Ana de 12, la madre y una
-  tía elegida por ella. **Es una sola instancia por proceso**, si no cada pedido perdería lo
+- `tipos.ts` — Familia, Chico (edad, género y **su** `nextdnsProfileId`), AdultoResponsable (con
+  `rol` y `elegidoPorElChico`), Hogar, Canal, Respuesta y ObservacionDelAdulto.
+  🔴 **`faltantesDeAlta()` ya no existe** (17/8): se partió en `loQueImpideTrabajar()` —sin chico,
+  lo único duro— y `sugerenciasParaLaFamilia()`, que aconseja con el porqué. Ver «EL HOGAR».
+- `memoria.ts` — el modo demo. Siembra la familia con token `demo`: Ana de 12, la madre
+  (progenitora) y una tía **referente**, elegida por ella. 🔑 Un solo progenitor a propósito: es
+  el caso que el sistema trataba como incompleto hasta el 17/8. **Es una sola instancia por proceso**, si no cada pedido perdería lo
   cargado.
 - `supabase.ts` — misma interfaz contra Postgres. La traducción snake_case ⇄ camelCase vive
   ahí y en ningún otro lado.
@@ -1261,7 +1295,8 @@ puede contar como dirección del proyecto, no como algo que ya hace.
 - **La charla del adulto con el asistente** (tabla `charlas`, agregada el 16/8 a la noche).
   🔴 Es la **única** tabla con texto de una conversación, y no contradice la regla 2: lo que
   nunca se guarda es lo que escribió **el chico**. Esto es un adulto preguntándole al sistema.
-  Es **de cada adulto** —el informe lo ven los dos, esto no— y **se borra entero de un toque**,
+  🔴 **Era de cada adulto hasta el 16/8; desde el 17 es de la FAMILIA** —entre padres no hay nada
+  separado, ver «EL HOGAR»— y **se borra entero de un toque**,
   con `delete` de verdad. Se puede borrar porque no entra a ningún cálculo; las señales y las
   observaciones no se pueden, porque de ahí sale la lectura.
 
@@ -1298,7 +1333,9 @@ niega a tocar a alguien de otra casa sin depender de que quien llame se acuerde 
 consecuencia real de la baja: sin eso, quien se fue de la familia seguiría entrando a ver a la
 criatura.
 
-🔑 **`faltantesDeAlta()` ahora cuenta sólo adultos ACTIVOS.** Es lo que hace visible el hueco: la
+🔴 **`faltantesDeAlta()` dejó de existir el 17/8** — ver «EL HOGAR». Lo que sigue vale para
+entender de dónde salió, no para lo que hace hoy.
+🔑 **Contaba sólo adultos ACTIVOS.** Era lo que hacía visible el hueco: la
 baja no se traba nunca, pero la familia que queda con uno solo lo ve escrito en pantalla hasta
 que lo cubra. Verificado en el navegador el 16/8.
 
@@ -1337,7 +1374,7 @@ lugar reservado en la pantalla, diciendo que todavía no está).
 
 | Quién | Entra con contraseña | Recibe por su canal |
 |---|---|---|
-| **Los dos adultos responsables** | ✅ sí, cada uno la suya | ✅ |
+| **Los progenitores** | 🔴 **una sola clave, del HOGAR** (cambió el 17/8) | ✅ |
 | **El chico** | ❌ no | ✅ (texto distinto, por banda) |
 | Cualquier otro referente | ❌ no | ✅ |
 
@@ -1414,7 +1451,8 @@ pantalla aparte: el padre lo consulta con el informe a la vista, que es cuando l
 cierra el navegador y vuelve al otro día: antes volvía a arrancar de cero la conversación más
 difícil que va a tener, y el asistente no se acordaba de nada.
 
-- **Es de cada adulto, no de la familia.** El informe lo ven los dos; esto no. Verificado con
+- 🔴 **SIN EFECTO desde el 17/8 — era de cada adulto, ahora es de la familia.** Ver «EL HOGAR».
+  Se conserva el texto para saber qué se pensó y por qué se cambió. Verificado con
   las dos cuentas: Carla ve la suya, Mariana ve cero.
 - **Se borra entero de un toque**, con confirmación en la propia pantalla y un `delete` de
   verdad. Que la charla se guarda, y que es suya, se dice **en la pantalla** y no en una
@@ -1745,9 +1783,18 @@ publicación, se confirma antes.
 ## Reglas de trabajo
 
 - Rama por fase, `npm run typecheck` antes de cada commit.
-- 🔴 **Si se tocó `reglas.ts`, además `npm run probar-reglas`.** Tres veces se frenó de más una
-  respuesta buena y ninguna la encontró el typecheck: aparecen con el modelo contestando, de a
-  una y por casualidad. Toda regla nueva entra con su caso que pasa y su caso que se frena.
+- 🔴 **`npm run probar` antes de cada commit que toque lógica.** Corre las tres tandas:
+
+  | | Qué cuida |
+  |---|---|
+  | `probar-reglas` (12) | Que el control del asistente no frene de más ni de menos |
+  | `probar-sugerencias` (11) | Que no se le diga a una familia que está incompleta cuando no lo está |
+  | `probar-instalacion` (27) | Que los endpoints de DNS estén letra por letra |
+
+  🔑 **Las tres existen por el mismo motivo: son errores que el typecheck NO ve.** Una regla que
+  frena de más deja al padre sin respuesta; una sugerencia de más le dice a una familia que le
+  falta algo; un DNS mal escrito no da error y deja al motor ciego. **Toda regla nueva entra con
+  su caso que pasa y su caso que se frena** — sin el segundo no se sabe si la condición hace algo.
 - Verificación visual en **`localhost:3007`**, no en el 3000: en el 3000 hay un service worker
   de un proyecto viejo que sirve su caché por encima de lo que devuelva el servidor.
 - ⚠ **El repositorio en memoria va colgado de `globalThis`**, no de una variable de módulo:
@@ -1761,3 +1808,9 @@ publicación, se confirma antes.
 - Registro cordial y voseo en todo texto de cara al usuario. Nada de jerga sin traducir.
 - ⚠ En este dominio **Edgardo no es la fuente** (a diferencia de calefacción): todo dato se cita
   o no se afirma.
+- 🔴 **Este archivo se pudre solo.** Corregirlo en la MISMA sesión en que se corrige el código, y
+  cuando contradiga al código, **gana el código**. El 17/8 quedaron varias secciones del 16 que
+  decían lo contrario de lo que hace hoy el sistema; están marcadas donde aparecen, no borradas,
+  porque saber qué se pensó antes y por qué se cambió vale más que un archivo prolijo.
+- 🔴 **El repositorio es PÚBLICO.** Nunca una clave, un token ni un identificador de perfil acá.
+  Ya pasó una vez y abría el panel de administración de producción.
