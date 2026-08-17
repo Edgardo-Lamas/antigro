@@ -11,6 +11,11 @@ import {
   Trash2,
   UserMinus,
   MessageCircle,
+  Download,
+  Copy,
+  Check,
+  TriangleAlert,
+  Smartphone,
 } from "lucide-react";
 import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senales/tipos";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
@@ -25,8 +30,10 @@ import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
  *  notificaciones, los informes, está el asistente, tienen el código QR para
  *  incluir a los referentes, incluso darlos de baja"*.
  *
- *  📌 Entran los **dos adultos responsables**, cada uno con su cuenta. El chico
- *  y cualquier otro referente no tienen cuenta: escanean y reciben por su canal.
+ *  🔴 **Entran los progenitores, con UNA clave de la casa** (rediseñado el 17/8;
+ *  antes era una cuenta por adulto). El chico y el referente no entran: escanean
+ *  y reciben por su canal. Entre padres no hay nada separado — ni el informe ni
+ *  la charla con el asistente.
  */
 
 interface Persona {
@@ -280,6 +287,9 @@ export default function MiFamilia() {
 
       {/* ── El asistente ───────────────────────────────────────────────── */}
       <Asistente chico={datos.chico?.nombre} />
+
+      {/* ── La instalación ─────────────────────────────────────────────── */}
+      <Instalacion chico={datos.chico?.nombre} />
 
       {/* ── Quiénes están ──────────────────────────────────────────────── */}
       <section className="mt-8">
@@ -931,5 +941,171 @@ function Referente({
         </div>
       )}
     </li>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA INSTALACIÓN
+   ═══════════════════════════════════════════════════════════════════════════
+
+   🔴 **Esta sección existe porque hasta el 17/8 AntiGro no le decía a la
+   familia que había algo que instalar.** El sistema entero se apoya en ver la
+   actividad de red del chico, y nadie le explicaba cómo hacer que la vea.
+
+   🔑 **El orden de lo que se dice importa tanto como lo que se dice.** Primero
+   qué NO es —no se instala una aplicación, no se leen mensajes—, y recién
+   después el paso técnico. Contado al revés, un padre que abre esto siente que
+   le están pidiendo poner un espía en el teléfono de su hijo, y con razón.
+   Contado así, la instalación misma es la regla 3 vuelta un acto concreto: se
+   cambia el DNS, y el chico lo puede ver.
+
+   ⚠ **Y el router no aparece primero, aparece último y con su advertencia.**
+   Es el lugar donde la gente lo pondría por instinto, y es el peor: no ve datos
+   móviles, que es por donde pasa la madrugada. */
+
+interface GuiaDeInstalacion {
+  aparato: string;
+  nombre: string;
+  pasos: string[];
+  advertencia?: string;
+  archivo?: "apple" | "windows";
+  aCopiar?: string;
+}
+
+interface DatosDeInstalacion {
+  listo: boolean;
+  motivo: string | null;
+  comprobacion: string;
+  guias: GuiaDeInstalacion[];
+}
+
+function Instalacion({ chico }: { chico?: string }) {
+  const [datos, setDatos] = useState<DatosDeInstalacion | null>(null);
+  const [abierta, setAbierta] = useState<string | null>(null);
+  const [copiado, setCopiado] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/mi-familia/instalacion", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then(setDatos)
+      .catch(() => undefined);
+  }, []);
+
+  if (!datos) return null;
+
+  async function copiar(texto: string, aparato: string) {
+    await navigator.clipboard.writeText(texto).catch(() => undefined);
+    setCopiado(aparato);
+    setTimeout(() => setCopiado(null), 2000);
+  }
+
+  return (
+    <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+        <Smartphone size={13} /> Cómo queda andando
+      </h2>
+
+      {/* 🔴 Lo primero que se lee es qué NO es. Ver el comentario de arriba. */}
+      <p className="mt-3 text-sm leading-relaxed text-tenue">
+        <strong className="text-tinta">No se instala ninguna aplicación.</strong> Lo único que se
+        hace es decirle al aparato de {chico ?? "el chico"} a qué servidor preguntarle las
+        direcciones de los sitios. Ese servidor anota qué dominios se consultaron y a qué hora.
+        Nada más: <strong className="text-tinta">los mensajes no se leen, y no se pueden leer</strong>.
+      </p>
+      <p className="mt-2 text-sm leading-relaxed text-tenue">
+        Por eso {chico ?? "el chico"} lo puede ver y conviene que lo vea. Es lo que le prometimos
+        al darlo de alta.
+      </p>
+
+      {/* 🔑 Va donde no se puede saltear, no al final. */}
+      <p className="mt-4 rounded-md border border-acento/30 bg-acentoSuave px-3.5 py-2.5 text-sm leading-relaxed text-tinta">
+        <strong>Va en el aparato de {chico ?? "el chico"}</strong>, no en el router. Así lo sigue
+        viendo con datos móviles, en el colegio, y en cualquier casa donde esté.
+      </p>
+
+      {!datos.listo && (
+        <p className="mt-4 flex gap-2 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-2.5 text-xs leading-relaxed text-atencion">
+          <TriangleAlert size={14} className="mt-0.5 shrink-0" />
+          {/* 🔴 Se dice, no se disimula. Una instalación que no reporta se ve
+              igual que una casa tranquila, y esa confusión es el peor final. */}
+          <span>{datos.motivo}</span>
+        </p>
+      )}
+
+      <div className="mt-5 flex flex-col gap-2">
+        {datos.guias.map((g) => {
+          const abierto = abierta === g.aparato;
+          return (
+            <div key={g.aparato} className="rounded-md border border-borde">
+              <button
+                onClick={() => setAbierta(abierto ? null : g.aparato)}
+                className="flex w-full items-center justify-between px-4 py-2.5 text-left text-sm text-tinta transition hover:bg-fondo"
+              >
+                {g.nombre}
+                <span className="font-mono text-[10px] text-apagado">{abierto ? "−" : "+"}</span>
+              </button>
+
+              {abierto && (
+                <div className="border-t border-borde px-4 py-3.5">
+                  <ol className="flex list-decimal flex-col gap-1.5 pl-4 text-sm leading-relaxed text-tenue">
+                    {g.pasos.map((p) => (
+                      <li key={p}>{p}</li>
+                    ))}
+                  </ol>
+
+                  {g.aCopiar && (
+                    <button
+                      onClick={() => copiar(g.aCopiar!, g.aparato)}
+                      className="mt-3 flex w-full items-center justify-between gap-2 rounded border border-borde bg-fondo px-3 py-2 text-left font-mono text-xs text-acento transition hover:border-acento"
+                    >
+                      <span className="truncate">{g.aCopiar}</span>
+                      {copiado === g.aparato ? (
+                        <Check size={13} className="shrink-0" />
+                      ) : (
+                        <Copy size={13} className="shrink-0" />
+                      )}
+                    </button>
+                  )}
+
+                  {g.archivo && datos.listo && (
+                    <a
+                      href={`/api/mi-familia/instalacion?archivo=${g.archivo}&aparato=${g.aparato}`}
+                      className="mt-3 flex w-fit items-center gap-1.5 rounded-md bg-acento px-3 py-1.5 text-xs font-semibold text-fondo"
+                    >
+                      <Download size={12} /> Bajar el archivo
+                    </a>
+                  )}
+
+                  {g.advertencia && (
+                    <p className="mt-3 flex gap-2 rounded border border-atencion/30 bg-atencionSuave px-3 py-2 text-xs leading-relaxed text-atencion">
+                      <TriangleAlert size={13} className="mt-0.5 shrink-0" />
+                      <span>{g.advertencia}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 🔴 La comprobación no es un consejo del final: es el único modo de
+          distinguir «quedó bien» de «no llegó nada», que se ven igual. */}
+      <p className="mt-4 border-t border-borde pt-3 text-xs leading-relaxed text-apagado">
+        Cuando termines, abrí{" "}
+        <a
+          href={datos.comprobacion}
+          target="_blank"
+          rel="noreferrer"
+          className="font-mono text-acento hover:underline"
+        >
+          {datos.comprobacion}
+        </a>{" "}
+        <strong className="text-tenue">en el aparato de {chico ?? "el chico"}</strong>. Si dice{" "}
+        <code className="font-mono text-tenue">&quot;status&quot;: &quot;ok&quot;</code>, quedó. Si
+        dice <code className="font-mono text-tenue">unconfigured</code>, no quedó — y no te lo va a
+        avisar de otra forma.
+      </p>
+    </section>
   );
 }

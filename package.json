@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "probar-reglas": "node --experimental-strip-types --no-warnings src/lib/ia/reglas.prueba.ts",
     "probar-sugerencias": "node --experimental-strip-types --no-warnings src/lib/datos/sugerencias.prueba.ts",
-    "probar": "npm run probar-reglas && npm run probar-sugerencias"
+    "probar": "npm run probar-reglas && npm run probar-sugerencias && npm run probar-instalacion",
+    "probar-instalacion": "node --experimental-strip-types --no-warnings src/lib/instalacion.prueba.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
