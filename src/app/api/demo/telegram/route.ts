@@ -5,6 +5,7 @@ import { FuenteSimulador, type Escenario } from "@/lib/senales";
 import { evaluar, VENTANA_DIAS } from "@/lib/motor";
 import { redactarLecturaParaAdultos, redactarMensajeAlChico } from "@/lib/ia";
 import { TransporteTelegram } from "@/lib/mensajeria";
+import { deQuienViene, tomarTurno } from "@/lib/limite";
 import { enlaceDeVinculacion, nombreDelBot } from "@/lib/mensajeria/vinculacion";
 import {
   CODIGO_DEMO,
@@ -102,6 +103,20 @@ const Envio = z.object({
   nombre: z.string().max(40).default("Ana"),
 });
 
+/**
+ * 🔐 Cuántos avisos puede pedir un mismo visitante, y por qué esos números.
+ *
+ * Este endpoint es público a propósito: el botón está en la home y apretarlo es
+ * la demostración. Pero cada vez que sale un aviso son **dos llamadas a Opus 5
+ * y tres mensajes de Telegram**, así que sin límite alcanza un `for` para que
+ * la demo cueste plata y le llene el teléfono a los tres que están mirando.
+ *
+ * Seis por minuto: el que prueba en serio aprieta, lee lo que le llegó y vuelve
+ * a apretar con otro escenario. Seis le sobra y no lo va a rozar nunca.
+ */
+const TOPE_DEMO = 6;
+const VENTANA_DEMO_SEG = 60;
+
 export async function POST(req: Request) {
   const parsed = Envio.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
@@ -111,6 +126,26 @@ export async function POST(req: Request) {
 
   const destinatarios = await conectados();
   const cupo = estadoDelCupo(destinatarios);
+
+  /* 🔑 El límite se cobra ANTES de escribir nada, pero DESPUÉS de mirar el
+     cupo: si no hay nadie conectado no se llama al modelo, así que ese pedido
+     no cuesta y no tiene por qué gastar turno. */
+  if (destinatarios.length > 0) {
+    const turno = await tomarTurno(`demo:${deQuienViene(req)}`, VENTANA_DEMO_SEG, TOPE_DEMO);
+    if (!turno.permitido) {
+      return NextResponse.json(
+        {
+          enviado: false,
+          motivo: "demasiado_seguido",
+          /* ⚠ Se dice el número, no un "esperá un rato". Quien está probando
+             esto adelante de gente necesita saber cuánto. */
+          esperaSeg: turno.esperaSeg,
+          cupo,
+        },
+        { status: 429 },
+      );
+    }
+  }
 
   if (destinatarios.length === 0) {
     return NextResponse.json({

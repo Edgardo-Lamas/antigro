@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { repositorio } from "@/lib/datos";
+import { tomarTurno } from "@/lib/limite";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
 import { evaluar, VENTANA_DIAS } from "@/lib/motor";
 import { responderAlAdulto, TURNOS_DE_MEMORIA, type TurnoDelAsistente } from "@/lib/ia";
@@ -45,6 +46,20 @@ const TURNOS_EN_PANTALLA = 60;
 const Pedido = z.object({
   pregunta: z.string().trim().min(1).max(2000),
 });
+
+/**
+ * 🔐 Cuántas preguntas por hora, por adulto.
+ *
+ * Acá hay sesión, así que esto no está para frenar a un desconocido: está para
+ * que una cuenta filtrada, o un bucle escrito sin querer en la pantalla, no
+ * pueda gastar sin techo. **El tope no puede molestar a un padre asustado**, que
+ * es exactamente el que más va a preguntar y el que menos merece encontrarse
+ * una puerta cerrada: treinta preguntas en una hora es más de lo que da una
+ * conversación seguida, y el que las llegue a necesitar tiene un problema que
+ * no se resuelve con el asistente.
+ */
+const TOPE_ASISTENTE = 30;
+const VENTANA_ASISTENTE_SEG = 60 * 60;
 
 /** La sesión de un adulto responsable, o la razón por la que no hay respuesta. */
 async function adultoDeLaSesion() {
@@ -99,6 +114,30 @@ export async function POST(req: Request) {
   const parsed = Pedido.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json({ error: "parametros_invalidos" }, { status: 400 });
+  }
+
+  const turno = await tomarTurno(
+    `asistente:${yo.adultoId}`,
+    VENTANA_ASISTENTE_SEG,
+    TOPE_ASISTENTE,
+  );
+  if (!turno.permitido) {
+    /* ⚠ El texto sale por `texto`, el mismo campo que usa una respuesta normal,
+       para que la pantalla lo muestre en el hilo como cualquier otra cosa que
+       diga el asistente. Un cartel de error rojo acá dejaría al adulto sin
+       saber si el sistema se rompió o si hizo algo mal. */
+    return NextResponse.json(
+      {
+        texto:
+          "Estuvimos hablando bastante seguido y necesito un rato. " +
+          `Volvé en ${Math.ceil(turno.esperaSeg / 60)} minutos y seguimos.\n\n` +
+          "Si es algo que no puede esperar, la Línea 137 atiende las 24 horas.",
+        origen: "respaldo",
+        causa: "falla",
+        motivos: ["Demasiadas preguntas seguidas."],
+      },
+      { status: 429 },
+    );
   }
 
   const repo = repositorio();

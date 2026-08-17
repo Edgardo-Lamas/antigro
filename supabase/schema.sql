@@ -299,3 +299,73 @@ alter table charlas enable row level security;
 
 -- Ninguna tabla tiene políticas para anon: todo pasa por el servidor con
 -- service role, y el token de familia se valida ahí.
+
+
+-- ─── 11. LÍMITE DE FRECUENCIA (auditoría del 17/8) ───────────────
+--  🔴 **Por qué existe.** Cada respuesta del asistente y cada texto que se
+--  redacta son una llamada a Opus 5, y hasta el 17/8 no había NINGÚN límite en
+--  todo el sistema. La auditoría encontró tres rutas abiertas que llamaban al
+--  modelo sin pedir sesión; dos se cerraron y una —la de la demo— tiene que
+--  seguir siendo pública, porque el botón está en la home y es el producto.
+--
+--  🔑 **Y vive en la base por la misma razón que el cupo.** Un contador en
+--  memoria no sirve: en Vercel cada ruta de API es una función distinta con su
+--  propia memoria, así que cada instancia tendría su propio conteo y el límite
+--  sería el límite por instancia, que no es ningún límite. Es la tercera vez
+--  que aparece la misma trampa en este proyecto.
+--
+--  🔑 **El conteo es atómico.** La cuenta sube dentro del mismo `insert … on
+--  conflict`, no con un leer-y-después-escribir: si dos pedidos entran en el
+--  mismo milisegundo, los dos se cuentan. Leer y escribir por separado es una
+--  carrera, y una carrera en un límite de gasto es un límite que no limita.
+
+create table if not exists frecuencia (
+  -- Qué se está limitando y a quién: 'demo:<ip>', 'asistente:<adulto_id>'.
+  clave   text primary key,
+  -- Cuándo empezó la ventana en curso.
+  ventana timestamptz not null default now(),
+  cuenta  int not null default 0
+);
+
+alter table frecuencia enable row level security;
+
+-- Devuelve si el pedido pasa, cuántos quedan y en cuántos segundos se libera.
+create or replace function tomar_turno(
+  p_clave       text,
+  p_ventana_seg int,
+  p_tope        int
+)
+returns table (permitido boolean, restantes int, espera_seg int)
+language plpgsql
+as $$
+declare
+  v_ahora   timestamptz := now();
+  v_inicio  timestamptz;
+  v_cuenta  int;
+begin
+  insert into frecuencia (clave, ventana, cuenta)
+  values (p_clave, v_ahora, 1)
+  on conflict (clave) do update
+    set
+      -- Si la ventana anterior ya venció, esta empieza de cero.
+      ventana = case
+        when frecuencia.ventana < v_ahora - make_interval(secs => p_ventana_seg)
+        then v_ahora else frecuencia.ventana end,
+      cuenta = case
+        when frecuencia.ventana < v_ahora - make_interval(secs => p_ventana_seg)
+        then 1 else frecuencia.cuenta + 1 end
+  returning frecuencia.ventana, frecuencia.cuenta into v_inicio, v_cuenta;
+
+  return query select
+    v_cuenta <= p_tope,
+    greatest(p_tope - v_cuenta, 0),
+    greatest(
+      0,
+      ceil(extract(epoch from (v_inicio + make_interval(secs => p_ventana_seg)) - v_ahora))::int
+    );
+end;
+$$;
+
+-- Higiene: las claves que ya no se van a volver a mirar no tienen por qué
+-- quedar. No hace falta cron — se limpia solo cuando alguien pasa por acá.
+create index if not exists frecuencia_ventana_idx on frecuencia (ventana);

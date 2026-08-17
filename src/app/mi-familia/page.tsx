@@ -534,11 +534,19 @@ function Asistente({ chico }: { chico?: string }) {
         body: JSON.stringify({ pregunta: limpio }),
       });
       const d = await res.json();
+      /* 🔑 Si el servidor mandó un texto, se muestra ése aunque el código no sea
+         200. El límite de frecuencia contesta 429 con una explicación escrita
+         —cuánto falta, y la Línea 137 mientras tanto—, y taparla con el cartel
+         genérico dejaría al adulto sin saber si el sistema se rompió. El
+         genérico queda para cuando de verdad no vino nada. */
       setTurnos((t) => [
         ...t,
         {
           quien: "asistente",
-          texto: res.ok ? d.texto : "No pude contestarte ahora. Probá de nuevo en un momento.",
+          texto:
+            typeof d?.texto === "string" && d.texto.trim()
+              ? d.texto
+              : "No pude contestarte ahora. Probá de nuevo en un momento.",
           origen: d.origen,
           causa: d.causa,
         },

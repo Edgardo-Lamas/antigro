@@ -16,14 +16,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
 
-        /* ── Modo demo: sin Supabase, el panel igual se puede abrir ── */
+        /* ── Modo demo: sin Supabase, el panel igual se puede abrir ──
+           🔴 **Sin credenciales en el entorno no entra nadie, y eso es a
+           propósito.** Acá había un usuario y una clave escritos como valor por
+           defecto. Parecían inofensivos —son de modo demo— y no lo eran: la
+           cuenta de administración de producción se sembró con ESOS valores, y
+           este archivo vive en un repositorio público. El 17/8 se comprobó que
+           la clave publicada abría `/panel`.
+
+           La lección no es "esa clave era mala": es que un valor por defecto
+           que abre una puerta se filtra al lugar donde no tenía que estar. Si
+           falta la variable, el panel se cierra. Fallar cerrado es la única
+           forma de que esto no vuelva a pasar. */
         if (!hayBase()) {
-          const emailDemo = process.env.ADMIN_EMAIL ?? "demo@antigro.app";
-          const claveDemo = process.env.ADMIN_PASSWORD ?? "antigro2026";
-          if (
-            email.toLowerCase() === emailDemo.toLowerCase() &&
-            password === claveDemo
-          ) {
+          const emailDemo = process.env.ADMIN_EMAIL;
+          const claveDemo = process.env.ADMIN_PASSWORD;
+          if (!emailDemo || !claveDemo) return null;
+
+          if (email.toLowerCase() === emailDemo.toLowerCase() && password === claveDemo) {
             return { id: "demo", email: emailDemo, name: "Cuenta demo", rol: "admin" };
           }
           return null;

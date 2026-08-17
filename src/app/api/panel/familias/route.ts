@@ -82,9 +82,24 @@ export async function POST(req: Request) {
     familia: alta.familia,
     chicos: alta.chicos.length,
     adultos: alta.adultos.length,
-    // El enlace que se le pasa a los adultos. Es lo único que necesitan.
-    enlace: `/familia/${alta.familia.token}`,
     demo: repo.clase === "memoria",
+
+    /**
+     * 🔴 **Este alta todavía no deja a la familia adentro, y hay que decirlo.**
+     *
+     * Hasta el 17/8 devolvía `enlace: /familia/<token>`, una pantalla que se
+     * abría sin cuenta. Esa pantalla se borró —entregaba los códigos de
+     * vinculación a cualquiera que tuviera el token—, y al sacarla quedó al
+     * descubierto algo que el enlace tapaba: **el alta crea la familia, los
+     * chicos y los adultos, pero no crea ninguna cuenta en `usuarios`.** Las de
+     * Mariana y Carla se sembraron a mano.
+     *
+     * O sea que una familia dada de alta por acá hoy no puede entrar a
+     * `/mi-familia`. No es un error de esta ruta: es la mitad que falta, y le
+     * toca al alta desde el panel, que es lo próximo que se construye.
+     */
+    puedenEntrar: false,
+    falta: "Los adultos todavía no tienen cuenta: el alta no crea usuarios.",
   });
 }
 

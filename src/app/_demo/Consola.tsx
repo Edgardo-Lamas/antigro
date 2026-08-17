@@ -443,6 +443,14 @@ function Entrega({
           "Con esta historia el sistema no le escribe a nadie, así que no se manda nada. " +
             "No es un error: sólo se avisa cuando el patrón se sostiene.",
         );
+      } else if (d.motivo === "demasiado_seguido") {
+        /* Se dice el número y se dice por qué. Cada aviso son dos llamadas al
+           modelo y tres mensajes a teléfonos de verdad: que el freno exista es
+           parte de lo que se está mostrando, no una falla que haya que tapar. */
+        setAviso(
+          `Vas muy seguido: cada aviso escribe con el modelo y sale a tres teléfonos de ` +
+            `verdad. Probá de nuevo en ${d.esperaSeg} segundos.`,
+        );
       } else {
         setAviso("No se pudo entregar. El detalle queda abajo, sin disimular.");
         if (d.entregas) setEntregas(d.entregas as Entrega[]);

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { MINIMO_ADULTOS, repositorio } from "@/lib/datos";
@@ -40,12 +39,15 @@ export default async function Panel() {
             <li key={f.id} className="flex items-baseline justify-between gap-4 px-5 py-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-tinta">{f.nombre}</p>
-                <Link
-                  href={`/familia/${f.token}`}
-                  className="mt-0.5 block truncate font-mono text-xs text-acento hover:underline"
-                >
-                  /familia/{f.token}
-                </Link>
+                {/* 🔐 El token se muestra tapado y no es un enlace.
+                    La pantalla `/familia/[token]` se borró el 17/8: entregaba,
+                    sin pedir sesión, los códigos de vinculación de la familia
+                    entera. Y el token sigue siendo una credencial —con él se
+                    piden avisos por `/api/alertas`—, así que tampoco se deja a
+                    la vista de una cámara. Los adultos entran por `/entrar`. */}
+                <p className="mt-0.5 truncate font-mono text-xs text-apagado">
+                  token ··················{f.token.slice(-4)}
+                </p>
               </div>
               <span
                 className={`shrink-0 rounded px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${

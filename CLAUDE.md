@@ -9,6 +9,109 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
+## 🔐 LA AUDITORÍA DEL 2026-08-17 — leer esto antes que nada
+
+La pidió Edgardo antes de seguir construyendo: *"qué te parece si hacemos una auditoría, debug,
+seguridades, código muerto"*. Fue la decisión correcta y encontró algo grave.
+
+### 🔴 1. El repositorio es PÚBLICO y tenía adentro las claves de producción
+
+`github.com/Edgardo-Lamas/antigro` es público. Las tres cuentas de producción abrían con claves
+que estaban escritas en archivos versionados. Se comprobó contra el hash real de la base: las
+tres abrían.
+
+| Cuenta | Dónde estaba escrita |
+|---|---|
+| **la de administración** — abre `/panel` | `src/auth.ts`, como valor por defecto del modo demo |
+| `mariana@ejemplo.ar` | este `CLAUDE.md`, en dos lugares |
+| `carla@ejemplo.ar` | ídem |
+
+🔑 **Lo que hay que aprender, porque es lo único que evita que vuelva a pasar:** la clave de
+administración **no la eligió nadie**. Era el valor por defecto que `auth.ts` usaba cuando no hay
+base —parecía inofensivo, es "modo demo"— y cuando el 16/8 se sembró la cuenta en `usuarios` se
+sembró **con ese valor**. Un valor por defecto que abre una puerta se termina filtrando al lugar
+donde no tenía que estar. Por eso ahora, si faltan `ADMIN_EMAIL`/`ADMIN_PASSWORD`, **no entra
+nadie**: fallar cerrado.
+
+✅ Claves rotadas, valores por defecto sacados del código, claves fuera de este archivo.
+⚠ **Las claves viejas quedaron en el historial de git.** Están rotadas, así que ya no sirven —
+pero se leen. Reescribir el historial no vale la pena a cuatro días del congelamiento.
+
+### 🔴 2. Tres rutas abiertas llamaban a Opus 5 sin pedir sesión y sin ningún límite
+
+**No había un solo límite de frecuencia en todo el sistema**, y cada texto redactado son dos
+llamadas a Opus 5.
+
+| Ruta | Qué era | Qué se hizo |
+|---|---|---|
+| `GET /api/mensajes` | pública, 2 llamadas por pedido. Un **GET**: bastaba una etiqueta `<img>` o un rastreador para gastar en bucle | **borrada** — no la llamaba nadie |
+| `POST /api/alertas` | pública, 2 llamadas **+ mensajes de verdad** a los teléfonos de una familia | **cerrada con sesión de admin** |
+| `POST /api/demo/telegram` | es el botón de la home, tiene que seguir siendo pública | **límite por IP**: 6 por minuto |
+
+📌 En `/api/alertas` la IA escribía **antes** de que `avisar()` decidiera si repetía: aunque el
+mensaje se omitiera por «ya se avisó hoy», las dos llamadas ya se habían pagado.
+🔑 No se borró como la otra porque ahí vive la única llamada a `avisar()`, que es la salida real
+del sistema y de la que va a colgar la escalada.
+
+### 🔴 3. `/familia/[token]` entregaba los códigos de vinculación a cualquiera
+
+Sin sesión, `GET /api/familia/<token>` devolvía el código de vinculación del chico y de cada
+adulto. Con ese código, cualquiera aprieta «Iniciar» en el bot y **se mete en el canal de esa
+familia**. Es exactamente el ataque que la vinculación por código de un solo uso viene a evitar
+—y `/api/mi-familia/qr` está escrito con ese cuidado; esta ruta, de la fase 1, no.
+
+✅ Borradas la ruta y la pantalla. `/entrar` + `/mi-familia` ya las habían reemplazado.
+🔴 **Y el token de una familia es una CREDENCIAL.** Con él se piden avisos por `/api/alertas`.
+⚠ **No se filma.** `/panel` ahora lo muestra tapado y sin enlace, justamente por el video.
+
+### 🔴 4. Al sacar esa pantalla quedó al descubierto: el alta no crea cuentas
+
+`POST /api/panel/familias` crea la familia, los chicos y los adultos, **pero ninguna fila en
+`usuarios`**. Las de Mariana y Carla se sembraron a mano el 16/8. O sea que **una familia dada de
+alta hoy no puede entrar a `/mi-familia`** — el enlace `/familia/<token>` tapaba el hueco.
+
+➡ **Esto es requisito del alta desde el panel, que es lo próximo que se construye.** Sin crear la
+cuenta, el alta no termina en ningún lado.
+
+### 🟡 5. Lo demás
+
+- ✅ `coberturaDelProceso()` borrada: no la llamaba nadie. El texto que la explicaba se quedó,
+  porque el argumento sirve.
+- ✅ `MINIMO_ADULTOS` se importaba de dos lugares distintos.
+- ⚠ `.env.local.respaldo-16-08` sigue en la carpeta. Está fuera de git —nunca se filtró—, pero es
+  una copia entera de los secretos, y desde la rotación tiene claves viejas. **Borrarlo.**
+- 📌 `npm audit` marca 2 críticas y 4 altas. **Las críticas no aplican:** son de OAuth en
+  `@auth/core` y acá se usa sólo Credentials, sin OAuth y sin proveedor de correo. Las de `next`
+  piden saltar a la 16, que es romper cosas a cuatro días del congelamiento. `npm audit fix` a
+  secas —sin `--force`— arregla `@auth/core`, `nanoid` y `ws` sin romper nada.
+- 🔴 **Un error mío del informe, corregido:** dije que el esquema no encendía RLS. **Sí lo
+  enciende**, en las nueve tablas. Lo busqué en mayúsculas y está escrito en minúsculas. Se
+  verificó además contra la base: con la clave `anon` y con la `publishable`, las tablas devuelven
+  vacío.
+
+### ✅ Lo que la auditoría encontró BIEN, y conviene no romperlo
+
+- **La autorización del panel de la familia.** La familia sale de la sesión, nunca del navegador,
+  y cada ruta lo comprueba por su cuenta.
+- **No hay XSS.** El texto del asistente se arma como elementos de React; el único
+  `dangerouslySetInnerHTML` es el SVG del QR que dibuja el propio servidor.
+- **El webhook de Telegram valida el secreto** antes de tocar nada.
+- **La clave `anon` de Supabase nunca sale al navegador:** está en el entorno y ningún código
+  la usa.
+- Cabeceras de seguridad puestas, y `next@14.2.35` ya está por encima del bypass de middleware.
+
+### ⚠ Lo que quedó pendiente de la auditoría, y le toca a él
+
+1. **Correr el SQL nuevo** — la tabla `frecuencia` y la función `tomar_turno`, al final de
+   `supabase/schema.sql`. **Sin eso el límite deja pasar todo** (a propósito: tirar abajo el
+   asistente porque falta una migración sería peor). Avisa por consola y lo dice en la respuesta,
+   pero hay que correrlo.
+   🔑 La base va adelante del código, igual que con `charlas` el 16/8.
+2. **Borrar `.env.local.respaldo-16-08`.**
+3. **`npm audit fix`** (sin `--force`), y que haya días para verificarlo.
+
+---
+
 ## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN (cierre del 2026-08-16, de noche)
 
 ### ✅ Todo subido y EN PRODUCCIÓN — `antigro.vercel.app` sirve `ff8eb1e`
@@ -89,6 +192,8 @@ la sección del asistente, más abajo. Lo que salió de ahí y no estaba previst
 1. **El alta desde el panel.** Hoy una familia entra por API. **Acá arranca la próxima sesión** —
    quedó dicho el 16/8 de noche: *"sí pero lo vemos en otra sesión"*.
    🔑 Y ahora el alta carga algo más que nombre y edad: ver **el contexto del chico**, abajo.
+   🔴 **Y tiene que crear la cuenta de cada adulto en `usuarios`** — lo encontró la auditoría del
+   17/8: hoy el alta no crea ninguna, así que la familia queda afuera de su propio panel.
 2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    ⚠ **Él pidió ir despacio con esto**, textual: *"con el cuestionario vamos despacio, decidimos
    en un rato"*. No resolverlo de un saque.
@@ -121,11 +226,17 @@ y estar seguro. **No "arreglar" esto agregando streaming sin volver a discutirlo
 
 ### Cuentas para probar
 
-- Panel de la familia: `mariana@ejemplo.ar` o `carla@ejemplo.ar`, clave `familia2026`.
-  ⚠ Es la familia **inventada** (Ana, Mariana y Carla no existen).
-- Panel de administración: la cuenta de siempre, ya cargada en `usuarios`.
+🔴 **Las claves NO se escriben acá, y este archivo es la razón por la que hay que decirlo.**
+Hasta el 17/8 estaban las tres en este mismo lugar, y **el repositorio es público**: cualquiera
+que lo abriera entraba al panel de administración de producción. Ver «LA AUDITORÍA DEL 17/8».
+
+- Panel de la familia: `mariana@ejemplo.ar` o `carla@ejemplo.ar`. La clave está en `.env.local`,
+  que está fuera de git. ⚠ Es la familia **inventada** (Ana, Mariana y Carla no existen).
+- Panel de administración: `ADMIN_EMAIL`, con la clave de `ADMIN_PASSWORD`.
   🔴 Si algún día se enchufa una base nueva, el panel vuelve a quedar cerrado: `auth.ts` usa
-  `ADMIN_EMAIL`/`ADMIN_PASSWORD` **sólo cuando no hay base**.
+  `ADMIN_EMAIL`/`ADMIN_PASSWORD` **sólo cuando no hay base** — y desde el 17/8, **si esas dos
+  variables no están, no entra nadie**. Antes tenía un usuario y una clave escritos como valor
+  por defecto, y de ahí salió el problema.
 
 ---
 
@@ -1030,7 +1141,8 @@ comprobación en `layout.tsx`, igual que `/panel`.
 Lo que quedaba abierto era la pantalla, que sin datos mostraba su estado de error.
 
 ⚠ **Cuentas de prueba de la familia inventada** (Ana, Mariana y Carla no existen):
-`mariana@ejemplo.ar` y `carla@ejemplo.ar`, clave `familia2026`.
+`mariana@ejemplo.ar` y `carla@ejemplo.ar`. 🔴 **La clave va en `.env.local`, nunca acá:** este
+archivo se publica. Ver «LA AUDITORÍA DEL 17/8».
 
 ⬜ **Falta:** el alta desde el panel, el cuestionario del adulto y el asistente (que ya tiene su
 lugar reservado en la pantalla, diciendo que todavía no está).

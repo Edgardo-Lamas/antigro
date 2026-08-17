@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
-import { canalListo, faltantesDeAlta, repositorio } from "@/lib/datos";
-import { MINIMO_ADULTOS } from "@/lib/datos/tipos";
+import { canalListo, faltantesDeAlta, MINIMO_ADULTOS, repositorio } from "@/lib/datos";
 import { transporteDe } from "@/lib/mensajeria";
 
 /**

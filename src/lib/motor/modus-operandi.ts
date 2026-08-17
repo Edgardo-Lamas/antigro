@@ -152,15 +152,13 @@ export const PROCESO: EtapaDelProceso[] = [
  * decir —y sostener— es que reconoce **la forma del proceso** con lo que ve, y
  * que pide ayuda para el resto: a los adultos por el cuestionario, y al propio
  * chico, que es el único que estuvo en la etapa 4.
+ *
+ * 📌 Acá vivía `coberturaDelProceso()`, que contaba esas etapas. **Se borró en
+ * la auditoría del 17/8: no la llamaba nadie.** El texto se queda porque el
+ * argumento sirve —es lo que hay que poder contestar cuando pregunten por qué
+ * no alcanza con mirar la red—, y los números salen de contar la tabla de
+ * arriba, que es de donde salían igual.
  */
-export function coberturaDelProceso() {
-  const ve = PROCESO.filter((e) => e.huellaEnLaRed !== null).length;
-  return {
-    etapas: PROCESO.length,
-    conHuellaEnLaRed: ve,
-    ciegas: PROCESO.filter((e) => e.huellaEnLaRed === null).map((e) => e.nombre),
-  };
-}
 
 /**
  * Hasta dónde llegó el proceso, según lo que se vio. **No es un diagnóstico.**
