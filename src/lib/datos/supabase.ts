@@ -7,6 +7,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import bcrypt from "bcryptjs";
 import { generarToken } from "@/lib/supabase";
 import { exigeVinculacion, generarCodigo } from "./tipos";
 import type {
@@ -20,7 +21,13 @@ import type {
   SenalRegistrada,
   TurnoDeCharla,
 } from "./tipos";
-import type { AltaDeFamilia, Repositorio } from "./repositorio";
+import type {
+  AltaDeFamilia,
+  AltaDeHogar,
+  DatosDeLaFamilia,
+  Repositorio,
+  ResultadoDeAlta,
+} from "./repositorio";
 
 /* ── Traducción fila ⇄ dominio ───────────────────────────────────────────── */
 
@@ -46,6 +53,8 @@ type FilaChico = {
   // 🔑 El perfil es del chico desde el 17/8: el filtro va en su dispositivo,
   // no en el router de la casa. Ver `Chico` en tipos.ts.
   nextdns_profile_id: string | null;
+  // 🔑 Corre la hora de la madrugada, como la edad. Ver `TurnoEscolar`.
+  turno_escolar: Chico["turnoEscolar"] | null;
   activo: boolean;
   created_at: string;
 };
@@ -107,6 +116,7 @@ const aChico = (c: FilaChico): Chico => ({
   edad: c.edad,
   genero: c.genero,
   canal: aCanal(c),
+  turnoEscolar: c.turno_escolar ?? undefined,
   nextdnsProfileId: c.nextdns_profile_id ?? undefined,
   activo: c.activo,
   creado: c.created_at,
@@ -162,14 +172,169 @@ export class RepositorioSupabase implements Repositorio {
     if (error || !fila) throw new Error(error?.message ?? "No se pudo crear la familia");
     const familia = aFamilia(fila);
 
-    const { data: chicos } = await this.db
+    /* 🔑 Los dos caminos de alta —éste, por API, y el recorrido— escriben por
+       la misma puerta. Cuando estaban duplicados, agregar el turno escolar
+       significaba acordarse de tocar los dos. */
+    const { chicos, adultos } = await this.insertarChicosYAdultos(
+      familia.id,
+      alta.chicos,
+      alta.adultos,
+    );
+
+    return { familia, chicos, adultos };
+  }
+
+  /**
+   * ───────────────────────────────────────────────────────────────────────────
+   *  LA PUERTA DE LA CASA — primer paso del recorrido de alta (17/8)
+   * ───────────────────────────────────────────────────────────────────────────
+   *
+   * 🔴 **Cierra el agujero de la auditoría:** hasta hoy el alta creaba familia,
+   * chicos y adultos y ninguna cuenta, así que la familia quedaba afuera de su
+   * propio panel. Las de Mariana y Carla se habían sembrado a mano.
+   *
+   * 🔑 **La clave se cifra acá y en ningún otro lado.** Entra en claro por el
+   * pedido, sale hasheada a la base y no se devuelve nunca.
+   */
+  async crearHogar(alta: AltaDeHogar): Promise<ResultadoDeAlta> {
+    const email = alta.email.trim().toLowerCase();
+
+    /* 🔑 Se pregunta antes en vez de dejar reventar el índice único, porque a
+       la persona hay que decirle CUÁL de las dos cosas pasó. Igual, si dos
+       altas entran a la vez, la que pierde cae en el `insert` de abajo: el
+       índice es el que manda, no esta consulta. */
+    const { data: yaEsta } = await this.db
+      .from("usuarios")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+    if (yaEsta) return { ok: false, motivo: "email_tomado" };
+
+    /* ── La familia: se crea, o se reusa la que ya está ──
+       🔑 Reusarla es exactamente el caso de padres separados. La segunda casa
+       NO crea una familia nueva: se cuelga de la misma, con otro `hogar`. */
+    let familia: Familia;
+    if (alta.familiaId) {
+      const { data } = await this.db
+        .from("familias")
+        .select("*")
+        .eq("id", alta.familiaId)
+        .maybeSingle<FilaFamilia>();
+      if (!data) throw new Error("La familia no existe");
+      familia = aFamilia(data);
+
+      const { data: ocupado } = await this.db
+        .from("usuarios")
+        .select("id")
+        .eq("familia_id", familia.id)
+        .eq("hogar", alta.hogar ?? "")
+        .maybeSingle();
+      if (ocupado) return { ok: false, motivo: "hogar_ocupado" };
+    } else {
+      const { data, error } = await this.db
+        .from("familias")
+        .insert({
+          nombre: alta.nombreDeLaFamilia?.trim() || "Mi familia",
+          token: generarToken(),
+        })
+        .select()
+        .single<FilaFamilia>();
+      if (error || !data) throw new Error(error?.message ?? "No se pudo crear la familia");
+      familia = aFamilia(data);
+    }
+
+    const hash = await bcrypt.hash(alta.clave, 12);
+    const { data: usuario, error } = await this.db
+      .from("usuarios")
+      .insert({
+        email,
+        password_hash: hash,
+        /* 📌 El nombre de la cuenta es el de la casa, no el de una persona: la
+           credencial es del hogar y la usan los dos progenitores. */
+        nombre: familia.nombre,
+        rol: "adulto",
+        familia_id: familia.id,
+        hogar: alta.hogar ?? null,
+      })
+      .select("id")
+      .single<{ id: string }>();
+
+    if (error || !usuario) {
+      /* 23505 es la violación de índice único de Postgres: o el correo o la
+         casa. Es la carrera que la consulta de arriba no puede evitar. */
+      if (error?.code === "23505") {
+        return {
+          ok: false,
+          motivo: error.message.includes("hogar") ? "hogar_ocupado" : "email_tomado",
+        };
+      }
+      throw new Error(error?.message ?? "No se pudo crear la cuenta");
+    }
+
+    return { ok: true, familia, usuarioId: usuario.id };
+  }
+
+  /**
+   * Los datos de la familia, ya adentro del recorrido.
+   *
+   * 🔴 **Reemplaza, no acumula.** El recorrido se puede rehacer, y si esto
+   * sumara, volver atrás a corregir una edad dejaría dos chicos cargados.
+   */
+  async cargarDatosDeLaFamilia(
+    familiaId: string,
+    datos: DatosDeLaFamilia,
+  ): Promise<FamiliaCompleta> {
+    if (datos.nombre?.trim()) {
+      const nombre = datos.nombre.trim();
+      await this.db.from("familias").update({ nombre }).eq("id", familiaId);
+
+      /* 🔴 **Y la cuenta también, o el panel saluda con otro nombre.** La
+         credencial se crea antes que los datos, así que nace con un nombre
+         provisorio; si esto no se actualizara, el encabezado diría «Familia
+         Gómez» y abajo «entraste como Mi familia». Apareció probando el
+         recorrido entero en el navegador, no en el typecheck.
+         🔑 La cuenta es del HOGAR: su nombre es el de la casa, no el de una
+         persona. Por eso se copia el de la familia y no se pregunta aparte. */
+      await this.db.from("usuarios").update({ nombre }).eq("familia_id", familiaId);
+    }
+
+    /* 🔑 Los chicos se reemplazan de verdad: un chico cargado en una pasada
+       anterior del recorrido no es historia que haya que conservar, es un error
+       de tipeo. ⚠ Y `on delete cascade` se lleva sus señales, que es lo
+       correcto: eran las de un chico que nunca existió. */
+    await this.db.from("chicos").delete().eq("familia_id", familiaId);
+
+    /* 🔴 Los adultos NO se borran: baja blanda. Sus observaciones son entrada
+       del motor y borrarlas cambiaría lecturas que ya se hicieron. */
+    await this.db
+      .from("adultos")
+      .update({ activo: false, baja_en: new Date().toISOString(), baja_motivo: "otro" })
+      .eq("familia_id", familiaId)
+      .eq("activo", true);
+
+    await this.insertarChicosYAdultos(familiaId, datos.chicos, datos.adultos);
+
+    const completa = await this.familiaPorId(familiaId);
+    if (!completa) throw new Error("La familia no existe");
+    return completa;
+  }
+
+  /** Lo que comparten `crearFamilia` y `cargarDatosDeLaFamilia`. */
+  private async insertarChicosYAdultos(
+    familiaId: string,
+    chicos: AltaDeFamilia["chicos"],
+    adultos: AltaDeFamilia["adultos"],
+  ): Promise<{ chicos: Chico[]; adultos: AdultoResponsable[] }> {
+    const { data: filasChicos } = await this.db
       .from("chicos")
       .insert(
-        alta.chicos.map((c) => ({
-          familia_id: familia.id,
+        chicos.map((c) => ({
+          familia_id: familiaId,
           nombre: c.nombre,
           edad: c.edad,
           genero: c.genero,
+          // 🔑 Corre la hora de la madrugada, igual que la edad. Ver `pesos.ts`.
+          turno_escolar: c.turnoEscolar ?? null,
           canal_tipo: c.canal.tipo,
           canal_destino: exigeVinculacion(c.canal.tipo) ? null : c.canal.destino,
           codigo_vinculacion: exigeVinculacion(c.canal.tipo) ? generarCodigo() : null,
@@ -179,11 +344,11 @@ export class RepositorioSupabase implements Repositorio {
       .select()
       .returns<FilaChico[]>();
 
-    const { data: adultos } = await this.db
+    const { data: filasAdultos } = await this.db
       .from("adultos")
       .insert(
-        alta.adultos.map((a) => ({
-          familia_id: familia.id,
+        adultos.map((a) => ({
+          familia_id: familiaId,
           nombre: a.nombre,
           vinculo: a.vinculo,
           rol: a.rol,
@@ -197,9 +362,8 @@ export class RepositorioSupabase implements Repositorio {
       .returns<FilaAdulto[]>();
 
     return {
-      familia,
-      chicos: (chicos ?? []).map(aChico),
-      adultos: (adultos ?? []).map(aAdulto),
+      chicos: (filasChicos ?? []).map(aChico),
+      adultos: (filasAdultos ?? []).map(aAdulto),
     };
   }
 

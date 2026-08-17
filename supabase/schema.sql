@@ -534,3 +534,59 @@ update chicos c
 --  La de `familias` queda, vacía y sin uso, para no perder nada en la mudanza.
 comment on column familias.nextdns_profile_id is
   'EN DESUSO desde el 17/8: el perfil pasó a chicos.nextdns_profile_id, porque el filtro va en el dispositivo del chico y no en el router de la casa.';
+
+
+-- ═════════════════════════════════════════════════════════════════
+--  13. EL RECORRIDO DE ALTA — 17/8
+-- ═════════════════════════════════════════════════════════════════
+--
+--  Edgardo describió la secuencia completa del producto: *"accede al enlace,
+--  elige la suscripción, paga la suscripción y luego el sistema lo lleva en un
+--  recorrido de pantallas para cargar los datos"*. Y para el CoderCup, lo mismo
+--  sin el pago: *"abre el enlace, llega al panel de logueo, crea credenciales, y
+--  accede al mismo recorrido pero sin pagar. Ve el simulador y luego la carga de
+--  datos"*.
+--
+--  🔴 Eso cierra el agujero que dejó al descubierto la auditoría: hasta hoy el
+--  alta creaba familia, chicos y adultos y NINGUNA cuenta, así que una familia
+--  dada de alta quedaba afuera de su propio panel. Las de la familia sembrada se
+--  habían hecho a mano.
+
+
+-- ── 13.1 · El turno escolar del chico ──
+--
+--  🔴 **No es una pregunta más: repara algo que el sistema afirmaba sin saberlo.**
+--  El 16/8 el asistente decía que la madrugada «desordena el descanso» del chico,
+--  y Edgardo lo volteó — el sistema no sabe a qué hora se levanta ese chico.
+--
+--  🔑 **Corre la HORA de referencia, no toca ningún peso.** Es el mismo mecanismo
+--  que ya usa la edad (`horaDeReferencia` en `pesos.ts`), y por eso se enchufa
+--  sin tocar el motor: mañana adelanta una hora, tarde y noche la atrasan una,
+--  «no va al colegio» no mueve nada. Topado entre las 21 y las 02.
+--
+--  ⚠ Es criterio de producto, NO un dato. A diferencia del corrimiento de fase de
+--  la adolescencia —que tiene fuente clínica citada en `pesos.ts`—, acá no hay
+--  estudio que diga cuánto corre un turno tarde, y no se cita como si lo hubiera.
+--
+--  📌 Nullable a propósito: las familias de antes del recorrido no lo tienen, y
+--  sin el dato el motor hace exactamente lo que hacía antes. Un dato que falta no
+--  puede cambiar una lectura ya hecha.
+
+alter table chicos add column if not exists turno_escolar text
+  check (turno_escolar in ('manana', 'tarde', 'doble', 'noche', 'no_va'));
+
+
+-- ── 13.2 · La cuenta del hogar la crea el recorrido, no la mano ──
+--
+--  No hay columna nueva: la 12.2 ya dejó `usuarios.familia_id` + `usuarios.hogar`
+--  y el índice único `usuarios_hogar_idx` (una puerta por casa). Lo que cambia es
+--  QUIÉN escribe esa fila — ahora el alta, y ya no un insert a mano.
+--
+--  🔴 Y por eso este comentario existe: el índice único dejó de ser una red y
+--  pasó a ser la regla que corre en caliente cada vez que alguien se registra.
+--  `crearHogar` pregunta antes para poder decir cuál de las dos cosas pasó, pero
+--  el que decide es el índice: dos altas simultáneas de la misma casa las corta
+--  Postgres, no la aplicación.
+
+comment on index usuarios_hogar_idx is
+  'Una puerta por casa. Lo aplica el recorrido de alta (crearHogar): si dos altas de la misma casa entran a la vez, la que pierde recibe 23505 y se le contesta hogar_ocupado.';

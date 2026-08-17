@@ -23,6 +23,11 @@ const Params = z.object({
   dia: z.coerce.number().int().min(0).max(VENTANA_DIAS - 1).default(VENTANA_DIAS - 1),
   edad: z.coerce.number().int().min(7).max(17).default(12),
   genero: z.enum(["nena", "varon", "otro"]).default("nena"),
+  /**
+   * 🔑 Corre la hora a partir de la cual la conexión deja de explicarse sola.
+   * Sin esto el motor mira sólo la edad, que es lo que hacía antes del 17/8.
+   */
+  turno: z.enum(["manana", "tarde", "doble", "noche", "no_va"]).optional(),
   chicoId: z.string().default("demo"),
   barrido: z.coerce.boolean().default(false),
   /** Qué contestaron los adultos. Es la segunda entrada del motor. */
@@ -72,8 +77,9 @@ export async function GET(req: Request) {
     );
   }
 
-  const { escenario, dia, edad, genero, chicoId, barrido, adultos, observados } = parsed.data;
-  const chico = { edad, genero };
+  const { escenario, dia, edad, genero, chicoId, barrido, adultos, observados, turno } =
+    parsed.data;
+  const chico = { edad, genero, turnoEscolar: turno };
   const observaciones = RESPUESTAS[adultos];
 
   // El comienzo de la historia queda fijo. El reloj sólo corre el final.

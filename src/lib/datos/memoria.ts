@@ -20,7 +20,13 @@ import type {
   SenalRegistrada,
   TurnoDeCharla,
 } from "./tipos";
-import { dentroDe, type AltaDeFamilia, type Repositorio } from "./repositorio";
+import {
+  dentroDe,
+  type AltaDeFamilia,
+  type DatosDeLaFamilia,
+  type Repositorio,
+  type ResultadoDeAlta,
+} from "./repositorio";
 
 let contador = 0;
 const nuevoId = (prefijo: string) => `${prefijo}-${++contador}`;
@@ -149,6 +155,71 @@ export class RepositorioEnMemoria implements Repositorio {
     this.adultos.push(...adultos);
 
     return { familia, chicos, adultos };
+  }
+
+  /**
+   * ───────────────────────────────────────────────────────────────────────────
+   *  🔴 ACÁ EL MODO DEMO SE PLANTA, Y ES LO ÚNICO QUE HACE
+   * ───────────────────────────────────────────────────────────────────────────
+   *
+   * Todo lo demás de este repositorio anda sin base: el motor lee, el panel
+   * muestra, el asistente contesta. **Una credencial, no.** Guardarla acá sería
+   * prometer una cuenta que no sobrevive al próximo reinicio del servidor —y,
+   * peor, `auth.ts` no la miraría: sin base sólo abre la cuenta de
+   * administración del entorno.
+   *
+   * 🔑 **Por eso devuelve `sin_base` en vez de fingir que anduvo.** Es la misma
+   * regla que el límite de frecuencia: dejar pasar está bien, hacerlo en
+   * silencio no. La pantalla lo dice con todas las letras.
+   */
+  async crearHogar(): Promise<ResultadoDeAlta> {
+    return { ok: false, motivo: "sin_base" };
+  }
+
+  async cargarDatosDeLaFamilia(
+    familiaId: string,
+    datos: DatosDeLaFamilia,
+  ): Promise<FamiliaCompleta> {
+    const familia = this.familias.find((f) => f.id === familiaId);
+    if (!familia) throw new Error("La familia no existe");
+    if (datos.nombre?.trim()) familia.nombre = datos.nombre.trim();
+
+    const ahora = new Date().toISOString();
+
+    // Los chicos se reemplazan; los adultos se dan de baja blanda. El porqué
+    // de la diferencia está en `cargarDatosDeLaFamilia` del contrato.
+    this.chicos = this.chicos.filter((c) => c.familiaId !== familiaId);
+    for (const a of this.adultos) {
+      if (a.familiaId === familiaId && a.activo) {
+        a.activo = false;
+        a.bajaEn = ahora;
+        a.bajaMotivo = "otro";
+      }
+    }
+
+    this.chicos.push(
+      ...datos.chicos.map((c) => ({
+        ...c,
+        canal: conCodigo(c.canal),
+        id: nuevoId("chico"),
+        familiaId,
+        activo: true,
+        creado: ahora,
+      })),
+    );
+
+    this.adultos.push(
+      ...datos.adultos.map((a) => ({
+        ...a,
+        canal: conCodigo(a.canal),
+        id: nuevoId("adulto"),
+        familiaId,
+        activo: true,
+        creado: ahora,
+      })),
+    );
+
+    return this.completar(familia)!;
   }
 
   async familiaPorToken(token: string): Promise<FamiliaCompleta | null> {

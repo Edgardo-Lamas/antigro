@@ -16,7 +16,7 @@
 import type { SenalDeRed, TipoDeSenal } from "@/lib/senales/tipos";
 import { esCruce, nombreDeLugar, puertaDe } from "@/lib/senales/plataformas";
 import { NOMBRE_DE_SENAL } from "@/lib/senales/tipos";
-import type { Chico } from "@/lib/datos/tipos";
+import type { Chico, TurnoEscolar } from "@/lib/datos/tipos";
 import {
   CLASE_DE_SENAL,
   MEDIA_VENTANA_DIAS,
@@ -166,14 +166,24 @@ export function diaLocal(fecha: Date | string): string {
  * ⚠ Las **absolutas** (madrugada, evasión) no se tocan: valen desde el día uno,
  * porque no se comparan contra nada.
  */
-function cargaDelDia(senales: SenalDeRed[], confianza: number, edad: number): number {
+function cargaDelDia(
+  senales: SenalDeRed[],
+  confianza: number,
+  edad: number,
+  turno?: TurnoEscolar,
+): number {
   const restante = senales.reduce((acc, s) => {
     const atenuacion = CLASE_DE_SENAL[s.tipo] === "relativa" ? confianza : 1;
     /* 🔑 La madrugada es absoluta, pero **se compara contra la EDAD**: a las 2
        de la mañana una nena de 9 y un pibe de 16 no son lo mismo. Ver
-       `factorMadrugada` — se corre la hora de referencia, no se baja el peso. */
+       `factorMadrugada` — se corre la hora de referencia, no se baja el peso.
+
+       🔑 Y desde el 17/8 el TURNO ESCOLAR corre esa misma hora un escalón más:
+       el que entra al colegio a las 7:30 y el que entra a las 13 no están
+       haciendo lo mismo a las 23:30. Sin dato de turno se comporta igual que
+       antes — mira sólo la edad. */
     const porEdad =
-      s.tipo === "madrugada" ? factorMadrugada(edad, new Date(s.fecha).getHours()) : 1;
+      s.tipo === "madrugada" ? factorMadrugada(edad, new Date(s.fecha).getHours(), turno) : 1;
     const aporte = Math.min(1, s.intensidad * PESO_POR_TIPO[s.tipo] * atenuacion * porEdad);
     return acc * (1 - aporte);
   }, 1);
@@ -236,7 +246,12 @@ function rachaSostenida(dias: DiaDeLaVentana[]): number {
 /* ── La evaluación ───────────────────────────────────────────────────────── */
 
 export interface Consulta {
-  chico: Pick<Chico, "edad" | "genero">;
+  /**
+   * 📌 `turnoEscolar` viaja opcional a propósito: las familias dadas de alta
+   * antes del recorrido no lo tienen, y sin él el motor hace exactamente lo que
+   * hacía antes. Un dato que falta no puede cambiar una lectura ya hecha.
+   */
+  chico: Pick<Chico, "edad" | "genero" | "turnoEscolar">;
   senales: SenalDeRed[];
   /** Hasta qué momento se mira. Moverlo es lo que hace el reloj acelerado. */
   hasta: Date;
@@ -283,7 +298,10 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
   const historia: { dia: string; carga: number }[] = [];
   for (let t = new Date(diaLocal(arranque) + "T00:00:00").getTime(); t <= hasta.getTime(); t += DIA_MS) {
     const clave = diaLocal(new Date(t));
-    historia.push({ dia: clave, carga: cargaDelDia(porDia.get(clave) ?? [], 1, chico.edad) });
+    historia.push({
+      dia: clave,
+      carga: cargaDelDia(porDia.get(clave) ?? [], 1, chico.edad, chico.turnoEscolar),
+    });
   }
 
   const perfil = construirPerfil(historia, diasObservados);
@@ -299,7 +317,7 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
     const delDia = porDia.get(clave) ?? [];
     return {
       dia: clave,
-      carga: cargaDelDia(delDia, alcance.valor, chico.edad),
+      carga: cargaDelDia(delDia, alcance.valor, chico.edad, chico.turnoEscolar),
       tipos: [...new Set(delDia.map((s) => s.tipo))],
     };
   });

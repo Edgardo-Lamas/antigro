@@ -90,9 +90,17 @@ export default async function Panel() {
             eligió él es alguien a quien de verdad le va a escribir.
           </li>
         </ul>
-        <p className="mt-4 border-t border-borde pt-3 text-xs text-apagado">
-          El formulario de alta se arma en la fase 4. Hoy el alta entra por{" "}
-          <code className="text-tenue">POST /api/panel/familias</code>, que ya valida todo esto.
+        {/* 🔴 Acá decía que el formulario de alta «se arma en la fase 4» y que
+            mientras tanto el alta entraba por API. Quedó viejo el 17/8: la
+            familia se da de alta sola, en un recorrido de pantallas. */}
+        <p className="mt-4 border-t border-borde pt-3 text-xs leading-relaxed text-apagado">
+          Las familias se dan de alta solas: crean la clave de su casa en{" "}
+          <code className="text-tenue">/entrar</code> y cargan los datos en el recorrido de{" "}
+          <code className="text-tenue">/alta</code>, que además les muestra el sistema andando y
+          la instalación. Esta administración las lista y las puede pausar.{" "}
+          <code className="text-tenue">POST /api/panel/familias</code> sigue existiendo para dar
+          de alta desde acá, pero <strong className="text-tenue">no crea la cuenta</strong> — esa
+          la crea el recorrido.
         </p>
       </section>
     </main>

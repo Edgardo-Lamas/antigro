@@ -133,12 +133,59 @@ export type Genero = "nena" | "varon" | "otro";
 export const EDAD_MINIMA = 7;
 export const EDAD_MAXIMA = 17;
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL TURNO ESCOLAR — dato del alta, no pregunta del cuestionario (17/8)
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **Salió de un error del sistema, no de una idea de producto.** El 16/8 el
+ * asistente afirmaba que la madrugada «desordena el descanso» del chico, y
+ * Edgardo lo volteó: el sistema **no sabe a qué hora se levanta ese chico**.
+ * Puede estar de vacaciones o ir al turno tarde. Cerró el hueco él mismo: *"la
+ * información debe darle al asistente información del chico, por ejemplo si va
+ * al colegio por la mañana, por la tarde"*.
+ *
+ * 🔑 **Es de otra naturaleza que el cuestionario y conviene no mezclarlos.** El
+ * cuestionario es observación periódica —*"¿con qué frecuencia viste X?"*, se
+ * vuelve a contestar—. Esto es un dato fijo del chico, como la edad, y por eso
+ * vive acá y se carga una sola vez.
+ *
+ * ⚠ **No mueve ningún peso: mueve la HORA.** Es el mismo mecanismo que ya usa
+ * la edad y que ya está probado (`horaDeReferencia` en `pesos.ts`). Atenuar el
+ * peso diría "en este chico la madrugada importa menos", que es falso. Correr
+ * la hora dice lo que de verdad pasa: **en este chico la madrugada empieza
+ * antes o después.**
+ */
+export type TurnoEscolar = "manana" | "tarde" | "doble" | "noche" | "no_va";
+
+export const TURNOS_ESCOLARES: {
+  id: TurnoEscolar;
+  nombre: string;
+  /** Qué implica para el sistema. Se muestra en el alta: nadie elige a ciegas. */
+  detalle: string;
+}[] = [
+  { id: "manana", nombre: "Mañana", detalle: "Se levanta temprano todos los días." },
+  { id: "tarde", nombre: "Tarde", detalle: "Puede dormir más a la mañana." },
+  { id: "doble", nombre: "Doble turno", detalle: "Mañana y tarde en el colegio." },
+  { id: "noche", nombre: "Noche", detalle: "Cursa de noche y vuelve tarde." },
+  { id: "no_va", nombre: "No va al colegio", detalle: "Por ahora no está escolarizado." },
+];
+
 export interface Chico {
   id: string;
   familiaId: string;
   nombre: string;
   edad: number;
   genero: Genero;
+  /**
+   * 🔑 Corre la hora a partir de la cual estar conectado deja de explicarse
+   * solo. Ver `TurnoEscolar` acá arriba y `horaDeReferencia` en `pesos.ts`.
+   *
+   * 📌 Opcional a propósito: las familias dadas de alta antes del recorrido no
+   * lo tienen, y no tenerlo no es un dato faltante que haya que reclamar — es
+   * el comportamiento de siempre, el que sólo mira la edad.
+   */
+  turnoEscolar?: TurnoEscolar;
   /** El canal del chico, separado del de los adultos. */
   canal: Canal;
   /**

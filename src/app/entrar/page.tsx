@@ -15,15 +15,34 @@ import { ShieldCheck, LoaderCircle } from "lucide-react";
  *  la que abre un padre o una madre, muchas veces por primera vez y muchas
  *  veces preocupado. Por eso dice qué es esto antes de pedir nada.
  *
- *  📌 **No hay «crear cuenta», y es a propósito.** Las cuentas las crea AntiGro
- *  al dar de alta el servicio, porque un alta trae decisiones que no se toman
- *  en un formulario: quiénes son los dos adultos responsables, quién es el
- *  referente de afuera y la conversación con el chico. Poner un botón de
- *  registro acá sería prometer un autoservicio que el producto no tiene.
+ *  ───────────────────────────────────────────────────────────────────────────
+ *  🔴 **ACÁ DECÍA QUE NO HABÍA «CREAR CUENTA», Y ESO CAMBIÓ EL 17/8.**
+ *  ───────────────────────────────────────────────────────────────────────────
+ *
+ *  El comentario viejo argumentaba que un alta trae decisiones que no se toman
+ *  en un formulario —quiénes son los adultos, quién el referente de afuera, la
+ *  conversación con el chico— y que poner un botón de registro sería prometer un
+ *  autoservicio que el producto no tenía.
+ *
+ *  🔑 **El argumento era correcto y por eso la solución no fue agregar un botón:
+ *  fue construir el recorrido.** Edgardo describió la secuencia entera: *"accede
+ *  al enlace, elige la suscripción, paga la suscripción y luego el sistema lo
+ *  lleva en un recorrido de pantallas para cargar los datos"*. Esas decisiones
+ *  no desaparecieron — viven en `/alta`, una por pantalla, con la conversación
+ *  con el chico incluida. Lo que se crea acá es sólo la puerta.
+ *
+ *  📌 Y contesta lo que quedó abierto en la auditoría del 17/8: hasta hoy el
+ *  alta no creaba ninguna cuenta y la familia quedaba afuera de su propio panel.
  */
+
+type Modo = "entrar" | "crear";
+
+/** Ver `CLAVE_MINIMA` en la ruta: el largo es lo que sostiene la puerta. */
+const CLAVE_MINIMA = 8;
 
 export default function Entrar() {
   const router = useRouter();
+  const [modo, setModo] = useState<Modo>("entrar");
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState("");
@@ -34,13 +53,32 @@ export default function Entrar() {
     setError("");
     setCargando(true);
     try {
+      if (modo === "crear") {
+        const res = await fetch("/api/alta/hogar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, clave }),
+        });
+        const datos = await res.json();
+        if (!res.ok) {
+          setError(datos.error ?? "No se pudo crear la cuenta.");
+          return;
+        }
+      }
+
       const res = await signIn("credentials", { email, password: clave, redirect: false });
-      if (res?.ok) router.push("/mi-familia");
+      if (res?.ok) {
+        /* 🔑 Recién creada, la familia todavía no tiene chico: va al recorrido,
+           no al panel. Un panel vacío no le explica a nadie qué hacer. */
+        router.push(modo === "crear" ? "/alta" : "/mi-familia");
+        return;
+      }
+
       /* ⚠ Un solo mensaje para las dos fallas —email que no existe y
          contraseña equivocada— a propósito: si dijera cuál de las dos es,
          cualquiera podría averiguar qué direcciones tienen cuenta en un
          sistema que cuida chicos. */
-      else setError("El email o la contraseña no coinciden.");
+      setError("El email o la contraseña no coinciden.");
     } finally {
       setCargando(false);
     }
@@ -49,23 +87,52 @@ export default function Entrar() {
   const campo =
     "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
   const etiqueta = "mb-1.5 block text-[11px] uppercase tracking-[0.06em] text-apagado";
+  const creando = modo === "crear";
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
         <div className="rounded-xl border border-borde bg-superficie px-7 py-8">
-          <div className="mb-7 text-center">
+          <div className="mb-6 text-center">
             <div className="mx-auto mb-3.5 flex h-11 w-11 items-center justify-center rounded-lg bg-acentoSuave">
               <ShieldCheck size={19} className="text-acento" />
             </div>
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-apagado">
               AntiGro
             </p>
-            <p className="mt-2 text-base font-semibold text-tinta">Entrá a tu familia</p>
-            <p className="mt-1.5 text-xs leading-relaxed text-tenue">
-              Acá están los avisos, los informes y el asistente. Sólo los adultos responsables
-              tienen cuenta.
+            <p className="mt-2 text-base font-semibold text-tinta">
+              {creando ? "Poné en marcha el sistema" : "Entrá a tu familia"}
             </p>
+            <p className="mt-1.5 text-xs leading-relaxed text-tenue">
+              {creando
+                ? "Primero la clave de tu casa. Después el sistema te muestra cómo funciona y te va pidiendo los datos."
+                : "Acá están los avisos, los informes y el asistente."}
+            </p>
+          </div>
+
+          {/* 🔑 Las dos puertas a la vista, no una escondida detrás de un enlace
+              chico: el jurado tiene que encontrar «crear» sin buscarlo. */}
+          <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg border border-borde bg-fondo p-1">
+            {(
+              [
+                { id: "entrar", texto: "Ya tengo cuenta" },
+                { id: "crear", texto: "Es mi primera vez" },
+              ] as const
+            ).map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                onClick={() => {
+                  setModo(o.id);
+                  setError("");
+                }}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                  modo === o.id ? "bg-acentoSuave text-acento" : "text-apagado"
+                }`}
+              >
+                {o.texto}
+              </button>
+            ))}
           </div>
 
           <form onSubmit={enviar} className="flex flex-col gap-3.5">
@@ -94,12 +161,20 @@ export default function Entrar() {
                 value={clave}
                 onChange={(e) => setClave(e.target.value)}
                 required
-                autoComplete="current-password"
+                minLength={creando ? CLAVE_MINIMA : undefined}
+                autoComplete={creando ? "new-password" : "current-password"}
                 className={campo}
               />
+              {creando && (
+                <p className="mt-1.5 text-xs leading-relaxed text-apagado">
+                  Al menos {CLAVE_MINIMA} caracteres.{" "}
+                  <strong className="text-tenue">Es la clave de la casa</strong>, no de una
+                  persona: la usan los dos.
+                </p>
+              )}
             </div>
 
-            {error && <p className="text-xs text-riesgo">{error}</p>}
+            {error && <p className="text-xs leading-relaxed text-riesgo">{error}</p>}
 
             <button
               type="submit"
@@ -108,8 +183,11 @@ export default function Entrar() {
             >
               {cargando ? (
                 <>
-                  <LoaderCircle size={14} className="animate-spin" /> Entrando…
+                  <LoaderCircle size={14} className="animate-spin" />{" "}
+                  {creando ? "Creando…" : "Entrando…"}
                 </>
+              ) : creando ? (
+                "Crear la clave y empezar"
               ) : (
                 "Entrar"
               )}
@@ -118,12 +196,20 @@ export default function Entrar() {
         </div>
 
         <p className="mt-5 text-center text-xs leading-relaxed text-apagado">
-          ¿Todavía no tenés cuenta? Las crea AntiGro cuando se da de alta el servicio en tu casa.
-          Podés{" "}
-          <Link href="/" className="text-acento underline">
-            ver cómo funciona
-          </Link>{" "}
-          sin registrarte.
+          {creando ? (
+            <>
+              No se cobra nada:{" "}
+              <strong className="text-tenue">esto es una demostración del sistema.</strong>
+            </>
+          ) : (
+            <>
+              También podés{" "}
+              <Link href="/" className="text-acento underline">
+                ver cómo funciona
+              </Link>{" "}
+              sin registrarte.
+            </>
+          )}
         </p>
       </div>
     </div>

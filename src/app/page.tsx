@@ -45,7 +45,10 @@ async function laPuerta(): Promise<{ texto: string; destino: string }> {
 
   if (rol === "adulto") return { texto: "Ir a mi familia", destino: "/mi-familia" };
   if (rol === "admin") return { texto: "Ir al panel", destino: "/panel" };
-  return { texto: "Entrar a mi familia", destino: "/entrar" };
+  /* 🔑 Desde el 17/8 esta puerta abre las DOS cosas: entrar, y ponerlo en
+     marcha por primera vez. Decía sólo «entrar a mi familia», y con eso el que
+     todavía no tenía cuenta no tenía por dónde empezar. */
+  return { texto: "Entrar o empezar", destino: "/entrar" };
 }
 
 function version(): string {
@@ -94,7 +97,7 @@ export default async function Home() {
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-apagado">
           Movés los controles y el motor vuelve a leer. No hace falta registrarse.{" "}
           <Link href={puerta.destino} className="text-acento underline">
-            Si ya tenés AntiGro en tu casa, entrá acá.
+            Para ponerlo en marcha en tu casa, empezá acá.
           </Link>
         </p>
       </header>

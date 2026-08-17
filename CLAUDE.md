@@ -18,14 +18,95 @@ estadísticas oficiales sobre qué pesa cuánto.
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
-| **En producción** | `7ddd5db`, promovido y verificado |
-| **Último commit** | `c0a659f` (sólo documentación, por eso no se promovió) |
-| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación, todo en verde |
+| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno |
+
+### ✅ EL RECORRIDO DE ALTA — hecho al final del 17/8
+
+**Es lo que estaba primero en la lista y ya está.** Lo definió Edgardo describiendo la secuencia
+de producción —*"accede al enlace, elige la suscripción, paga la suscripción y luego el sistema
+lo lleva en un recorrido de pantallas para cargar los datos"*— y la del CoderCup, que es la misma
+sin el pago: *"abre el enlace, llega al panel de logueo, crea credenciales, y accede al mismo
+recorrido pero sin pagar. **Ve el simulador y luego la carga de datos**"*.
+
+🔴 **El alta dejó de ser una herramienta de administración: la familia se da de alta sola.**
+Hasta hoy `/entrar` decía con todas las letras que no había «crear cuenta» y argumentaba bien
+—un alta trae decisiones que no se toman en un formulario—. **El argumento era correcto y por eso
+la solución no fue agregar un botón: fue construir el recorrido**, donde esas decisiones viven
+una por pantalla.
+
+| Dónde | Qué |
+|---|---|
+| `/entrar` | Dos puertas a la vista: «ya tengo cuenta» y «es mi primera vez» |
+| `/api/alta/hogar` | Crea familia + credencial. **Pública y escribe** → límite de 3 por minuto por IP |
+| `/alta` + `Recorrido.tsx` | Las cinco pantallas |
+| `/api/alta/datos` | Carga chico y adultos. La familia sale de la SESIÓN, nunca del cuerpo |
+
+**Las cinco pantallas, y el orden no es casual:** simulador → el chico → la casa y los adultos →
+**la conversación con el chico** → la instalación.
+
+🔑 **El simulador va ANTES de pedir un solo dato.** Nadie carga la edad de su hijo en un sistema
+que todavía no vio funcionar. Se reusa `Consola` tal cual, que ya estaba verificada.
+🔑 **La regla 4 dejó de ser la única sin implementar.** La conversación con el chico es la cuarta
+pantalla y va **antes** de la instalación a propósito. No hay nada que tildar: el sistema no puede
+comprobar que la charla pasó y no finge que sí.
+📌 **El pago se nombra y NO se simula.** La pantalla dice que en el producto terminado la
+suscripción ya estaría paga y que acá no se cobra nada. Un checkout falso es exactamente lo que
+este producto no se puede permitir.
+
+✅ **Cierra el agujero de la auditoría:** el alta ya crea la cuenta. Una familia dada de alta hoy
+entra a su panel.
+🔑 **Y `/mi-familia` manda al recorrido si la familia no tiene chico** (en el `layout`): entre
+crear la credencial y cargar los datos hay un rato en que la familia existe y está hueca, y ahí un
+panel vacío no le explica nada a nadie.
+
+⚠ **Lo que apareció probándolo en el navegador y NO en el typecheck:** la cuenta nace con el
+nombre provisorio de la familia, así que el panel saludaba «entraste como Mi familia» debajo de un
+encabezado que decía «Familia Gómez». `cargarDatosDeLaFamilia` ahora actualiza los dos.
+
+✅ **Verificado de punta a punta contra la Supabase de producción** (crear credencial → recorrido
+→ panel propio), y **las tres familias de prueba se borraron**: en producción queda sólo la
+sembrada.
+
+### ⬜ Lo que queda del recorrido
+
+1. **La segunda puerta de padres separados.** El recorrido pregunta si el chico vive en una casa o
+   en dos y explica qué significa, pero **la segunda credencial todavía no se crea desde ahí** —
+   `crearHogar` ya la sabe hacer (`familiaId` + `hogar`, con el chequeo de que quien la pide ya
+   está en esa familia). Falta la pantalla en `/mi-familia`.
+2. **El canal de los adultos.** El recorrido los carga sin destino: se vinculan después, por QR,
+   desde el panel. Coherente con cómo funciona Telegram, pero el recorrido no lo cuenta.
+3. **Cambiar la clave.** No existe en ningún lado, ni antes ni ahora.
+
+### 📊 El turno escolar — medido, no supuesto
+
+✅ En el modelo, en el motor, en la base y con `npm run probar-turno` (23 comprobaciones).
+Corre la **hora** de referencia de la madrugada, igual que la edad; no toca ningún peso.
+
+🔴 **Y hay que decir lo que la medición dio: el turno NO mueve el día en que el sistema habla.**
+Barrido de los 4 escenarios × 3 edades × 6 turnos: el día no cambió en ninguno. Mueve el puntaje
+~0,02 en el persistente y ~0,004 en la evasión.
+🔑 **Es exactamente el mismo resultado que dio la edad el 15/8, y por el mismo motivo:** el
+puntaje sube ~0,06 por día cerca del umbral y el salto diario se come la diferencia. **Si alguna
+vez hace falta que mueva el día, la perilla es `diasExigidos` en `evaluar.ts`, no este
+corrimiento.**
+📌 **Su valor real no es adelantar el aviso: es que el sistema deje de suponer un horario que no
+conoce.** De ahí salió —de la corrección del 16/8, cuando el asistente afirmaba que la madrugada
+«desordena el descanso»—, y ahí es donde sirve: en el asistente y en la escalada.
+
+### ✅ Los números del motor, re-verificados el 17/8
+
+**Normal y cambio leve nunca hablan · persistente `atencion` el 14 y HABLA el 20 · evasión HABLA
+el 12 · persistente con cuestionario alto habla el 17.**
+
+⚠ **Si alguna nota vieja dice que el persistente habla el 17, está desactualizada** — son los
+números del 14/8, de antes de la rampa de confianza. Este archivo y `docs/presentacion/serie.json`
+siempre tuvieron el 20 bien, **así que el PDF que circuló está bien.**
 
 ### 🗺 El mapa, para no buscar
 
-**Pantallas** — `/` es la consola de demostración (la home ES la demo) · `/entrar` + `/mi-familia`
-es el panel de los padres · `/panel` es la administración.
+**Pantallas** — `/` es la consola de demostración (la home ES la demo) · `/entrar` es la puerta
+**y el registro** · `/alta` es el recorrido de alta · `/mi-familia` es el panel de los padres ·
+`/panel` es la administración.
 
 | Dónde | Qué hay |
 |---|---|
@@ -36,6 +117,7 @@ es el panel de los padres · `/panel` es la administración.
 | `src/lib/mensajeria/` | **Entrega.** Telegram, correo, WhatsApp y el transporte de ensayo. `avisar.ts` decide a quién |
 | `src/lib/instalacion.ts` | **Qué instala la familia** y en qué aparato (17/8) |
 | `src/lib/limite.ts` | **El límite de frecuencia**, en Postgres (17/8) |
+| `src/app/alta/` | **El recorrido de alta** (17/8). `Recorrido.tsx` son las cinco pantallas |
 | `src/lib/observatorio/` | Estadística propia con *lift*. Anda; falta contarlo, no construirlo |
 | `*.prueba.ts` | Las tres tandas. Se corren con `npm run probar` |
 
@@ -80,6 +162,10 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
   ⚠ **Carla ya NO tiene cuenta** — es la referente, y desde el 17/8 el referente no entra al panel.
   Es la familia **inventada**: Ana, Mariana y Carla no existen.
 - **Panel de administración:** `ADMIN_EMAIL` con `ADMIN_PASSWORD`, los dos en `.env.local`.
+- 🔑 **Y desde el recorrido, cualquiera se hace la suya en `/entrar`.** Es lo que va a hacer el
+  jurado. ⚠ **Eso escribe en la Supabase de producción**: cada prueba deja una familia de verdad.
+  Las tres del 17/8 se borraron (`delete from familias where id = …`, que cascadea a chicos,
+  adultos y usuarios). **Conviene revisar antes de grabar** que no haya quedado basura.
 
 ### Qué pasó el 17/8, en orden
 
@@ -92,19 +178,13 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
    → sección «LA INSTALACIÓN».
 4. **✅ Dos tandas de pruebas nuevas**, `probar-sugerencias` y `probar-instalacion`, por la misma
    regla de siempre: cada regla entra con su caso que pasa y su caso que se frena.
+5. **✅ El recorrido de alta**, con `probar-turno` — la quinta tanda. → bloque de arriba.
 
 ### ⬜ Lo que sigue, en este orden
 
-1. **El alta desde el panel.** Es lo próximo y es lo más grande que queda. Hoy una familia entra
-   por API, y **el alta no crea ninguna cuenta**, así que queda afuera de su propio panel.
-   Ahora tiene que resolver, todo junto:
-   - 🔴 **Crear la credencial del hogar** en `usuarios` (`familia_id` + `hogar`).
-   - 🔴 **Preguntar si el chico vive en una casa o en dos.** Esa pregunta ordena el formulario
-     entero: con dos, son dos credenciales de la misma familia.
-   - 🔴 **El rol de cada adulto** — progenitor o referente. No se deduce del parentesco.
-   - 🔴 **El contexto del chico** — el turno escolar, que corre la hora de la madrugada igual que
-     la edad. Ver «EL CONTEXTO DEL CHICO».
-   - 🔴 **Mostrar la instalación** y en qué aparato. Ya está construida, hay que engancharla.
+1. ~~**El alta desde el panel.**~~ ✅ **HECHO el 17/8**, y no quedó «desde el panel»: la familia se
+   da de alta sola, en un recorrido de pantallas. Ver el bloque «EL RECORRIDO DE ALTA» arriba, que
+   incluye lo que quedó pendiente de él.
 2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    ⚠ **Él pidió ir despacio**, textual: *"con el cuestionario vamos despacio"*. No resolverlo de
    un saque. 🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que

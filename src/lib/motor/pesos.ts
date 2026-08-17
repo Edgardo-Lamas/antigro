@@ -17,7 +17,7 @@
  */
 
 import type { TipoDeSenal } from "@/lib/senales/tipos";
-import type { Genero } from "@/lib/datos/tipos";
+import type { Genero, TurnoEscolar } from "@/lib/datos/tipos";
 
 /* ── Peso por tipo de señal ──────────────────────────────────────────────── */
 
@@ -126,15 +126,67 @@ export function factorEdad(edad: number): number {
  */
 
 /**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL TURNO ESCOLAR CORRE LA MISMA HORA QUE LA EDAD (17/8)
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **No es una mejora: es la reparación de algo que el sistema afirmaba sin
+ * saberlo.** El 16/8 el asistente decía que la madrugada «desordena el
+ * descanso», y Edgardo lo volteó: **el sistema no sabe a qué hora se levanta
+ * ese chico.** Uno que entra al colegio a las 7:30 y otro que entra a las 13
+ * no están haciendo lo mismo a las 23:30.
+ *
+ * 🔑 **Se enchufa en el mecanismo que ya existe y ya está probado.** La edad
+ * corre esta misma hora, y el turno la corre un escalón más — para el mismo
+ * lado o para el contrario, según de qué turno se trate.
+ *
+ * ⚠ **Esto es criterio de producto, no un dato, y no se cita como si lo fuera.**
+ * A diferencia del corrimiento de fase de la adolescencia —que tiene fuente
+ * clínica y está arriba—, acá no hay estudio que diga cuánto corre un turno
+ * tarde. Una hora es lo mínimo que se puede mover sin que el cambio sea
+ * decorativo, y lo máximo que se puede mover sin inventar precisión.
+ *
+ * 🔴 **Y nunca apaga la madrugada.** El corrimiento es de una hora, el piso de
+ * `factorMadrugada` sigue en 0,55, y el techo está topado: ningún turno puede
+ * empujar la referencia más allá de las 2 de la mañana. Un chico conectado a
+ * las 3, todas las noches, sigue siendo señal vaya al turno que vaya.
+ */
+const CORRIMIENTO_POR_TURNO: Record<TurnoEscolar, number> = {
+  /* Se levanta temprano: a las 23 ya le está sacando horas al sueño. */
+  manana: -1,
+  /* Puede dormir a la mañana, así que a las 23 todavía no significa lo mismo. */
+  tarde: +1,
+  /* Doble turno entra temprano igual: manda la hora a la que se levanta. */
+  doble: -1,
+  /* Vuelve del colegio de noche: a las 23 recién está llegando a la casa. */
+  noche: +1,
+  /* Sin colegio no hay hora de levantarse que el sistema pueda suponer, así
+     que no se mueve nada. 📌 No es lo mismo que no contestar: es contestar que
+     no hay horario, y el sistema deja de imaginarse uno. */
+  no_va: 0,
+};
+
+/** Ningún turno corre la referencia más allá de las 02:00. */
+const TOPE_REFERENCIA = 26;
+/** Ni más acá de las 21:00. */
+const PISO_REFERENCIA = 21;
+
+/**
  * A partir de qué hora estar conectado ya no se explica por la edad.
  * 📌 Los cortes son decisión de producto, informados por el corrimiento de fase
  * de ~2 h documentado arriba. Devuelve la hora en formato 24 h.
+ *
+ * @param turno Si se sabe a qué turno va. Sin esto se comporta igual que antes.
  */
-export function horaDeReferencia(edad: number): number {
-  if (edad <= 10) return 22;
-  if (edad <= 13) return 23;
-  if (edad <= 15) return 24;
-  return 25; // 01:00 del día siguiente
+export function horaDeReferencia(edad: number, turno?: TurnoEscolar): number {
+  let hora: number;
+  if (edad <= 10) hora = 22;
+  else if (edad <= 13) hora = 23;
+  else if (edad <= 15) hora = 24;
+  else hora = 25; // 01:00 del día siguiente
+
+  if (turno) hora += CORRIMIENTO_POR_TURNO[turno];
+  return Math.min(TOPE_REFERENCIA, Math.max(PISO_REFERENCIA, hora));
 }
 
 /**
@@ -150,10 +202,10 @@ const PISO_MADRUGADA = 0.55;
 /** A cuántas horas pasadas la referencia el peso llega al máximo. */
 const HORAS_AL_MAXIMO = 4;
 
-export function factorMadrugada(edad: number, hora: number): number {
+export function factorMadrugada(edad: number, hora: number, turno?: TurnoEscolar): number {
   // La madrugada cruza la medianoche: 01:00 son las 25 del día anterior.
   const horaCorrida = hora <= 12 ? hora + 24 : hora;
-  const desvio = horaCorrida - horaDeReferencia(edad);
+  const desvio = horaCorrida - horaDeReferencia(edad, turno);
   if (desvio <= 0) return PISO_MADRUGADA;
   return Math.min(1, PISO_MADRUGADA + (desvio / HORAS_AL_MAXIMO) * (1 - PISO_MADRUGADA));
 }

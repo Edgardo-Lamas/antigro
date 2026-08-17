@@ -38,12 +38,95 @@ export interface Vinculacion {
   familiaId: string;
 }
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL RECORRIDO DE ALTA — el hogar se crea ANTES que los datos (17/8)
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔑 **Son dos momentos distintos y por eso son dos métodos.** Edgardo describió
+ * la secuencia entera: *"accede al enlace, llega al panel de logueo, crea
+ * credenciales, y accede al mismo recorrido pero sin pagar. Ve el simulador y
+ * luego la carga de datos"*. Primero existe la puerta; después, adentro, se
+ * carga quién vive en la casa.
+ *
+ * 🔴 **Y resuelve el agujero que dejó la auditoría del 17/8.** Hasta hoy el alta
+ * creaba la familia, los chicos y los adultos, pero **ninguna cuenta**: una
+ * familia dada de alta quedaba afuera de su propio panel. La credencial dejó de
+ * ser algo que se siembra a mano.
+ *
+ * 📌 En producción esto va después del pago. Hoy no se cobra —está decidido— y
+ * el recorrido lo dice en pantalla en vez de simular un cobro que no existe.
+ */
+export interface AltaDeHogar {
+  /**
+   * 🔴 Con qué entra la casa. **Es del hogar, no de una persona**: los dos
+   * progenitores usan la misma. Ver `Hogar` en `tipos.ts`.
+   */
+  email: string;
+  /** En claro. El repositorio la cifra; no viaja ni se guarda así. */
+  clave: string;
+  /** Cómo se llama esta casa. `null` cuando hay una sola, que es lo normal. */
+  hogar?: string | null;
+  /**
+   * 🔑 A qué familia se suma esta puerta. **Sin esto se crea una familia
+   * nueva; con esto se agrega la SEGUNDA casa** de padres separados — un solo
+   * panel, dos puertas, y ninguno puede dejar al otro afuera.
+   */
+  familiaId?: string;
+  /** Cómo se llama la familia. Sólo cuando se está creando. */
+  nombreDeLaFamilia?: string;
+}
+
+/**
+ * Cómo salió el alta de un hogar.
+ *
+ * 🔴 **El fracaso se nombra, no se tira una excepción genérica.** Cada uno de
+ * estos casos se le cuenta distinto al que está del otro lado, y confundirlos
+ * es lo que hace que alguien se quede trabado sin saber por qué.
+ */
+export type ResultadoDeAlta =
+  | { ok: true; familia: Familia; usuarioId: string }
+  /** Ya hay una cuenta con ese correo. */
+  | { ok: false; motivo: "email_tomado" }
+  /** Esa casa ya tiene su puerta. Dos claves en un hogar no existen. */
+  | { ok: false; motivo: "hogar_ocupado" }
+  /**
+   * 🔴 Modo demo: sin Supabase no hay dónde guardar una cuenta que sobreviva al
+   * próximo pedido. **No se finge que anduvo.** El sistema entero corre sin
+   * base y lo dice en pantalla; esto es lo único que de verdad la necesita.
+   */
+  | { ok: false; motivo: "sin_base" };
+
+/** Lo que se carga adentro del recorrido, ya con la puerta creada. */
+export interface DatosDeLaFamilia {
+  /** Cómo se llama la familia. Se puede corregir acá. */
+  nombre?: string;
+  chicos: AltaDeFamilia["chicos"];
+  adultos: AltaDeFamilia["adultos"];
+}
+
 export interface Repositorio {
   readonly clase: "supabase" | "memoria";
 
   /* Familias */
   crearFamilia(alta: AltaDeFamilia): Promise<FamiliaCompleta>;
   familiaPorToken(token: string): Promise<FamiliaCompleta | null>;
+
+  /**
+   * Crea la puerta de una casa: la familia si no existe, y la credencial.
+   * Ver `AltaDeHogar` — es el primer paso del recorrido, antes de los datos.
+   */
+  crearHogar(alta: AltaDeHogar): Promise<ResultadoDeAlta>;
+
+  /**
+   * Carga el chico y los adultos de una familia que ya tiene puerta.
+   *
+   * 🔴 **Reemplaza lo que había, no acumula.** El recorrido se puede rehacer
+   * —alguien se equivoca en la edad y vuelve atrás— y si esto sumara, la
+   * segunda pasada dejaría dos chicos. Los adultos que ya estaban se dan de
+   * baja blanda, nunca se borran: sus observaciones son entrada del motor.
+   */
+  cargarDatosDeLaFamilia(familiaId: string, datos: DatosDeLaFamilia): Promise<FamiliaCompleta>;
 
   /**
    * Por id, que es como la busca el panel de la familia.

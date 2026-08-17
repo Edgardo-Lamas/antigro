@@ -33,6 +33,8 @@ export default auth((req) => {
   const enLoginDelPanel = ruta === "/panel/login";
   const enMiFamilia = ruta.startsWith("/mi-familia");
   const enEntrar = ruta === "/entrar";
+  /** El recorrido de alta: ya hay credencial, falta quién vive en la casa. */
+  const enAlta = ruta.startsWith("/alta");
 
   /* ── Las dos pantallas de logueo ──────────────────────────────────────── */
   // Ya con sesión abierta, ninguna de las dos tiene sentido: va a su casa.
@@ -51,10 +53,26 @@ export default auth((req) => {
     if (!sesion) return NextResponse.redirect(new URL("/entrar", req.url));
     if (rol !== "adulto") return NextResponse.redirect(new URL("/panel", req.url));
   }
+
+  /* ── El recorrido de alta ─────────────────────────────────────────────── */
+  /* 🔑 Misma regla que el panel: es de la familia, no de la administración. Un
+     `admin` no pertenece a ninguna familia, así que acá no tiene qué cargar. */
+  if (enAlta) {
+    if (!sesion) return NextResponse.redirect(new URL("/entrar", req.url));
+    if (rol !== "adulto") return NextResponse.redirect(new URL("/panel", req.url));
+  }
 });
 
 // ⚠ `/panel/:path*` por sí solo NO cubre `/panel`. Van los dos, y lo mismo
 //   vale para `/mi-familia`.
 export const config = {
-  matcher: ["/panel", "/panel/:path*", "/mi-familia", "/mi-familia/:path*", "/entrar"],
+  matcher: [
+    "/panel",
+    "/panel/:path*",
+    "/mi-familia",
+    "/mi-familia/:path*",
+    "/entrar",
+    "/alta",
+    "/alta/:path*",
+  ],
 };
