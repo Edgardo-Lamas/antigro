@@ -117,9 +117,13 @@ pausado; el de producción es `xlwgwpojbmakzmlrzgmw`, el del Marketplace—. Lo 
 `POSTGRES_URL_NON_POOLING` de `.env.local`, con `pg`. ⚠ Hay que **sacarle el `?sslmode=require`**
 a la cadena: `pg` lo trata como `verify-full` y falla contra el certificado de Supabase.
 
-⚠ **Queda una sola cosa, y es de él: borrar `.env.local.respaldo-16-08`.** Está fuera de git y
-nunca se filtró, pero es una copia entera de los secretos en el Escritorio y, después de la
-rotación, con claves viejas adentro.
+✅ **`.env.local.respaldo-16-08` borrado.** Antes se comprobó que no se perdía nada: ninguna
+variable existía sólo ahí, y de las 13 había 9 idénticas. Las 4 que diferían estaban todas
+muertas — la clave publicada, `VERCEL_OIDC_TOKEN` (se renueva solo) y las dos de Supabase, que
+📌 **apuntaban a `aqfqfhptwvkpavstjohn`**: el respaldo era la configuración de antes de
+provisionar por el Marketplace. Es el mismo proyecto abandonado que ve el MCP.
+
+**No queda nada pendiente de la auditoría.**
 
 📌 **El build tira un aviso, es previo a la auditoría y es inofensivo:** `bcryptjs` carga `crypto`,
 que el Edge Runtime no soporta, y el middleware arrastra `auth.ts` entero. **No se ejecuta nunca
