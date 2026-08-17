@@ -194,10 +194,13 @@ export default async function Home() {
       </section>
 
       <footer className="mt-12 flex flex-wrap items-baseline justify-between gap-3 border-t border-borde pt-6">
+        {/* 🔴 Reescrito el 17/8, misma corrección que en la consola y en la
+            guía: «el motor», «un control» y «la IA» son palabras nuestras, no
+            del padre que las lee. */}
         <p className="max-w-3xl text-xs leading-relaxed text-apagado">
-          El motor decide con el registro fechado, la IA lo pone en palabras y un control revisa lo
-          que escribió antes de que salga. Si el control no lo aprueba, sale un texto fijo escrito
-          de antemano.
+          Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia artificial
+          sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que
+          el sistema no pueda sostener. Si no pasa esa revisión, sale un texto escrito de antemano.
         </p>
 
         {/* 🔑 El sello de versión, y no es un adorno de programador.

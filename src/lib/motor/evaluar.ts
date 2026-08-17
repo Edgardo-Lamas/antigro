@@ -503,10 +503,18 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
        contra la EDAD (ver `factorMadrugada`). Y eso importa justamente cuando
        el chico ya venía siendo acosado antes del alta: ahí su historia trae el
        problema adentro y una lectura que sólo mire cambios no lo ve nunca. */
+    /* 🔴 Reescrito el 17/8. Decía «la actividad en horarios que para su edad
+       son de madrugada», y Edgardo lo frenó: *"habíamos dicho que hay muchas
+       razones por las que un chico está despierto a la madrugada"*. Dicho así,
+       enumerado como una de las cosas que el sistema mira, suena a que estar
+       despierto de noche ES el hallazgo — y no lo es: es un hecho más del
+       registro, que sólo pesa cuando se repite.
+       🔑 «A qué hora hubo actividad» dice exactamente lo mismo de lo que el
+       sistema hace, sin colgarle una conclusión que no saca. */
     porQue.push(
-      "Lo que sí mira desde el primer día, sin depender de nada de esto: la actividad en horarios " +
-        "que para su edad son de madrugada, y los intentos de saltar el filtro. Ninguna de las dos " +
-        "se compara contra su historia, así que valen igual desde el primer día.",
+      "Lo que sí mira desde el primer día, sin depender de nada de esto: a qué hora hubo " +
+        "actividad, y los intentos de saltar el filtro. Ninguna de las dos se compara contra su " +
+        "historia, así que valen igual desde el primer día.",
     );
   }
 

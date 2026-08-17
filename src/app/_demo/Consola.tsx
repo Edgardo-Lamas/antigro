@@ -313,11 +313,18 @@ export default function Consola() {
           </button>
         </div>
 
+        {/* 🔴 Reescrito el 17/8. Decía «los textos los escribe un modelo de
+            lenguaje… pasa por un control automático». Edgardo lo frenó con una
+            pregunta sin vuelta: *"¿qué puede saber el usuario/padres de qué es
+            «modelo» y de controles automáticos?"*. Nada — y ésta es la garantía
+            central del producto, así que no puede estar escrita en un idioma
+            que el que la necesita no habla. */}
         {!mensajes && !pidiendoMensajes && (
           <p className="mt-3 text-sm leading-relaxed text-apagado">
-            Los textos los escribe un modelo de lenguaje, pero el modelo no decide nada: decide el
-            motor con el registro fechado. Lo generado pasa por un control automático y, si no lo
-            aprueba, sale un texto fijo escrito de antemano.
+            Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia artificial
+            sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que
+            el sistema no pueda sostener. Si no pasa esa revisión, sale un texto escrito de
+            antemano.
           </p>
         )}
 

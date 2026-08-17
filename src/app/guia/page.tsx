@@ -116,9 +116,16 @@ export default function Guia() {
         bajada="Tres entradas, una lectura, dos salidas. Todo lo que sigue se puede ver funcionando en la pantalla principal, sin registrarse."
       >
         <div className="flex flex-col gap-3">
+          {/* 🔴 Reescrito el 17/8. Decía «actividad en horarios que para su
+              edad son de madrugada», y Edgardo lo frenó: *"habíamos dicho que
+              hay muchas razones por las que un chico está despierto a la
+              madrugada"*. Enumerarla así, seca y al lado de las otras, la deja
+              sonando como si estar despierto de noche fuera en sí mismo un
+              indicio — y no lo es. Lo que la hace significar algo es que se
+              repita, y eso hay que decirlo en la misma frase o no decirlo. */}
           <Ficha
             que="Mira la actividad de red del chico, no su contenido"
-            detalle="Volumen fuera de lo habitual, actividad en horarios que para su edad son de madrugada, plataformas nuevas, e intentos de saltar el filtro. Nunca el texto."
+            detalle="Cuánto, a qué hora, hacia qué tipo de sitio, y si aparecieron intentos de saltar el filtro. Nunca el texto. Y ninguno de esos hechos significa nada por separado: un chico despierto de noche puede estar jugando, de vacaciones o durmiendo mal, y el sistema no tiene forma de saber cuál es."
           />
           <Ficha
             que="No alerta por un evento: alerta por persistencia"
@@ -128,9 +135,20 @@ export default function Guia() {
             que="Aprende a este chico, no a un chico promedio"
             detalle="Arma un perfil con toda la historia disponible y compara contra su propia conducta previa. Cuanto más tiempo lleva conectado, más ve. Y dos señales —madrugada y evasión del filtro— no se comparan contra nada, así que valen desde el primer día."
           />
+          {/* 🔴 **Faltaba, y lo marcó Edgardo el 17/8:** *"el sistema hace
+              análisis de datos… y razonamiento basado en datos de psicología,
+              patrones de ataque de los depredadores que proporcionan organismos
+              específicos, que debemos mencionarlos"*. El modelo estaba
+              construido desde el 15/8 (`modus-operandi.ts`) y la guía no lo
+              nombraba: es lo que separa mirar la sombra del chico de reconocer
+              la secuencia del que ataca. */}
+          <Ficha
+            que="Mira al agresor, no sólo al chico"
+            detalle="El grooming no es un evento: es una secuencia con etapas, descrita por el Sexual Grooming Model. El sistema no diagnostica una etapa —no puede—, pero sabe qué huella dejaría cada una en la red y reconoce la secuencia a mitad de camino."
+          />
           <Ficha
             que="Cruza lo que la red no puede ver"
-            detalle="Nueve preguntas a los adultos sobre hechos que ellos observan y una red jamás vería. Es la segunda entrada, y puede adelantar el aviso."
+            detalle="Nueve preguntas a los adultos sobre hechos que ellos observan y una red jamás vería. Cada pregunta declara de dónde sale, y ninguna se presenta como indicador validado si no lo es."
           />
           <Ficha
             que="Le escribe a los adultos Y al propio chico"
@@ -138,7 +156,7 @@ export default function Guia() {
           />
           <Ficha
             que="Un asistente que acompaña a los adultos"
-            detalle="Explica el informe, ordena las opciones y dice cómo abrir la conversación. Un control automático revisa cada respuesta antes de que salga; si no la aprueba, sale un texto fijo escrito de antemano."
+            detalle="Explica el informe, ordena las opciones y dice cómo abrir la conversación. Cada respuesta se revisa antes de que la leas: no puede decirte que no es nada, ni que sí, ni estimar qué tan probable es — eso no lo puede saber, y decírtelo sería mentirte con cara de sistema."
           />
           <Ficha
             que="El chico sabe que existe, desde el minuto cero"
@@ -166,14 +184,25 @@ export default function Guia() {
               "No ve lo que pasa dentro de WhatsApp.",
               "Va cifrado, y ahí está el 74,3% de los casos. El sistema lo dice en cada informe en vez de disimularlo.",
             ],
+            /* 🔴 Reescrito el 17/8. Decía «decide el motor con el registro
+               fechado, el modelo sólo escribe el texto y un control automático
+               lo revisa». Lo volteó Edgardo con una pregunta que no tiene
+               vuelta: *"¿qué puede saber el usuario/padres de qué es «modelo» y
+               de controles automáticos?"*. Nada. Y la garantía más importante
+               del producto no puede estar escrita en un idioma que el que la
+               necesita no habla. */
             [
               "La inteligencia artificial no decide nada.",
-              "Decide el motor, con el registro fechado. El modelo sólo escribe el texto, y un control automático lo revisa antes de que salga.",
+              "Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia artificial sólo lo pone en palabras. Y antes de que ese texto le llegue a nadie, se revisa que no diga nada que el sistema no pueda sostener; si no pasa esa revisión, sale un texto escrito de antemano.",
             ],
-            [
-              "No sabe los horarios de esa casa si nadie se los cuenta.",
-              "Por eso el alta pregunta el turno escolar. Sin ese dato, el sistema no supone un horario — y no afirma nada sobre el descanso del chico.",
-            ],
+            /* 🔴 Acá había un ítem sobre el turno escolar y el descanso del
+               chico. **Lo sacó Edgardo el 17/8** y el motivo es de producto, no
+               de redacción: *"da la idea de que el sistema se dedica a
+               establecer si el chico descansa o no… lleva a que los padres
+               piensen que esto tiene que ver con el grooming"*.
+               🔑 El turno escolar es un dato NUESTRO, que usamos como contexto
+               para armar el perfil. No se le explica al padre como si fuera una
+               función del producto. */
             [
               "No es prueba judicial.",
               "Es una cronología de qué se vio y en qué días, que puede ordenar una denuncia. La denuncia se hace en la Justicia.",
@@ -225,10 +254,16 @@ export default function Guia() {
             que="Un informe para que el padre pueda denunciar"
             detalle="Lo que lo haría útil no es una conclusión —el sistema no afirma— sino el registro fechado: qué se vio, en qué días, y qué explícitamente no se puede ver."
           />
-          <Ficha
-            que="El mismo motor para bullying"
-            detalle="La arquitectura transfiere y está construida así desde el primer día. Los números no: salen de estudios de grooming, y el bullying pasa en buena parte en la escuela, donde la red no ve nada. Por eso hoy AntiGro no dice que haga esto."
-          />
+          {/* 🔴 **ACÁ HABÍA UNA FICHA SOBRE BULLYING Y LA SACÓ EDGARDO EL 17/8.**
+              Textual: *"metiste bullying y sólo te había hecho una consulta que
+              era para entorno"*. Tiene razón y yo tenía la decisión escrita:
+              **el PDF de presentación no menciona bullying a propósito**, y esa
+              decisión no había cambiado. Una consulta suya para entender el
+              terreno no es una línea de producto.
+              🔴 **No volver a ponerla** sin que él lo pida: hoy no hay fuente
+              que respalde transferir los pesos —salen de estudios de grooming—
+              y el bullying pasa en buena parte en la escuela, donde la red no
+              ve nada. */}
         </div>
       </Seccion>
 
@@ -270,6 +305,53 @@ export default function Guia() {
               <li>· La franja más vulnerable es de 9 a 13 años.</li>
               <li>· 33,3% recibió una propuesta de «ser novio o novia» dentro de un juego.</li>
             </ul>
+          </div>
+
+          {/* 🔴 Este bloque faltaba y es el que sostiene «mira al agresor». Sin
+              él, el razonamiento sobre las etapas parecería nuestro. */}
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Cómo ataca un agresor — el modelo de las cinco etapas
+            </p>
+            <p className="mt-1 text-xs text-apagado">
+              Sexual Grooming Model (SGM) — Winters &amp; Jeglic, 2017; ampliado con una quinta
+              etapa por Winters y col., 2020
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tenue">
+              Es un modelo con <strong className="text-tinta">validez de contenido establecida
+              por un panel de expertos</strong>, que describe 77 conductas agrupadas en cinco
+              etapas: selección de la víctima · obtener acceso y aislarla · desarrollo de la
+              confianza · desensibilización · mantenimiento posterior. Sobre él se construyó la{" "}
+              <em>Sexual Grooming Scale – Victim Version</em>, puesta a prueba con 115 víctimas
+              adultas.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tenue">
+              AntiGro no lo usa para diagnosticar una etapa —para eso habría que leer las
+              conversaciones, y no se leen—. Lo usa al revés:{" "}
+              <strong className="text-tinta">
+                para saber qué huella dejaría cada etapa en la red
+              </strong>{" "}
+              y poder decir «lo que se ve encaja con esta forma», que es distinto de «esto está
+              pasando».
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Qué le preguntamos a los adultos, y por qué esa pregunta
+            </p>
+            <p className="mt-1 text-xs text-apagado">
+              Ministerio Público de la Provincia de Buenos Aires — Procuración General de la SCBA
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tenue">
+              Recomienda a los adultos observar cambios de humor y de horarios de conexión. Es una
+              recomendación de un organismo oficial,{" "}
+              <strong className="text-tinta">sin una cifra detrás</strong>, y el sistema la trata
+              como tal: vale más que nuestra intuición y menos que un porcentaje. Cada pregunta del
+              cuestionario declara si se apoya en un estudio, en la recomendación de un organismo,
+              o si es simplemente un hecho observable que le pedimos al adulto que mire{" "}
+              <strong className="text-tinta">sin afirmar que ese hecho signifique grooming</strong>.
+            </p>
           </div>
 
           <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
