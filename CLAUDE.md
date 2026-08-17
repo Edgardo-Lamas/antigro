@@ -100,13 +100,73 @@ NO la dispara.** Acá el riesgo es el de siempre con el signo cambiado — una s
 cuando no corresponde le está diciendo a una familia que está incompleta. `npm run probar` corre
 las dos tandas.
 
-### ⬜ Lo que queda de esta conversación
+---
 
-1. **La instalación del filtro en el alta.** Los archivos de Red Familiar se reusan tal cual; lo
-   que falta es **dónde y cómo se le explica a la familia**, y en qué aparato. Hoy AntiGro no lo
-   dice en ningún lado — es el hueco marcado el 15/8 («sí hay que instalar algo»).
-2. **El alta desde el panel**, que sigue siendo lo próximo, y ahora con más carga: crear la cuenta
-   del hogar, preguntar si el chico vive en una casa o en dos, y cargar el rol de cada adulto.
+## 📡 LA INSTALACIÓN — hecha el 17/8, y cierra el hueco del 15/8
+
+✅ En producción: `/api/mi-familia/instalacion` y la sección «Cómo queda andando» del panel.
+✅ `npm run probar-instalacion`, 27 comprobaciones.
+
+**Hasta hoy AntiGro no le decía a la familia que había algo que instalar.** El sistema entero se
+apoya en ver la actividad de red del chico, y nadie le explicaba cómo hacer que la vea.
+
+### 🔴 Va en el APARATO del chico, no en el router — y no es una preferencia
+
+El router **no ve datos móviles**. La madrugada es una de las dos únicas señales absolutas del
+motor, y un chico a las 3 de la mañana está tanto en el WiFi como en su plan de datos.
+
+⚠ **Instalado sólo en el router, AntiGro queda ciego a la hora que más significa y NI SE ENTERA:**
+no recibir nada se lee exactamente igual que estar todo tranquilo. Por eso la advertencia del
+router es el texto más importante de `instalacion.ts`, y el router va **último** en la lista — es
+el lugar donde la gente lo pondría por instinto, y es el peor.
+
+### 🔴 De Red Familiar se hereda la MECÁNICA, no el contenido
+
+Corrección de lo que yo había dicho: sus cuatro archivos (`rodos-3/public/tools/`) **apuntan a
+Cloudflare Family** (`1.1.1.3`), no a NextDNS — eran las herramientas gratuitas de la landing.
+Cloudflare Family filtra bien y **no reporta nada**, así que para AntiGro no sirve: el motor no
+lee lo que se bloqueó, lee lo que pasó. Lo aprovechable es la forma, que está bien.
+
+### 🔴 Los endpoints, verificados contra la fuente y NO de memoria
+
+| Para | Formato | Fuente |
+|---|---|---|
+| Apple (`.mobileconfig`) | `https://dns.nextdns.io/<id>` — el id en la **ruta** | apple.nextdns.io |
+| Android (DNS privado) | `<id>.dns.nextdns.io` — el id de **subdominio** | help.nextdns.io |
+
+⚠ **Son al revés uno del otro**, y por eso hay pruebas letra por letra: un DNS mal escrito **no da
+error**. El aparato pregunta a otro lado, la familia queda creyendo que está protegida y el motor
+no recibe una sola señal.
+
+### 🔑 Todo camino termina en la comprobación
+
+`https://test.nextdns.io/` devuelve `{"status":"unconfigured"}` o el id del perfil. **Es un paso de
+la instalación, no un consejo del final**, justamente porque el fallo es silencioso.
+
+### 📌 Decisiones que conviene no revertir sin pensarlas
+
+- **El orden del texto:** primero qué NO es (no se instala una app, no se leen mensajes), después
+  el paso técnico. Al revés, un padre siente que le piden poner un espía en el teléfono del hijo.
+  Contado así, **la instalación misma es la regla 3 vuelta un acto concreto**.
+- **`PayloadRemovalDisallowed` va en `false`.** Trabarlo desde el perfil no sirve —se saca
+  reseteando— y contradice la regla 3. Si la familia quiere trabarlo, es Screen Time, y es una
+  decisión de ellos.
+- **La etiqueta del aparato NUNCA lleva el nombre del chico.** Viaja a un tercero; con «telefono»
+  alcanza. Hay una prueba que lo comprueba.
+- **Los UUID del perfil son estables:** si cambiaran en cada descarga, los perfiles se apilarían
+  en el iPhone en vez de reemplazarse.
+- **Sin `nextdnsProfileId` no se entrega archivo** (409) y la pantalla dice por qué. Un archivo con
+  identificador vacío daría una instalación que parece hecha y no reporta nada.
+
+### ⬜ Lo que queda
+
+1. **Engancharlo al alta**, cuando el alta exista: hoy vive en el panel, que es donde una familia
+   ya adentro lo va a buscar.
+2. **La cuenta de NextDNS.** Sin perfil real no hay nada que instalar de verdad — hoy la pantalla
+   lo dice con todas las letras en vez de disimularlo.
+3. **El alta desde el panel**, que sigue siendo lo próximo, y ahora con más carga: crear la cuenta
+   del hogar, preguntar si el chico vive en una casa o en dos, cargar el rol de cada adulto y
+   mostrar esta instalación.
 
 ---
 
