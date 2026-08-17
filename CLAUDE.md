@@ -18,6 +18,7 @@ estadísticas oficiales sobre qué pesa cuánto.
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
+| **En producción** | `85cbe69`, promovido y verificado el 17/8 |
 | **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour |
 
 ### ✅ EL RECORRIDO DE ALTA — hecho al final del 17/8
