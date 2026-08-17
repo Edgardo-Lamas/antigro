@@ -9,6 +9,107 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
+## 🏠 EL HOGAR — rediseño del 17/8, y deja atrás varias cosas del 16
+
+**Lo trajo Edgardo entero, corrigiendo el modelo que habíamos construido el día anterior.**
+✅ En producción y verificado. Migración aplicada, `npm run probar` en verde.
+
+### 🔴 Las cuatro correcciones, con sus palabras
+
+| Lo que estaba | Lo que es ahora |
+|---|---|
+| Una cuenta por adulto | **Una clave por HOGAR** |
+| La charla del asistente, de cada adulto | **De la familia: entre padres no hay nada separado** |
+| El referente con acceso al panel | **Afuera del panel.** Recibe avisos y sabe que está |
+| Mínimo dos adultos, exigido | **Nada obligatorio: se sugiere, con el porqué** |
+
+1. **No hay privacidad entre padres.** *"Es el hijo, los dos son igual de responsables, los dos
+   van a querer saber cómo está. Es una locura pensar privacidad entre padres."*
+   ⚠ Yo había leído mal «privado de los padres» como privacidad *entre* ellos. Es **frente al
+   referente**. Sobre esa lectura equivocada armé toda una distinción; se cayó entera.
+2. **Una clave por casa.** *"En la práctica los padres no van a aceptar tener cada uno una clave
+   diferente, es decirles que cada uno se maneja por separado."*
+   🔑 Y hay una razón más dura que la fricción: **una clave que los dos conocen no protege nada.**
+   Sostener la charla privada era prometer algo que el sistema no podía cumplir.
+3. **El referente no entra al panel**, pero *"sí debe saber que es parte del sistema"*.
+4. **Nada se exige.** *"Tampoco podemos exigir padres y referentes, siempre sugerimos."*
+
+📌 Y la frase que ordena todo: *"no podemos pensar que solo existe un solo escenario: dos padres
+y un referente"*.
+
+### 🔑 Padres separados: UN panel con DOS puertas
+
+*"No puede haber dos panel, uno en cada casa. Es un solo panel con acceso en cada casa."*
+
+Dos filas en `usuarios` de la **misma** familia, con distinto `hogar`. Ven exactamente lo mismo
+—alertas, informe, charla—; lo único que se duplica es la entrada. ⚠ Y eso resuelve algo que una
+clave compartida entre separados no resuelve: **ninguno puede dejar al otro afuera cambiándola.**
+
+📌 `hogar` en `null` **no es un dato faltante**: es la casa única, que es el caso normal.
+
+### ✅ Lo que arregló de paso: dos carteles que mentían
+
+- **A un hogar con un solo progenitor le decía «hacen falta al menos 2 adultos responsables».**
+  Es falso: esa familia no está incompleta. Ahora es una sugerencia con su porqué, en gris y no
+  en naranja de alerta, y **sólo aparece si además no hay referente**.
+- 🔴 **Y había un cartel imposible de apagar.** La regla vieja pedía que algún adulto tuviera la
+  marca «lo eligió el chico». Pero a los 8 años el referente lo eligen los padres —eso está
+  decidido y es correcto—, así que la marca va en `false` con todo derecho y la familia veía para
+  siempre un faltante que sólo se resolvía haciendo lo que a esa edad no corresponde.
+  **Un cartel que no se puede apagar entrena a ignorar los carteles.**
+
+### 🔑 El perfil de NextDNS pasó de la familia al CHICO
+
+Salió de la otra mitad de la conversación: *"si el sistema está activo en una casa (configurado el
+DNS) cuando vaya a la otra casa el sistema no va a funcionar"*.
+
+**Ya estaba resuelto en Red Familiar y las piezas están hechas.** De su `CLAUDE.md`:
+*"NextDNS — es la única opción que protege los celulares fuera del hogar. Pi-hole: cubre
+únicamente la red del hogar"*. En `rodos-3/public/tools/` hay `internet-segura-ios.mobileconfig`,
+`guia-android.html`, `internet-segura-windows.bat` y `guia-router.html`, más el bloqueo de
+desinstalación (Screen Time, Family Link, cuenta estándar).
+
+➡ **El filtro va en el DISPOSITIVO del chico, no en el router.** La instalación en el router es
+la que se rompe cuando el chico cambia de casa. La del aparato viaja con él.
+
+🔴 **Y arregla algo más grande que las dos casas:** el router no ve datos móviles, y ahí vive la
+señal de madrugada, que es una de las dos únicas absolutas. Con instalación sólo en el router el
+motor queda ciego a la hora que más significa, **y ni se entera**. En Red Familiar la protección
+fuera del hogar era el abono más caro; **acá no puede ser un extra, es el piso**.
+
+🔑 Si el filtro es del aparato del chico, el perfil es del chico. Colgado de la familia, dos
+hermanos compartían perfil y sus señales se mezclaban en una sola lectura.
+
+### 📌 Lo que cambió en la base y en el código
+
+- `adultos.rol` — `progenitor` | `referente`. **No se deduce del `vinculo`**: una abuela puede ser
+  la tutora y un padre puede ser el referente que eligió el chico.
+- `usuarios` cuelga de `familia_id` + `hogar`; se fue `adulto_id`. Índice único por casa.
+- `charlas.adulto_id` pasa a opcional y **no se filtra por él**.
+- `chicos.nextdns_profile_id`; la de `familias` quedó marcada en desuso.
+- `faltantesDeAlta` → `loQueImpideTrabajar` (sin chico, lo único duro) + `sugerenciasParaLaFamilia`.
+- ⚠ **La migración BORRA la cuenta de quien quedó como referente**, y eso ES el cambio, no un
+  efecto colateral. En la familia sembrada se llevó la de Carla. Frenó sola la primera vez, en el
+  índice único, al encontrar dos cuentas en la misma casa: se revirtió entera y se le agregó el
+  paso de consolidación.
+
+### ✅ `npm run probar-sugerencias` — 11 casos
+
+Misma regla que `probar-reglas`: **cada sugerencia entra con el caso que la dispara y el caso que
+NO la dispara.** Acá el riesgo es el de siempre con el signo cambiado — una sugerencia que aparece
+cuando no corresponde le está diciendo a una familia que está incompleta. `npm run probar` corre
+las dos tandas.
+
+### ⬜ Lo que queda de esta conversación
+
+1. **La instalación del filtro en el alta.** Los archivos de Red Familiar se reusan tal cual; lo
+   que falta es **dónde y cómo se le explica a la familia**, y en qué aparato. Hoy AntiGro no lo
+   dice en ningún lado — es el hueco marcado el 15/8 («sí hay que instalar algo»).
+2. **El alta desde el panel**, que sigue siendo lo próximo, y ahora con más carga: crear la cuenta
+   del hogar, preguntar si el chico vive en una casa o en dos, y cargar el rol de cada adulto.
+
+---
+
 ## 🔐 LA AUDITORÍA DEL 2026-08-17 — leer esto antes que nada
 
 La pidió Edgardo antes de seguir construyendo: *"qué te parece si hacemos una auditoría, debug,
@@ -210,11 +311,15 @@ la sección del asistente, más abajo. Lo que salió de ahí y no estaba previst
 
 ### ⬜ Lo que sigue, en este orden
 
-1. **El alta desde el panel.** Hoy una familia entra por API. **Acá arranca la próxima sesión** —
-   quedó dicho el 16/8 de noche: *"sí pero lo vemos en otra sesión"*.
-   🔑 Y ahora el alta carga algo más que nombre y edad: ver **el contexto del chico**, abajo.
-   🔴 **Y tiene que crear la cuenta de cada adulto en `usuarios`** — lo encontró la auditoría del
-   17/8: hoy el alta no crea ninguna, así que la familia queda afuera de su propio panel.
+1. **El alta desde el panel.** Hoy una familia entra por API. **Acá arranca la próxima sesión.**
+   🔑 Y ahora carga bastante más que nombre y edad — ver **el contexto del chico**, abajo, y la
+   sección del HOGAR arriba de todo:
+   - 🔴 **Tiene que crear la cuenta del hogar** en `usuarios`. Hoy no crea ninguna, así que una
+     familia dada de alta queda afuera de su propio panel.
+   - 🔴 **Preguntar si el chico vive en una casa o en dos.** Esa pregunta ordena el formulario
+     entero: con dos, se crean dos credenciales de la misma familia.
+   - 🔴 **El rol de cada adulto** (progenitor o referente), que no se deduce del parentesco.
+   - 🔴 **Qué hay que instalar y en qué aparato** — ver el perfil de NextDNS, arriba.
 2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    ⚠ **Él pidió ir despacio con esto**, textual: *"con el cuestionario vamos despacio, decidimos
    en un rato"*. No resolverlo de un saque.

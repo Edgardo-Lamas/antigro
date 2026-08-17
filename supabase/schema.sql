@@ -450,6 +450,30 @@ update usuarios u
  where u.adulto_id = a.id
    and u.familia_id is null;
 
+--  🔴 **El referente pierde la cuenta, y no es un daño colateral: es el cambio.**
+--  El panel es de los progenitores. Quien quedó como referente sigue en el
+--  sistema —recibe los avisos, sabe que está— pero no entra. En la familia
+--  sembrada esto se lleva puesta la cuenta de Carla, que es la tía.
+delete from usuarios u
+ using adultos a
+ where u.adulto_id = a.id
+   and a.rol = 'referente';
+
+--  ⚠ Y si todavía quedan dos credenciales en la misma casa, se deja una: la
+--  primera. Es lo que la migración se encontró al correr por primera vez, y
+--  frenó entera antes de tocar nada. Dos cuentas en un hogar ya no existen
+--  —*"sería en todo caso una cuenta y dos administradores"*—, así que
+--  consolidarlas ES la migración, no un efecto secundario.
+delete from usuarios u
+ where u.rol = 'adulto'
+   and exists (
+     select 1 from usuarios otro
+      where otro.rol = 'adulto'
+        and otro.familia_id = u.familia_id
+        and coalesce(otro.hogar, '') = coalesce(u.hogar, '')
+        and (otro.created_at, otro.id) < (u.created_at, u.id)
+   );
+
 --  Y se sueltan las reglas viejas antes de borrar la columna.
 drop index if exists usuarios_adulto_idx;
 alter table usuarios drop constraint if exists usuarios_adulto_coherente;
