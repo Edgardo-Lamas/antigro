@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { LogIn } from "lucide-react";
+import { BookOpen, LogIn } from "lucide-react";
 import { auth } from "@/auth";
 import { BAJADA, PRODUCTO } from "@/lib/config";
 import { hayBase } from "@/lib/supabase";
 import { estadoDeLasFuentes } from "@/lib/senales";
 import { estadoDeLosCanales } from "@/lib/mensajeria";
 import Consola from "./_demo/Consola";
+import Tour, { BotonDelTour } from "./_demo/Tour";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -76,7 +77,18 @@ export default async function Home() {
           —gris sobre gris, arriba de una página larga— y era invisible en la
           práctica aunque estuviera en el HTML. Esta es la puerta por la que
           entra todo el que ya es cliente: si hay que buscarla, está mal hecha. */}
-      <div className="flex justify-end pb-3">
+      <div className="flex flex-wrap justify-end gap-2 pb-3">
+        {/* 🔑 La guía al lado de la puerta, no escondida en el pie. El que
+            llega a evaluar el sistema en diez minutos necesita encontrarla
+            sin buscar — igual que el cliente necesita encontrar la puerta. */}
+        <BotonDelTour />
+        <Link
+          href="/guia"
+          className="flex items-center gap-2 rounded-md border border-borde px-4 py-2.5 text-sm font-medium text-tenue transition hover:border-acento hover:text-acento"
+        >
+          <BookOpen size={15} />
+          Guía
+        </Link>
         <Link
           href={puerta.destino}
           className="flex items-center gap-2 rounded-md border border-acento/60 bg-acentoSuave px-4 py-2.5 text-sm font-semibold text-acento transition hover:border-acento hover:bg-acento hover:text-fondo"
@@ -103,13 +115,16 @@ export default async function Home() {
       </header>
 
       <Consola />
+      {/* Los carteles cortos, paso a paso. Arranca solo la primera vez y no
+          vuelve; el botón de arriba lo trae de nuevo. */}
+      <Tour />
 
       {/* ── LO QUE HAY CONECTADO DETRÁS ──────────────────────────────────────
           🔑 Va al pie y no arriba: es la prueba de que la puerta a un filtro
           real está hecha, no la puerta de entrada al producto. Y dice cuándo
           algo NO está conectado, porque fingir una entrega sería lo peor que
           podría hacer un sistema que pide que se le crea. */}
-      <section className="mt-14">
+      <section id="tour-fuentes" className="mt-14">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
           Lo que hay conectado detrás
         </h2>

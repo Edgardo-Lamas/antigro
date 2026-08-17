@@ -18,7 +18,7 @@ estadísticas oficiales sobre qué pesa cuánto.
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
-| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno |
+| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour |
 
 ### ✅ EL RECORRIDO DE ALTA — hecho al final del 17/8
 
@@ -49,6 +49,12 @@ que todavía no vio funcionar. Se reusa `Consola` tal cual, que ya estaba verifi
 🔑 **La regla 4 dejó de ser la única sin implementar.** La conversación con el chico es la cuarta
 pantalla y va **antes** de la instalación a propósito. No hay nada que tildar: el sistema no puede
 comprobar que la charla pasó y no finge que sí.
+
+⚠ **Se presta a UNA confusión y ya pasó (17/8):** Edgardo entendió que *el asistente* iba a tener
+esa conversación con el chico. **No.** Es una pantalla **para los padres**, que los guía sobre qué
+contarle. Confirmado por él: *"que los padres guiados tengan esa explicación, perfecto"*.
+🔴 El asistente **habla sólo con los adultos**. El chico recibe orientación por su canal cuando el
+motor habla, y eso es otra cosa.
 📌 **El pago se nombra y NO se simula.** La pantalla dice que en el producto terminado la
 suscripción ya estaría paga y que acá no se cobra nada. Un checkout falso es exactamente lo que
 este producto no se puede permitir.
@@ -66,6 +72,68 @@ encabezado que decía «Familia Gómez». `cargarDatosDeLaFamilia` ahora actuali
 ✅ **Verificado de punta a punta contra la Supabase de producción** (crear credencial → recorrido
 → panel propio), y **las tres familias de prueba se borraron**: en producción queda sólo la
 sembrada.
+
+### 🔐 EL ENLACE DEL JURADO ESTÁ CERRADO CON LLAVE (17/8)
+
+**Lo levantó Edgardo apenas quedó hecho el recorrido**, y tenía razón: *"si les damos el enlace
+para que ingresen directo, y de repente alguien lo consigue, puede hacer explotar el sistema"*.
+
+🔴 **El agujero lo abrió el recorrido mismo:** hasta ese momento **ninguna ruta pública escribía**.
+Y el problema no es la basura en la base, es la plata — cada cuenta creada llega al asistente, que
+son llamadas a Opus 5. El asistente ya tiene su tope, pero es **por familia**, así que sin freno en
+el alta alcanza con crear familias para multiplicarlo.
+
+**Tres capas, y el ORDEN importa:**
+
+| | Qué frena | Dónde |
+|---|---|---|
+| 1 | Martilleo — 3 por minuto **por IP** | `tomarTurno("alta:<ip>")` |
+| 2 | **Código de invitación**, el que viaja en el enlace | `CODIGO_DE_INVITACION` |
+| 3 | **Tope global**: 40 altas por día en todo el sistema | `tomarTurno("altas:global")` |
+
+🔴 **El código se comprueba ANTES del tope global, y no es un detalle.** Al revés, cualquiera sin
+código quemaría el cupo del día pegándole a la ruta y el jurado encontraría la puerta cerrada sin
+que nadie hubiera entrado.
+🔑 **El tope global existe porque el código va escrito adentro del enlace**, y un enlace que
+circula se copia. Es el techo del gasto, pase lo que pase.
+🔴 **Sin `CODIGO_DE_INVITACION` en el entorno, las altas quedan CERRADAS** — la lección de la
+auditoría aplicada de entrada: fallar cerrado.
+📌 **Y la pestaña «es mi primera vez» sólo aparece con el enlace bueno** (`/entrar?i=<código>`).
+Una dirección pelada muestra únicamente el logueo: si la puerta no abre, no se dibuja.
+
+⚠ **El código está en Vercel (producción y preview) y en `.env.local`. NO se escribe acá** — este
+archivo vive en un repositorio público, que es exactamente lo que encontró la auditoría.
+**Para armar el enlace del jurado, sacalo de `.env.local`.**
+
+### 📖 LA GUÍA Y EL TOUR — pedidos por Edgardo el 17/8
+
+Son **dos cosas distintas porque resuelven dos momentos distintos**, y conviene no fusionarlas.
+
+**`/guia`** — *"orientada a destacar las capacidades del sistema, sus proyecciones y de dónde
+salen sus recursos"*. Escrita para **quien evalúa**, no para una familia: qué hace, qué
+explícitamente NO hace, qué hay que instalar, hacia dónde va, y la fuente de cada cifra.
+🔴 **La sección más importante es «Lo que NO hace».** Un sistema que sólo enumera capacidades se
+lee como un folleto; éste se sostiene en que dice dónde termina. Si hay que recortar, esa sección
+es la última que se toca.
+🔑 Separa lo que dicen los estudios de **los números que elegimos nosotros**. Ningún estudio
+publica coeficientes de riesgo, y presentarlos como si vinieran de ahí sería inventar autoridad.
+📌 **«Hacia dónde va» son los cuatro temas de «DESPUÉS DEL 23»**, contados como dirección del
+proyecto y nunca como algo que ya hace.
+
+**El tour** (`src/app/_demo/Tour.tsx`) — *"una guía de varios pasos con unos carteles, cortitos"*.
+Seis carteles sobre la consola. Arranca solo la primera vez, se cierra con Escape o con la cruz,
+**y no vuelve** (queda anotado en el navegador); el botón «Guía rápida» lo trae de nuevo.
+
+🔑 **El texto vive aparte en `pasos-del-tour.ts`**, por dos razones que se refuerzan: es contenido,
+y así se puede probar — las tandas corren con node pelado, que no lee `.tsx`.
+🔴 **`LARGO_MAXIMO` (130) no es estilo: si un cartel no entra, se reescribe el cartel.** Un cartel
+que hay que leer con ganas se cierra sin leer, y ocupa la pantalla en los primeros diez segundos,
+que es lo único que un jurado va a mirar seguro.
+🔴 **El segundo cartel dice que no se leen los mensajes, y va segundo a propósito:** si alguien
+abandona después de dos, eso es lo que se tiene que llevar. **Hay una comprobación que lo
+verifica**, para que nadie lo reordene sin ver lo que está moviendo.
+📌 Las anclas son `id` reales de la pantalla, y `probar-tour` comprueba que existan — un `id` mal
+escrito no rompe nada, hace que ese cartel deje de señalar **callado**.
 
 ### ⬜ Lo que queda del recorrido
 

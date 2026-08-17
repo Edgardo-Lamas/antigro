@@ -1,0 +1,345 @@
+import Link from "next/link";
+import { ArrowLeft, BookOpen } from "lucide-react";
+import { MARCO_LEGAL, PRODUCTO, RECURSOS } from "@/lib/config";
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LA GUÍA DE USO — pedida por Edgardo el 17/8
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  Textual: *"redactar una guía de uso orientada a destacar las capacidades del
+ *  sistema, sus proyecciones y de dónde salen sus recursos"*.
+ *
+ *  🔑 **No está escrita para una familia, está escrita para quien EVALÚA.** Una
+ *  familia aprende usando el producto —para eso está el recorrido y para eso
+ *  está el tour—; el que llega a juzgarlo en diez minutos necesita otra cosa:
+ *  qué hace, qué explícitamente no hace, hacia dónde va, y de dónde sale cada
+ *  número que el sistema muestra.
+ *
+ *  🔴 **La sección más importante es «Lo que NO hace».** Un sistema que sólo
+ *  enumera capacidades se lee como un folleto; éste se sostiene justamente en
+ *  que dice dónde termina. Si alguna vez hay que recortar esta página, esa
+ *  sección es la última que se toca.
+ *
+ *  ⚠ **Acá no entra ni una cifra que no esté citada.** Todas salen de lo que ya
+ *  usa el motor, con la fuente al lado — es la regla del proyecto, y en esta
+ *  página es además el argumento.
+ */
+
+export const metadata = {
+  title: "Guía de AntiGro — qué hace, qué no, y de dónde sale cada dato",
+};
+
+/* ── Piezas chicas, para que el contenido se lea y no se pierda en clases ──── */
+
+function Seccion({
+  titulo,
+  bajada,
+  children,
+}: {
+  titulo: string;
+  bajada?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-12">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">{titulo}</h2>
+      {bajada && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-tenue">{bajada}</p>}
+      <div className="mt-4">{children}</div>
+    </section>
+  );
+}
+
+function Ficha({ que, detalle }: { que: string; detalle: string }) {
+  return (
+    <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+      <p className="text-sm font-medium text-tinta">{que}</p>
+      <p className="mt-1.5 text-sm leading-relaxed text-tenue">{detalle}</p>
+    </div>
+  );
+}
+
+export default function Guia() {
+  return (
+    <main className="mx-auto max-w-3xl px-6 py-12">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-2 text-sm text-tenue transition hover:text-acento"
+      >
+        <ArrowLeft size={14} /> Volver
+      </Link>
+
+      <header className="mt-6 border-b border-borde pb-8">
+        <div className="flex items-center gap-2.5">
+          <BookOpen size={17} className="text-acento" />
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-apagado">
+            {PRODUCTO} · guía
+          </p>
+        </div>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-tinta">
+          Qué hace, qué no hace, y de dónde sale cada dato
+        </h1>
+        <p className="mt-3 max-w-2xl text-balance text-lg leading-relaxed text-tenue">
+          {PRODUCTO} percibe señales de que un chico puede estar siendo acosado en internet{" "}
+          <strong className="text-tinta">sin leer un solo mensaje suyo</strong>. Esta página está
+          escrita para quien quiere entenderlo rápido y verificarlo.
+        </p>
+      </header>
+
+      {/* ── El hallazgo que define el diseño ─────────────────────────────── */}
+      <Seccion
+        titulo="Por dónde empezar"
+        bajada="Antes de las capacidades, el hallazgo que ordena todo el diseño — porque es lo que explica por qué el sistema está hecho así y no como un control parental."
+      >
+        <div className="rounded-lg border border-riesgo/40 bg-riesgoSuave px-5 py-5">
+          <p className="text-sm leading-relaxed text-tinta">
+            Los indicadores de grooming están documentados, pero son{" "}
+            <strong>conversacionales</strong>: toda la investigación seria detecta leyendo
+            mensajes. Un filtro de red ve dominio y hora. Y el{" "}
+            <strong>74,3% de los casos pasa por WhatsApp</strong>, cifrado y permitido: para un
+            filtro, un pedido de fotos a un chico de 12 y la tarea del colegio son el mismo evento.
+          </p>
+          <p className="mt-3 text-sm font-semibold leading-relaxed text-tinta">
+            Ningún control parental por DNS protege del grooming. Ni éste ni ninguno.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-tenue">
+            Por eso {PRODUCTO} no confía en una sola fuente: cruza tres. Lo que ve la red, lo que
+            observan los adultos, y lo que dicen las estadísticas oficiales sobre cuánto pesa cada
+            cosa.
+          </p>
+        </div>
+      </Seccion>
+
+      {/* ── Capacidades ──────────────────────────────────────────────────── */}
+      <Seccion
+        titulo="Qué hace"
+        bajada="Tres entradas, una lectura, dos salidas. Todo lo que sigue se puede ver funcionando en la pantalla principal, sin registrarse."
+      >
+        <div className="flex flex-col gap-3">
+          <Ficha
+            que="Mira la actividad de red del chico, no su contenido"
+            detalle="Volumen fuera de lo habitual, actividad en horarios que para su edad son de madrugada, plataformas nuevas, e intentos de saltar el filtro. Nunca el texto."
+          />
+          <Ficha
+            que="No alerta por un evento: alerta por persistencia"
+            detalle="Un pico aislado es ruido. El sistema exige que el patrón se sostenga varios días antes de abrir la boca — el 90% de las víctimas sufre acoso cotidiano sostenido durante meses."
+          />
+          <Ficha
+            que="Aprende a este chico, no a un chico promedio"
+            detalle="Arma un perfil con toda la historia disponible y compara contra su propia conducta previa. Cuanto más tiempo lleva conectado, más ve. Y dos señales —madrugada y evasión del filtro— no se comparan contra nada, así que valen desde el primer día."
+          />
+          <Ficha
+            que="Cruza lo que la red no puede ver"
+            detalle="Nueve preguntas a los adultos sobre hechos que ellos observan y una red jamás vería. Es la segunda entrada, y puede adelantar el aviso."
+          />
+          <Ficha
+            que="Le escribe a los adultos Y al propio chico"
+            detalle="Cuando el patrón se sostiene, el aviso va a los adultos responsables con el porqué y con lo que no se puede saber; y al chico le llega orientación escrita para su edad, por su canal."
+          />
+          <Ficha
+            que="Un asistente que acompaña a los adultos"
+            detalle="Explica el informe, ordena las opciones y dice cómo abrir la conversación. Un control automático revisa cada respuesta antes de que salga; si no la aprueba, sale un texto fijo escrito de antemano."
+          />
+          <Ficha
+            que="El chico sabe que existe, desde el minuto cero"
+            detalle="El alta incluye una pantalla que guía a los padres sobre qué contarle. Un chico que sabe que hay una red que lo cuida es un aliado; uno que se siente espiado es un adversario."
+          />
+        </div>
+      </Seccion>
+
+      {/* ── 🔴 La sección que sostiene a todas las demás ─────────────────── */}
+      <Seccion
+        titulo="Lo que NO hace"
+        bajada="Es la parte más importante de esta guía. Un sistema que sólo enumera capacidades se lee como un folleto."
+      >
+        <ul className="flex flex-col gap-3">
+          {[
+            [
+              "Nunca afirma que un chico está siendo acosado. Ni que está a salvo.",
+              "Señala, nombra y deriva. Las dos afirmaciones son igual de irresponsables, y la segunda es peor porque tranquiliza.",
+            ],
+            [
+              "No lee el contenido de las conversaciones. Nunca.",
+              "Es la línea que separa esto de un espía. De lo que escribe el chico no se guarda una palabra, y el modelo de datos está construido para que no se pueda.",
+            ],
+            [
+              "No ve lo que pasa dentro de WhatsApp.",
+              "Va cifrado, y ahí está el 74,3% de los casos. El sistema lo dice en cada informe en vez de disimularlo.",
+            ],
+            [
+              "La inteligencia artificial no decide nada.",
+              "Decide el motor, con el registro fechado. El modelo sólo escribe el texto, y un control automático lo revisa antes de que salga.",
+            ],
+            [
+              "No sabe los horarios de esa casa si nadie se los cuenta.",
+              "Por eso el alta pregunta el turno escolar. Sin ese dato, el sistema no supone un horario — y no afirma nada sobre el descanso del chico.",
+            ],
+            [
+              "No es prueba judicial.",
+              "Es una cronología de qué se vio y en qué días, que puede ordenar una denuncia. La denuncia se hace en la Justicia.",
+            ],
+          ].map(([que, detalle]) => (
+            <li key={que} className="rounded-lg border border-borde bg-fondo px-5 py-4">
+              <p className="text-sm font-medium text-tinta">{que}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-tenue">{detalle}</p>
+            </li>
+          ))}
+        </ul>
+      </Seccion>
+
+      {/* ── Cómo se instala ──────────────────────────────────────────────── */}
+      <Seccion
+        titulo="Qué hay que instalar"
+        bajada="No se instala una aplicación de AntiGro. Se le dice al aparato a qué servidor de nombres preguntar, y ese servidor anota qué dominios se consultaron y a qué hora."
+      >
+        <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+          <p className="text-sm leading-relaxed text-tenue">
+            <strong className="text-tinta">Va en el aparato del chico, no en el router</strong>, y
+            no es una preferencia: el router no ve datos móviles, y ahí vive la señal de madrugada
+            — una de las dos únicas absolutas. Instalado sólo en el router, el sistema queda ciego
+            a la hora que más significa <em>y ni se entera</em>: no recibir nada se lee igual que
+            estar todo tranquilo.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-tenue">
+            Como va en el aparato, además viaja con el chico entre dos casas, que es el caso de
+            padres separados.
+          </p>
+        </div>
+      </Seccion>
+
+      {/* ── Proyecciones ─────────────────────────────────────────────────── */}
+      <Seccion
+        titulo="Hacia dónde va"
+        bajada="Se cuenta como dirección del proyecto, nunca como algo que ya hace. La diferencia importa: lo de arriba se puede probar hoy en pantalla; esto todavía no existe."
+      >
+        <div className="flex flex-col gap-3">
+          <Ficha
+            que="Investigación por la vía policial y judicial"
+            detalle="Los factores de riesgo mejor documentados no están en la web abierta: se consiguen en esferas policiales y judiciales. El único estudio de factores de riesgo que apareció está armado sobre sentencias."
+          />
+          <Ficha
+            que="Perfil de vulnerabilidad — como contexto, nunca como puntaje"
+            detalle="Nivel escolar, tipo de escuela, con quién vive el chico. Sirve para que el asistente no dé un consejo estúpido y para saber a quién escalar. No mueve ningún número: hoy no hay fuente que respalde puntuar a una familia por su forma."
+          />
+          <Ficha
+            que="Un informe para que el padre pueda denunciar"
+            detalle="Lo que lo haría útil no es una conclusión —el sistema no afirma— sino el registro fechado: qué se vio, en qué días, y qué explícitamente no se puede ver."
+          />
+          <Ficha
+            que="El mismo motor para bullying"
+            detalle="La arquitectura transfiere y está construida así desde el primer día. Los números no: salen de estudios de grooming, y el bullying pasa en buena parte en la escuela, donde la red no ve nada. Por eso hoy AntiGro no dice que haga esto."
+          />
+        </div>
+      </Seccion>
+
+      {/* ── 🔴 De dónde sale cada dato ───────────────────────────────────── */}
+      <Seccion
+        titulo="De dónde salen los datos"
+        bajada="Toda cifra que el sistema muestra sale de acá. Las que no tienen fuente, no se afirman."
+      >
+        <div className="flex flex-col gap-4">
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Estudio nacional sobre acoso sexual a niñas, niños y adolescentes mediante TIC
+            </p>
+            <p className="mt-1 text-xs text-apagado">
+              Ministerio de Justicia y Derechos Humanos de la Nación, Dirección Nacional de
+              Política Criminal, 2023
+            </p>
+            <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
+              <li>· 74,3% de los casos pasa por WhatsApp.</li>
+              <li>· 90% de las víctimas sufre acoso cotidiano sostenido durante meses.</li>
+              <li>· 80% de las víctimas de acoso virtual infantil son nenas.</li>
+              <li>· 63% de los chicos no sabe qué es el grooming.</li>
+              <li>· 43% no habla de estos temas con sus padres.</li>
+              <li>
+                · El grueso de las víctimas está entre los 11 y los 15, con un segundo grupo
+                importante entre los 7 y los 10.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">Informe Grooming LATAM</p>
+            <p className="mt-1 text-xs text-apagado">
+              Red Grooming LATAM, presentado en mayo de 2025 · n≈28.360 encuestas anónimas a chicos
+              de 9 a 17 años en 14 países, relevamiento 2024/2025 ·{" "}
+              <span className="font-mono">groomingarg.org/informe-grooming-latam</span>
+            </p>
+            <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
+              <li>· La franja más vulnerable es de 9 a 13 años.</li>
+              <li>· 33,3% recibió una propuesta de «ser novio o novia» dentro de un juego.</li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Por qué la madrugada se mide distinto según la edad
+            </p>
+            <p className="mt-1 text-xs text-apagado">
+              Asociación Española de Pediatría (<span className="font-mono">aeped.es/enfamilia</span>
+              ) y Sociedad Española de Medicina de la Adolescencia (
+              <span className="font-mono">adolescenciasema.org</span>)
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tenue">
+              En la adolescencia hay un retraso biológico del inicio de la secreción nocturna de
+              melatonina: el punto medio del sueño se corre a lo largo de la segunda década de la
+              vida. Por eso, a las 2 de la mañana, una nena de 9 y un pibe de 16 no son lo mismo —
+              y el sistema{" "}
+              <strong className="text-tinta">corre la hora en vez de bajar el peso</strong>.
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">Marco legal argentino</p>
+            <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
+              <li>· {MARCO_LEGAL.ley26904}</li>
+              <li>· {MARCO_LEGAL.ley27590}</li>
+            </ul>
+          </div>
+
+          {/* 🔴 Los pesos son NUESTROS y eso se dice. El estudio no publica
+              coeficientes de riesgo, y decir que sí sería inventar una autoridad. */}
+          <div className="rounded-lg border border-atencion/40 bg-atencionSuave px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Y una distinción que conviene no saltear
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-tinta">
+              Las cifras de arriba son de los estudios. Los <strong>números concretos</strong> con
+              los que el motor pondera cada señal —cuánto pesa la madrugada, cuántos días tiene que
+              sostenerse un patrón— <strong>los elegimos nosotros</strong>, informados por esas
+              cifras. Ningún estudio publica coeficientes de riesgo, y presentarlos como si
+              vinieran de ahí sería inventar una autoridad que no existe.
+            </p>
+          </div>
+        </div>
+      </Seccion>
+
+      {/* ── A dónde recurrir ─────────────────────────────────────────────── */}
+      <Seccion
+        titulo="Cuando la respuesta correcta no es un sistema"
+        bajada="Está escrito en el producto y no en la letra chica: cuando lo que hace falta es un adulto o un organismo, el sistema lo dice."
+      >
+        <div className="flex flex-col gap-3">
+          <Ficha
+            que={`${RECURSOS.linea137.nombre} — ${RECURSOS.linea137.telefono}`}
+            detalle={`${RECURSOS.linea137.detalle}. WhatsApp ${RECURSOS.linea137.whatsapp}.`}
+          />
+          <Ficha
+            que={RECURSOS.gapp.nombre}
+            detalle={`${RECURSOS.gapp.detalle} — ${RECURSOS.gapp.url}`}
+          />
+        </div>
+      </Seccion>
+
+      <div className="mt-12 flex flex-wrap gap-3 border-t border-borde pt-8">
+        <Link
+          href="/"
+          className="rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition"
+        >
+          Ver el sistema funcionando
+        </Link>
+      </div>
+    </main>
+  );
+}

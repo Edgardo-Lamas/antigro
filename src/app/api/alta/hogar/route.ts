@@ -39,6 +39,55 @@ const VENTANA_SEG = 60;
 const TOPE = 3;
 
 /**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  🔴 EL ENLACE QUE SE LE PASA AL JURADO ES UNA PUERTA, Y HAY QUE TRATARLA ASÍ
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * Lo levantó Edgardo el 17/8, apenas quedó hecho el recorrido: *"si les damos el
+ * enlace para que ingresen directo, y de repente alguien lo consigue, puede
+ * hacer explotar el sistema"*. **Tiene razón, y el agujero lo abrió el recorrido
+ * mismo:** hasta hoy ninguna ruta pública escribía.
+ *
+ * 🔑 **Y el problema no es la basura en la base: es la plata.** Cada cuenta creada
+ * llega al asistente, que son llamadas a Opus 5. El asistente ya tiene su tope
+ * —30 por hora **por familia**—, así que sin freno en el alta alcanza con crear
+ * familias para multiplicarlo. **El cuello de botella tiene que estar acá.**
+ *
+ * Tres capas, y el ORDEN importa:
+ *
+ * 1. **Por IP** (arriba): frena el martilleo.
+ * 2. **Código de invitación**: el que viaja en el enlace del jurado.
+ * 3. **Tope global diario**: porque un enlace que circula se copia, y el código
+ *    va escrito adentro. Es el techo del gasto, pase lo que pase.
+ *
+ * 🔴 **El código se comprueba ANTES del tope global, y no es un detalle.** Al
+ * revés, cualquiera sin código podría quemar el cupo del día pegándole a la
+ * ruta, y el jurado se encontraría la puerta cerrada sin que nadie entrara.
+ */
+
+/**
+ * 🔴 **Sin la variable en el entorno, las altas quedan CERRADAS.** Es la lección
+ * de la auditoría del 17/8 aplicada de entrada: acá había una clave de ejemplo
+ * que terminó abriendo la cuenta de administración de producción. **Un valor por
+ * defecto que abre una puerta se filtra al lugar donde no tenía que estar.**
+ * Fallar cerrado es lo único que evita que vuelva a pasar.
+ */
+function codigoEsperado(): string | null {
+  const codigo = process.env.CODIGO_DE_INVITACION?.trim();
+  return codigo && codigo.length > 0 ? codigo : null;
+}
+
+/**
+ * Cuántas altas entran por día en todo el sistema.
+ *
+ * 📌 El número sale de para qué existe esto: un jurado, más él probando. Cuarenta
+ * es holgado para eso y sigue siendo un techo. ⚠ Si algún día AntiGro tiene
+ * clientes de verdad, esto se saca — es un freno de demostración, no de producto.
+ */
+const TOPE_DIARIO = 40;
+const DIA_SEG = 60 * 60 * 24;
+
+/**
  * 🔴 **Ocho, y con un porqué que se puede defender.** Es la puerta al informe de
  * un chico. Cuatro caracteres es una clave que se adivina; pedir mayúsculas,
  * números y símbolos empuja a la gente al papelito pegado en la heladera. La
@@ -62,6 +111,8 @@ const Cuerpo = z.object({
    * identificador. Ver el chequeo de sesión abajo.
    */
   familiaId: z.string().optional(),
+  /** El que viaja en el enlace que se le pasa al jurado. Ver arriba. */
+  invitacion: z.string().max(100).optional(),
 });
 
 export async function POST(req: Request) {
@@ -84,7 +135,48 @@ export async function POST(req: Request) {
     );
   }
 
-  const { email, clave, nombreDeLaFamilia, hogar, familiaId } = parsed.data;
+  const { email, clave, nombreDeLaFamilia, hogar, familiaId, invitacion } = parsed.data;
+
+  /* ── 2. El código de invitación ──────────────────────────────────────────
+     ⚠ Va ANTES del tope global a propósito: si no, cualquiera sin código
+     quemaría el cupo del día y el jurado encontraría la puerta cerrada. */
+  const esperado = codigoEsperado();
+  if (!esperado) {
+    return NextResponse.json(
+      {
+        error:
+          "Las altas están cerradas en este momento. Podés ver el sistema entero " +
+          "funcionando sin registrarte.",
+        cerrado: true,
+      },
+      { status: 503 },
+    );
+  }
+  if (invitacion?.trim() !== esperado) {
+    /* 📌 No dice «código incorrecto» ni «falta el código»: los dos casos suenan
+       igual desde afuera. El que tiene el enlace bueno nunca ve esto. */
+    return NextResponse.json(
+      { error: "Este enlace no habilita crear una cuenta.", sinInvitacion: true },
+      { status: 403 },
+    );
+  }
+
+  /* ── 3. El techo del gasto, pase lo que pase ─────────────────────────────
+     🔑 Existe porque el código viaja escrito adentro del enlace, y un enlace
+     que circula se copia. Esto es lo único que no depende de que el código
+     siga siendo secreto. */
+  const delDia = await tomarTurno("altas:global", DIA_SEG, TOPE_DIARIO);
+  if (!delDia.permitido) {
+    return NextResponse.json(
+      {
+        error:
+          "Se llegó al máximo de cuentas nuevas por hoy. Podés ver el sistema " +
+          "entero funcionando sin registrarte.",
+        topeDiario: true,
+      },
+      { status: 429 },
+    );
+  }
 
   /* 🔴 La segunda casa la abre alguien que YA está en la familia. Sin esto, el
      `familiaId` del cuerpo sería una llave para colgarse de cualquier familia. */

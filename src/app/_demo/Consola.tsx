@@ -150,7 +150,10 @@ export default function Consola() {
   return (
     <div className="space-y-6">
       {/* ── LOS CONTROLES ─────────────────────────────────────────────── */}
-      <section className="grid gap-px overflow-hidden rounded-xl border border-borde bg-borde md:grid-cols-3">
+      <section
+        id="tour-controles"
+        className="grid gap-px overflow-hidden rounded-xl border border-borde bg-borde md:grid-cols-3"
+      >
         <Panel titulo="El chico">
           <div className="flex flex-wrap items-center gap-3">
             <label className="flex items-center gap-2 text-sm">
@@ -215,7 +218,10 @@ export default function Consola() {
       </section>
 
       {/* ── EL RELOJ ──────────────────────────────────────────────────── */}
-      <section className="flex flex-wrap items-center gap-4 rounded-xl border border-borde bg-superficie px-5 py-4">
+      <section
+        id="tour-reloj"
+        className="flex flex-wrap items-center gap-4 rounded-xl border border-borde bg-superficie px-5 py-4"
+      >
         <button
           onClick={reproducir}
           disabled={corriendo}
@@ -242,6 +248,7 @@ export default function Consola() {
 
       {/* ── LA LECTURA ────────────────────────────────────────────────── */}
       <section
+        id="tour-lectura"
         className={`rounded-xl border ${color.borde} ${color.fondo} transition-colors ${
           cargando ? "opacity-70" : ""
         }`}
@@ -292,7 +299,7 @@ export default function Consola() {
       </section>
 
       {/* ── LO QUE SALDRÍA ────────────────────────────────────────────── */}
-      <section className="rounded-xl border border-borde bg-superficie px-5 py-5">
+      <section id="tour-mensajes" className="rounded-xl border border-borde bg-superficie px-5 py-5">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-tenue">
             Lo que saldría

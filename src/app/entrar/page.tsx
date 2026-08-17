@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, LoaderCircle } from "lucide-react";
 
@@ -41,8 +41,31 @@ type Modo = "entrar" | "crear";
 const CLAVE_MINIMA = 8;
 
 export default function Entrar() {
+  /* `useSearchParams` obliga a un límite de Suspense en el build de producción.
+     Sin esto, `next build` falla al prerenderizar esta página. */
+  return (
+    <Suspense fallback={null}>
+      <Puerta />
+    </Suspense>
+  );
+}
+
+function Puerta() {
   const router = useRouter();
-  const [modo, setModo] = useState<Modo>("entrar");
+  const params = useSearchParams();
+
+  /**
+   * 🔑 **El código de invitación viaja en el enlace, no lo escribe nadie.**
+   * `?i=…` es lo que hace que el enlace que se le pasa al jurado sirva y una
+   * dirección pelada no. Ver la ruta `/api/alta/hogar`: sin esto las altas
+   * están cerradas.
+   *
+   * 📌 Y si el enlace lo trae, se abre directamente en «es mi primera vez»: el
+   * que llega por ahí viene a empezar, no a entrar.
+   */
+  const invitacion = params.get("i") ?? "";
+
+  const [modo, setModo] = useState<Modo>(invitacion ? "crear" : "entrar");
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState("");
@@ -57,7 +80,7 @@ export default function Entrar() {
         const res = await fetch("/api/alta/hogar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, clave }),
+          body: JSON.stringify({ email, clave, invitacion }),
         });
         const datos = await res.json();
         if (!res.ok) {
@@ -110,30 +133,39 @@ export default function Entrar() {
             </p>
           </div>
 
-          {/* 🔑 Las dos puertas a la vista, no una escondida detrás de un enlace
-              chico: el jurado tiene que encontrar «crear» sin buscarlo. */}
-          <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg border border-borde bg-fondo p-1">
-            {(
-              [
-                { id: "entrar", texto: "Ya tengo cuenta" },
-                { id: "crear", texto: "Es mi primera vez" },
-              ] as const
-            ).map((o) => (
-              <button
-                key={o.id}
-                type="button"
-                onClick={() => {
-                  setModo(o.id);
-                  setError("");
-                }}
-                className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
-                  modo === o.id ? "bg-acentoSuave text-acento" : "text-apagado"
-                }`}
-              >
-                {o.texto}
-              </button>
-            ))}
-          </div>
+          {/* 🔑 **Las dos puertas aparecen SÓLO con el enlace de invitación.**
+              El que llega con `?i=…` ve «es mi primera vez» sin buscarlo; una
+              dirección pelada muestra únicamente el logueo.
+
+              🔴 No es cosmética: es la misma decisión que la ruta. Ofrecer un
+              botón de registro que después va a contestar «este enlace no
+              habilita crear una cuenta» sería mandar a la gente contra una
+              puerta cerrada, y encima le contaría al que pasa que el registro
+              existe. Si la puerta no abre, no se dibuja. */}
+          {invitacion && (
+            <div className="mb-6 grid grid-cols-2 gap-1 rounded-lg border border-borde bg-fondo p-1">
+              {(
+                [
+                  { id: "entrar", texto: "Ya tengo cuenta" },
+                  { id: "crear", texto: "Es mi primera vez" },
+                ] as const
+              ).map((o) => (
+                <button
+                  key={o.id}
+                  type="button"
+                  onClick={() => {
+                    setModo(o.id);
+                    setError("");
+                  }}
+                  className={`rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                    modo === o.id ? "bg-acentoSuave text-acento" : "text-apagado"
+                  }`}
+                >
+                  {o.texto}
+                </button>
+              ))}
+            </div>
+          )}
 
           <form onSubmit={enviar} className="flex flex-col gap-3.5">
             <div>
