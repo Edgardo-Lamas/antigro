@@ -4,10 +4,20 @@
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  🔴 **AntiGro no se instala: se cambia el DNS.** No hay una app que espíe, no
- *  hay nada que se meta en el teléfono a mirar mensajes. Se le dice al aparato
- *  a qué servidor de nombres preguntar, y ese servidor —NextDNS— guarda qué
- *  dominios se consultaron y a qué hora. Nada más. Contarlo así, primero, es lo
- *  que hace que la regla 3 sea un paso concreto y no una promesa.
+ *  hay nada que se meta en el teléfono a mirar mensajes. En el teléfono del
+ *  chico se cambia **una sola cosa**: a quién le pregunta dónde queda cada
+ *  página que abre. Hoy se lo pregunta a la empresa de internet; con AntiGro se
+ *  lo pregunta a **NextDNS**, que además de contestar deja anotado qué se
+ *  consultó y a qué hora. Nada más.
+ *
+ *  ⚠ **Esto de acá arriba es la explicación TÉCNICA, para quien programa.** La
+ *  que lee un padre vive en `COMO_FUNCIONA` (`config.ts`) y está en criollo:
+ *  Edgardo frenó la versión vieja el 17/8 porque hablaba de «el aparato», «un
+ *  servidor de nombres» y «ese servidor» sin decir nunca cuál. **Si hay que
+ *  cambiar lo que se le cuenta a la familia, se cambia allá, no acá.**
+ *
+ *  Contarlo así, primero, es lo que hace que la regla 3 sea un paso concreto y
+ *  no una promesa.
  *
  *  ─────────────────────────────────────────────────────────────────────────
  *  🔑 **VA EN EL APARATO DEL CHICO, NO EN EL ROUTER.** Es la decisión.
@@ -318,10 +328,15 @@ chcp 65001 >nul
 title AntiGro — configurar DNS
 echo.
 echo   AntiGro no instala ninguna aplicacion.
-echo   Lo unico que hace este archivo es decirle a esta computadora
-echo   a que servidor preguntar los nombres de los sitios.
 echo.
-echo   No lee mensajes. No puede leerlos.
+echo   Cada vez que esta computadora abre una pagina, primero tiene que
+echo   averiguar donde queda, como buscar un numero en una guia telefonica.
+echo   Hoy esa consulta se la hace a la empresa que te da internet.
+echo   Este archivo cambia UNA cosa: a partir de ahora se la hace a NextDNS,
+echo   que ademas de contestarla deja anotado que se consulto y a que hora.
+echo.
+echo   Eso es todo lo que ve AntiGro: nombres de sitios y horarios.
+echo   No lee mensajes. No puede leerlos: por ahi no pasan.
 echo.
 net session >nul 2>&1
 if %errorlevel% neq 0 (

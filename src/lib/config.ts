@@ -2,6 +2,60 @@
 
 export const PRODUCTO = "AntiGro";
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  CÓMO SE EXPLICA LA INSTALACIÓN — reescrito el 17/8
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **Estaba escrito en nuestro idioma y Edgardo lo frenó**, señalando cada
+ * hueco: *"«se le dice al aparato a qué servidor de nombres preguntar, y ese
+ * servidor anota…» ¿a qué aparato? ¿a qué servidor de nombres preguntar? ¿y ese
+ * servidor, cuál? ESTÁ MAL EXPLICADO"*. Las tres preguntas eran correctas: el
+ * texto no decía en qué aparato, no decía qué es un servidor de nombres, y
+ * nombraba «ese servidor» sin haber dicho nunca cuál.
+ *
+ * 🔑 **Vive acá, en un solo lugar, porque estaba escrito de cuatro maneras
+ * distintas** —en la guía, en el panel, en el recorrido y en `instalacion.ts`—
+ * y arreglarlo significaba acordarse de los cuatro. Es la explicación que más
+ * veces lee un padre y la que decide si confía o desinstala.
+ *
+ * 📌 **El orden no se toca:** primero qué NO es, después la comparación, y
+ * recién al final el paso técnico. Al revés, un padre siente que le están
+ * pidiendo poner un espía en el teléfono del hijo.
+ */
+export const COMO_FUNCIONA = {
+  /** Lo primero, siempre. */
+  noEs: "No se instala ninguna aplicación, ni nada que mire lo que el chico escribe.",
+
+  /**
+   * 🔑 La comparación con la guía telefónica es lo que hace entendible todo lo
+   * demás. Sin ella, «servidor de nombres» no significa nada para nadie.
+   */
+  laComparacion:
+    "Cada vez que un teléfono abre algo —un juego, una red social, cualquier página— " +
+    "primero tiene que averiguar dónde queda, como buscar un número en una guía " +
+    "telefónica. Hoy esa consulta se la hace a la empresa que te da internet.",
+
+  /** Qué cambia, dicho sin una sola palabra técnica. */
+  queCambia:
+    "Lo único que se cambia es a quién se le hace esa consulta: en vez de a la empresa " +
+    "de internet, pasa a hacérsela a NextDNS, un servicio que además de contestarla " +
+    "deja anotado qué se consultó y a qué hora.",
+
+  /** 🔴 Y el límite, que es lo que sostiene la promesa. */
+  elLimite:
+    "Eso es todo lo que ve AntiGro: nombres de sitios y horarios. Los mensajes no " +
+    "pasan por ahí, así que no se leen — y no es que no queramos: no se puede.",
+
+  /**
+   * 🔴 En el aparato del chico, no en el router. **No es una preferencia:** el
+   * router no ve los datos móviles, y ahí vive la señal de madrugada.
+   */
+  donde:
+    "Se hace en el teléfono del chico, no en el router de la casa. Así lo sigue " +
+    "viendo cuando sale con datos móviles y cuando está en otra casa.",
+} as const;
+
 export const BAJADA =
   "Percibe señales de que un chico puede estar siendo acosado en internet, sin leer un solo mensaje suyo.";
 

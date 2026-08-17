@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
-import { MARCO_LEGAL, PRODUCTO, RECURSOS } from "@/lib/config";
+import { COMO_FUNCIONA, MARCO_LEGAL, PRODUCTO, RECURSOS } from "@/lib/config";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -217,21 +217,22 @@ export default function Guia() {
       </Seccion>
 
       {/* ── Cómo se instala ──────────────────────────────────────────────── */}
-      <Seccion
-        titulo="Qué hay que instalar"
-        bajada="No se instala una aplicación de AntiGro. Se le dice al aparato a qué servidor de nombres preguntar, y ese servidor anota qué dominios se consultaron y a qué hora."
-      >
+      {/* 🔴 Reescrito el 17/8. Ver `COMO_FUNCIONA` en `config.ts`: el texto
+          viejo hablaba de «el aparato», «un servidor de nombres» y «ese
+          servidor» sin decir nunca cuál, y Edgardo lo frenó pregunta por
+          pregunta. Ahora sale de un solo lugar, y en criollo. */}
+      <Seccion titulo="Qué hay que instalar" bajada={COMO_FUNCIONA.noEs}>
         <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
-          <p className="text-sm leading-relaxed text-tenue">
-            <strong className="text-tinta">Va en el aparato del chico, no en el router</strong>, y
-            no es una preferencia: el router no ve datos móviles, y ahí vive la señal de madrugada
-            — una de las dos únicas absolutas. Instalado sólo en el router, el sistema queda ciego
-            a la hora que más significa <em>y ni se entera</em>: no recibir nada se lee igual que
-            estar todo tranquilo.
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-tenue">
-            Como va en el aparato, además viaja con el chico entre dos casas, que es el caso de
-            padres separados.
+          <p className="text-sm leading-relaxed text-tenue">{COMO_FUNCIONA.laComparacion}</p>
+          <p className="mt-3 text-sm leading-relaxed text-tinta">{COMO_FUNCIONA.queCambia}</p>
+          <p className="mt-3 text-sm leading-relaxed text-tenue">{COMO_FUNCIONA.elLimite}</p>
+
+          <p className="mt-4 border-t border-borde pt-3 text-sm leading-relaxed text-tenue">
+            <strong className="text-tinta">{COMO_FUNCIONA.donde}</strong> Y eso no es una
+            preferencia: el router no ve los datos móviles, y ahí vive la señal de madrugada — una
+            de las dos que valen desde el primer día. Puesto sólo en el router, el sistema queda
+            ciego a esa hora <em>y ni se entera</em>: no recibir nada se lee igual que estar todo
+            tranquilo.
           </p>
         </div>
       </Seccion>

@@ -48,7 +48,7 @@ import {
   type Vinculo,
 } from "@/lib/datos/tipos";
 import { APARATOS, COMPROBACION, guiaPara, type Aparato } from "@/lib/instalacion";
-import { EDAD_PARA_ELEGIR_REFERENTE, quienEligeAlReferente } from "@/lib/config";
+import { COMO_FUNCIONA, EDAD_PARA_ELEGIR_REFERENTE, quienEligeAlReferente } from "@/lib/config";
 
 interface AdultoEnPantalla {
   nombre: string;
@@ -567,12 +567,17 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
           <h2 className="text-lg font-semibold text-tinta">Qué hay que instalar</h2>
 
           <div className="mt-4 rounded-lg border border-borde bg-superficie px-5 py-4">
-            <p className="text-sm leading-relaxed text-tenue">
-              <strong className="text-tinta">No se instala una app de AntiGro.</strong> No hay nada
-              que se meta en el teléfono a mirar mensajes. Se le dice al aparato a qué servidor de
-              nombres preguntar, y ese servidor anota qué dominios se consultaron y a qué hora.
-              Nada más.
+            {/* 🔴 Reescrito el 17/8 — ver `COMO_FUNCIONA` en `config.ts`. El
+                texto viejo no decía en qué aparato, ni qué era «un servidor de
+                nombres», ni cuál era «ese servidor». */}
+            <p className="text-sm leading-relaxed text-tinta">
+              <strong>{COMO_FUNCIONA.noEs}</strong>
             </p>
+            <p className="mt-2 text-sm leading-relaxed text-tenue">
+              {COMO_FUNCIONA.laComparacion}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-tinta">{COMO_FUNCIONA.queCambia}</p>
+            <p className="mt-2 text-sm leading-relaxed text-tenue">{COMO_FUNCIONA.elLimite}</p>
           </div>
 
           {/* 🔴 Va en el aparato del chico, no en el router. El router no ve

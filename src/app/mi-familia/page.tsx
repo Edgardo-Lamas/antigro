@@ -20,6 +20,7 @@ import {
 import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senales/tipos";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
+import { COMO_FUNCIONA } from "@/lib/config";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -1005,13 +1006,17 @@ function Instalacion({ chico }: { chico?: string }) {
         <Smartphone size={13} /> Cómo queda andando
       </h2>
 
-      {/* 🔴 Lo primero que se lee es qué NO es. Ver el comentario de arriba. */}
+      {/* 🔴 Lo primero que se lee es qué NO es. Ver el comentario de arriba.
+          ⚠ Reescrito el 17/8: decía «decirle al aparato a qué servidor
+          preguntarle las direcciones», y Edgardo lo frenó — no decía en qué
+          aparato, ni qué es ese servidor, ni cuál. Sale de `COMO_FUNCIONA`
+          en `config.ts`, que es ahora el único lugar donde está escrito. */}
       <p className="mt-3 text-sm leading-relaxed text-tenue">
-        <strong className="text-tinta">No se instala ninguna aplicación.</strong> Lo único que se
-        hace es decirle al aparato de {chico ?? "el chico"} a qué servidor preguntarle las
-        direcciones de los sitios. Ese servidor anota qué dominios se consultaron y a qué hora.
-        Nada más: <strong className="text-tinta">los mensajes no se leen, y no se pueden leer</strong>.
+        <strong className="text-tinta">{COMO_FUNCIONA.noEs}</strong>
       </p>
+      <p className="mt-2 text-sm leading-relaxed text-tenue">{COMO_FUNCIONA.laComparacion}</p>
+      <p className="mt-2 text-sm leading-relaxed text-tinta">{COMO_FUNCIONA.queCambia}</p>
+      <p className="mt-2 text-sm leading-relaxed text-tenue">{COMO_FUNCIONA.elLimite}</p>
       <p className="mt-2 text-sm leading-relaxed text-tenue">
         Por eso {chico ?? "el chico"} lo puede ver y conviene que lo vea. Es lo que le prometimos
         al darlo de alta.
