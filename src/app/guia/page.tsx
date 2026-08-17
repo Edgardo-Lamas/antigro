@@ -84,6 +84,20 @@ export default function Guia() {
           <strong className="text-tinta">sin leer un solo mensaje suyo</strong>. Esta página está
           escrita para quien quiere entenderlo rápido y verificarlo.
         </p>
+
+        {/* 🔴 Faltaba, y lo marcó Edgardo el 17/8: *"no pusiste el ranking
+            LATAM donde Argentina figura segunda"*. Estaba en el PDF desde el
+            15/8 y no acá. Es el dato que ubica el problema antes de explicar
+            nada — sin él, la página arranca hablando de un sistema en el aire. */}
+        <div className="mt-6 rounded-lg border border-riesgo/40 bg-riesgoSuave px-5 py-4">
+          <p className="text-base font-semibold leading-snug text-tinta">
+            Argentina es el segundo país de América Latina con más casos de ciberacoso infantil.
+          </p>
+          <p className="mt-1.5 text-sm leading-relaxed text-tenue">
+            Sólo detrás de México, según UNESCO y el CIPDH. Y el 60% de los hechos no se denuncia,
+            por vergüenza o falta de información.
+          </p>
+        </div>
       </header>
 
       {/* ── El hallazgo que define el diseño ─────────────────────────────── */}
@@ -158,6 +172,43 @@ export default function Guia() {
             que="Un asistente que acompaña a los adultos"
             detalle="Explica el informe, ordena las opciones y dice cómo abrir la conversación. Cada respuesta se revisa antes de que la leas: no puede decirte que no es nada, ni que sí, ni estimar qué tan probable es — eso no lo puede saber, y decírtelo sería mentirte con cara de sistema."
           />
+          {/* 🔴 **Estaba construido desde el 15/8 y la guía no lo nombraba.**
+              Lo marcó Edgardo el 17/8 pidiendo mostrar que la herramienta es
+              potente y fundada — y describió exactamente esto, sin saber que
+              ya existía: un depredador que se conecta con muchos chicos, y los
+              perfiles de esos chicos iguales entre sí.
+              🔑 Es lo más difícil de copiar que tiene el producto: no compara
+              al chico contra sí mismo, compara un LUGAR contra el resto de las
+              casas. Ver `src/lib/observatorio/`. */}
+          <Ficha
+            que="Cruza lo que pasa en una casa con lo que pasa en las demás"
+            detalle="Un acosador no trabaja de a un chico: la literatura lo llama «spray and prey» — contacta a muchos a la vez. Si el mismo lugar nuevo aparece en varias casas la misma semana, eso ya pide explicación. Y no se cuenta cuántos chicos lo vieron, porque entonces lo más peligroso sería siempre lo más popular: se mide cuánto más aparece entre los chicos con alerta que entre todos los demás."
+          />
+          <Ficha
+            que="Y mira si el público de ese lugar es imposible"
+            detalle="Un lugar legítimo tiene público diverso: Roblox tiene chicos de 7 a 17, varones y nenas. Un canal armado para captar tiene público angosto — misma edad, mismo género. Por eso el sistema puede señalar un sitio que nadie vio nunca y del que no hay ninguna denuncia previa: no necesita saber qué es, le alcanza con notar que su público no se parece al de ninguna plataforma normal."
+          />
+          {/* 🔴 **Sin esto, las dos fichas de arriba serían una fantasía**, que
+              es justo lo que Edgardo pidió evitar: *"todo esto sin caer en
+              fantasías"*. El mecanismo está construido y probado; lo que no
+              tiene todavía son casas de las que salir. Decirlo acá cuesta un
+              párrafo y es lo que hace creíble todo lo demás de la página. */}
+          <div className="rounded-lg border border-atencion/40 bg-atencionSuave px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Y hasta acá, lo que este cruce todavía NO puede darte
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-tinta">
+              El mecanismo está construido y probado, pero{" "}
+              <strong>necesita varias casas conectadas para producir algo</strong>, y hoy AntiGro
+              no las tiene. Por eso cada hallazgo sale marcado con cuánto se apoya —
+              <em>insuficiente</em>, <em>indicio</em> o <em>consistente</em>— y por debajo de un
+              piso de chicos el sistema directamente no mira el perfil, porque con pocos casos un
+              casillero de «nenas de 10» es casi una identidad. Un observatorio que informa un
+              hallazgo sin decir sobre cuántos casos se apoya es peor que no tenerlo: alguien lo va
+              a citar.
+            </p>
+          </div>
+
           <Ficha
             que="El chico sabe que existe, desde el minuto cero"
             detalle="El alta incluye una pantalla que guía a los padres sobre qué contarle. Un chico que sabe que hay una red que lo cuida es un aliado; uno que se siente espiado es un adversario."
@@ -247,13 +298,23 @@ export default function Guia() {
             que="Investigación por la vía policial y judicial"
             detalle="Los factores de riesgo mejor documentados no están en la web abierta: se consiguen en esferas policiales y judiciales. El único estudio de factores de riesgo que apareció está armado sobre sentencias."
           />
+          {/* 🔴 Reescrito el 17/8. La versión anterior decía que el contexto
+              servía «para que el asistente no dé un consejo estúpido», y
+              Edgardo la frenó por dos motivos distintos: la palabra, y que
+              **vendía corta la herramienta**. Cada tipo de dato tiene una
+              función precisa y hay que decir cuál. */}
           <Ficha
-            que="Perfil de vulnerabilidad — como contexto, nunca como puntaje"
-            detalle="Nivel escolar, tipo de escuela, con quién vive el chico. Sirve para que el asistente no dé un consejo estúpido y para saber a quién escalar. No mueve ningún número: hoy no hay fuente que respalde puntuar a una familia por su forma."
+            que="Perfil de vulnerabilidad — contexto que orienta, nunca un puntaje"
+            detalle="Nivel y tipo de escuela, con quién vive el chico, su turno. Cada dato tiene una función precisa: definir a quién se escala cuando el sistema habla (si los padres viven en casas distintas, la segunda línea es la otra casa); ajustar a quién le habla el asistente, porque el consejo que sirve para una madre no sirve para el abuelo que está criando; y afinar la lectura de los horarios. No mueve ningún puntaje, y eso es deliberado: el estudio del Ministerio documenta comunicación familiar deficiente como factor de riesgo, no la forma de la familia. Puntuar a una familia por su estructura sería inventar una autoridad que ninguna fuente respalda."
           />
+          {/* 🔴 Reescrito el 17/8. Edgardo: *"si el informe dice esto, es lo
+              mismo que un padre vaya y diga lo que le parece al denunciar; esto
+              tiene que ser más fundado"*. Tenía razón: la versión anterior
+              describía un acta, no una herramienta. Lo que sigue es lo que el
+              sistema **ya calcula** — no hay nada acá que haya que inventar. */}
           <Ficha
             que="Un informe para que el padre pueda denunciar"
-            detalle="Lo que lo haría útil no es una conclusión —el sistema no afirma— sino el registro fechado: qué se vio, en qué días, y qué explícitamente no se puede ver."
+            detalle="No una conclusión —el sistema no afirma— sino cuatro cosas que un padre solo no puede llevar: el registro fechado de qué se vio y en qué días; con qué etapa del modelo de grooming encaja esa huella y por qué; qué dicen las estadísticas oficiales sobre ese perfil de chico; y, si el observatorio lo detectó, que ese mismo lugar apareció en otras casas la misma semana. Y al lado, con la misma letra, qué es lo que explícitamente no se puede ver. Eso es lo que separa una denuncia con material de una denuncia con una impresión."
           />
           {/* 🔴 **ACÁ HABÍA UNA FICHA SOBRE BULLYING Y LA SACÓ EDGARDO EL 17/8.**
               Textual: *"metiste bullying y sólo te había hecho una consulta que
@@ -283,6 +344,14 @@ export default function Guia() {
               Política Criminal, 2023
             </p>
             <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
+              <li>
+                · Argentina es el <strong className="text-tinta">segundo país de América Latina</strong>{" "}
+                con más casos de ciberacoso infantil, sólo detrás de México (UNESCO y CIPDH,
+                recopilado en el estudio).
+              </li>
+              <li>· 56,4% de los chicos de 9 a 17 habla por internet con gente que no conoce.</li>
+              <li>· 35,4% recibió un pedido de fotos desnudo o con poca ropa.</li>
+              <li>· 60% de los hechos no se denuncia, por vergüenza o falta de información.</li>
               <li>· 74,3% de los casos pasa por WhatsApp.</li>
               <li>· 90% de las víctimas sufre acoso cotidiano sostenido durante meses.</li>
               <li>· 80% de las víctimas de acoso virtual infantil son nenas.</li>
@@ -306,6 +375,38 @@ export default function Guia() {
               <li>· La franja más vulnerable es de 9 a 13 años.</li>
               <li>· 33,3% recibió una propuesta de «ser novio o novia» dentro de un juego.</li>
             </ul>
+          </div>
+
+          {/* 🔴 La fuente del cruce entre casas. Sin esto, «los acosadores
+              contactan a muchos chicos a la vez» sería una corazonada nuestra
+              — y es sobre esa frase que se apoya el observatorio entero. */}
+          <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
+            <p className="text-sm font-semibold text-tinta">
+              Por qué un mismo lugar aparece en varias casas a la vez
+            </p>
+            <p className="mt-1 text-xs text-apagado">
+              Revisión de estrategias de grooming pre y post internet — Child Abuse &amp; Neglect,
+              noviembre de 2021 · PubMed 34801848
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tenue">
+              La revisión describe lo que llama <em>«spray and prey»</em>: la tecnología le permite
+              al acosador chatear <strong className="text-tinta">simultáneamente con cualquier
+              cantidad de chicos</strong>, en cualquier lugar y momento. De ahí sale una
+              consecuencia que el sistema aprovecha: si un mismo acosador toca a muchos chicos a la
+              vez, el mismo lugar aparece en varios chicos a la vez.{" "}
+              <strong className="text-tinta">
+                Eso no necesita escala para significar algo: necesita simultaneidad, y la
+                simultaneidad la pone el atacante.
+              </strong>
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tenue">
+              ⚠ Y una distinción que el sistema respeta: que las víctimas se concentran en un
+              perfil está en las dos fuentes del proyecto. Que <em>cada</em> acosador persiga un
+              perfil consistente es una inferencia razonable que{" "}
+              <strong className="text-tinta">no está verificada en fuente, y no se afirma</strong>.
+              El detector no depende de eso — mide contra la diversidad esperable de una
+              plataforma, sea cual sea el motivo de la concentración.
+            </p>
           </div>
 
           {/* 🔴 Este bloque faltaba y es el que sostiene «mira al agresor». Sin
