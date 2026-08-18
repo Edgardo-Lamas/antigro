@@ -188,24 +188,45 @@ export default function Guia() {
             que="Y mira si el público de ese lugar es imposible"
             detalle="Un lugar legítimo tiene público diverso: Roblox tiene chicos de 7 a 17, varones y nenas. Un canal armado para captar tiene público angosto — misma edad, mismo género. Por eso el sistema puede señalar un sitio que nadie vio nunca y del que no hay ninguna denuncia previa: no necesita saber qué es, le alcanza con notar que su público no se parece al de ninguna plataforma normal."
           />
-          {/* 🔴 **Sin esto, las dos fichas de arriba serían una fantasía**, que
-              es justo lo que Edgardo pidió evitar: *"todo esto sin caer en
-              fantasías"*. El mecanismo está construido y probado; lo que no
-              tiene todavía son casas de las que salir. Decirlo acá cuesta un
-              párrafo y es lo que hace creíble todo lo demás de la página. */}
-          <div className="rounded-lg border border-atencion/40 bg-atencionSuave px-5 py-4">
+          {/* 🔴 **Esto estaba escrito como una carencia y Edgardo lo dio
+              vuelta el 17/8:** *"obvio que no tiene casas si esto es un
+              concurso; un punto que tenés que destacar es que el sistema se va
+              fortaleciendo en la medida que junta datos, necesarios y
+              fundamentales para análisis"*.
+              🔑 Tenía razón y el encuadre anterior era malo por dos motivos: se
+              disculpaba por algo que no es una falla, y escondía una propiedad
+              real del diseño. **Que el sistema mejore con el uso no es una
+              promesa a futuro: es cómo está construido**, y se puede señalar
+              dónde. Lo que NO cambia es la honestidad — los marcadores de
+              solidez y el piso de privacidad siguen acá, contados como lo que
+              son: rigor, no letra chica. */}
+          <div className="rounded-lg border border-acento/40 bg-acentoSuave px-5 py-5">
             <p className="text-sm font-semibold text-tinta">
-              Y hasta acá, lo que este cruce todavía NO puede darte
+              Y se fortalece con el uso — por diseño, no como promesa
             </p>
             <p className="mt-2 text-sm leading-relaxed text-tinta">
-              El mecanismo está construido y probado, pero{" "}
-              <strong>necesita varias casas conectadas para producir algo</strong>, y hoy AntiGro
-              no las tiene. Por eso cada hallazgo sale marcado con cuánto se apoya —
-              <em>insuficiente</em>, <em>indicio</em> o <em>consistente</em>— y por debajo de un
-              piso de chicos el sistema directamente no mira el perfil, porque con pocos casos un
-              casillero de «nenas de 10» es casi una identidad. Un observatorio que informa un
-              hallazgo sin decir sobre cuántos casos se apoya es peor que no tenerlo: alguien lo va
-              a citar.
+              AntiGro mejora en <strong>dos ejes a la vez</strong>. Con el tiempo en una casa: el
+              perfil se arma con toda la historia disponible, no con una ventana fija, así que cada
+              día que pasa el sistema distingue mejor lo raro de lo habitual{" "}
+              <em>en ese chico</em>. Y con cada casa nueva: el cruce entre familias se vuelve más
+              filoso, porque un lugar que aparece en dos casas es una coincidencia y en seis es un
+              patrón.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-tinta">
+              <strong>Y no arranca desprotegido mientras aprende</strong>, que es la trampa de
+              cualquier sistema que necesita datos: las dos señales que no se comparan contra nada
+              —los horarios y los intentos de saltar el filtro— funcionan desde el primer día,
+              incluso con un chico que ya venía siendo acosado antes del alta.
+            </p>
+            <p className="mt-3 border-t border-acento/20 pt-3 text-sm leading-relaxed text-tenue">
+              Por eso cada hallazgo sale marcado con cuánto se apoya —<em>insuficiente</em>,{" "}
+              <em>indicio</em> o <em>consistente</em>—, y por debajo de un piso de chicos el
+              sistema directamente no mira el perfil, porque con pocos casos un casillero de
+              «nenas de 10» es casi una identidad.{" "}
+              <strong className="text-tinta">
+                Un observatorio que informa un hallazgo sin decir sobre cuántos casos se apoya es
+                peor que no tenerlo: alguien lo va a citar.
+              </strong>
             </p>
           </div>
 

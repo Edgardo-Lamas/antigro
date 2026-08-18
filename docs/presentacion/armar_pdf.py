@@ -68,10 +68,10 @@ HTML = f"""<!doctype html>
   body {{
     font-family: Charter, "Iowan Old Style", Palatino, Georgia, serif;
     color: var(--tinta); background: var(--papel);
-    font-size: 8.7pt; line-height: 1.46; -webkit-font-smoothing: antialiased;
+    font-size: 8.4pt; line-height: 1.4; -webkit-font-smoothing: antialiased;
   }}
   .page {{
-    width: 210mm; height: 297mm; padding: 12mm 16mm 10mm;
+    width: 210mm; height: 297mm; padding: 10mm 16mm 8mm;
     background: var(--papel); overflow: hidden;
     page-break-after: always; display: flex; flex-direction: column;
   }}
@@ -83,12 +83,12 @@ HTML = f"""<!doctype html>
        font-weight: 600; letter-spacing: -.012em; margin-bottom: 2.2mm; }}
   .kicker {{ font-family: "Avenir Next", "Helvetica Neue", sans-serif; font-size: 6.3pt;
        font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--apagado); }}
-  p {{ margin-bottom: 2.1mm; max-width: 162mm; }}
+  p {{ margin-bottom: 1.8mm; max-width: 162mm; }}
   p:last-child {{ margin-bottom: 0; }}
   strong {{ font-weight: 600; }}
   .lede {{ font-size: 10pt; line-height: 1.42; color: var(--tinta-suave); }}
   .nota {{ font-size: 6.9pt; line-height: 1.38; color: var(--apagado); max-width: none; }}
-  .sec {{ margin-top: 3.3mm; }}
+  .sec {{ margin-top: 2.8mm; }}
   .regla-fuerte {{ border: 0; border-top: 1.6pt solid var(--petroleo); margin: 2mm 0 2.8mm; }}
 
   .cinta {{ display: flex; justify-content: space-between; align-items: baseline; }}
@@ -111,7 +111,7 @@ HTML = f"""<!doctype html>
   .par .dato {{ font-size: 7.9pt; line-height: 1.32; color: var(--tinta-suave); }}
   .par .dato b {{ font-family: "Avenir Next", sans-serif; font-weight: 600;
     color: var(--petroleo); font-size: 8.5pt; }}
-  .par .dec {{ font-size: 7.9pt; line-height: 1.36; }}
+  .par .dec {{ font-size: 7.7pt; line-height: 1.3; }}
   .par .dec::before {{ content: "→"; color: var(--ambar); font-family: "Avenir Next", sans-serif;
     margin-right: 2.2mm; font-weight: 600; }}
 
@@ -146,13 +146,13 @@ HTML = f"""<!doctype html>
   /* gráfico */
   .grafico {{ margin-top: 3.2mm; }}
   .fila {{ display: grid; grid-template-columns: 53mm 1fr 21mm; gap: 4mm;
-    align-items: end; padding: 1.9mm 0; border-top: .35pt solid var(--linea-fina); }}
+    align-items: end; padding: 1.5mm 0; border-top: .35pt solid var(--linea-fina); }}
   .fila:first-child {{ border-top: .8pt solid var(--tinta); }}
-  .fila.destacada {{ background: var(--petroleo-claro); margin: 0 -3mm; padding: 1.9mm 3mm; }}
+  .fila.destacada {{ background: var(--petroleo-claro); margin: 0 -3mm; padding: 1.5mm 3mm; }}
   .fila-nom {{ font-family: "Avenir Next", sans-serif; font-size: 7.5pt; font-weight: 600;
     line-height: 1.2; margin-bottom: .7mm; }}
   .fila-desc {{ font-size: 6.6pt; line-height: 1.26; color: var(--apagado); }}
-  .barras {{ display: flex; align-items: flex-end; gap: .9mm; height: 8.6mm;
+  .barras {{ display: flex; align-items: flex-end; gap: .9mm; height: 7.8mm;
     border-bottom: .5pt solid var(--linea); }}
   .barras i {{ flex: 1; display: block; }}
   .badge {{ font-family: "Avenir Next", sans-serif; font-size: 6.7pt; font-weight: 600;
@@ -185,11 +185,11 @@ HTML = f"""<!doctype html>
     font-family: "Avenir Next", sans-serif; font-weight: 600; }}
   .limites td:last-child {{ color: var(--tinta-suave); }}
 
-  .fuentes {{ font-size: 7.3pt; line-height: 1.38; color: var(--tinta-suave); margin-top: 2.6mm; }}
-  .fuentes li {{ margin-bottom: 1.5mm; list-style: none; padding-left: 3.4mm; text-indent: -3.4mm; }}
+  .fuentes {{ font-size: 7.05pt; line-height: 1.32; color: var(--tinta-suave); margin-top: 2.6mm; }}
+  .fuentes li {{ margin-bottom: .8mm; list-style: none; padding-left: 3.4mm; text-indent: -3.4mm; }}
   .fuentes li::before {{ content: "— "; color: var(--apagado); }}
 
-  .cita {{ border-left: 1.6pt solid var(--ambar); padding: .4mm 0 .4mm 4mm; margin: 2.4mm 0;
+  .cita {{ border-left: 1.6pt solid var(--ambar); padding: .3mm 0 .3mm 4mm; margin: 1.9mm 0;
     font-size: 8.1pt; line-height: 1.38; font-style: italic; color: var(--tinta-suave); }}
   .cita .aut {{ display: block; font-style: normal; margin-top: 1.1mm;
     font-family: "Avenir Next", sans-serif; font-size: 6.9pt; color: var(--apagado); }}
@@ -204,7 +204,7 @@ HTML = f"""<!doctype html>
   .corrobora .cuerpo {{ font-size: 7.6pt; line-height: 1.36; color: var(--tinta-suave); }}
   .corrobora b {{ font-family: "Avenir Next", sans-serif; font-weight: 600; color: var(--petroleo); }}
   .destacado {{ background: var(--ambar-claro); border-left: 1.6pt solid var(--ambar);
-    padding: 2.5mm 4mm; margin-top: 2.8mm; font-size: 7.9pt; line-height: 1.38; }}
+    padding: 2.1mm 4mm; margin-top: 2.4mm; font-size: 7.9pt; line-height: 1.34; }}
   .destacado p {{ max-width: none; }}
 </style></head><body>
 
@@ -275,7 +275,7 @@ HTML = f"""<!doctype html>
       <div class="senal"><span class="n">Salto marcado de volumen</span>
         <span class="d">Contra la línea de base del propio chico, no contra un promedio ajeno. Un chico que siempre usó mucho el teléfono no arranca en rojo.</span></div>
       <div class="senal"><span class="n">Actividad de red a horas tardías</span>
-        <span class="d">Por sí sola no dice nada: un chico despierto de noche puede estar jugando, de vacaciones o durmiendo mal. Pesa cuando se repite. No se compara contra su historia, así que cuenta desde el primer día — incluso con un chico que ya venía siendo acosado.</span></div>
+        <span class="d">Por sí sola no dice nada —puede estar jugando o de vacaciones—: pesa cuando se repite. No se compara contra su historia, así que cuenta desde el primer día.</span></div>
       <div class="senal"><span class="n">Plataforma nueva</span>
         <span class="d">Aparece un servicio o un sitio de chat con desconocidos que antes no estaba.</span></div>
       <div class="senal fuerte"><span class="n">Intento de saltar el filtro</span>
@@ -431,13 +431,9 @@ HTML = f"""<!doctype html>
         n≈28.360 encuestas anónimas a NNyA de 9 a 17 años en 14 países, relevamiento 2024/2025. Es la fuente
         más grande y más reciente de las dos, y la que fija la franja más vulnerable entre los 9 y los 13 años.</li>
       <li><strong>Cómo ataca un agresor — el modelo de las cinco etapas.</strong> <em>Sexual Grooming Model</em>
-        (SGM), Winters &amp; Jeglic, 2017; ampliado con una quinta etapa por Winters y col., 2020. Tiene validez de
-        contenido establecida por un panel de expertos y describe 77 conductas agrupadas en cinco etapas: selección
-        de la víctima, obtener acceso y aislarla, desarrollo de la confianza, desensibilización, y mantenimiento
-        posterior. Sobre él se construyó la <em>Sexual Grooming Scale – Victim Version</em>, puesta a prueba con 115
-        víctimas adultas. <strong>AntiGro no lo usa para diagnosticar una etapa</strong> —eso exigiría leer las
-        conversaciones, y no se leen—: lo usa al revés, para saber qué huella dejaría cada etapa en la red y poder
-        decir «lo que se ve encaja con esta forma», que es distinto de «esto está pasando».</li>
+        (SGM), Winters &amp; Jeglic, 2017, ampliado en 2020: validez de contenido establecida por un panel de
+        expertos, 77 conductas agrupadas en cinco etapas. <strong>AntiGro no lo usa para diagnosticar una etapa</strong>
+        —eso exigiría leer las conversaciones—: lo usa al revés, para saber qué huella dejaría cada una en la red.</li>
       <li><strong>Marco legal:</strong> Ley 26.904 (grooming, delito desde 2013, art. 131 del Código Penal) y
         Ley 27.590 «Mica Ortega», que crea el Programa Nacional de Prevención y Concientización del Grooming.
         <strong>Derivación:</strong> Línea 137 y app GAPP de Grooming Argentina. Y el Ministerio Público de la
@@ -447,11 +443,9 @@ HTML = f"""<!doctype html>
         señal son <em>decisiones de producto informadas por esas cifras</em>, no coeficientes publicados por el estudio,
         y la distinción está anotada en el código dato por dato.</li>
       <li><strong>Y una que preferimos decir antes de que la pregunten:</strong> el sistema <strong>no espera una
-        cantidad fija de días</strong> para saber qué es «lo habitual» en un chico. Fijar un número —14, 30— habría sido
-        inventar una certeza que no existe: eso depende de cada chico, y son adolescentes que cambian todo el tiempo.
-        En su lugar, la confianza crece con lo que el sistema va observando, baja si la conducta de ese chico es
-        errática, y <strong>se muestra en pantalla en vez de esconderse</strong>. Las dos señales que no dependen de
-        ninguna comparación —la madrugada y los intentos de saltar el filtro— funcionan desde el primer día.</li>
+        cantidad fija de días</strong> para saber qué es «lo habitual» en un chico. Fijar un número —14, 30— habría
+        sido inventar una certeza que no existe: depende de cada chico. La confianza crece con lo que el sistema va
+        observando, baja si la conducta es errática, y <strong>se muestra en pantalla en vez de esconderse</strong>.</li>
     </ul>
   </div>
 
@@ -460,14 +454,20 @@ HTML = f"""<!doctype html>
     <p style="margin-top:1.8mm">
       <strong>Sistema en desarrollo.</strong> El motor de análisis, la mensajería —Telegram, correo y WhatsApp
       detrás de una misma interfaz— y la vinculación de canales están funcionando y probados contra dispositivos
-      reales. <strong>Quién decide es el sistema</strong>, mirando qué pasó y en qué días. La inteligencia
-      artificial sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que el
-      sistema no pueda sostener; si no pasa esa revisión, sale un texto escrito de antemano.
+      reales. <strong>Quién decide es el sistema</strong>, mirando qué pasó y en qué días; la inteligencia
+      artificial sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que el sistema
+      no pueda sostener.
     </p>
     <p>
-      Cada lectura queda registrada con su fecha. Agregado y anonimizado, eso produce algo que hoy no existe:
-      cuántos días pasan entre la primera señal y el patrón sostenido, con qué frecuencia lo que ve la red
-      coincide con lo que ven los adultos, y a qué edad empiezan a aparecer ciertas conductas.
+      <strong>Y se fortalece a medida que junta datos, en dos ejes.</strong> Con el tiempo en una casa: el perfil se
+      arma con toda la historia, no con una ventana fija. Y con cada casa nueva: un acosador no trabaja de a un
+      chico —<em>«spray and prey»</em>, Child Abuse &amp; Neglect 2021—, así que el mismo lugar apareciendo en
+      varias casas la misma semana pide explicación. No se cuenta cuántos chicos lo vieron —lo peligroso sería lo
+      popular—: se mide cuánto más aparece entre los que tienen alerta, y si el público de ese lugar es
+      <em>imposible</em>, angosto en edad y género donde un sitio legítimo es diverso. <strong>Eso permite señalar
+      un sitio del que no hay ninguna denuncia previa.</strong> Agregado y anonimizado, ese mismo registro produce
+      algo que hoy no existe: cuántos días pasan entre la primera señal y el patrón sostenido, y a qué edad
+      empiezan a aparecer ciertas conductas.
     </p>
     <div class="cita">«Argentina carece de datos concretos respecto de casuística por jurisdicciones.»
       <span class="aut">Hernán Navarro, director de Grooming Argentina — marzo de 2026</span></div>
