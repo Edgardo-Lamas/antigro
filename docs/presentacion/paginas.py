@@ -1,228 +1,15 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8">
-<title>AntiGro — Documento de presentación</title>
-<style>
-  /* ══════════════════════════════════════════════════════════════════════
-     REGISTRO PACIENTE — el sistema. Ver `filosofia-de-diseno.md`.
 
-     🔴 CUATRO TAMAÑOS DE LETRA Y NINGUNO MÁS. Si algo no entra, va a otra
-        página. La letra chica es una falta de respeto disfrazada de elegancia.
-     ══════════════════════════════════════════════════════════════════════ */
+def pie(n, total):
+    return f'<div class="pie"><span>AntiGro · Documento de presentación</span><span>{n} / {total}</span></div>'
 
-  :root {
-    --papel:      #FBFAF7;   /* papel cálido, nunca blanco puro */
-    --tinta:      #191E24;
-    --tinta-media:#46525E;
-    --apagado:    #8B949D;
-    --linea:      #E4E0D8;
-    --linea-fina: #EFECE5;
+def cinta(txt):
+    return f'<div class="cinta"><span class="kicker">{txt}</span><span class="kicker">AntiGro</span></div>'
 
-    /* 🔑 UN acento, y se reserva. Tres veces por página, no treinta. */
-    --petroleo:   #0D6B6A;
-    --petroleo-claro: #EAF2F1;
-    --ambar:      #B87118;
-    --ambar-claro:#FBF2E3;
-    --gris:       #D3CEC4;
+TOTAL = 10
 
-    /* Los cuatro tamaños. */
-    --t-display:  33pt;
-    --t-titulo:   15.5pt;
-    --t-cuerpo:   10.4pt;
-    --t-nota:     8.4pt;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  @page { size: A4; margin: 0; }
-
-  body {
-    font-family: Charter, "Iowan Old Style", Palatino, Georgia, serif;
-    color: var(--tinta); background: var(--papel);
-    font-size: var(--t-cuerpo); line-height: 1.58;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* 🔴 Márgenes anchos y NO negociables. Achicarlos para ganar una línea es
-     exactamente lo que arruinó la versión anterior. */
-  .page {
-    width: 210mm; height: 297mm; padding: 20mm 22mm 16mm;
-    background: var(--papel); overflow: hidden;
-    page-break-after: always; display: flex; flex-direction: column;
-    position: relative;
-  }
-  .page:last-child { page-break-after: auto; }
-
-  /* ── Tipografía ──────────────────────────────────────────────────── */
-
-  .display {
-    font-family: "Avenir Next", "Helvetica Neue", sans-serif;
-    font-size: var(--t-display); font-weight: 600; line-height: 1.04;
-    letter-spacing: -.026em; color: var(--tinta);
-  }
-  h2 {
-    font-family: "Avenir Next", "Helvetica Neue", sans-serif;
-    font-size: var(--t-titulo); font-weight: 600; line-height: 1.24;
-    letter-spacing: -.012em; color: var(--tinta);
-  }
-  .kicker {
-    font-family: "Avenir Next", "Helvetica Neue", sans-serif;
-    font-size: 7.2pt; font-weight: 600; letter-spacing: .19em;
-    text-transform: uppercase; color: var(--apagado);
-  }
-  /* 🔑 La medida: nunca más de ~65 caracteres. El ojo se pierde al volver. */
-  p { max-width: 152mm; }
-  p + p { margin-top: 3.2mm; }
-  strong { font-weight: 600; }
-  em { font-style: italic; }
-  .nota { font-size: var(--t-nota); line-height: 1.5; color: var(--tinta-media); }
-  .suave { color: var(--tinta-media); }
-
-  /* ── Ritmo vertical ──────────────────────────────────────────────── */
-  .sec { margin-top: 11mm; }
-  .sec > h2 { margin-top: 2.4mm; }
-  .sec > p, .sec > .nota { margin-top: 3.4mm; }
-  .respiro { flex: 1; }
-
-  hr.regla {
-    border: 0; border-top: .6pt solid var(--linea); margin: 3mm 0 0;
-  }
-  hr.gruesa {
-    border: 0; border-top: 2pt solid var(--tinta); margin: 3mm 0 0;
-  }
-
-  /* ── Encabezado y pie corridos ───────────────────────────────────── */
-  .cinta {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding-bottom: 2.4mm; border-bottom: .6pt solid var(--linea);
-  }
-  .pie {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding-top: 3mm; border-top: .6pt solid var(--linea);
-    font-family: "Avenir Next", sans-serif; font-size: 7.2pt;
-    letter-spacing: .05em; color: var(--apagado);
-  }
-
-  /* ── Cifras: la lámina de datos ──────────────────────────────────── */
-  .cifras {
-    display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 8mm 9mm; margin-top: 6mm;
-  }
-  .cifra .n {
-    font-family: "Avenir Next", sans-serif; font-size: 25pt; font-weight: 500;
-    letter-spacing: -.02em; color: var(--petroleo); line-height: 1;
-    display: block;
-  }
-  .cifra .d {
-    display: block; margin-top: 2.2mm; font-size: var(--t-nota);
-    line-height: 1.42; color: var(--tinta-media); max-width: 46mm;
-  }
-
-  /* ── Bloque destacado: se usa poco, por eso pesa ─────────────────── */
-  .destacado {
-    border-left: 2.2pt solid var(--petroleo); padding: 1mm 0 1mm 6mm;
-    margin-top: 6mm;
-  }
-  .destacado.alerta { border-left-color: var(--ambar); }
-
-  .marco {
-    border: .6pt solid var(--linea); background: #fff;
-    padding: 6mm 7mm; margin-top: 6mm;
-  }
-
-  /* ── Listas ──────────────────────────────────────────────────────── */
-  ul { list-style: none; }
-  .lista li {
-    padding-left: 6mm; text-indent: -6mm; margin-top: 2.6mm;
-    max-width: 152mm;
-  }
-  .lista li::before { content: "—"; color: var(--petroleo); margin-right: 2.6mm; }
-  .lista.densa li { margin-top: 2mm; font-size: var(--t-nota); line-height: 1.48; }
-
-  /* ── Dos columnas para pares dato→decisión ───────────────────────── */
-  .pares { margin-top: 5mm; }
-  .par {
-    display: grid; grid-template-columns: 62mm 1fr; gap: 7mm;
-    padding: 3.4mm 0; border-top: .6pt solid var(--linea-fina);
-    align-items: start;
-  }
-  .par:first-child { border-top: 0; }
-  .par .dato { font-weight: 600; line-height: 1.4; }
-  .par .dato b {
-    font-family: "Avenir Next", sans-serif; color: var(--petroleo);
-    font-weight: 600;
-  }
-  .par .dec { font-size: var(--t-nota); line-height: 1.5; color: var(--tinta-media); }
-
-  /* ── Rejilla de dos columnas ─────────────────────────────────────── */
-  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm 9mm; margin-top: 5mm; }
-  .item { }
-  .item .n {
-    font-family: "Avenir Next", sans-serif; font-size: 9pt; font-weight: 600;
-    display: block; padding-bottom: 1.6mm; border-bottom: .6pt solid var(--linea);
-  }
-  .item .d { display: block; margin-top: 2.4mm; font-size: var(--t-nota);
-             line-height: 1.48; color: var(--tinta-media); }
-  .item.fuerte .n { color: var(--petroleo); border-bottom-color: var(--petroleo); }
-
-  /* ── El gráfico ──────────────────────────────────────────────────── */
-  .grafico { margin-top: 7mm; }
-  .fila {
-    display: grid; grid-template-columns: 54mm 1fr 26mm; gap: 6mm;
-    align-items: end; padding: 3.6mm 0; border-top: .6pt solid var(--linea-fina);
-  }
-  .fila.destacada {
-    background: var(--petroleo-claro); margin: 0 -5mm; padding: 3.6mm 5mm;
-    border-top-color: var(--petroleo);
-  }
-  .fila-nom { font-weight: 600; line-height: 1.3; font-size: 9.6pt; }
-  .fila-desc { font-size: 7.6pt; line-height: 1.34; color: var(--apagado); margin-top: 1mm; }
-  .barras { display: flex; align-items: flex-end; gap: 1.1mm; height: 13mm; }
-  .barras i { flex: 1; display: block; border-radius: .4mm .4mm 0 0; }
-  .fila-badge { text-align: right; }
-  .badge {
-    font-family: "Avenir Next", sans-serif; font-size: 7pt; font-weight: 600;
-    padding: 1.2mm 2.4mm; display: inline-block; white-space: nowrap;
-    border-radius: 1mm;
-  }
-  .badge-hab { background: var(--petroleo); color: #fff; }
-  .badge-cal { background: var(--gris); color: #5C564C; }
-  .eje {
-    display: grid; grid-template-columns: 54mm 1fr 26mm; gap: 6mm;
-    margin-top: 2.4mm;
-  }
-  .eje-dias {
-    display: flex; justify-content: space-between;
-    font-family: "Avenir Next", sans-serif; font-size: 7pt; color: var(--apagado);
-  }
-  .leyenda {
-    display: flex; gap: 7mm; margin-top: 5mm; flex-wrap: wrap;
-    font-size: 7.6pt; color: var(--tinta-media);
-  }
-  .leyenda span { display: flex; align-items: center; gap: 2mm; }
-  .leyenda b { width: 3mm; height: 3mm; display: inline-block; border-radius: .5mm; }
-
-  /* ── Cita ────────────────────────────────────────────────────────── */
-  .cita {
-    border-left: 2.2pt solid var(--ambar); padding: 1mm 0 1mm 6mm; margin-top: 6mm;
-    font-style: italic; color: var(--tinta-media); max-width: 148mm;
-  }
-  .cita .aut {
-    display: block; margin-top: 2mm; font-style: normal;
-    font-family: "Avenir Next", sans-serif; font-size: 7.4pt; color: var(--apagado);
-  }
-
-  /* ── Contacto ────────────────────────────────────────────────────── */
-  .contacto {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding-top: 4mm; margin-top: 6mm; border-top: 2pt solid var(--tinta);
-  }
-  .contacto .q {
-    font-family: "Avenir Next", sans-serif; font-size: 12pt; font-weight: 600;
-  }
-  .contacto .m { font-size: var(--t-nota); color: var(--petroleo); }
-</style>
-</head><body>
-
+# ═══════════════ 1 · PORTADA ═══════════════
+# 🔑 Una sola idea y mucho aire. La portada no explica: ubica.
+P1 = f"""
 <div class="page">
   <div class="cinta"><span class="kicker">Documento de presentación</span><span class="kicker">Agosto de 2026</span></div>
 
@@ -260,10 +47,13 @@
     </p>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>1 / 10</span></div>
-</div>
+  {pie(1, TOTAL)}
+</div>"""
+
+# ═══════════════ 2 · EL PROBLEMA, MEDIDO ═══════════════
+P2 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">El problema, medido</span><span class="kicker">AntiGro</span></div>
+  {cinta("El problema, medido")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Estudio nacional</span>
@@ -297,10 +87,13 @@
     </p>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>2 / 10</span></div>
-</div>
+  {pie(2, TOTAL)}
+</div>"""
+
+# ═══════════════ 3 · ARGENTINA + EL PUNTO INCÓMODO ═══════════════
+P3 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">Argentina · el punto de partida</span><span class="kicker">AntiGro</span></div>
+  {cinta("Argentina · el punto de partida")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Medido por el organismo al que este sistema deriva</span>
@@ -339,10 +132,13 @@
     </p>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>3 / 10</span></div>
-</div>
+  {pie(3, TOTAL)}
+</div>"""
+
+# ═══════════════ 4 · QUÉ VE Y QUÉ NO ═══════════════
+P4 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">Qué ve el sistema · qué no hace</span><span class="kicker">AntiGro</span></div>
+  {cinta("Qué ve el sistema · qué no hace")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Ese rastro son cuatro cosas, y nada más que cuatro</span>
@@ -402,10 +198,13 @@
     </div>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>4 / 10</span></div>
-</div>
+  {pie(4, TOTAL)}
+</div>"""
+
+# ═══════════════ 5 · DE CADA DATO, UNA DECISIÓN ═══════════════
+P5 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">De cada dato, una decisión</span><span class="kicker">AntiGro</span></div>
+  {cinta("De cada dato, una decisión")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Nada de lo que hace el sistema salió de una ocurrencia</span>
@@ -455,10 +254,15 @@
     </div>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>5 / 10</span></div>
-</div>
+  {pie(5, TOTAL)}
+</div>"""
+
+# ═══════════════ 6 · LAS REGLAS Y SU RESPALDO ═══════════════
+# 🔑 La página que separa a AntiGro de un control parental. Verificado el 18/8
+#    contra UCF y ScienceDaily antes de publicarlo.
+P6 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">Por qué estas reglas, y no un control parental</span><span class="kicker">AntiGro</span></div>
+  {cinta("Por qué estas reglas, y no un control parental")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">La investigación</span>
@@ -509,10 +313,13 @@
     </p>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>6 / 10</span></div>
-</div>
+  {pie(6, TOTAL)}
+</div>"""
+
+# ═══════════════ 7 · LA PRUEBA ═══════════════
+P7 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">El corazón del sistema</span><span class="kicker">AntiGro</span></div>
+  {cinta("El corazón del sistema")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">La regla que define el producto</span>
@@ -523,47 +330,7 @@
     </p>
 
     <div class="grafico">
-      
-      <div class="fila">
-        <div class="fila-txt">
-          <div class="fila-nom">Semana normal</div>
-          <div class="fila-desc">Lo que se ve en la enorme mayoría de las casas.</div>
-        </div>
-        <div class="barras"><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i></div>
-        <div class="fila-badge"><span class="badge badge-cal">nunca habla</span></div>
-      </div>
-      <div class="fila">
-        <div class="fila-txt">
-          <div class="fila-nom">Cambio leve</div>
-          <div class="fila-desc">Unos días distintos que después vuelven a lo de siempre.</div>
-        </div>
-        <div class="barras"><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.33mm;background:var(--gris)"></i><i style="height:2.16mm;background:var(--gris)"></i><i style="height:2.72mm;background:var(--ambar)"></i><i style="height:2.60mm;background:var(--gris)"></i><i style="height:2.52mm;background:var(--gris)"></i><i style="height:1.53mm;background:var(--gris)"></i><i style="height:1.59mm;background:var(--gris)"></i><i style="height:1.29mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i></div>
-        <div class="fila-badge"><span class="badge badge-cal">nunca habla</span></div>
-      </div>
-      <div class="fila">
-        <div class="fila-txt">
-          <div class="fila-nom">Patrón que persiste</div>
-          <div class="fila-desc">El cambio se sostiene y se profundiza semana a semana.</div>
-        </div>
-        <div class="barras"><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.10mm;background:var(--gris)"></i><i style="height:1.69mm;background:var(--gris)"></i><i style="height:1.91mm;background:var(--gris)"></i><i style="height:2.16mm;background:var(--gris)"></i><i style="height:3.00mm;background:var(--ambar)"></i><i style="height:3.82mm;background:var(--ambar)"></i><i style="height:4.72mm;background:var(--ambar)"></i><i style="height:5.59mm;background:var(--ambar)"></i><i style="height:6.21mm;background:var(--ambar)"></i><i style="height:7.23mm;background:var(--ambar)"></i><i style="height:8.18mm;background:var(--ambar)"></i><i style="height:8.66mm;background:var(--petroleo)"></i><i style="height:9.32mm;background:var(--petroleo)"></i></div>
-        <div class="fila-badge"><span class="badge badge-hab">habla el día 20</span></div>
-      </div>
-      <div class="fila">
-        <div class="fila-txt">
-          <div class="fila-nom">Intento de saltar el filtro</div>
-          <div class="fila-desc">Aparece VPN, proxy o DNS alternativo.</div>
-        </div>
-        <div class="barras"><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.00mm;background:var(--gris)"></i><i style="height:1.50mm;background:var(--gris)"></i><i style="height:2.44mm;background:var(--gris)"></i><i style="height:4.21mm;background:var(--ambar)"></i><i style="height:6.01mm;background:var(--petroleo)"></i><i style="height:7.81mm;background:var(--petroleo)"></i><i style="height:9.16mm;background:var(--petroleo)"></i><i style="height:10.63mm;background:var(--petroleo)"></i><i style="height:11.56mm;background:var(--petroleo)"></i><i style="height:11.92mm;background:var(--petroleo)"></i><i style="height:11.36mm;background:var(--petroleo)"></i><i style="height:11.39mm;background:var(--petroleo)"></i><i style="height:10.93mm;background:var(--petroleo)"></i><i style="height:10.89mm;background:var(--petroleo)"></i></div>
-        <div class="fila-badge"><span class="badge badge-hab">habla el día 12</span></div>
-      </div>
-      <div class="fila destacada">
-        <div class="fila-txt">
-          <div class="fila-nom">El mismo patrón, con los adultos ya marcando cambios</div>
-          <div class="fila-desc">Las dos miradas coinciden.</div>
-        </div>
-        <div class="barras"><i style="height:6.86mm;background:var(--ambar)"></i><i style="height:6.86mm;background:var(--ambar)"></i><i style="height:6.86mm;background:var(--ambar)"></i><i style="height:6.93mm;background:var(--ambar)"></i><i style="height:6.99mm;background:var(--ambar)"></i><i style="height:7.10mm;background:var(--ambar)"></i><i style="height:7.10mm;background:var(--ambar)"></i><i style="height:7.23mm;background:var(--ambar)"></i><i style="height:7.40mm;background:var(--ambar)"></i><i style="height:7.67mm;background:var(--ambar)"></i><i style="height:7.77mm;background:var(--ambar)"></i><i style="height:7.89mm;background:var(--ambar)"></i><i style="height:8.28mm;background:var(--ambar)"></i><i style="height:8.67mm;background:var(--ambar)"></i><i style="height:9.09mm;background:var(--ambar)"></i><i style="height:9.50mm;background:var(--ambar)"></i><i style="height:9.80mm;background:var(--petroleo)"></i><i style="height:10.27mm;background:var(--petroleo)"></i><i style="height:10.72mm;background:var(--petroleo)"></i><i style="height:10.96mm;background:var(--petroleo)"></i><i style="height:11.26mm;background:var(--petroleo)"></i></div>
-        <div class="fila-badge"><span class="badge badge-hab">habla el día 17</span></div>
-      </div>
+      {"".join(filas)}
       <div class="eje">
         <span></span>
         <span class="eje-dias"><span>día 1</span><span>día 7</span><span>día 14</span><span>día 21</span></span>
@@ -592,10 +359,13 @@
     </p>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>7 / 10</span></div>
-</div>
+  {pie(7, TOTAL)}
+</div>"""
+
+# ═══════════════ 8 · EN QUÉ SE BASA ═══════════════
+P8 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">En qué se basa</span><span class="kicker">AntiGro</span></div>
+  {cinta("En qué se basa")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Las fuentes</span>
@@ -648,10 +418,13 @@
     </ul>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>8 / 10</span></div>
-</div>
+  {pie(8, TOTAL)}
+</div>"""
+
+# ═══════════════ 9 · ESTADO, ESCALADO Y ALIANZAS ═══════════════
+P9 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">Estado · por dónde escala · con quiénes</span><span class="kicker">AntiGro</span></div>
+  {cinta("Estado · por dónde escala · con quiénes")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Estado</span>
@@ -703,10 +476,16 @@
     </p>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>9 / 10</span></div>
-</div>
+  {pie(9, TOTAL)}
+</div>"""
+
+# ═══════════════ 10 · ALIANZAS Y CIERRE ═══════════════
+# 🔑 La cita de Navarro va acá y no antes: nombra el hueco que estas alianzas
+#    existirían para llenar. El cierre del documento es una pregunta abierta,
+#    no una promesa.
+P10 = f"""
 <div class="page">
-  <div class="cinta"><span class="kicker">Con quiénes</span><span class="kicker">AntiGro</span></div>
+  {cinta("Con quiénes")}
 
   <div class="sec" style="margin-top:9mm">
     <span class="kicker">Alianzas que mejorarían los datos</span>
@@ -761,6 +540,5 @@
     <span class="q">Edgardo Lamas</span><span class="m">lamasedgardo2024@gmail.com</span>
   </div>
 
-  <div class="pie"><span>AntiGro · Documento de presentación</span><span>10 / 10</span></div>
-</div>
-</body></html>
+  {pie(10, TOTAL)}
+</div>"""
