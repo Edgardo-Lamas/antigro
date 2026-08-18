@@ -18,8 +18,36 @@ estadísticas oficiales sobre qué pesa cuánto.
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
+| **En producción** | `e8ad4ca` |
+| ⚠ **Sin promover** | **5 commits.** En código sólo cambia `src/app/guia/page.tsx`; el resto es `docs/`. **Promover es lo primero de la próxima sesión.** |
+| **Último commit** | `a639cc1` — el PDF rediseñado |
 | **En producción** | `85cbe69`, promovido y verificado el 17/8 |
 | **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour |
+
+### 🎨 EL PDF, REDISEÑADO EL 18/8 — y la regla que lo gobierna de ahora en más
+
+**Edgardo lo frenó:** *"el PDF está bastante feíto, letra muy chica"*. 🔴 **Tenía razón y la causa
+era mía y acumulada:** yo venía achicando la tipografía sesión tras sesión para que el contenido
+entrara en tres carillas. Peor: **el documento se venía imprimiendo con el texto cortado en
+silencio** (`.page` tiene alto fijo y `overflow:hidden`), y la página 2 —que nadie tocó ese día—
+también se cortaba, así que el defecto **estaba en el PDF que ya circuló**.
+
+🔴 **LA REGLA, y reemplaza al método viejo: si el contenido no entra, el contenido pasa a otra
+página. NUNCA se comprime la tipografía para forzar una carilla menos.**
+
+✅ Se escribió primero `docs/presentacion/filosofia-de-diseno.md` («Registro Paciente») y de ahí
+salió el sistema: **cuatro tamaños de letra y ninguno más**, cuerpo 10,4 pt, márgenes de 20 mm,
+medida de línea acotada, **un solo acento reservado**, y **una pregunta por carilla**. Quedó en
+**10 páginas**, verificadas una por una.
+
+⚠ **Cómo verificar que NO se corta** —y hay que hacerlo siempre, porque el fallo es mudo—: servir
+`antigro.html` (`python3 -m http.server`) y comparar `clientHeight` contra `scrollHeight` de cada
+`.page`. Mirar sólo el HTML no alcanza: hay que renderizar el PDF a imagen (`pdftoppm -png`).
+
+📌 El generador se partió en cuatro archivos: `cabecera.py` (datos y gráfico), `estilos.py` (el
+sistema), `paginas.py` (el contenido) y `armar_pdf.py` (arma e imprime).
+
+⬜ **Falta seguir puliendo** — él lo dio por buen camino, no por terminado.
 
 ### ✅ EL RECORRIDO DE ALTA — hecho al final del 17/8
 
