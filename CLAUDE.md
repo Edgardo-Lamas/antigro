@@ -1363,6 +1363,163 @@ diseñar la escalada sin saber cuántas veces pasa de verdad.
 
 ---
 
+## 🔎 LAS TRES CONSULTAS EXTERNAS — 2026-08-17/18
+
+**Edgardo consultó por su cuenta a Perplexity, Gemini y Manus** sobre cómo alimentar un sistema
+de alerta temprana de grooming, sin contarles nada de AntiGro. Los tres devolvieron arquitecturas
+completas. 🔴 **Guardado a pedido suyo: *"andá guardando estos datos, que venimos bien"*.**
+
+### 🔑 Lo que más vale: convergieron con decisiones que ya habíamos tomado
+
+**Ninguno sabía nada del proyecto**, y aun así los tres describieron piezas que ya están
+construidas. En un dominio donde ni él ni yo somos la fuente, esto es la mejor validación externa
+disponible antes de hablar con un especialista.
+
+| Lo que propusieron | Lo que ya teníamos | Desde |
+|---|---|---|
+| «Un solo factor aislado no genera alerta» | La regla de persistencia | 14/8 |
+| Escala ponderada de riesgo | `en_calma` · `atencion` · `patron_sostenido` | 14/8 |
+| Metadatos de red sin leer contenido | Regla 2 | fase 0 |
+| Cuestionario a los padres, base psicológica | La segunda entrada, 9 indicadores | 14/8 |
+| Etapas del grooming, detectar **progresiones** | `modus-operandi.ts` (SGM) | 15/8 |
+| Aviso a adultos con derivación a protocolos | Las dos salidas + 137 y GAPP | 14/8 |
+| «cuándo y cuánto, no qué se dice» | Nuestra formulación, casi textual | — |
+| **«Nunca etiquetar a una persona como depredador»** | **Regla 1** | fase 0 |
+| «Mostrar siempre por qué se generó la alerta» | `lectura.porQue` | 14/8 |
+| Restar incertidumbre del puntaje | El `alcance`, que atenúa las relativas | 15/8 |
+
+🔴 **Y Manus recomendó como «mejor siguiente pieza» construir un motor de correlación con reglas
+ponderadas, que reciba eventos, reduzca falsos positivos y devuelva nivel, explicación y
+recomendaciones.** Eso es exactamente `src/lib/motor/`, y está hecho desde el 14/8 con pruebas.
+
+### ✅ Lo genuinamente nuevo, y vale
+
+1. **🔑 LA EDAD DEL DOMINIO — lo mejor que salió de las tres.** Hoy `plataforma_nueva` significa
+   **nueva para ese chico**; nadie mira si el dominio es nuevo *en internet*. Un chat registrado
+   hace tres semanas no es Roblox, y el motor hoy los trata igual.
+   · Fuente: WHOIS, o la API de VirusTotal (`docs.virustotal.com/reference/whois`).
+   · Es metadato puro: no toca contenido, no rompe ninguna regla.
+   · 🔑 **Se potencia con el observatorio:** dominio nuevo **+** aparece en varias casas **+**
+     público homogéneo es mucho más que cada cosa por separado.
+2. **Acortadores de URL.** No los clasificamos. Es la forma típica de mandar un enlace tapando a
+   dónde va.
+3. **Screen Time / Digital Wellbeing** — `DeviceActivity` + `FamilyControls` en Apple,
+   `UsageStatsManager` en Android. Ver la sección propia más abajo.
+4. **NCMEC, Interpol, Europol, UFECI** como fuentes de taxonomía. UFECI es argentina y engancha
+   con «la vía policial-judicial» que ya estaba parqueada. 📌 NCMEC define *online enticement*
+   como categoría paraguas — buen término, y citable.
+5. **La ley argentina de protección de datos personales.** Citamos la 26.904 y la 27.590 y **no**
+   la de datos personales, tratando datos de un menor. Es un hueco nuestro.
+6. **Reputación de dominio (VirusTotal, PhishTank, abuse.ch).** ⚠ Con la salvedad de abajo.
+
+### 🔴 Lo que NO pasa, y por qué — con nuestras reglas, no con una opinión
+
+- **Cruzar el registro de ofensores sexuales (NSOPW / Offenders.io) con la ubicación por IP.**
+  Falla la **regla 1**. No sabemos quién es el contacto —no leemos mensajes—, así que no hay
+  ningún nombre que cruzar; la IP llega a nivel ciudad; y el registro es de EE.UU.
+  🔑 **Manus lo confirma sin que se lo pregunten:** *"nunca etiquetar a una persona como
+  «depredador»"*.
+- **BERT / RoBERTa afinados para detectar grooming.** Falla la **regla 2**: esos modelos reciben
+  texto. «Detectar el contexto sin leer cada palabra» es humo.
+- **OSINT sobre los perfiles del chico** (PII expuesta, EXIF, ubicación visible). No falla ninguna
+  regla escrita, pero **es una intrusión de otra naturaleza** — mirarle las redes. Merece
+  discusión propia, no un descarte al pasar. Manus le da peso 20 y Gemini una capa entera.
+
+### ⚠ Los errores que traían, verificados
+
+🔴 **Perplexity afirmó que PhishTank, URLhaus y OISD «contienen dominios conocidos por alojar CSAM
+o sitios de grooming». Es FALSO** y se verificó: URLhaus es distribución de *malware*, PhishTank
+es *phishing*, OISD es malware/C2/phishing. Ninguna tiene que ver con abuso infantil.
+📌 Es el mismo patrón que en Criterio Térmico, donde Perplexity inventó normas IRAM dos veces.
+**Sirven para abrir puertas, no para cerrar decisiones.**
+
+🔑 **Y Manus lo dice bien, que es la lectura correcta:** *"la reputación DNS permite detectar
+phishing, malware o infraestructura sospechosa, pero **no identifica grooming directamente**;
+debe ser una señal contextual de peso bajo"*.
+
+⚠ **La lista que sí existe es la IWF** (Internet Watch Foundation): 500 a 800 URLs, actualizada
+dos veces por día, sólo para miembros y licenciatarios, con cuota. **Pero resuelve otro problema:**
+es material que *muestra* abuso, y a esos sitios entra el agresor, no el chico groomeado.
+
+⚠ Varios indicadores que presentaban como «detectables» **no son visibles por DNS**: regalos
+digitales, transacciones, borrado de historial, que el contacto busque perfiles de menores,
+introducción progresiva de temas sexuales, amenazas. Son contenido, o pasan dentro de una app.
+
+### 🔴 GROK — la cuarta consulta, y la más rigurosa. Es sobre todo una advertencia
+
+**Contesta la pregunta de fondo con un no:** *"no hay bases de datos públicas detalladas de
+perfiles de depredadores accesibles para sistemas civiles o comerciales"*. Los repositorios de
+NCMEC e Interpol (ICSE) están restringidos a investigadores policiales. **Cuarta confirmación
+independiente de que cruzar registros de ofensores no es un camino.**
+
+📌 **Lo que sí hay, y es lo que ya usamos:** estadísticas agregadas, tipologías de alto nivel
+derivadas de causas judiciales, y listas verificadas de dominios. Nada comparable «perfil contra
+perfil».
+
+#### 🔑 Y trae un hallazgo NUEVO que nos toca el diseño
+
+**Save the Children** analiza sentencias judiciales (2023-2024) y da perfiles estadísticos:
+víctimas de ~13 años, mayoría nenas — **eso ya lo teníamos**. Pero sobre los agresores dice dos
+cosas que no teníamos:
+
+1. 🔴 **«Mayoritariamente hombres, muchos SIN ANTECEDENTES».** Esto no es un dato de color: **es
+   la razón de fondo por la que cruzar registros de ofensores no protegería a nadie.** Si buena
+   parte no tiene antecedentes, no está en ningún registro. Nuestro camino —patrones de conducta,
+   no identidades— no es sólo el más limpio legalmente: **es el único que alcanza a ese grupo.**
+2. ⚠ **«Proporción creciente del entorno familiar o conocido».** Es incómodo y toca el diseño del
+   referente: el adulto de confianza podría ser el problema. **No se resuelve antes del 23**, pero
+   queda anotado — hoy el sistema supone que el referente es seguro por definición.
+
+⚠ **Verificar en fuente antes de publicar cualquiera de las dos.** Vienen de un modelo, no del
+informe. Si van al PDF o al video, primero se busca el documento de Save the Children.
+
+#### ⚖ La advertencia legal, y hay que tomarla
+
+*"Cualquier sistema que procese datos DNS de menores, perfiles de niños o contexto familiar entra
+en territorio altamente regulado… consentimiento parental explícito"*, y recomienda **consultar
+abogados especializados en protección de datos de menores** antes de construir.
+📌 Encaja con el hueco que ya detectamos: **no citamos la ley argentina de datos personales.**
+
+#### 📚 Fuentes que nombra y que podemos usar
+
+**NCMEC CyberTipline** (el canal de reporte, y la fuente de *online enticement*) · **Save the
+Children** (sentencias) · **IWF** e **INHOPE** · **National Juvenile Online Victimization Study**
+(EE.UU.) · Ministerio del Interior de España, Policía Nacional (BIT) y Guardia Civil (GDT).
+⚠ **Datasets académicos** (Perverted Justice, PAN 2012): son de chats y **para investigación**, no
+para producción. Leerlos implicaría contenido — no entran.
+
+📌 **Y coincide con nuestra prioridad de siempre:** *"el mayor impacto real sigue estando en
+facilitar el reporte a las tip lines oficiales"*. Es lo que hace `RECURSOS` en `config.ts` con la
+Línea 137 y GAPP.
+
+### 📱 Screen Time / Digital Wellbeing — la decisión es de Edgardo
+
+🔴 **Acá me equivoqué el 18/8 y él me lo marcó.** Dije que exigir una app «es exactamente lo que le
+prometemos que no hacemos», y **es falso: en el celular del chico SÍ instalamos algo** —el perfil
+de NextDNS—, y lo pusimos ahí justamente porque el router no ve los datos móviles. Usé un
+argumento que contradice nuestra propia decisión, y venía de rechazar tres sugerencias seguidas.
+
+**La diferencia real es de grado, no de género:** un perfil de DNS es una **configuración**; Screen
+Time exige una **app** que corre en el aparato.
+
+🔑 **Y tiene un argumento fuerte a favor que hay que registrar:** nuestro DNS tiene un agujero real
+—un navegador con DoH propio, o una app con IP fija, **desaparece de nuestra vista**— y desaparecer
+se lee **igual que estar todo tranquilo**, que es el fallo silencioso que más nos importa. Screen
+Time tapa justo ese hueco: ve tiempo de uso por app aunque el DNS no vea nada.
+
+Costo: app, permiso especial de Apple (`FamilyControls`), y cambia lo que se le cuenta al chico.
+⚠ En Apple los datos de `DeviceActivityReport` están pensados para **no salir del aparato**, así
+que probablemente haya que calcular ahí. `developer.apple.com/documentation/screentimeapidocumentation/`
+
+### 📌 Los cuatro límites que propuso Manus — tres ya son nuestros
+
+No leer mensajes privados ✅ · **no grabar teclado, pantalla, cámara ni micrófono** (nunca hizo
+falta decirlo porque no tenemos app; si alguna vez hay una, esto se escribe) · procesar
+localmente lo posible · mostrar siempre por qué se generó la alerta ✅ y nunca etiquetar a una
+persona ✅.
+
+---
+
 ## 🗓 DESPUÉS DEL 23 — parqueado con acuerdo, no olvidado
 
 **Los cuatro los trajo Edgardo el 16/8 y él mismo los mandó a después de la presentación.** No
