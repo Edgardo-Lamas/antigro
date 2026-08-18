@@ -20,7 +20,7 @@ estadísticas oficiales sobre qué pesa cuánto.
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
 | **En producción** | `1d8669c`, promovido y verificado el **18/8**. Ya no queda nada sin promover |
 | **Último commit** | `0c787f4` — las herramientas de la sesión al `.gitignore`. ⚠ **No está en producción y no hace falta:** no cambia nada que corra |
-| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour + **79 de los términos**. **En verde el 18/8** |
+| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour + **91 de los términos**. **En verde el 18/8** |
 | **Comprobado en vivo** | `/` `/guia` `/entrar` dan 200; `/alta` y `/mi-familia` mandan a `/entrar`, `/panel` a su logueo; y **`/entrar` sin código no dibuja «es mi primera vez»** |
 
 ⚠ **El push NO publica.** Subir la rama genera una vista previa; producción cambia sólo con
@@ -69,10 +69,36 @@ Si alguien la escribe, la tanda se pone en rojo antes de que llegue a producció
 prohíbe «no detecta», «no puede», «no reemplaza»: **ésas describen el alcance real y hay que
 escribirlas.** La diferencia es entre decir qué hace el producto y pretender que el daño no es de uno.
 
-⬜ **Lo que falta, y es lo que los vuelve útiles:** que alguien los acepte. La aceptación va en el
-recorrido de alta, con las declaraciones, y se guarda con `VERSION` y fecha.
-⚠ **`VERSION` cambia cuando cambia el TEXTO, no cuando cambia el código** — si alguien aceptó la
-versión de agosto hay que poder saber qué aceptó.
+### ✅ LA ACEPTACIÓN — hecha el 18/8, y la base va PRIMERO
+
+🔴 **🚨 NO PROMOVER SIN APLICAR LA MIGRACIÓN 14.** El alta manda `terminos_version` en el insert
+de `usuarios`; si la columna no existe, **crear una cuenta revienta en producción**. Es la regla
+del `CLAUDE.md`: la base va adelante del código salvo migración destructiva, y ésta es aditiva.
+📌 El script está en el scratchpad de la sesión (`migrar-14.js`) y el SQL en `schema.sql` § 14.
+⚠ **Verificado el 18/8 que la columna NO estaba** y que en producción hay sólo dos cuentas:
+`demo@antigro.app` (admin) y `mariana@ejemplo.ar`. **Nada de basura de pruebas.**
+
+| Dónde | Qué |
+|---|---|
+| `/entrar` (modo crear) | **Las cinco declaraciones a la VISTA** + el tilde. El botón no se habilita sin él |
+| `/api/alta/hogar` | Exige `terminos` y lo compara contra `VERSION_DE_LOS_TERMINOS`. Sin eso, no hay cuenta |
+| `usuarios.terminos_version` + `terminos_en` | Dónde queda. Nullable: las cuentas viejas son anteriores a que hubiera términos, y marcarlas sería inventar un consentimiento |
+
+🔑 **Se guarda la VERSIÓN, no un booleano.** «Aceptó» no dice QUÉ aceptó, y el texto va a cambiar.
+Y `VERSION_DE_LOS_TERMINOS` **cambia cuando cambia el TEXTO, no cuando cambia el código**.
+🔑 **Las declaraciones van a la vista y no detrás del enlace.** Son la única parte del documento
+que compromete al que acepta; esconderlas atrás de un «leí y acepto» las volvería la letra chica
+que estos términos no son. Salen de `SECCIONES`, así que agregar una la hace aparecer sola.
+🔴 Si el texto cambió mientras alguien tenía la pantalla abierta, la ruta contesta **409** y le
+pide recargar: lo que estaba leyendo ya no es lo que hay.
+
+⚠ **`VERSION_DE_LOS_TERMINOS` vive en `src/lib/legal.ts`, NO en `terminos.ts`** — y no se
+re-exporta aunque sería cómodo: `terminos.ts` lo carga node pelado para la tanda, y node no
+resuelve el alias `@/`. Un re-export de valor rompe la tanda entera; los `import type` no.
+
+📌 **Y se corrigió un texto que había quedado mal:** `/entrar` decía que la clave del hogar *"la
+usan los dos"*. Vale para un matrimonio conviviente, **no para padres separados** — ahí quién la
+tiene lo decide el responsable, y la otra casa tiene su propia entrada.
 
 ### 🔑 LAS CREDENCIALES, CERRADO EL 18/8 — con la ley al lado
 
@@ -360,9 +386,8 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 1. ~~**El alta desde el panel.**~~ ✅ **HECHO el 17/8**, y no quedó «desde el panel»: la familia se
    da de alta sola, en un recorrido de pantallas. Ver el bloque «EL RECORRIDO DE ALTA» arriba, que
    incluye lo que quedó pendiente de él.
-2. **La aceptación de los términos en el alta** (18/8). El documento ya está en `/terminos`; falta
-   que alguien lo acepte, con las declaraciones y guardando `VERSION` + fecha. Sin eso, unos
-   términos que nadie aceptó no cubren nada. → sección «LOS TÉRMINOS DE USO».
+2. ~~**La aceptación de los términos en el alta.**~~ ✅ **HECHA el 18/8.**
+   🔴 **Pendiente de él: aplicar la migración 14 ANTES de promover**, o el alta se rompe.
 3. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    ⚠ **Él pidió ir despacio**, textual: *"con el cuestionario vamos despacio"*. No resolverlo de
    un saque. 🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que
@@ -376,6 +401,8 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 
 ### ⚠ Lo que le toca a él, no al código
 
+- 🚨 **Aplicar la migración 14 ANTES de promover** (`terminos_version` en `usuarios`). Sin ella, el
+  alta se rompe en producción. Ver «LA ACEPTACIÓN».
 - 🔴 **Decidir si saca una cuenta de NextDNS antes del jueves.** Sin perfil real la instalación
   queda explicada pero **no demostrable en el video**, y la pantalla lo dice con todas las letras.
 - **Leer las respuestas del asistente con calma.** Es el único que puede decir si el registro está
