@@ -20,12 +20,87 @@ estadísticas oficiales sobre qué pesa cuánto.
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
 | **En producción** | `1d8669c`, promovido y verificado el **18/8**. Ya no queda nada sin promover |
 | **Último commit** | `0c787f4` — las herramientas de la sesión al `.gitignore`. ⚠ **No está en producción y no hace falta:** no cambia nada que corra |
-| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour. **En verde el 18/8** |
+| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour + **79 de los términos**. **En verde el 18/8** |
 | **Comprobado en vivo** | `/` `/guia` `/entrar` dan 200; `/alta` y `/mi-familia` mandan a `/entrar`, `/panel` a su logueo; y **`/entrar` sin código no dibuja «es mi primera vez»** |
 
 ⚠ **El push NO publica.** Subir la rama genera una vista previa; producción cambia sólo con
 `vercel promote`. Se confundió el 18/8 — ver «Cómo se publica, porque NO es automático» más abajo.
 🔴 **Y el promote lo tiene que correr Edgardo:** el clasificador de permisos lo frena siempre.
+
+### ⚖️ LOS TÉRMINOS DE USO Y EL MARCO LEGAL — 18/8, lo pidió Edgardo
+
+**Salió de discutir las credenciales y terminó tocando el diseño entero.** Él lo propuso así:
+*"se me ocurre que podemos crear un «Términos de uso», si lo aceptan nos daría cobertura"*.
+
+🔴 **La corrección más importante, y va contra la intuición: un checkbox NO da esa cobertura.**
+El **art. 37 de la Ley 24.240** tiene **por no convenidas** las cláusulas que limitan la
+responsabilidad por daños. Se escriben, el usuario las acepta, y un juez las tacha dejando el
+contrato en pie sin ellas. Y los derechos de un chico no los renuncia su padre tildando nada.
+⚠ Verificado que sigue vigente: la Disposición 753/2025 derogó la Resolución 9/2004 (listados para
+prepagas, telefonía y bancos). **No alcanza al art. 37.**
+
+🔑 **Lo que sí protege, y de eso están hechos los términos:** describir con precisión qué hace el
+sistema y qué no · **las declaraciones de quien se da de alta** («declaro que ejerzo la
+responsabilidad parental»), que es lo único de un contrato de adhesión que traslada algo · y el
+registro de quién accedió.
+
+🔥 **EL HALLAZGO DE LA SESIÓN, y conviene que nadie lo pierda: la regla 1 dejó de ser sólo ética.**
+La **Ley 25.326, art. 7 inc. 3** prohíbe *"la formación de archivos, bancos o registros que
+almacenen información que **directa o indirectamente** revele datos sensibles"*, y el art. 2 mete
+ahí *"información referente a la salud o a la vida sexual"*. ➡ Un registro que afirmara que un
+chico está siendo víctima de grooming **sería un archivo prohibido**. Que AntiGro hable de señales
+que merecen atención y nunca de un diagnóstico **no es prudencia: es lo único legal**.
+📌 Y la **Ley 26.061, art. 10** respalda la regla 2: el chico tiene derecho a la vida privada, y
+esos derechos *"no pueden ser objeto de injerencias arbitrarias o ilegales"*. **Leer los mensajes
+sería una injerencia.** Esto va a la guía y probablemente al video.
+
+**Dónde quedó todo:**
+
+| Dónde | Qué |
+|---|---|
+| `src/lib/legal.ts` | **Las seis normas, con texto TEXTUAL, enlace y fecha de verificación.** Fuente única |
+| `src/app/terminos/terminos.ts` | El contenido: 8 secciones, y las declaraciones aparte de lo que decimos nosotros |
+| `src/app/terminos/page.tsx` | La pantalla. Enlazada al pie de la home |
+| `npm run probar-terminos` | 79 comprobaciones |
+
+🔴 **La comprobación que justifica la tanda entera: que no aparezca ninguna cláusula de exención.**
+La tentación en cualquier sesión futura va a ser agregar un *"AntiGro no se responsabiliza por…"*.
+Si alguien la escribe, la tanda se pone en rojo antes de que llegue a producción. ⚠ Y la lista NO
+prohíbe «no detecta», «no puede», «no reemplaza»: **ésas describen el alcance real y hay que
+escribirlas.** La diferencia es entre decir qué hace el producto y pretender que el daño no es de uno.
+
+⬜ **Lo que falta, y es lo que los vuelve útiles:** que alguien los acepte. La aceptación va en el
+recorrido de alta, con las declaraciones, y se guarda con `VERSION` y fecha.
+⚠ **`VERSION` cambia cuando cambia el TEXTO, no cuando cambia el código** — si alguien aceptó la
+versión de agosto hay que poder saber qué aceptó.
+
+### 🔑 LAS CREDENCIALES, CERRADO EL 18/8 — con la ley al lado
+
+**Se cerró conversando y él corrigió dos veces cómo yo lo estaba diciendo.**
+🔴 **«La clave la comparte toda la casa» era MÍO y está mal dicho.** Es **una credencial por
+hogar**, y quién la tiene **lo decide el responsable de esa casa**. Al panel entran progenitores o
+tutores; **el referente nunca**.
+🔴 **Y él plantea DOS escenarios, no una contradicción** —lo aclaró porque yo los leí como uno—:
+matrimonio conviviente, donde *"la respuesta de uno es la de los dos"* y se recomienda contestar
+juntos; y separados en malos términos, donde hay un responsable del día a día y el otro puede
+tener régimen de visitas *"o directamente no aparecer"*.
+
+🔑 **Cómo se junta con el diseño del 17/8, y la ley lo respalda:** el responsable decide si se abre
+la segunda puerta; **abierta, no la puede cerrar** — es de la otra casa. Así el acceso a cómo está
+un hijo no se usa como moneda de cambio.
+📌 El respaldo: **CCyC art. 641 inc. b** (separados, el ejercicio es de ambos) y **art. 654**
+(*"cada progenitor debe informar al otro sobre cuestiones de educación, salud y otras relativas a
+la persona… del hijo"*). **Cómo está el hijo es exactamente eso.**
+⚠ **Si hay medida judicial, esa manda.** Y AntiGro **no pide sentencias ni las puede verificar**:
+lo dice y se corre. Pedirlas sería ponerse en un rol de juez que no tiene.
+
+🔴 **El registro que pidió él** —*"tener un registro de quien interactuó que luego iría en el
+informe"*— con una distinción que lo hace honesto: **desde qué casa se entró es un HECHO** (la
+credencial es del hogar); **quién de las personas es una DECLARACIÓN**. Se guardan distinto y se
+muestran distinto. Decir «verificado» sería afirmar lo que el sistema no puede sostener.
+
+⬜ **Sin construir todavía:** la pantalla de la segunda puerta en `/mi-familia`, el registro de
+accesos, y la firma del cuestionario.
 
 ### 🎨 EL PDF, REDISEÑADO EL 18/8 — y la regla que lo gobierna de ahora en más
 
@@ -285,13 +360,16 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 1. ~~**El alta desde el panel.**~~ ✅ **HECHO el 17/8**, y no quedó «desde el panel»: la familia se
    da de alta sola, en un recorrido de pantallas. Ver el bloque «EL RECORRIDO DE ALTA» arriba, que
    incluye lo que quedó pendiente de él.
-2. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
+2. **La aceptación de los términos en el alta** (18/8). El documento ya está en `/terminos`; falta
+   que alguien lo acepte, con las declaraciones y guardando `VERSION` + fecha. Sin eso, unos
+   términos que nadie aceptó no cubren nada. → sección «LOS TÉRMINOS DE USO».
+3. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    ⚠ **Él pidió ir despacio**, textual: *"con el cuestionario vamos despacio"*. No resolverlo de
    un saque. 🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que
    dispara el sistema no es una alerta, es el cuestionario.*
-3. **El acuse de recibo y la escalada.** Diseñado el 16/8, sin construir — sección propia abajo.
-4. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
-5. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
+4. **El acuse de recibo y la escalada.** Diseñado el 16/8, sin construir — sección propia abajo.
+5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
+6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
    operativo."* No empezarlo antes. El guion que hay todavía es el de Criterio Térmico.
 
 📌 Y hay **cuatro temas parqueados con acuerdo para después del 23** — ver «DESPUÉS DEL 23».

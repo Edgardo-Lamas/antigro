@@ -209,9 +209,20 @@ export default async function Home() {
             que es facilísimo estar mirando una foto de hace horas y jurar que
             "sigue igual". Con esto se sabe de un vistazo qué se está mirando,
             sin abrir una terminal ni preguntarle a nadie. */}
-        <p className="shrink-0 font-mono text-[10px] uppercase tracking-wider text-apagado">
-          versión {version()}
-        </p>
+        <div className="flex shrink-0 items-baseline gap-4">
+          {/* 🔑 Al pie y no arriba, a diferencia de la guía: nadie llega a
+              AntiGro buscando los términos. Pero tienen que estar enlazados
+              desde algún lugar estable, y el pie es donde se los busca. */}
+          <Link
+            href="/terminos"
+            className="font-mono text-[10px] uppercase tracking-wider text-apagado transition hover:text-acento"
+          >
+            Términos de uso
+          </Link>
+          <p className="font-mono text-[10px] uppercase tracking-wider text-apagado">
+            versión {version()}
+          </p>
+        </div>
       </footer>
     </main>
   );
