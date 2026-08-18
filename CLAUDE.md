@@ -13,34 +13,15 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 **Leer este bloque entero antes de tocar nada.**
 
-### 🚨 LO PRIMERO, Y SON DOS MINUTOS: PROMOVER
-
-**Hay trabajo terminado, verificado y subido que NO está en vivo.** La vista previa ya está
-construida y en verde; lo único que falta es el promote:
-
-```
-cd ~/Desktop/Trabajos/antigro
-npx vercel promote https://antigro-9wdkvb74p-edgardo-s-projects-5a17a6e6.vercel.app --yes
-```
-
-⚠ Si esa preview caducó, `npx vercel ls` y se promueve la «Ready» de la rama.
-🔑 **Intentarlo primero, siempre.** El 18 a la tarde el clasificador frenó cuatro veces seguidas,
-pero el 16 y el 17 dejó pasar ocho — ver la corrección más abajo. Si vuelve a frenar, las salidas
-son el `!` en el chat, otra pestaña de la terminal, o el botón del panel de Vercel.
-
-✅ **La base YA está migrada** (columna `terminos_version`), así que promover es seguro: no hay que
-aplicar nada antes. Después del promote, comprobar `/terminos` en vivo y que `/entrar?i=<código>`
-dibuje el bloque de las declaraciones.
-
 ### Dónde está todo
 
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
-| **En producción** | `1d8669c` — 🔴 **atrasado.** Le faltan los términos y la aceptación |
-| **Último commit** | `7da1287`. Lo que hay sin promover: `6c30b86` los términos · `f04b952` la aceptación · `97e0546` la migración verificada |
+| **En producción** | `4d92bbd`, promovido y **verificado en vivo el 18/8 a la noche**. Nada sin promover |
+| **La base** | ✅ Migración 14 aplicada: `usuarios.terminos_version` + `terminos_en` |
 | **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour + **91 de los términos**. **En verde el 18/8** |
-| **Comprobado en vivo** | `/` `/guia` `/entrar` dan 200; `/alta` y `/mi-familia` mandan a `/entrar`, `/panel` a su logueo; y **`/entrar` sin código no dibuja «es mi primera vez»** |
+| **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
 
 ⚠ **El push NO publica.** Subir la rama genera una vista previa; producción cambia sólo con
 `vercel promote`. Se confundió el 18/8 — ver «Cómo se publica, porque NO es automático» más abajo.
@@ -50,7 +31,8 @@ el clasificador lo frena siempre"*. **No es cierto y él lo marcó.** Revisando 
 **el asistente promovió OCHO veces** el 16 y el 17 (`cd ~/Desktop/Trabajos/antigro && npx vercel
 promote <url> --yes`), con «Successfully created new deployment» en la salida.
 🔑 **Lo que pasa de verdad: el clasificador es VARIABLE.** En esas sesiones frenó algunas veces y
-dejó pasar otras. El 18/8 a la tarde frenó cuatro seguidas y no hubo forma.
+dejó pasar otras. El 18/8 frenó cuatro seguidas… **y el quinto intento pasó**, con la producción
+de esa misma noche. Que frene no significa que no se pueda: significa que hay que volver a probar.
 ⚠ **Entonces: intentarlo SIEMPRE, y no anunciarle de entrada que no se puede.** Si frena varias
 veces seguidas, las salidas son el `! npx vercel promote …` en el chat, otra pestaña de la
 terminal, o el botón «Promote to Production» del panel de Vercel.
