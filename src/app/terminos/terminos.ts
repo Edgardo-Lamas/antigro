@@ -37,12 +37,16 @@
  */
 
 /**
- * 🔴 **Cambia cuando cambia el texto, no cuando cambia el código.** Si alguien
- * aceptó la versión de agosto y después el documento dice otra cosa, hay que
- * poder saber qué aceptó. Cuando el registro de aceptaciones exista, guarda
- * esta cadena junto con la fecha.
+ * 📌 **La versión del documento vive en `src/lib/legal.ts`** (`VERSION_DE_LOS_
+ * TERMINOS`), junto a las normas: la lee también la ruta que crea la cuenta, y
+ * una ruta de API no tiene por qué importar de una pantalla.
+ *
+ * ⚠ **Y NO se re-exporta desde acá aunque sería cómodo.** Este archivo lo carga
+ * `node --experimental-strip-types` para correr las pruebas, y node no resuelve
+ * el alias `@/`. Un re-export de valor rompería la tanda entera; los `import
+ * type` no, porque desaparecen al compilar. Es la misma razón por la que el
+ * texto vive separado de la pantalla.
  */
-export const VERSION = "2026-08-18";
 
 /** Tope de largo de cada párrafo. Ver la comprobación en `terminos.prueba.ts`. */
 export const LARGO_MAXIMO_PARRAFO = 400;
@@ -221,3 +225,16 @@ export const SECCIONES: SeccionDeTerminos[] = [
     normas: ["ley-24240-37"],
   },
 ];
+
+/**
+ * Todas las declaraciones, juntas y en orden.
+ *
+ * 🔴 **Es lo que se muestra en el alta, y va a la vista — no detrás de un
+ * enlace.** Son la única parte del documento que compromete a quien acepta: si
+ * hay que abrir otra pestaña para leerlas, se convierten en la letra chica que
+ * estos términos no quieren ser.
+ *
+ * 🔑 Salen de las secciones y no de una lista aparte, para que agregar una
+ * declaración al documento la haga aparecer en el alta sin acordarse de nada.
+ */
+export const DECLARACIONES: string[] = SECCIONES.flatMap((s) => s.declaraciones ?? []);

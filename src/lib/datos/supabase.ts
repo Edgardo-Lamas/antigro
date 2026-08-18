@@ -255,6 +255,12 @@ export class RepositorioSupabase implements Repositorio {
         rol: "adulto",
         familia_id: familia.id,
         hogar: alta.hogar ?? null,
+        /* 🔴 Qué versión de los términos aceptó y cuándo. Va en el MISMO insert
+           que la cuenta, no en un update después: si el segundo paso fallara,
+           quedaría una credencial viva sin ninguna aceptación detrás — que es
+           justo el estado que estos campos existen para que no pase. */
+        terminos_version: alta.terminosVersion,
+        terminos_en: new Date().toISOString(),
       })
       .select("id")
       .single<{ id: string }>();

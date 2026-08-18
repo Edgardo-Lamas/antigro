@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowLeft, ScrollText } from "lucide-react";
 import { PRODUCTO } from "@/lib/config";
-import { norma } from "@/lib/legal";
-import { SECCIONES, VERSION } from "./terminos";
+import { norma, VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
+import { SECCIONES } from "./terminos";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -93,7 +93,7 @@ export default function Terminos() {
         </div>
 
         <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-apagado">
-          Versión {VERSION}
+          Versión {VERSION_DE_LOS_TERMINOS}
         </p>
       </header>
 

@@ -19,8 +19,8 @@
  *  el respaldo desaparecido, que es peor que no citar nada.
  */
 
-import { NORMAS } from "../../lib/legal.ts";
-import { LARGO_MAXIMO_PARRAFO, SECCIONES, VERSION } from "./terminos.ts";
+import { NORMAS, VERSION_DE_LOS_TERMINOS } from "../../lib/legal.ts";
+import { DECLARACIONES, LARGO_MAXIMO_PARRAFO, SECCIONES } from "./terminos.ts";
 
 let fallaron = 0;
 function comprobar(nombre: string, condicion: boolean, detalle?: string) {
@@ -156,6 +156,39 @@ comprobar(
   TODO_EL_TEXTO.includes("no es asesoramiento legal"),
 );
 
+/* ── 4.b Las declaraciones, que son lo que se muestra en el alta ─────────── */
+
+comprobar("hay declaraciones para mostrar en el alta", DECLARACIONES.length > 0);
+
+/**
+ * 🔑 Se leen a continuación de «Antes de empezar, declarás», así que todas
+ * tienen que encajar en esa frase. Una que arranque distinto queda escrita como
+ * si el sistema afirmara algo en nombre del que se registra.
+ */
+for (const d of DECLARACIONES) {
+  comprobar(`«${d.slice(0, 45)}…» arranca como una declaración`, d.startsWith("Que "));
+}
+
+/**
+ * 🔴 **Una declaración NO puede ser una renuncia de derechos.** El art. 37 inc.
+ * b tiene por no convenidas las cláusulas que importen renuncia o restricción
+ * de los derechos del consumidor: disfrazarlas de «declaro que…» no las salva,
+ * y encima ensucia lo único del documento que sí traslada algo.
+ */
+for (const d of DECLARACIONES) {
+  const t = d.toLowerCase();
+  comprobar(
+    `«${d.slice(0, 45)}…» no es una renuncia`,
+    !t.includes("renuncio") && !t.includes("no reclamar") && !t.includes("libero"),
+  );
+}
+
+comprobar(
+  "🔑 las declaraciones son cortas — una sola idea cada una",
+  DECLARACIONES.every((d) => d.length <= 120),
+  DECLARACIONES.map((d) => `${d.length}`).join(" · "),
+);
+
 /* ── 5. Que se pueda leer ────────────────────────────────────────────────── */
 
 for (const seccion of SECCIONES) {
@@ -175,8 +208,8 @@ for (const seccion of SECCIONES) {
 
 comprobar(
   "la versión del documento es una fecha",
-  /^\d{4}-\d{2}-\d{2}$/.test(VERSION),
-  VERSION,
+  /^\d{4}-\d{2}-\d{2}$/.test(VERSION_DE_LOS_TERMINOS),
+  VERSION_DE_LOS_TERMINOS,
 );
 
 console.log(

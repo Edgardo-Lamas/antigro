@@ -75,6 +75,21 @@ export interface AltaDeHogar {
   familiaId?: string;
   /** Cómo se llama la familia. Sólo cuando se está creando. */
   nombreDeLaFamilia?: string;
+  /**
+   * ───────────────────────────────────────────────────────────────────────────
+   * 🔴 QUÉ VERSIÓN DE LOS TÉRMINOS ACEPTÓ — 18/8, y es obligatorio
+   * ───────────────────────────────────────────────────────────────────────────
+   *
+   * **No es opcional a propósito.** Unos términos que nadie aceptó no cubren
+   * nada, y la única parte de ese documento que traslada algo son las
+   * declaraciones de quien se da de alta: *"declaro que ejerzo la
+   * responsabilidad parental sobre el chico"*. Sin eso guardado con su fecha,
+   * queda la afirmación de que alguien aceptó y ninguna forma de mostrarlo.
+   *
+   * 🔑 **Se guarda la VERSIÓN, no un booleano.** «Aceptó» no dice qué aceptó. Si
+   * el texto cambia en septiembre, un `true` de agosto no prueba nada.
+   */
+  terminosVersion: string;
 }
 
 /**

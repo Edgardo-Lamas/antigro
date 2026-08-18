@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { repositorio } from "@/lib/datos";
 import { deQuienViene, tomarTurno } from "@/lib/limite";
+import { VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -113,6 +114,22 @@ const Cuerpo = z.object({
   familiaId: z.string().optional(),
   /** El que viaja en el enlace que se le pasa al jurado. Ver arriba. */
   invitacion: z.string().max(100).optional(),
+  /**
+   * ───────────────────────────────────────────────────────────────────────────
+   * 🔴 LA ACEPTACIÓN DE LOS TÉRMINOS — 18/8
+   * ───────────────────────────────────────────────────────────────────────────
+   *
+   * **Obligatoria, y viaja la versión.** Un booleano diría que alguien aceptó
+   * pero no QUÉ aceptó, y el texto va a cambiar. Se comprueba contra
+   * `VERSION_DE_LOS_TERMINOS` abajo.
+   *
+   * 🔑 **Se valida en el servidor aunque la pantalla ya lo exija**, por lo de
+   * siempre: la pantalla es una comodidad, el que decide es el servidor. Un
+   * pedido armado a mano no puede saltearse la aceptación.
+   */
+  terminos: z
+    .string({ error: "Falta aceptar los términos de uso." })
+    .max(40, "Falta aceptar los términos de uso."),
 });
 
 export async function POST(req: Request) {
@@ -135,7 +152,25 @@ export async function POST(req: Request) {
     );
   }
 
-  const { email, clave, nombreDeLaFamilia, hogar, familiaId, invitacion } = parsed.data;
+  const { email, clave, nombreDeLaFamilia, hogar, familiaId, invitacion, terminos } = parsed.data;
+
+  /* ── 1.b Los términos ────────────────────────────────────────────────────
+     🔴 **Antes que nada de lo demás**, porque es lo único de todo el alta que
+     el usuario tiene que haber leído. Y compara contra la versión vigente en
+     vez de contra «algo»: si el texto cambió mientras alguien tenía la pantalla
+     abierta, lo que estaba leyendo ya no es lo que hay, y aceptarlo a ciegas
+     sería peor que no aceptar. Se le pide que la recargue. */
+  if (terminos !== VERSION_DE_LOS_TERMINOS) {
+    return NextResponse.json(
+      {
+        error:
+          "Los términos de uso cambiaron mientras tenías esta página abierta. " +
+          "Recargá y volvé a leerlos antes de seguir.",
+        terminosViejos: true,
+      },
+      { status: 409 },
+    );
+  }
 
   /* ── 2. El código de invitación ──────────────────────────────────────────
      ⚠ Va ANTES del tope global a propósito: si no, cualquiera sin código
@@ -189,7 +224,14 @@ export async function POST(req: Request) {
   }
 
   const repo = repositorio();
-  const alta = await repo.crearHogar({ email, clave, hogar, familiaId, nombreDeLaFamilia });
+  const alta = await repo.crearHogar({
+    email,
+    clave,
+    hogar,
+    familiaId,
+    nombreDeLaFamilia,
+    terminosVersion: terminos,
+  });
 
   if (!alta.ok) {
     /* Cada motivo se cuenta distinto porque son problemas distintos, y confundirlos

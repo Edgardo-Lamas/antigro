@@ -590,3 +590,26 @@ alter table chicos add column if not exists turno_escolar text
 
 comment on index usuarios_hogar_idx is
   'Una puerta por casa. Lo aplica el recorrido de alta (crearHogar): si dos altas de la misma casa entran a la vez, la que pierde recibe 23505 y se le contesta hogar_ocupado.';
+
+
+-- ─── 14. LA ACEPTACIÓN DE LOS TÉRMINOS ───────────────────────────
+--  🔴 Se guarda la VERSIÓN, no un booleano, y el motivo es todo el punto:
+--  «aceptó» no dice QUÉ aceptó. Si el texto de los términos cambia en
+--  septiembre, un `true` de agosto no prueba nada. Con la versión y la fecha
+--  se puede reconstruir exactamente qué documento tenía delante.
+--
+--  🔑 Van en `usuarios` y no en una tabla aparte porque la unidad que acepta es
+--  la CREDENCIAL DEL HOGAR: cada casa acepta cuando se crea su puerta, y la
+--  segunda casa de padres separados acepta la suya. Una tabla de aceptaciones
+--  tendría exactamente una fila por usuario.
+--
+--  ⚠ Nullable, y no puede ser de otra manera: las cuentas que ya existían —la
+--  de administración, la familia sembrada— nacieron antes de que hubiera
+--  términos. Marcarlas como que aceptaron sería inventar un consentimiento.
+--  Vacío significa «no consta», que es la verdad.
+
+alter table usuarios add column if not exists terminos_version text;
+alter table usuarios add column if not exists terminos_en timestamptz;
+
+comment on column usuarios.terminos_version is
+  'Qué versión de los términos aceptó esta casa al crearse. Vacío = la cuenta es anterior a que existieran, no que se haya salteado la aceptación.';

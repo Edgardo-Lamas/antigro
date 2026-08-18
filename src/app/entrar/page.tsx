@@ -5,6 +5,8 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, LoaderCircle } from "lucide-react";
+import { VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
+import { DECLARACIONES } from "@/app/terminos/terminos";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -71,6 +73,12 @@ function Puerta() {
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
 
+  /**
+   * 🔴 **Sin esto no hay cuenta, y la ruta lo comprueba igual.** La pantalla es
+   * una comodidad; el que decide es el servidor. Ver `/api/alta/hogar`.
+   */
+  const [acepta, setAcepta] = useState(false);
+
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -80,7 +88,9 @@ function Puerta() {
         const res = await fetch("/api/alta/hogar", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, clave, invitacion }),
+          /* 🔑 Viaja la VERSIÓN de los términos, no un `true`. «Aceptó» no
+             dice qué aceptó, y el texto va a cambiar. */
+          body: JSON.stringify({ email, clave, invitacion, terminos: VERSION_DE_LOS_TERMINOS }),
         });
         const datos = await res.json();
         if (!res.ok) {
@@ -114,7 +124,10 @@ function Puerta() {
 
   return (
     <div className="flex min-h-screen items-center justify-center px-6 py-12">
-      <div className="w-full max-w-sm">
+      {/* 🔑 Más ancha al crear: las declaraciones tienen que poder leerse. Una
+          columna angosta las parte en cinco renglones cada una y el bloque se
+          vuelve un muro que nadie mira. */}
+      <div className={`w-full ${creando ? "max-w-md" : "max-w-sm"}`}>
         <div className="rounded-xl border border-borde bg-superficie px-7 py-8">
           <div className="mb-6 text-center">
             <div className="mx-auto mb-3.5 flex h-11 w-11 items-center justify-center rounded-lg bg-acentoSuave">
@@ -199,18 +212,70 @@ function Puerta() {
               />
               {creando && (
                 <p className="mt-1.5 text-xs leading-relaxed text-apagado">
+                  {/* 🔴 Corregido el 18/8. Decía «la usan los dos», y Edgardo
+                      marcó que eso vale para un matrimonio conviviente y no
+                      para padres separados: ahí quién la tiene lo decide el
+                      responsable, y la otra casa tiene su PROPIA entrada. */}
                   Al menos {CLAVE_MINIMA} caracteres.{" "}
-                  <strong className="text-tenue">Es la clave de la casa</strong>, no de una
-                  persona: la usan los dos.
+                  <strong className="text-tenue">Es la clave de esta casa</strong>, no de una
+                  persona. Si el chico vive en dos casas, la otra va a tener su propia entrada.
                 </p>
               )}
             </div>
+
+            {/* ────────────────────────────────────────────────────────────
+                🔴 LA ACEPTACIÓN DE LOS TÉRMINOS — 18/8
+                ────────────────────────────────────────────────────────────
+                🔑 **Las declaraciones van a la VISTA, no detrás del enlace.**
+                Son la única parte del documento que compromete al que lo
+                acepta, y esconderlas atrás de un «leí y acepto» las
+                convertiría en la letra chica que estos términos no son.
+                El documento entero sigue a un clic, en otra pestaña para no
+                perder lo escrito.
+
+                📌 Sólo al crear la cuenta. El que ya la tiene, ya aceptó. */}
+            {creando && (
+              <div className="rounded-lg border border-atencion/40 bg-atencionSuave px-4 py-3.5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-tinta">
+                  Antes de empezar, declarás
+                </p>
+                <ul className="mt-2.5 flex flex-col gap-1.5">
+                  {DECLARACIONES.map((d) => (
+                    <li key={d.slice(0, 30)} className="flex gap-2 text-xs leading-relaxed text-tinta">
+                      <span className="mt-[6px] h-1 w-1 shrink-0 rounded-full bg-atencion" />
+                      <span>{d}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <label className="mt-3.5 flex cursor-pointer items-start gap-2.5 border-t border-atencion/30 pt-3">
+                  <input
+                    type="checkbox"
+                    checked={acepta}
+                    onChange={(e) => setAcepta(e.target.checked)}
+                    required
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-atencion"
+                  />
+                  <span className="text-xs leading-relaxed text-tinta">
+                    Declaro lo de arriba y acepto los{" "}
+                    <Link
+                      href="/terminos"
+                      target="_blank"
+                      className="text-acento underline underline-offset-2"
+                    >
+                      términos de uso
+                    </Link>
+                    .
+                  </span>
+                </label>
+              </div>
+            )}
 
             {error && <p className="text-xs leading-relaxed text-riesgo">{error}</p>}
 
             <button
               type="submit"
-              disabled={cargando}
+              disabled={cargando || (creando && !acepta)}
               className="mt-1 flex items-center justify-center gap-2 rounded-md bg-acento px-4 py-2.5 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
             >
               {cargando ? (

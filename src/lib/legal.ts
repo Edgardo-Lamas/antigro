@@ -23,6 +23,22 @@
  *  archivo existe justamente para no meterse en eso.
  */
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LA VERSIÓN DE LOS TÉRMINOS — se guarda con cada aceptación
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **Cambia cuando cambia el TEXTO, no cuando cambia el código.** Si alguien
+ * aceptó la versión de agosto y en septiembre el documento dice otra cosa, hay
+ * que poder saber qué fue lo que aceptó. Una aceptación sin versión es una
+ * fecha suelta que no prueba nada.
+ *
+ * 🔑 **Vive acá y no en `app/terminos/`** porque la lee la ruta que crea la
+ * cuenta. Una ruta de API que importa de una pantalla es la clase de enredo que
+ * después nadie se anima a tocar.
+ */
+export const VERSION_DE_LOS_TERMINOS = "2026-08-18";
+
 export interface NormaCitada {
   id: string;
   /** Cómo se la nombra en pantalla. */
