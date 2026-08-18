@@ -1492,6 +1492,116 @@ para producción. Leerlos implicaría contenido — no entran.
 facilitar el reporte a las tip lines oficiales"*. Es lo que hace `RECURSOS` en `config.ts` con la
 Línea 137 y GAPP.
 
+### 🏆 LA QUINTA (Claude en claude.ai) — la más completa, y trae el respaldo que faltaba
+
+#### 🔴 EL HALLAZGO MÁS IMPORTANTE DE LAS CINCO CONSULTAS
+
+**Pamela Wisniewski (UCF/Vanderbilt) y su línea de trabajo, revisada por pares:** las apps de
+control parental *"hacen poco para mantener seguros a los adolescentes"* y **pueden dañar la
+confianza entre padre e hijo y reducir la capacidad del menor de responder a una amenaza**. En un
+estudio de 74 apps Android, **el 89% de las funciones eran de control y sólo el 11% apoyaban la
+autorregulación del adolescente**. Y el dato que lo cierra: la involucración parental y la
+supervisión directa se asociaron con **menos** victimización — **pero NO el uso de apps de
+control**.
+Referencias: Park, Akter, Badillo-Urquiola & Wisniewski 2024 (IEEE Security & Privacy),
+*"de control parental invasivo a soluciones centradas en el adolescente para la resiliencia
+digital"*; y CHI 2026, *"From Vulnerable to Resilient"*, sobre cybergrooming y resiliencia.
+
+🔑 **Esto no nos corrige: nos respalda, y es lo mejor que teníamos sin saberlo.** Cada decisión que
+Edgardo tomó por criterio propio cae del lado que la investigación recomienda:
+
+| Decisión suya | Lo que dice la literatura |
+|---|---|
+| **Regla 3** — el chico sabe desde el minuto cero | Transparencia con el adolescente por diseño |
+| **Regla 4** — la charla de alta es la primera intervención | «Involucración parental directa», lo único que se asoció a menos victimización |
+| **Al chico también le llega el mensaje**, no sólo a los adultos | Enfoque centrado en el adolescente, no en el control |
+| **El referente lo elige el chico** (11+) | Autonomía evolutiva, comunidad |
+| **No se leen los mensajes** | Minimización de datos |
+
+➡ **Esto va al video y al PDF.** Es la diferencia entre «otro control parental» y un sistema
+diseñado sobre lo que la investigación dice que funciona. ⚠ Verificar las citas en fuente antes de
+publicarlas.
+
+#### 🇦🇷 Datos argentinos nuevos y citables
+
+🔴 **Línea 137 — Equipo Niñ@s contra la Explotación Sexual y Grooming** (Programa Las Víctimas
+contra las Violencias): **823 consultas entre enero y octubre de 2022; el 38% (309) eran de
+grooming. De esas 309: el 59% de las víctimas tenía entre 12 y 17 años, el 22% entre 6 y 11, y el
+76% eran mujeres.**
+🔑 Es dato **argentino, oficial y del organismo al que ya derivamos**. Encaja con nuestras bandas
+de edad y con el factor de género que ya usamos. **Lo mejor para sumar al PDF.**
+
+Otros: **NCMEC CyberTipline — 80.524 reportes de *online enticement* en 2022, +82%** interanual ·
+**Thorn: 1 de cada 3 (33%) chicos de 9 a 12 reportó una interacción sexual online**; sextorsión en
+1 de cada 5 adolescentes, con autolesión en el 15% que **casi se triplica al 28% en jóvenes
+LGBTQ+** · **IWF: +360% de imágenes autogeneradas de chicos de 7 a 10 años** (H1 2020 vs H1 2022).
+
+#### ⚠ 60% de los agresores eran conocidos por la víctima (estudio IBSEAC 2023)
+
+🔴 **Segunda fuente independiente del mismo hallazgo** — Grok lo trajo vía Save the Children. Dos
+fuentes distintas apuntando a lo mismo ya no es un dato suelto.
+➡ **Toca el diseño del referente y no está resuelto.** Hoy el sistema supone que el adulto de
+confianza es seguro por definición. No se arregla antes del 23; **no puede perderse.**
+
+#### 🔴 ECH está cerrando la ventana del DNS — y nuestra arquitectura ya lo contesta
+
+**ECH (Encrypted Client Hello, RFC 9858, fines de 2024)** cifra el ClientHello y elimina la última
+fuga que quedaba: hasta ahora, aun con DNS cifrado, el hostname se veía en el SNI. Con ECH, un
+observador de red sólo ve **IP de destino** (inútil detrás de CDN) y **volumen/tiempo**.
+
+🔑 **Pero eso mata la observación pasiva, no la nuestra.** El informe lo dice con todas las letras:
+*"lo realista es operar el **resolver** que el dispositivo usa, no espiar tráfico cifrado ajeno"*.
+**Eso es exactamente AntiGro**: el perfil de NextDNS en el aparato del chico nos hace *ser* el
+resolver, así que las consultas nos llegan cifrado o no.
+⚠ **El agujero que sí tenemos sigue siendo el mismo:** una app o navegador con su propio DoH pasa
+de largo nuestro perfil — y desaparecer se lee igual que estar tranquilo. Es el hueco que taparía
+Screen Time.
+
+#### ✅ Otras dos que nos validan
+
+- **Los LLMs sobre-marcan grooming**: un estudio de 2024 probó 6 modelos sobre 3.840 respuestas y
+  **marcan grooming en interacciones inofensivas**. ➡ Es exactamente por lo que la IA acá **no
+  decide**: decide el motor y `reglas.ts` revisa lo que sale.
+- **Arquitectura de Bark**: alerta + fragmento + categoría, **nunca la transcripción completa**.
+  Nosotros hacemos aún menos —ni fragmento, porque no hay contenido—, y es la misma filosofía.
+
+#### 🔴 El perfil de vulnerabilidad: lo que decidimos el 16/8 tiene respaldo legal
+
+El SGM describe que la etapa de selección apunta a chicos *inseguros, solitarios, con baja
+autoestima, no cercanos a sus padres, de hogares monoparentales, con falta de supervisión*. **Y el
+informe advierte en la misma página** que usar identidad LGBTQ+, nivel socioeconómico o estructura
+familiar **como features de riesgo es éticamente problemático y potencialmente ilegal**: convierte
+características protegidas en predictores. Bajo el **AI Act** europeo, inferir datos sensibles y
+perfilar menores cae en categorías prohibidas o de alto riesgo.
+➡ **Es la decisión de Edgardo del 16/8, palabra por palabra:** *"debe sumar a contexto no
+puntaje"*. Ahora tiene marco legal detrás, no sólo criterio.
+
+#### ⚖ Lo legal, con el artículo preciso
+
+**Ley 25.326, art. 2: la vida sexual es dato sensible; art. 7: nadie puede ser obligado a darlos.**
+Un sistema que infiere riesgo sexual de un menor **trata datos sensibles de un menor** — el punto
+más delicado de todos. Hay reforma en curso alineada al RGPD (proyectos 2024-2025).
+**Observación General 25 (CRC/C/GC/25, 2021):** primer documento que reconoce los derechos del
+niño online, y protege **su privacidad incluso frente a la vigilancia de sus padres**.
+**Ley 26.904** (art. 131 CP) y **Ley 27.458** (Día Nacional, 13/11) ya las citamos.
+
+#### 📌 Buena parte de ese informe describe OTRO producto — y conviene tenerlo claro
+
+Las secciones de corpus (PAN12, ChatCoder2, Perverted-Justice), de modelos en español
+(BETO/RoBERTuito) y de APIs de moderación **suponen un sistema que lee las conversaciones**. Ese
+no es AntiGro: rompe la regla 2. **No hay que leerlo como una hoja de ruta que estamos ignorando** —
+describe la otra mitad del campo, la que decidimos no pisar.
+⚠ Dato útil igual: **no existe corpus de grooming publicado en español**, y los que hay son de
+2012, en inglés y de **operaciones señuelo** (adultos haciéndose pasar por chicos), no de víctimas
+reales. Si alguna vez alguien nos pregunta por qué no clasificamos texto, ésa es la respuesta corta.
+
+#### ⚠ Lo que hay que verificar antes de publicar cualquiera de estas cifras
+
+Vienen de un modelo, no de los informes. **Antes de que vayan al PDF o al video, se busca el
+documento.** El propio informe marca dos con cautela: los «45 minutos / 19 segundos» de grooming en
+gaming salen de **Crisp**, una firma comercial citada por WeProtect; y varias cifras provienen de
+ONGs que mezclan investigación con *advocacy* (Thorn, WeProtect, Grooming Argentina).
+
 ### 📱 Screen Time / Digital Wellbeing — la decisión es de Edgardo
 
 🔴 **Acá me equivoqué el 18/8 y él me lo marcó.** Dije que exigir una app «es exactamente lo que le
