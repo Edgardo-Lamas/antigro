@@ -18,7 +18,8 @@ estadísticas oficiales sobre qué pesa cuánto.
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
-| **En producción** | `4d92bbd`, promovido y **verificado en vivo el 18/8 a la noche**. Nada sin promover |
+| **En producción** | `4d92bbd`, promovido y **verificado en vivo el 18/8 a la noche** |
+| **Último commit** | `4bd068c` — sólo este archivo. ⚠ **No está en producción y no hace falta:** no cambia nada que corra. **No es trabajo pendiente** |
 | **La base** | ✅ Migración 14 aplicada: `usuarios.terminos_version` + `terminos_en` |
 | **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour + **91 de los términos**. **En verde el 18/8** |
 | **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
