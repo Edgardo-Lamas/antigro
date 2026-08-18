@@ -71,12 +71,15 @@ escribirlas.** La diferencia es entre decir qué hace el producto y pretender qu
 
 ### ✅ LA ACEPTACIÓN — hecha el 18/8, y la base va PRIMERO
 
-🔴 **🚨 NO PROMOVER SIN APLICAR LA MIGRACIÓN 14.** El alta manda `terminos_version` en el insert
-de `usuarios`; si la columna no existe, **crear una cuenta revienta en producción**. Es la regla
-del `CLAUDE.md`: la base va adelante del código salvo migración destructiva, y ésta es aditiva.
-📌 El script está en el scratchpad de la sesión (`migrar-14.js`) y el SQL en `schema.sql` § 14.
-⚠ **Verificado el 18/8 que la columna NO estaba** y que en producción hay sólo dos cuentas:
-`demo@antigro.app` (admin) y `mariana@ejemplo.ar`. **Nada de basura de pruebas.**
+✅ **LA MIGRACIÓN 14 YA ESTÁ APLICADA A PRODUCCIÓN** (18/8, autorizada por él). `usuarios` tiene
+`terminos_version` (text) y `terminos_en` (timestamptz). El SQL está en `schema.sql` § 14.
+✅ **Verificado de punta a punta contra la base de producción:** se creó una cuenta con la
+aceptación, quedó guardada como `2026-08-18` con su fecha y hora, **y la familia de prueba se
+borró**. En producción quedan sólo `demo@antigro.app` (admin) y `mariana@ejemplo.ar`.
+📌 Las dos cuentas viejas quedan en «no consta», que es la verdad: son anteriores a que hubiera
+términos, y marcarlas como que aceptaron sería inventar un consentimiento.
+🔑 **La base fue adelante del código, como manda la regla** — el insert del alta manda esas
+columnas, así que promover primero habría roto el alta en vivo.
 
 | Dónde | Qué |
 |---|---|
@@ -386,8 +389,8 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 1. ~~**El alta desde el panel.**~~ ✅ **HECHO el 17/8**, y no quedó «desde el panel»: la familia se
    da de alta sola, en un recorrido de pantallas. Ver el bloque «EL RECORRIDO DE ALTA» arriba, que
    incluye lo que quedó pendiente de él.
-2. ~~**La aceptación de los términos en el alta.**~~ ✅ **HECHA el 18/8.**
-   🔴 **Pendiente de él: aplicar la migración 14 ANTES de promover**, o el alta se rompe.
+2. ~~**La aceptación de los términos en el alta.**~~ ✅ **HECHA el 18/8**, con la migración 14 ya
+   aplicada y verificada contra producción. ⬜ Falta promover.
 3. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
    ⚠ **Él pidió ir despacio**, textual: *"con el cuestionario vamos despacio"*. No resolverlo de
    un saque. 🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que
@@ -401,8 +404,6 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 
 ### ⚠ Lo que le toca a él, no al código
 
-- 🚨 **Aplicar la migración 14 ANTES de promover** (`terminos_version` en `usuarios`). Sin ella, el
-  alta se rompe en producción. Ver «LA ACEPTACIÓN».
 - 🔴 **Decidir si saca una cuenta de NextDNS antes del jueves.** Sin perfil real la instalación
   queda explicada pero **no demostrable en el video**, y la pantalla lo dice con todas las letras.
 - **Leer las respuestas del asistente con calma.** Es el único que puede decir si el registro está
