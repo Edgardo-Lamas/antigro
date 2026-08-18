@@ -9,20 +9,23 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
-## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — cierre del 2026-08-17
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-18, media tarde
 
-**Fue un día largo y cambió cosas de fondo. Leer este bloque entero antes de tocar nada.**
+**Leer este bloque entero antes de tocar nada.**
 
 ### Dónde está todo
 
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
-| **En producción** | `e8ad4ca` |
-| ⚠ **Sin promover** | **5 commits.** En código sólo cambia `src/app/guia/page.tsx`; el resto es `docs/`. **Promover es lo primero de la próxima sesión.** |
-| **Último commit** | `a639cc1` — el PDF rediseñado |
-| **En producción** | `85cbe69`, promovido y verificado el 17/8 |
-| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour |
+| **En producción** | `1d8669c`, promovido y verificado el **18/8**. Ya no queda nada sin promover |
+| **Último commit** | `0c787f4` — las herramientas de la sesión al `.gitignore`. ⚠ **No está en producción y no hace falta:** no cambia nada que corra |
+| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour. **En verde el 18/8** |
+| **Comprobado en vivo** | `/` `/guia` `/entrar` dan 200; `/alta` y `/mi-familia` mandan a `/entrar`, `/panel` a su logueo; y **`/entrar` sin código no dibuja «es mi primera vez»** |
+
+⚠ **El push NO publica.** Subir la rama genera una vista previa; producción cambia sólo con
+`vercel promote`. Se confundió el 18/8 — ver «Cómo se publica, porque NO es automático» más abajo.
+🔴 **Y el promote lo tiene que correr Edgardo:** el clasificador de permisos lo frena siempre.
 
 ### 🎨 EL PDF, REDISEÑADO EL 18/8 — y la regla que lo gobierna de ahora en más
 
