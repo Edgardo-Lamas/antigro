@@ -145,13 +145,12 @@ export interface Lectura {
 
 /* ── Utilidades ──────────────────────────────────────────────────────────── */
 
-/** `YYYY-MM-DD` local — en UTC, una señal de las 22 caería al día siguiente. */
-export function diaLocal(fecha: Date | string): string {
-  const d = typeof fecha === "string" ? new Date(fecha) : fecha;
-  const mes = `${d.getMonth() + 1}`.padStart(2, "0");
-  const dia = `${d.getDate()}`.padStart(2, "0");
-  return `${d.getFullYear()}-${mes}-${dia}`;
-}
+/* 🔑 `diaLocal` se mudó a `dia.ts` el 19/8 y se re-exporta desde acá para no
+   romper a nadie. El motivo de la mudanza: `parte.ts` la necesita y tiene que
+   poder cargarse con node pelado, que no resuelve el alias `@/` — y este
+   archivo arrastra medio sistema. Un solo lugar, dos consumidores. */
+export { diaLocal } from "./dia.ts";
+import { diaLocal } from "./dia.ts";
 
 /**
  * Carga de un día: se combinan las señales como probabilidades, no sumando.

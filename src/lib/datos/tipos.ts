@@ -313,7 +313,22 @@ export type SenalRegistrada = SenalDeRed;
  * distintos, con texto distinto, y el sistema puede saber si ya insistió sin
  * confundirlo con haber avisado dos veces.
  */
-export type ClaseDeRespuesta = "alerta_adultos" | "orientacion_chico" | "escalada_adultos";
+export type ClaseDeRespuesta =
+  | "alerta_adultos"
+  | "orientacion_chico"
+  | "escalada_adultos"
+  /**
+   * 🔑 **La señal de vida, pedida por Edgardo el 19/8:** *"si no da señales de
+   * nada los usuarios pueden pensar «¿esta porquería está funcionando?»"*.
+   * Sale haya o no novedades — de ahí el nombre: es un parte, no un reporte.
+   */
+  | "parte_periodico"
+  /**
+   * 🔴 **Una avería, no una novedad sobre el chico.** Es el único mensaje del
+   * sistema que pide una acción concreta, porque mientras dure la familia cree
+   * que está protegida y no lo está.
+   */
+  | "aviso_de_ceguera";
 
 /** Lo que el sistema dijo, a quién y por qué. */
 export interface Respuesta {

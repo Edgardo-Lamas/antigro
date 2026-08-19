@@ -687,3 +687,23 @@ comment on column respuestas.acusado_en is
 alter table respuestas drop constraint if exists respuestas_clase_check;
 alter table respuestas add constraint respuestas_clase_check
   check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos'));
+
+
+-- ─── 18. EL PARTE Y LA CEGUERA ───────────────────────────────────
+--  Los pidió Edgardo el 19/8: *"el sistema debe dar señales de vida
+--  regularmente… si pasaron 4 meses sin nada que reportar eso llevaría a los
+--  usuarios a repensar si tiene sentido conectar AntiGro"*.
+--
+--  🔴 Y al construirlo apareció algo más grave: **hasta ese día el sistema no
+--  sabía cuándo estaba CIEGO.** Si el perfil se desinstala o el chico cambia de
+--  teléfono, no llega ninguna señal — y eso se leía exactamente igual que «todo
+--  tranquilo». Es el único fallo que se disfraza de buena noticia.
+--
+--  🔑 Son dos clases y no una porque son dos cosas distintas: el parte cuenta
+--  lo que el sistema miró y NO pide nada; el aviso de ceguera es una avería y
+--  sí pide una acción. Mezclarlos haría que la avería se lea como rutina.
+
+alter table respuestas drop constraint if exists respuestas_clase_check;
+alter table respuestas add constraint respuestas_clase_check
+  check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos',
+                   'parte_periodico', 'aviso_de_ceguera'));

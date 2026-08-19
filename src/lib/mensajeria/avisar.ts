@@ -11,7 +11,14 @@
  * que tenga algo nuevo para decir nadie lo va a leer.
  */
 
-import { diaLocal, type Lectura } from "@/lib/motor";
+import {
+  diaLocal,
+  textoDeLaCeguera,
+  textoDelParte,
+  type Ceguera,
+  type Lectura,
+  type Parte,
+} from "@/lib/motor";
 import { canalListo, repositorio, type AdultoResponsable, type Chico, type Familia } from "@/lib/datos";
 import type { ClaseDeRespuesta, Respuesta } from "@/lib/datos/tipos";
 import { transporteDe } from "./index";
@@ -277,4 +284,112 @@ export async function escalar(aviso: {
   }
 
   return { decision, emitidos };
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL PARTE Y LA CEGUERA — la señal de vida
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Manda un mensaje del sistema a los responsables, sin botón y sin ceremonia.
+ *
+ * 🔑 **Va sólo a los responsables**, ni al referente ni al chico. El parte y la
+ * avería son de quien administra el sistema; el referente está para el chico, y
+ * el chico no tiene por qué recibir el mantenimiento de la casa.
+ *
+ * 🔴 **Y NO lleva botón «Lo vi».** El acuse existe para saber si alguien vio una
+ * ALERTA, y de ahí cuelga la escalada. Ponérselo a un parte mensual haría que un
+ * parte sin abrir se pareciera a una alerta sin abrir, que es exactamente la
+ * confusión que este mensaje viene a evitar.
+ */
+async function mandarALosResponsables(
+  chico: Chico,
+  adultos: AdultoResponsable[],
+  clase: ClaseDeRespuesta,
+  texto: string,
+  asunto: string,
+  ahora: Date,
+): Promise<AvisoEmitido[]> {
+  const repo = repositorio();
+  const emitidos: AvisoEmitido[] = [];
+
+  const responsables = adultos.filter(
+    (a) => a.rol === "progenitor" && a.activo !== false && canalListo(a.canal),
+  );
+
+  for (const adulto of responsables) {
+    const transporte = await transporteDe(adulto.canal.tipo);
+    const resultado = await transporte.enviar({
+      canal: adulto.canal.tipo,
+      destino: adulto.canal.destino,
+      asunto,
+      texto,
+    });
+
+    await repo.registrarRespuesta({
+      chicoId: chico.id,
+      fecha: ahora.toISOString(),
+      clase,
+      canal: adulto.canal.tipo,
+      destino: adulto.canal.destino,
+      texto,
+      // Un parte no se apoya en señales puntuales: resume el período entero.
+      senalesQueLaSostienen: [],
+      entregado: resultado.entregado,
+      acuseToken: null,
+      acusadoEn: null,
+    });
+
+    emitidos.push({
+      clase,
+      paraQuien: adulto.nombre,
+      canal: adulto.canal.tipo,
+      texto,
+      resultado,
+      omitidoPorRepetido: false,
+      sinVincular: false,
+    });
+  }
+
+  return emitidos;
+}
+
+/** El parte periódico: la señal de vida. */
+export async function enviarParte(entrada: {
+  chico: Chico;
+  adultos: AdultoResponsable[];
+  parte: Parte;
+  ahora: Date;
+}): Promise<AvisoEmitido[]> {
+  return mandarALosResponsables(
+    entrada.chico,
+    entrada.adultos,
+    "parte_periodico",
+    textoDelParte(entrada.chico.nombre, entrada.parte),
+    `AntiGro · el parte de ${entrada.chico.nombre}`,
+    entrada.ahora,
+  );
+}
+
+/**
+ * El aviso de que el sistema dejó de ver.
+ *
+ * 🔴 **Es el único mensaje del sistema que pide una acción concreta.** No es una
+ * novedad sobre el chico: es una avería. Y una avería que nadie arregla deja a
+ * la familia creyendo que está protegida cuando no lo está.
+ */
+export async function avisarDeLaCeguera(entrada: {
+  chico: Chico;
+  adultos: AdultoResponsable[];
+  ceguera: Ceguera;
+  ahora: Date;
+}): Promise<AvisoEmitido[]> {
+  return mandarALosResponsables(
+    entrada.chico,
+    entrada.adultos,
+    "aviso_de_ceguera",
+    textoDeLaCeguera(entrada.chico.nombre, entrada.ceguera),
+    `AntiGro · dejó de recibir datos de ${entrada.chico.nombre}`,
+    entrada.ahora,
+  );
 }

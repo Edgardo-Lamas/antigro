@@ -21,8 +21,8 @@ estadísticas oficiales sobre qué pesa cuánto.
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio`. 🔴 **Desde el 19/8 `main` SÍ es la de producción y se mergeó** — ver «Cómo se publica» |
 | **En producción** | `4d92bbd` — ⚠ **atrasado**: no tiene el cuestionario |
-| **La base** | ✅ 14 (`terminos`) · ✅ 15 (`observaciones.hogar`) · ✅ 16 (`respuestas.acuse_token` + `acusado_en`) · ✅ **17 (`escalada_adultos`)**. Las tres últimas del 19/8 |
-| **Verificación** | `npm run probar` — **314 comprobaciones** en 8 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + **33 escalada**. **En verde el 19/8** |
+| **La base** | ✅ 14 · 15 · 16 · 17 · ✅ **18 (`parte_periodico` + `aviso_de_ceguera`)**. De la 15 a la 18, todas del 19/8 |
+| **Verificación** | `npm run probar` — **349 comprobaciones** en 10 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + **35 parte**. **En verde el 19/8** |
 | **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) y `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real). **En verde el 19/8** |
 | **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
 
@@ -75,6 +75,74 @@ panel lo dice en «Quiénes están», no acá. Lo que sí se registra con `entre
 mensaje que salió y **el canal rechazó**.
 
 ✅ **La escalada y el cron se hicieron después, el mismo día** — ver los dos bloques de abajo.
+
+### ✅ EL SISTEMA YA SE MANEJA SOLO — 19/8, y cierra el circuito
+
+**Dos cosas que faltaban y colgaban del mismo reloj.**
+
+#### 🔴 1. El primer aviso, que hasta hoy NO salía solo
+
+`avisar()` se llamaba desde **un solo lugar**: `/api/alertas`, una ruta de administración con
+sesión. O sea que en una casa de verdad el motor podía detectar el patrón perfectamente y **no se
+lo contaba a nadie hasta que alguien entrara a pedirlo**. Al lado de lo construido el mismo día
+quedaba absurdo: **la escalada tenía reloj propio y el aviso original no.** El sistema sabía
+insistir sobre un aviso que no era capaz de mandar por su cuenta.
+
+✅ Ahora lo manda el reloj. 🔑 **Una vez por EPISODIO, no una por día:** el estado se sostiene
+varios días seguidos, y avisar en cada corrida sería la misma alerta todos los días —que es como
+un sistema se apaga solo—. El episodio empezó hace `diasSostenidos` días; si no hubo aviso desde
+entonces, se avisa.
+📌 **Y eso es también lo que hace que el gasto sea chico:** las dos llamadas a Opus 5 se pagan
+cuando hay algo nuevo que decir, no en cada corrida. Un chico en calma cuesta cero.
+⚠ **Si la IA no pudo escribir, no se manda nada.** `redactar` ya cae al respaldo determinista
+cuando el modelo falla o el control frena; un `null` significa que ni eso salió, y un aviso vacío
+gasta la atención sin decir nada.
+
+#### 🔴 2. EL PARTE — y el agujero que apareció construyéndolo
+
+**Lo pidió Edgardo:** *"el sistema debe dar señales de vida regularmente, si no da señales de nada
+los usuarios pueden pensar «¿esta porquería está funcionando?»… imaginate que pasaron 4 meses sin
+nada que reportar"*.
+
+🔴 **Y al ir a construirlo apareció algo más grave que lo comercial: el sistema NO SABÍA CUÁNDO
+ESTABA CIEGO.** Si el perfil se desinstala, el chico cambia de teléfono o el filtro deja de
+reportar, no llega ninguna señal — **y eso el motor lo leía exactamente igual que «todo
+tranquilo»**. No había una sola línea que distinguiera las dos cosas.
+➡ **Su pregunta no era sólo una duda del usuario: era razonable, porque el sistema no podía
+contestarla.** Es el único fallo que **se disfraza de buena noticia**.
+
+🔑 **Y eso da vuelta el argumento del parte.** Lo que prueba que el sistema sirve no es *«no pasó
+nada»*: es *«miré 31 días, hubo actividad tarde el 6, el 9 y el 14, ninguna se sostuvo, y por eso
+no te escribí»*. Convierte el silencio de **ausencia** en **trabajo hecho**.
+
+| Dónde | Qué |
+|---|---|
+| `src/lib/motor/parte.ts` | `mirarSiEstaCiego`, `armarParte` y los dos textos. **Puro** |
+| `src/lib/motor/dia.ts` | `diaLocal` se mudó acá: `parte.ts` tiene que cargarse con node pelado |
+| `enviarParte` / `avisarDeLaCeguera` en `avisar.ts` | La entrega |
+| `npm run probar-parte` (35) · `prueba-parte-envio.mjs` | Qué dice · que salga |
+
+⚠ **LO QUE EL PARTE NO PUEDE SER: una alerta chiquita.** Sin botón, sin color de atención, y sin
+sugerir que nadie haga nada. Si un padre ansioso lee «hubo tres noches tarde» y actúa sobre eso,
+**rompimos la regla 5 con nuestro propio mensaje**. Por eso el parte dice SIEMPRE, con todas las
+letras, por qué eso no ameritó escribirle — y hay una comprobación que lo verifica.
+🔑 **El aviso de ceguera es lo contrario y es el ÚNICO mensaje del sistema que pide una acción**:
+no es una novedad sobre el chico, es una avería. Y una avería que nadie arregla deja a la familia
+creyendo que está protegida cuando no lo está.
+📌 **`DIAS_PARA_SOSPECHAR_CEGUERA = 3`**, no uno: un chico puede pasar un día sin tocar el teléfono
+y avisar por eso sería el mismo falso positivo que la regla 5 evita del otro lado.
+📌 **Y «nunca hubo señales» NO es ceguera:** puede ser que el filtro no se haya instalado todavía.
+Decirle a una familia recién dada de alta que su sistema «dejó de funcionar» sería una alarma de
+avería sobre algo que nunca arrancó.
+🔑 **Los dos van sólo a los responsables** — ni al referente ni al chico. Es mantenimiento de la
+casa. ⬜ **Sin decidir, y lo dejó pensando él: si el chico recibe su propio parte.** Sería coherente
+con la regla 3 y quizá lo más fuerte para su confianza (*«seguimos sin leer tus mensajes»*), pero
+también puede leerse como un recordatorio de que lo miran.
+
+⚠ **El orden del reloj no es indiferente:** ceguera → aviso → escalada → parte. Con el sistema
+ciego no se alerta ni se escala ni se manda parte, porque todo eso se apoyaría en datos que no
+llegaron. Y el parte va último: si el sistema ya habló, sería ruido encima de una conversación
+abierta.
 
 ### ✅ LA ESCALADA Y EL RELOJ — construidos el 19/8, cerrando la tanda
 
@@ -622,8 +690,8 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
    aplicada, 73 comprobaciones y el recorrido verificado en el navegador. Ver el bloque «EL
    CUESTIONARIO DEL ADULTO» arriba. ✅ **Promovido y verificado en vivo el 19/8** (`8a7316e`).
 4. ~~**El acuse de recibo y la escalada.**~~ ✅ **HECHOS los tres el 19/8**: acuse, escalada y el
-   reloj. Ver sus bloques arriba. ⬜ Lo que queda de ahí: **que el sistema mande el PRIMER aviso
-   solo**, que hoy sigue necesitando que alguien llame a `/api/alertas`.
+   reloj. Ver sus bloques arriba. ✅ **Y el 19/8 a la noche, el primer aviso automático y el
+   parte** — el circuito quedó cerrado de punta a punta sin que intervenga nadie.
 5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
 6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
    operativo."* No empezarlo antes. El guion que hay todavía es el de Criterio Térmico.

@@ -26,14 +26,15 @@ const url = linea
   .replace(/^"|"$/g, "")
   .replace(/\?sslmode=require/, "");
 
-/* ── Migración 17: la clase de la escalada ────────────────────────────────
-   `escalada_adultos` es una clase aparte y no un `alerta_adultos` repetido: es
-   lo que permite saber si ya se insistió sin confundirlo con haber avisado dos
-   veces por el mismo patrón. Sólo afloja un check: no toca ninguna fila. */
+/* ── Migración 18: el parte y la ceguera ──────────────────────────────────
+   Dos clases nuevas, y son dos y no una porque son cosas distintas: el parte
+   cuenta lo que el sistema miró y NO pide nada; el aviso de ceguera es una
+   avería y sí pide una acción. Sólo afloja un check. */
 const PASOS = [
   "alter table respuestas drop constraint if exists respuestas_clase_check",
   `alter table respuestas add constraint respuestas_clase_check
-     check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos'))`,
+     check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos',
+                      'parte_periodico', 'aviso_de_ceguera'))`,
 ];
 
 const cliente = new pg.Client({ connectionString: url, ssl: { rejectUnauthorized: false } });
@@ -43,7 +44,7 @@ try {
   await cliente.query("begin");
   for (const paso of PASOS) await cliente.query(paso);
   await cliente.query("commit");
-  console.log("✅ Migración 17 aplicada");
+  console.log("✅ Migración 18 aplicada");
 } catch (e) {
   await cliente.query("rollback");
   console.error("❌ Revertida entera:", e.message);
