@@ -8,7 +8,7 @@ import {
 } from "@/lib/datos";
 import { enlaceDeVinculacion } from "@/lib/mensajeria/vinculacion";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
-import { evaluar, VENTANA_DIAS } from "@/lib/motor";
+import { evaluar, INDICADORES, juntarObservaciones, VENTANA_DIAS } from "@/lib/motor";
 import { EDAD_PARA_ELEGIR_REFERENTE, quienEligeAlReferente } from "@/lib/config";
 
 /**
@@ -44,38 +44,37 @@ function diasDesdeElAlta(creado: string): number {
 }
 
 /**
- * Junta lo que contestaron los adultos en el único mapa que espera el motor.
+ * Quién contestó el cuestionario, para mostrarlo en el panel.
  *
- * 🔴 **Dos reglas, y las dos tienen un porqué que conviene no perder:**
+ * 🔴 **Decidido por Edgardo el 18/8: la firma SE MUESTRA.** Y se muestra
+ * partida, porque las dos mitades no valen lo mismo — `hogar` lo comprobó el
+ * sistema al abrir la sesión, `nombre` es lo que esa persona declaró. La
+ * pantalla las dice distinto; acá viajan separadas para que pueda hacerlo.
  *
- * 1. **De cada adulto vale su última respuesta.** El cuestionario se puede
- *    volver a contestar, y lo que dijo alguien hace tres semanas no puede
- *    seguir pesando cuando ya dijo otra cosa.
- *
- * 2. 🔑 **Entre adultos, gana el que vio MÁS.** Si la madre marcó «nunca» y la
- *    tía marcó «seguido», la tía vio algo que la madre no vio — y ese es
- *    exactamente el motivo por el que el sistema exige un segundo adulto
- *    elegido por el chico. Promediar las dos respuestas borraría el único
- *    dato nuevo que hay ahí.
+ * 📌 Una por adulto: la última. Es la misma regla que usa el motor, y si acá
+ * apareciera el historial completo el panel contaría una cosa y el informe otra.
  */
-function loQueVieronLosAdultos(
-  observaciones: { adultoId: string; fecha: string; respuestas: Record<string, number> }[],
-): Record<string, number> {
-  const ultimaDeCadaUno = new Map<string, { fecha: string; respuestas: Record<string, number> }>();
+function firmasDelCuestionario(
+  observaciones: { adultoId: string; hogar?: string | null; fecha: string; respuestas: Record<string, number> }[],
+  adultos: { id: string; nombre: string }[],
+) {
+  const ultimaDeCadaUno = new Map<string, (typeof observaciones)[number]>();
   for (const o of observaciones) {
     const previa = ultimaDeCadaUno.get(o.adultoId);
-    if (!previa || o.fecha > previa.fecha) {
-      ultimaDeCadaUno.set(o.adultoId, { fecha: o.fecha, respuestas: o.respuestas });
-    }
+    if (!previa || o.fecha > previa.fecha) ultimaDeCadaUno.set(o.adultoId, o);
   }
 
-  const juntas: Record<string, number> = {};
-  for (const { respuestas } of ultimaDeCadaUno.values()) {
-    for (const [indicador, valor] of Object.entries(respuestas)) {
-      juntas[indicador] = Math.max(juntas[indicador] ?? 0, valor);
-    }
-  }
-  return juntas;
+  return [...ultimaDeCadaUno.values()]
+    .sort((a, b) => b.fecha.localeCompare(a.fecha))
+    .map((o) => ({
+      adultoId: o.adultoId,
+      /* Si el adulto se dio de baja, su observación sigue contando —es entrada
+         del motor— pero el nombre puede no estar. No se inventa. */
+      nombre: adultos.find((a) => a.id === o.adultoId)?.nombre ?? null,
+      hogar: o.hogar ?? null,
+      fecha: o.fecha,
+      respondidas: Object.keys(o.respuestas).length,
+    }));
 }
 
 export async function GET(req: Request) {
@@ -123,7 +122,7 @@ export async function GET(req: Request) {
         chico: { edad: chico.edad, genero: chico.genero },
         senales,
         hasta,
-        observaciones: loQueVieronLosAdultos(observaciones),
+        observaciones: juntarObservaciones(observaciones),
         diasObservados: diasDesdeElAlta(chico.creado),
       })
     : null;
@@ -184,6 +183,12 @@ export async function GET(req: Request) {
          `/api/mi-familia/adultos/baja`. */
     })),
     lectura,
+    /* 🔑 La firma del cuestionario. Va al lado de la lectura y no adentro: la
+       lectura es lo que el motor concluye, esto es quién aportó qué. */
+    cuestionario: {
+      firmas: firmasDelCuestionario(observaciones, datos.adultos),
+      deUnTotalDe: INDICADORES.length,
+    },
     almacenamiento: repo.clase,
     ventana,
     fuente: { id: fuente.id, nombre: fuente.nombre, simulada, motivo },

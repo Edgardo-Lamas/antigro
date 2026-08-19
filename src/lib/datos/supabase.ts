@@ -570,6 +570,8 @@ export class RepositorioSupabase implements Repositorio {
       .insert({
         chico_id: o.chicoId,
         adulto_id: o.adultoId,
+        // Desde qué casa. Es un hecho: sale de la sesión, nunca del formulario.
+        hogar: o.hogar ?? null,
         fecha: o.fecha,
         respuestas: o.respuestas,
       })
@@ -597,6 +599,7 @@ export class RepositorioSupabase implements Repositorio {
           id: string;
           chico_id: string;
           adulto_id: string;
+          hogar: string | null;
           fecha: string;
           respuestas: Record<string, number>;
         }[]
@@ -606,6 +609,7 @@ export class RepositorioSupabase implements Repositorio {
       id: o.id,
       chicoId: o.chico_id,
       adultoId: o.adulto_id,
+      hogar: o.hogar ?? null,
       fecha: o.fecha,
       respuestas: o.respuestas ?? {},
     }));

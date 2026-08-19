@@ -9,20 +9,66 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 ---
 
-## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-18, noche
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-19
 
 **Leer este bloque entero antes de tocar nada.**
+
+🔴 **LO PRIMERO: PROMOVER.** El cuestionario está construido, probado y **la migración 15 ya está
+aplicada a producción**, pero el código **todavía no se promovió**. Ver «Cómo se publica».
+⏳ **El código congela MAÑANA, jueves 20.**
 
 ### Dónde está todo
 
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
-| **En producción** | `4d92bbd`, promovido y **verificado en vivo el 18/8 a la noche** |
-| **Último commit** | `4bd068c` — sólo este archivo. ⚠ **No está en producción y no hace falta:** no cambia nada que corra. **No es trabajo pendiente** |
-| **La base** | ✅ Migración 14 aplicada: `usuarios.terminos_version` + `terminos_en` |
-| **Verificación** | `npm run probar` — 12 reglas + 11 sugerencias + 27 de instalación + 23 del turno + 15 del tour + **91 de los términos**. **En verde el 18/8** |
+| **En producción** | `4d92bbd` — ⚠ **atrasado**: no tiene el cuestionario |
+| **La base** | ✅ Migración 14 (`terminos`) y ✅ **migración 15** (`observaciones.hogar`, 19/8) |
+| **Verificación** | `npm run probar` — **252 comprobaciones**: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + **73 del cuestionario**. **En verde el 19/8** |
+| **En el navegador** | `node prueba-navegador.mjs` — el recorrido entero del cuestionario contra producción. **En verde el 19/8** |
 | **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
+
+### ✅ EL CUESTIONARIO DEL ADULTO — construido el 19/8. Era lo próximo y ya está
+
+**Las preguntas existían desde el 14/8 y el motor las consumía: lo que faltaba era la puerta.**
+El panel decía *«nadie contestó el cuestionario todavía»* y no había ningún lado adonde ir —
+**un cartel que señala un hueco y no ofrece cómo taparlo entrena a ignorar los carteles.**
+
+| Dónde | Qué |
+|---|---|
+| `/mi-familia/cuestionario` | La pantalla: **firma → 9 preguntas, una por pantalla → confirmación** |
+| `GET/POST /api/mi-familia/cuestionario` | Trae los firmantes y lo último de cada uno; guarda. 10 por hora por familia |
+| `juntarObservaciones` en `motor/cuestionario.ts` | **La regla de juntar, ahora en UN solo lugar** |
+| `observaciones.hogar` (migración 15) | El HECHO al lado de la DECLARACIÓN |
+| `npm run probar-cuestionario` | 73 comprobaciones |
+| `prueba-navegador.mjs` | El recorrido entero en el navegador |
+
+🔴 **La firma va PRIMERO y se MUESTRA en el panel** — decidido por Edgardo el 18/8. Y se muestra
+partida, que es lo que la hace honesta: *«desde tu casa»* **consta** (la sesión se abrió con la
+credencial de esa casa); *«contestó Mariana»* es lo que esa persona **declaró**. La pantalla de la
+firma explica la diferencia antes de pedirla, no después.
+🔴 **Al terminar NO hay puntaje**, y hay una comprobación en el navegador que lo verifica: se
+buscan porcentajes y decimales en el texto del cierre. Lo único numérico permitido es *«6 de 9
+preguntas»*.
+🔑 **«No sé / prefiero no contestar» está en todas, con el mismo peso visual que las demás.** Sin
+esa salida el que no sabe marca «no / nunca», y eso es una mentira entrando al motor. Lo salteado
+**no viaja como 0**: hay una prueba que comprueba que saltear y contestar «nunca» dan distinto.
+📌 **Se trae puesto lo último que contestó esa misma persona.** Volver a contestar es lo normal —
+la conducta de un chico cambia—, y arrancar de cero cada vez haría que la segunda vuelta costara
+igual que la primera. Una tarea que cuesta se deja de hacer.
+
+🔴 **HALLAZGO: el panel y el asistente NO se ponían de acuerdo, y nadie lo veía.** La regla de
+juntar estaba escrita **dos veces**. El panel se quedaba con la última respuesta de cada adulto y
+después tomaba la más alta por pregunta; **el asistente se salteaba el primer paso** y tomaba la
+más alta de todo el historial. ➡ Alguien corregía su respuesta, el panel mostraba la corrección
+y **el asistente le seguía hablando con la vieja**. Dos pantallas del mismo sistema diciendo cosas
+distintas del mismo chico. ✅ Arreglado: la regla vive en `juntarObservaciones` y está probada.
+🔑 **La lección:** una regla escrita en dos rutas no se puede probar, y por eso se desincronizó
+sin que nada se pusiera rojo.
+
+⚠ **Y volvió a aparecer un error viejo, en un lugar nuevo:** la firma mostraba la fecha en ISO
+(`2026-08-19`). Es exactamente lo que ya se había corregido el 15/8 en la advertencia del perfil.
+**Lo encontró el navegador, no el typecheck.** Ahora hay `fechaEnCriollo` y dice «hoy» / «ayer».
 
 ⚠ **El push NO publica.** Subir la rama genera una vista previa; producción cambia sólo con
 `vercel promote`. Se confundió el 18/8 — ver «Cómo se publica, porque NO es automático» más abajo.
@@ -139,8 +185,45 @@ informe"*— con una distinción que lo hace honesto: **desde qué casa se entr�
 credencial es del hogar); **quién de las personas es una DECLARACIÓN**. Se guardan distinto y se
 muestran distinto. Decir «verificado» sería afirmar lo que el sistema no puede sostener.
 
-⬜ **Sin construir todavía:** la pantalla de la segunda puerta en `/mi-familia`, el registro de
-accesos, y la firma del cuestionario.
+⬜ **Sin construir todavía:** la pantalla de la segunda puerta en `/mi-familia` y el registro de
+accesos. ✅ **La firma del cuestionario se hizo el 19/8** — ver su bloque arriba.
+
+### 🚫 EL REFERENTE NO ENTRA AL PANEL — NUNCA. Cerrado por Edgardo el 18/8
+
+**Lo dijo sin lugar a dudas y cierra una pregunta que yo había dejado abierta como si fuera
+negociable:** *"el referente no puede entrar nunca, es alguien que está para apoyar al chico,
+llegado el caso, y de acuerdo a lo que hable con el chico debería informar a sus padres"*.
+
+🔴 **El motivo NO es de permisos, es de confianza, y va en las dos direcciones:**
+1. Si el referente ve el informe de los padres, **puede devolverle esa información al chico sin
+   querer**. Y ahí se pierde lo único que hace útil al referente: que el chico le hable.
+2. Y al revés — si los padres se enteran de que el referente le pasó al chico información privada
+   de ellos, se rompe también de ese lado.
+
+🔑 **Entonces el referente es un canal de UNA sola dirección: recibe, no consulta.** Recibe los
+avisos que le corresponden y —idea de él, 18/8— **material y orientación cada tanto**, para que
+sepa qué hacer cuando el chico le hable. Lo que fluye hacia arriba es distinto: si de esa charla
+sale algo, **el referente informa a los padres**, hablando, no por el sistema.
+
+⚠ **Corrección de algo que yo había escrito mal:** que el referente no conteste el cuestionario
+**no es un hueco que el motor «extrañe»**. La regla de quedarse con la respuesta más alta se
+sostiene sola entre progenitores y tutores —dos padres, y sobre todo dos casas, ven pedazos
+distintos del mismo chico—. El comentario de `/api/mi-familia/route.ts` que justificaba esa regla
+con el referente **estaba equivocado y ya se corrigió**.
+
+⬜ **Queda como pieza para después del 23: el material periódico para el referente.**
+
+### 📋 EL CUESTIONARIO — qué es y qué no, según él (18/8)
+
+🔑 **Para qué está, textual: *"conocer los patrones de conducta del chico, que es de donde nos
+apoyamos principalmente"*.** No es un test de riesgo de una persona ni un puntaje sobre un chico.
+📌 Y encaja con lo que ya hace el motor: las señales de red y el cuestionario miran **lo mismo**
+—cómo se está comportando ese chico— desde dos lados. Por eso el motor lo llama «el segundo ojo».
+🔴 **Al terminar NO se muestra ningún puntaje.** Un número sobre un chico es lo que la regla 1
+prohíbe decir y lo que la **Ley 25.326 art. 7 inc. 3** prohíbe registrar. Se dice que la respuesta
+entró y que el informe pasa a estar mirado con los dos ojos.
+⚠ `APORTE_MAXIMO_ADULTOS = 0,7` en `evaluar.ts`: el cuestionario **no puede disparar solo una
+alerta**. Si alguna vez se decide que tiene que pesar más, la perilla es ésa.
 
 ### 🎨 EL PDF, REDISEÑADO EL 18/8 — y la regla que lo gobierna de ahora en más
 
@@ -402,10 +485,9 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
    incluye lo que quedó pendiente de él.
 2. ~~**La aceptación de los términos en el alta.**~~ ✅ **HECHA el 18/8**, con la migración 14 ya
    aplicada y verificada contra producción. ⬜ Falta promover.
-3. **El cuestionario del adulto.** Las preguntas existen en `cuestionario.ts`; falta la pantalla.
-   ⚠ **Él pidió ir despacio**, textual: *"con el cuestionario vamos despacio"*. No resolverlo de
-   un saque. 🔑 Es idea suya y es más que un formulario: *ante una conducta anormal, lo primero que
-   dispara el sistema no es una alerta, es el cuestionario.*
+3. ~~**El cuestionario del adulto.**~~ ✅ **HECHO el 19/8** — pantalla, ruta, migración 15
+   aplicada, 73 comprobaciones y el recorrido verificado en el navegador. Ver el bloque «EL
+   CUESTIONARIO DEL ADULTO» arriba. ⬜ **Falta promover.**
 4. **El acuse de recibo y la escalada.** Diseñado el 16/8, sin construir — sección propia abajo.
 5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
 6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
@@ -1903,10 +1985,17 @@ entender de dónde salió, no para lo que hace hoy.
 baja no se traba nunca, pero la familia que queda con uno solo lo ve escrito en pantalla hasta
 que lo cubra. Verificado en el navegador el 16/8.
 
-📌 **Cuando dos adultos contestaron distinto el cuestionario, gana el que vio MÁS**
-(`loQueVieronLosAdultos` en `/api/mi-familia`). Si la madre marcó «nunca» y la tía «seguido», la
-tía vio algo que la madre no — y ese es el motivo por el que el sistema exige un segundo adulto.
-Promediar borraría el único dato nuevo que hay ahí.
+🔴 **REESCRITO EL 19/8, y la versión vieja decía dos cosas mal.** Decía *«gana el que vio MÁS»* —
+lenguaje de competencia, que Edgardo marcó: *"no es una competencia"*— y justificaba la regla con
+el referente, que **no contesta el cuestionario ni entra al panel**.
+🔑 **Lo que hace de verdad `juntarObservaciones` (en `src/lib/motor/cuestionario.ts`):** de cada
+adulto vale su **última** respuesta, y de cada **PREGUNTA** queda la más alta, venga de quien
+venga. Es por pregunta y no por persona: el padre puede quedar arriba en los horarios y la madre
+en los regalos. **Nadie gana.** El porqué es que nadie ve el día entero de un chico — que un
+adulto no haya visto algo no prueba que no pasó, prueba que no estaba delante. Promediar partiría
+al medio una observación real por la ausencia del otro.
+⚠ **Sólo puede subir, nunca bajar**, y se acepta: subestimar es peor que mirar de más. Desde el
+18/8 se puede ver de dónde vino, porque la firma se muestra.
 
 ### 🔴 La trampa que apareció al probar en producción (16/8) — `middleware.ts` no se compilaba
 

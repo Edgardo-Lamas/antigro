@@ -146,6 +146,60 @@ export const INDICADORES: Indicador[] = [
   },
 ];
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  JUNTAR LO QUE CONTESTARON VARIOS ADULTOS
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  🔴 **No es una votación ni una competencia entre adultos**, y conviene
+ *  decirlo porque la formulación corta suena a eso. Lo que se arma acá es UNA
+ *  sola descripción de la conducta del chico, hecha con los pedazos que cada
+ *  adulto pudo ver. Las dos reglas salen de ahí:
+ *
+ *  1. **De cada adulto vale su última respuesta.** El cuestionario se vuelve a
+ *     contestar —la conducta de un chico cambia y el cuestionario está para
+ *     seguirla—, y lo que dijo alguien hace tres semanas no puede seguir
+ *     pesando cuando ya dijo otra cosa. No se acumula: se reemplaza.
+ *
+ *  2. 🔑 **De cada PREGUNTA queda la respuesta más alta, venga de quien venga.**
+ *     Es por pregunta y no por persona: el padre puede quedar arriba en los
+ *     horarios y la madre en los regalos. **Nadie gana.**
+ *     El porqué: **nadie ve el día entero de un chico.** Que un adulto no haya
+ *     visto algo no es prueba de que no pasó — es que no estaba delante. Por eso
+ *     no se promedia: promediar partiría al medio una observación real por la
+ *     ausencia del otro, que es justamente el dato que no tenemos.
+ *
+ *  ⚠ **La consecuencia, dicha de frente: esto sólo puede subir, nunca bajar.**
+ *  Un adulto angustiado que marca todo «seguido» manda sobre el resto. Se
+ *  acepta —subestimar es peor que mirar de más—, y desde el 18/8 se puede ver
+ *  de dónde vino: la firma de quién contestó se muestra en el panel.
+ *
+ *  🔴 **Vive acá y no en las rutas, y eso arregla un desacuerdo real (19/8).**
+ *  Estaba escrita dos veces: el panel aplicaba las dos reglas y el asistente
+ *  sólo la segunda. Con eso, un adulto que corregía su respuesta veía el cambio
+ *  en el panel mientras el asistente le seguía hablando con la respuesta vieja.
+ *  **Dos pantallas del mismo sistema diciendo cosas distintas del mismo chico.**
+ */
+export function juntarObservaciones(
+  observaciones: { adultoId: string; fecha: string; respuestas: Record<string, number> }[],
+): Record<string, number> {
+  const ultimaDeCadaUno = new Map<string, { fecha: string; respuestas: Record<string, number> }>();
+  for (const o of observaciones) {
+    const previa = ultimaDeCadaUno.get(o.adultoId);
+    if (!previa || o.fecha > previa.fecha) {
+      ultimaDeCadaUno.set(o.adultoId, { fecha: o.fecha, respuestas: o.respuestas });
+    }
+  }
+
+  const juntas: Record<string, number> = {};
+  for (const { respuestas } of ultimaDeCadaUno.values()) {
+    for (const [indicador, valor] of Object.entries(respuestas)) {
+      juntas[indicador] = Math.max(juntas[indicador] ?? 0, valor);
+    }
+  }
+  return juntas;
+}
+
 /** Los indicadores que se invierten: el riesgo está en la respuesta baja. */
 const INVERTIDOS = new Set(["sabe_que_es_grooming"]);
 

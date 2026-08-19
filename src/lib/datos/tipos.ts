@@ -385,10 +385,30 @@ export interface TurnoDeCharla {
  * Las preguntas se escriben en la fase 2, a partir de los indicadores
  * documentados. Acá queda dónde viven las respuestas.
  */
+/**
+ * Una vuelta del cuestionario: lo que un adulto dijo que ve.
+ *
+ * 🔴 **Los dos campos que identifican a quién contestó NO valen lo mismo, y la
+ * pantalla lo dice con todas las letras (18/8):**
+ *
+ * - `hogar` es un **HECHO**. Sale de la sesión, y la sesión se abrió con la
+ *   credencial de esa casa. El sistema lo comprobó.
+ * - `adultoId` es una **DECLARACIÓN**. Es la persona que dijo estar contestando.
+ *   Con una clave por hogar, el sistema no puede verificarlo y no lo finge.
+ *
+ * 🔑 Se guardan los dos porque **la firma se muestra en el panel**, y mostrar
+ * una declaración con cara de hecho es justo lo que este producto no hace.
+ */
 export interface ObservacionDelAdulto {
   id: string;
   chicoId: string;
+  /** 📌 DECLARADO por quien contestó. Ver el comentario de arriba. */
   adultoId: string;
+  /**
+   * 📌 CONSTA: desde qué casa se contestó. `null` es la casa única, que es el
+   * caso normal — no un dato faltante.
+   */
+  hogar?: string | null;
   fecha: string;
   /** id del indicador → 0 (nunca) a 3 (seguido). */
   respuestas: Record<string, number>;

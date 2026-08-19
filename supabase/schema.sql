@@ -613,3 +613,26 @@ alter table usuarios add column if not exists terminos_en timestamptz;
 
 comment on column usuarios.terminos_version is
   'Qué versión de los términos aceptó esta casa al crearse. Vacío = la cuenta es anterior a que existieran, no que se haya salteado la aceptación.';
+
+
+-- ─── 15. LA FIRMA DEL CUESTIONARIO ───────────────────────────────
+--  🔴 Es la distinción que pidió Edgardo el 18/8 y que hace honesta a la
+--  firma: **desde qué casa se contestó es un HECHO** —la credencial es del
+--  hogar y el sistema la comprobó al abrir la sesión— mientras que **quién de
+--  las personas contestó es una DECLARACIÓN** de quien estaba delante de la
+--  pantalla. `adulto_id` ya guardaba lo segundo; faltaba lo primero.
+--
+--  🔑 Y desde el 18/8 la firma SE MUESTRA en el panel, así que las dos tienen
+--  que estar: enseñar una declaración con cara de hecho sería exactamente lo
+--  que este producto no puede hacer.
+--
+--  ⚠ Nullable, y significa dos cosas distintas que conviene no confundir:
+--  en una familia de una sola casa `hogar` es null porque **no hay dos casas**
+--  (es el caso normal, igual que en `usuarios`); y en las observaciones
+--  anteriores al 18/8 es null porque **no se registraba**. Las segundas no
+--  existen en producción: nunca hubo pantalla para cargar una.
+
+alter table observaciones add column if not exists hogar text;
+
+comment on column observaciones.hogar is
+  'Desde qué casa se contestó. Es un HECHO: sale de la sesión, no del formulario. Se lee junto a adulto_id, que es una DECLARACION de quien contestó. Null = casa única, no dato faltante.';

@@ -1,10 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { signOut } from "next-auth/react";
 import {
+  ArrowRight,
   LoaderCircle,
   LogOut,
+  Eye,
   QrCode,
   Send,
   ShieldOff,
@@ -78,6 +81,18 @@ interface Respuesta {
   } | null;
   adultos: Adulto[];
   lectura: Lectura | null;
+  /* 🔴 La firma del cuestionario, y se muestra partida a propósito (18/8):
+     `hogar` lo comprobó el sistema, `nombre` lo declaró quien contestó. */
+  cuestionario: {
+    firmas: {
+      adultoId: string;
+      nombre: string | null;
+      hogar: string | null;
+      fecha: string;
+      respondidas: number;
+    }[];
+    deUnTotalDe: number;
+  };
   ventana: { dias: number };
   fuente: { simulada: boolean };
   senales: SenalDeRed[];
@@ -104,6 +119,30 @@ const VINCULO: Record<string, string> = {
   abuelo_a: "Abuelo o abuela",
   otro: "Otro",
 };
+
+/**
+ * La fecha como la diría una persona.
+ *
+ * 🔴 **Existe porque `diaLocal` devuelve `YYYY-MM-DD`, y eso es una clave, no
+ * un texto.** La firma del cuestionario salió «2026-08-19» en la primera prueba
+ * del 19/8 — el MISMO error que ya se había corregido el 15/8 en la advertencia
+ * del perfil, repetido en otro lugar. Un panel para padres no habla en ISO.
+ *
+ * 🔑 Y «hoy» / «ayer» no son un adorno: quien acaba de contestar tiene que
+ * reconocer su propia firma sin hacer la cuenta.
+ */
+function fechaEnCriollo(iso: string): string {
+  const cuando = new Date(iso);
+  const dia = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+
+  const hoy = new Date();
+  if (dia(cuando) === dia(hoy)) return "hoy";
+
+  const ayer = new Date(hoy.getTime() - 24 * 60 * 60 * 1000);
+  if (dia(cuando) === dia(ayer)) return "ayer";
+
+  return `el ${cuando.toLocaleDateString("es-AR", { day: "numeric", month: "long" })}`;
+}
 
 /** `YYYY-MM-DD` en la hora local del que mira, no en UTC. */
 function diaLocal(iso: string): string {
@@ -285,6 +324,13 @@ export default function MiFamilia() {
           )}
         </div>
       </section>
+
+      {/* ── Lo que ven los adultos ─────────────────────────────────────── */}
+      <ElCuestionario
+        chico={datos.chico?.nombre}
+        firmas={datos.cuestionario.firmas}
+        deUnTotalDe={datos.cuestionario.deUnTotalDe}
+      />
 
       {/* ── El asistente ───────────────────────────────────────────────── */}
       <Asistente chico={datos.chico?.nombre} />
@@ -524,6 +570,116 @@ interface TurnoEnPantalla {
  * empezar de cero la conversación más difícil que va a tener. Es de él —el otro
  * adulto no la ve— y la borra cuando quiere.
  */
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LO QUE VEN LOS ADULTOS — la puerta al cuestionario y quién lo contestó
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  🔴 **Existe porque hasta el 19/8 el panel avisaba que faltaba y no había
+ *  adónde ir.** El informe decía «nadie contestó el cuestionario todavía» —lo
+ *  sigue diciendo, en «Lo que no se ve desde acá»— y ese cartel era un callejón
+ *  sin salida. Un sistema que señala un hueco tiene que ofrecer la manera de
+ *  taparlo, o el cartel entrena a ignorar los carteles.
+ *
+ *  🔴 **La firma se muestra, y decidido así por Edgardo el 18/8.** Se muestra
+ *  PARTIDA, que es lo que la hace honesta: *«desde tu casa»* es un hecho que el
+ *  sistema comprobó al abrir la sesión; *«dice ser Mariana»* es una declaración
+ *  que no puede comprobar. Mostrarlas juntas y con el mismo tono convertiría
+ *  una declaración en un hecho.
+ *
+ *  📌 **Sin puntaje, ni acá ni en ningún lado.** Lo que se dice es cuántas
+ *  preguntas contestó cada uno y cuándo. Qué significa todo eso junto lo dice
+ *  el informe, y lo dice en señales, nunca en un número sobre un chico.
+ */
+function ElCuestionario({
+  chico,
+  firmas,
+  deUnTotalDe,
+}: {
+  chico?: string;
+  firmas: {
+    adultoId: string;
+    nombre: string | null;
+    hogar: string | null;
+    fecha: string;
+    respondidas: number;
+  }[];
+  deUnTotalDe: number;
+}) {
+  const nadieContesto = firmas.length === 0;
+
+  return (
+    <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+        <Eye size={13} /> Lo que ven ustedes
+      </h2>
+
+      {nadieContesto ? (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-tinta">
+            Todavía nadie contestó el cuestionario, así que el informe de{" "}
+            {chico ?? "tu hijo"} se está armando <strong>sólo con lo que ve la red</strong>.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-tenue">
+            Son nueve preguntas sobre lo que ustedes ven en casa. Sirven para conocer los patrones
+            de conducta de {chico ?? "tu hijo"}, que es donde el sistema se apoya principalmente.
+            Se pueden dejar sin contestar las que no sepas.
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-tinta">
+            El informe de {chico ?? "tu hijo"} se arma con las dos cosas: lo que ve la red y lo que
+            ven ustedes.
+          </p>
+
+          <ul className="mt-4 flex flex-col gap-2">
+            {firmas.map((f) => (
+              <li
+                key={f.adultoId}
+                className="rounded-md border border-borde bg-fondo px-4 py-3"
+              >
+                <p className="text-sm text-tinta">
+                  {/* 🔴 «Dice ser» no es desconfianza: es la verdad de lo que el
+                      sistema sabe. Con una clave por casa no puede distinguir a
+                      un padre del otro, y escribirlo liso sería afirmarlo. */}
+                  Contestó <strong>{f.nombre ?? "un adulto que ya no está en la familia"}</strong>
+                  <span className="text-apagado"> (declarado)</span>
+                </p>
+                <p className="mt-1 text-xs text-apagado first-letter:uppercase">
+                  {fechaEnCriollo(f.fecha)} · {f.respondidas} de {deUnTotalDe} preguntas ·{" "}
+                  {/* Esto sí consta: la sesión se abrió con la credencial de esa casa. */}
+                  {f.hogar ? `desde ${f.hogar}` : "desde la casa"} <span>(consta)</span>
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+            El sistema comprobó desde qué casa se contestó. Quién de ustedes lo hizo es lo que esa
+            persona declaró al entrar: la clave es de la casa, no de una persona.
+          </p>
+        </>
+      )}
+
+      <Link
+        href="/mi-familia/cuestionario"
+        className="mt-5 inline-flex items-center gap-2 rounded-md bg-acento px-4 py-2.5 text-sm font-semibold text-fondo transition"
+      >
+        {nadieContesto ? "Contestar el cuestionario" : "Volver a contestarlo"}
+        <ArrowRight size={14} />
+      </Link>
+
+      {!nadieContesto && (
+        <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+          De cada persona vale la última vez que contestó, así que cambiar una respuesta es
+          simplemente volver a entrar.
+        </p>
+      )}
+    </section>
+  );
+}
+
 function Asistente({ chico }: { chico?: string }) {
   const [turnos, setTurnos] = useState<TurnoEnPantalla[]>([]);
   const [pregunta, setPregunta] = useState("");

@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { repositorio } from "@/lib/datos";
 import { tomarTurno } from "@/lib/limite";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
-import { evaluar, VENTANA_DIAS } from "@/lib/motor";
+import { evaluar, juntarObservaciones, VENTANA_DIAS } from "@/lib/motor";
 import { responderAlAdulto, TURNOS_DE_MEMORIA, type TurnoDelAsistente } from "@/lib/ia";
 
 /**
@@ -173,12 +173,12 @@ export async function POST(req: Request) {
     hasta.toISOString(),
   );
 
-  const juntas: Record<string, number> = {};
-  for (const o of observaciones) {
-    for (const [indicador, valor] of Object.entries(o.respuestas)) {
-      juntas[indicador] = Math.max(juntas[indicador] ?? 0, valor);
-    }
-  }
+  /* 🔴 **Acá había un desacuerdo con el panel, encontrado el 19/8.** Este
+     bucle tomaba la respuesta más alta de TODO el historial, sin quedarse antes
+     con la última de cada adulto. Resultado: alguien corregía su respuesta, el
+     panel mostraba la corrección y el asistente seguía hablando con la vieja.
+     La regla ahora vive en un solo lugar y está probada. */
+  const juntas = juntarObservaciones(observaciones);
 
   const diasObservados = Math.max(
     1,
