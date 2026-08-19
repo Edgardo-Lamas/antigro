@@ -307,7 +307,13 @@ export interface AdultoResponsable {
 /** Una señal ya guardada. Sin fecha no se puede medir persistencia. */
 export type SenalRegistrada = SenalDeRed;
 
-export type ClaseDeRespuesta = "alerta_adultos" | "orientacion_chico";
+/**
+ * 🔑 **`escalada_adultos` es una clase aparte y no un `alerta_adultos` repetido**,
+ * y eso es lo que hace que no contradiga la regla de `avisar()`: son mensajes
+ * distintos, con texto distinto, y el sistema puede saber si ya insistió sin
+ * confundirlo con haber avisado dos veces.
+ */
+export type ClaseDeRespuesta = "alerta_adultos" | "orientacion_chico" | "escalada_adultos";
 
 /** Lo que el sistema dijo, a quién y por qué. */
 export interface Respuesta {

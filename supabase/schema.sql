@@ -672,3 +672,18 @@ comment on column respuestas.acuse_token is
   'Token del boton «Lo vi». De un solo uso y atado a esta fila, asi el acuse dice quien lo apreto sin que nadie lo declare. Solo lo llevan las alertas a adultos.';
 comment on column respuestas.acusado_en is
   'Cuando apreto «Lo vi». Vacio con token presente = se mando y nadie lo vio: eso es lo que dispara la escalada.';
+
+
+-- ─── 17. LA ESCALADA ─────────────────────────────────────────────
+--  🔑 `escalada_adultos` es una CLASE APARTE, no un `alerta_adultos` repetido.
+--  Es lo que permite que la escalada no contradiga la regla de `avisar()` —*no
+--  se repite el aviso*—: son mensajes distintos, con texto distinto, y el
+--  sistema puede saber si ya insistió sin confundirlo con haber avisado dos
+--  veces por el mismo patrón.
+--
+--  📌 Y lleva `acuse_token` igual que la alerta: si alguien abre la escalada,
+--  eso también consta.
+
+alter table respuestas drop constraint if exists respuestas_clase_check;
+alter table respuestas add constraint respuestas_clase_check
+  check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos'));

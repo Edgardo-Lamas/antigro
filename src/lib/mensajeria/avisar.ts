@@ -15,7 +15,12 @@ import { diaLocal, type Lectura } from "@/lib/motor";
 import { canalListo, repositorio, type AdultoResponsable, type Chico, type Familia } from "@/lib/datos";
 import type { ClaseDeRespuesta, Respuesta } from "@/lib/datos/tipos";
 import { transporteDe } from "./index";
-import { nuevoTokenDeAcuse } from "./acuse";
+import { nuevoTokenDeAcuse, type QuienLoVio } from "./acuse";
+import {
+  decidirEscalada,
+  textoDeLaEscalada,
+  type DecisionDeEscalada,
+} from "./escalada";
 import type { ResultadoDeEnvio } from "./tipos";
 
 export interface AvisoEmitido {
@@ -188,4 +193,88 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
   }
 
   return emitidos;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA ESCALADA — insistir cuando el aviso no lo abrió nadie
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Manda la escalada, si corresponde mandarla.
+ *
+ * 🔴 **Quién decide NO es esta función**: decide `decidirEscalada()`, que es
+ * pura y está probada caso por caso. Acá sólo se ejecuta. Es la misma división
+ * que en el resto del sistema — el motor decide, esta capa entrega — y es lo
+ * que hace que la política se pueda revisar sin tocar ningún transporte.
+ *
+ * 🚫 **Va SÓLO a los responsables activos, y el referente queda afuera.**
+ * Él ya recibió el aviso original: lo único que la escalada le agregaría es
+ * *«los padres no lo vieron»*, y eso es información sobre los padres. Es la
+ * asimetría que Edgardo cerró el 18/8. Ver `escalada.ts`.
+ */
+export async function escalar(aviso: {
+  chico: Chico;
+  adultos: AdultoResponsable[];
+  lectura: Lectura;
+  quienLoVio: QuienLoVio;
+  yaSeEscalo: boolean;
+  ahora: Date;
+}): Promise<{ decision: DecisionDeEscalada; emitidos: AvisoEmitido[] }> {
+  const { chico, adultos, lectura, quienLoVio, yaSeEscalo, ahora } = aviso;
+
+  const decision = decidirEscalada({ lectura, quienLoVio, yaSeEscalo, ahora });
+  if (!decision.escala) return { decision, emitidos: [] };
+
+  const repo = repositorio();
+  const texto = textoDeLaEscalada(
+    chico.nombre,
+    decision.horasDesdeElAviso ?? 0,
+    lectura.evasionesRecientes > 0,
+  );
+
+  const emitidos: AvisoEmitido[] = [];
+
+  /* 🔑 Los responsables, no todos los adultos. Y sólo los que tienen canal: a
+     quien no lo tiene no se le puede escribir, y eso ya lo dice el panel. */
+  const responsables = adultos.filter(
+    (a) => a.rol === "progenitor" && a.activo !== false && canalListo(a.canal),
+  );
+
+  for (const adulto of responsables) {
+    const acuseToken = nuevoTokenDeAcuse();
+    const transporte = await transporteDe(adulto.canal.tipo);
+    const resultado = await transporte.enviar({
+      canal: adulto.canal.tipo,
+      destino: adulto.canal.destino,
+      asunto: `AntiGro · ${chico.nombre} · sigue sin abrirse`,
+      texto,
+      acuseToken,
+    });
+
+    /* 📌 La escalada también lleva botón: si alguien la abre, eso consta. */
+    await repo.registrarRespuesta({
+      chicoId: chico.id,
+      fecha: ahora.toISOString(),
+      clase: "escalada_adultos",
+      canal: adulto.canal.tipo,
+      destino: adulto.canal.destino,
+      texto,
+      senalesQueLaSostienen: lectura.senalesQueLaSostienen,
+      entregado: resultado.entregado,
+      acuseToken,
+      acusadoEn: null,
+    });
+
+    emitidos.push({
+      clase: "escalada_adultos",
+      paraQuien: adulto.nombre,
+      canal: adulto.canal.tipo,
+      texto,
+      resultado,
+      omitidoPorRepetido: false,
+      sinVincular: false,
+    });
+  }
+
+  return { decision, emitidos };
 }

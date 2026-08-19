@@ -26,17 +26,14 @@ const url = linea
   .replace(/^"|"$/g, "")
   .replace(/\?sslmode=require/, "");
 
-/* ── Migración 16: el acuse de recibo ─────────────────────────────────────
-   `entregado` sólo decía que el transporte aceptó el mensaje. Estas dos
-   columnas son la diferencia entre eso y que alguien lo haya visto.
-   Aditivas y nullable: no tocan ninguna fila. */
+/* ── Migración 17: la clase de la escalada ────────────────────────────────
+   `escalada_adultos` es una clase aparte y no un `alerta_adultos` repetido: es
+   lo que permite saber si ya se insistió sin confundirlo con haber avisado dos
+   veces por el mismo patrón. Sólo afloja un check: no toca ninguna fila. */
 const PASOS = [
-  "alter table respuestas add column if not exists acuse_token text",
-  "alter table respuestas add column if not exists acusado_en timestamptz",
-  `create unique index if not exists respuestas_acuse_token_idx
-     on respuestas (acuse_token) where acuse_token is not null`,
-  "comment on column respuestas.acuse_token is 'Token del boton «Lo vi». De un solo uso y atado a esta fila, asi el acuse dice quien lo apreto sin que nadie lo declare. Solo lo llevan las alertas a adultos.'",
-  "comment on column respuestas.acusado_en is 'Cuando apreto «Lo vi». Vacio con token presente = se mando y nadie lo vio: eso es lo que dispara la escalada.'",
+  "alter table respuestas drop constraint if exists respuestas_clase_check",
+  `alter table respuestas add constraint respuestas_clase_check
+     check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos'))`,
 ];
 
 const cliente = new pg.Client({ connectionString: url, ssl: { rejectUnauthorized: false } });
@@ -46,7 +43,7 @@ try {
   await cliente.query("begin");
   for (const paso of PASOS) await cliente.query(paso);
   await cliente.query("commit");
-  console.log("✅ Migración 16 aplicada");
+  console.log("✅ Migración 17 aplicada");
 } catch (e) {
   await cliente.query("rollback");
   console.error("❌ Revertida entera:", e.message);

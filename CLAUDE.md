@@ -21,12 +21,12 @@ estadísticas oficiales sobre qué pesa cuánto.
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
 | **En producción** | `4d92bbd` — ⚠ **atrasado**: no tiene el cuestionario |
-| **La base** | ✅ Migración 14 (`terminos`) · ✅ 15 (`observaciones.hogar`) · ✅ **16 (`respuestas.acuse_token` + `acusado_en`)**, las dos del 19/8 |
-| **Verificación** | `npm run probar` — **281 comprobaciones**: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + **29 del acuse**. **En verde el 19/8** |
+| **La base** | ✅ 14 (`terminos`) · ✅ 15 (`observaciones.hogar`) · ✅ 16 (`respuestas.acuse_token` + `acusado_en`) · ✅ **17 (`escalada_adultos`)**. Las tres últimas del 19/8 |
+| **Verificación** | `npm run probar` — **314 comprobaciones** en 8 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + **33 escalada**. **En verde el 19/8** |
 | **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) y `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real). **En verde el 19/8** |
 | **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
 
-### ✅ EL ACUSE DE RECIBO — construido el 19/8. **La escalada NO, y va después**
+### ✅ EL ACUSE DE RECIBO — construido el 19/8
 
 **Lo pidió Edgardo el 16/8** —*"supongamos que al padre le robaron el celular, o que muy atareado
 lo dejó pasar"*— y el 19 acordamos el orden: **el acuse primero, la escalada después, y el cron al
@@ -74,9 +74,66 @@ disparara por una configuración a medias disfrazada de desatención. 📌 Y ojo
 panel lo dice en «Quiénes están», no acá. Lo que sí se registra con `entregado: false` es un
 mensaje que salió y **el canal rechazó**.
 
-⬜ **LO QUE SIGUE, en este orden:** la **escalada** (la política ya está decidida: cuelga de la
-persistencia, no de un cronómetro) y después **el cron**, que es la pieza que no existe — AntiGro
-nunca se despierta solo, y no hay `vercel.json` ni `vercel.ts`.
+✅ **La escalada y el cron se hicieron después, el mismo día** — ver los dos bloques de abajo.
+
+### ✅ LA ESCALADA Y EL RELOJ — construidos el 19/8, cerrando la tanda
+
+**La política estaba decidida desde el 16/8 y no se volvió a discutir:** es la regla 5 aplicada a
+la insistencia. Si el patrón se sigue sosteniendo, la razón para insistir sigue viva; **si el
+patrón se cortó, NO se escala** aunque nadie haya acusado recibo — perseguir a un padre por un
+aviso que ya no tiene sustento es cómo un sistema se gana el silenciado.
+
+| Dónde | Qué |
+|---|---|
+| `src/lib/mensajeria/escalada.ts` | **Decide** (`decidirEscalada`, pura) y **escribe** el texto |
+| `escalar()` en `avisar.ts` | Entrega. Sólo a los responsables activos con canal |
+| `/api/cron/revisar` + `vercel.json` | **El reloj**, cada hora |
+| `respuestas.clase = 'escalada_adultos'` (migración 17) | Clase aparte, no un aviso repetido |
+| `npm run probar-escalada` (33) | Cada regla con su caso que escala y su caso que no |
+
+🔴 **QUÉ ES LA «SEGUNDA LÍNEA» — corregido el 19/8, y la nota del 16 estaba equivocada.** Proponía
+tres destinatarios nuevos: el otro canal de la persona, el otro adulto, y el referente. **Dos de
+los tres no existen**, y se ve mirando el código: `avisar()` recorre `adultos` **entero**, así que
+el aviso original **ya salió a todos**, referente incluido.
+➡ **La escalada no suma destinatarios porque no queda ninguno por sumar.** Lo que suma es
+**información nueva**: que el primer aviso no lo abrió nadie y que el patrón siguió igual.
+🚫 **Y el referente NO recibe la escalada.** Lo único que le agregaría es *«los padres no lo
+vieron»*, y eso es información sobre los padres — la misma asimetría que Edgardo cerró el 18/8.
+
+🔑 **El texto es DETERMINISTA y no lo escribe el modelo**, por tres razones que se refuerzan: no
+hay nada que interpretar (es un hecho de dos partes); cada texto generado son dos llamadas a Opus 5
+y acá lo dispara un reloj sin que nadie lo pida; y si el modelo se cae, el respaldo saldría justo
+cuando el sistema está insistiendo porque nadie miró.
+
+⏱ **Los dos relojes, separados a propósito:** `HORAS_PARA_ESCALAR = 8` normalmente y
+`HORAS_CON_EVASION = 2` — la excepción que marcó él, porque la evasión es un **acto deliberado**.
+📌 **El orden de las preguntas en `decidirEscalada` no es indiferente:** primero se mira si el
+patrón se cortó. Si la razón para insistir se murió, no hace falta saber nada más.
+⚠ **Un canal roto NO es desatención:** si ningún aviso salió, no se escala — sería mandar otro
+mensaje al mismo lugar que ya rechazó el primero. Se dice en el panel.
+
+### 🔴 EL FRENO DEL RELOJ, y es lo más importante de esa ruta
+
+**Si las señales son SIMULADAS, el reloj no escala.** Sin NextDNS configurado `obtenerFuente` cae
+al simulador: escalar sobre eso sería mandarle un mensaje de verdad al teléfono de un padre de
+verdad **por una actividad que nunca ocurrió**.
+🔑 La consola de la home hace lo contrario y está bien —ahí lo simulado se muestra y nadie recibe
+nada—. **La diferencia es que este reloj ENTREGA.**
+📌 **Consecuencia hoy: en la demo el reloj corre y no escala nunca**, y lo dice
+(`motivo: "fuente_simulada"`). Es correcto, y es otra razón para la cuenta de NextDNS.
+
+⚠ **QUÉ HACE EL RELOJ Y QUÉ NO.** Sólo **escala avisos que ya salieron**. **NO manda el primer
+aviso**: ése necesita dos llamadas a Opus 5, y hacerlo por familia en cada corrida es el gasto que
+encontró la auditoría del 17/8. ➡ **El primer aviso sigue necesitando que alguien llame a
+`/api/alertas`.** Que el sistema alerte solo es la decisión que sigue, y es de producto y de costo.
+
+🔐 **Falla cerrado:** sin `CRON_SECRET` en el entorno, la ruta contesta 503 y no corre nadie. El
+secreto ya está en Vercel (producción y preview) y en `.env.local`.
+⚠ **Verificar en el panel de Vercel que el cron corra CADA HORA.** En el plan gratuito los cron
+sólo corren una vez por día, y con eso una espera de 8 horas queda inservible. `vercel.json` pide
+`0 * * * *`; si el plan lo baja, hay que saberlo.
+📌 Se usó `vercel.json` y no `vercel.ts` a propósito: `vercel.ts` es lo recomendado hoy pero pide
+`@vercel/config`, y no se agrega una dependencia el día antes del congelamiento por tres líneas.
 
 ### ✅ EL CUESTIONARIO DEL ADULTO — construido el 19/8. Era lo próximo y ya está
 
@@ -538,8 +595,9 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 3. ~~**El cuestionario del adulto.**~~ ✅ **HECHO el 19/8** — pantalla, ruta, migración 15
    aplicada, 73 comprobaciones y el recorrido verificado en el navegador. Ver el bloque «EL
    CUESTIONARIO DEL ADULTO» arriba. ✅ **Promovido y verificado en vivo el 19/8** (`8a7316e`).
-4. **El acuse de recibo y la escalada.** ✅ **El acuse, HECHO el 19/8** — ver su bloque arriba.
-   ⬜ **Falta la escalada**, y después el **cron**, que es la pieza que no existe.
+4. ~~**El acuse de recibo y la escalada.**~~ ✅ **HECHOS los tres el 19/8**: acuse, escalada y el
+   reloj. Ver sus bloques arriba. ⬜ Lo que queda de ahí: **que el sistema mande el PRIMER aviso
+   solo**, que hoy sigue necesitando que alguien llame a `/api/alertas`.
 5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
 6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
    operativo."* No empezarlo antes. El guion que hay todavía es el de Criterio Térmico.
