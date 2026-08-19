@@ -484,10 +484,10 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
    da de alta sola, en un recorrido de pantallas. Ver el bloque «EL RECORRIDO DE ALTA» arriba, que
    incluye lo que quedó pendiente de él.
 2. ~~**La aceptación de los términos en el alta.**~~ ✅ **HECHA el 18/8**, con la migración 14 ya
-   aplicada y verificada contra producción. ⬜ Falta promover.
+   aplicada y verificada contra producción. ✅ **Promovido el 18/8.**
 3. ~~**El cuestionario del adulto.**~~ ✅ **HECHO el 19/8** — pantalla, ruta, migración 15
    aplicada, 73 comprobaciones y el recorrido verificado en el navegador. Ver el bloque «EL
-   CUESTIONARIO DEL ADULTO» arriba. ⬜ **Falta promover.**
+   CUESTIONARIO DEL ADULTO» arriba. ✅ **Promovido y verificado en vivo el 19/8** (`8a7316e`).
 4. **El acuse de recibo y la escalada.** Diseñado el 16/8, sin construir — sección propia abajo.
 5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
 6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
@@ -2020,8 +2020,8 @@ Lo que quedaba abierto era la pantalla, que sin datos mostraba su estado de erro
 `mariana@ejemplo.ar` y `carla@ejemplo.ar`. 🔴 **La clave va en `.env.local`, nunca acá:** este
 archivo se publica. Ver «LA AUDITORÍA DEL 17/8».
 
-⬜ **Falta:** el alta desde el panel, el cuestionario del adulto y el asistente (que ya tiene su
-lugar reservado en la pantalla, diciendo que todavía no está).
+✅ **Los tres que faltaban acá ya están:** el asistente (16/8), el alta —que no quedó «desde el
+panel», la familia se da de alta sola— (17/8) y **el cuestionario del adulto (19/8)**.
 
 ### Quién tiene cuenta
 
