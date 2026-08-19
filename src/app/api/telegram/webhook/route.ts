@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { repositorio } from "@/lib/datos";
 import { codigoDeUnStart } from "@/lib/mensajeria/vinculacion";
+import { tokenDeUnToque } from "@/lib/mensajeria/acuse";
 import { TransporteTelegram } from "@/lib/mensajeria";
 import { CODIGO_DEMO, CUPO, nombreDelRol, soltarCupo, tomarCupo } from "@/lib/mensajeria/cupo-demo";
 
@@ -24,6 +25,18 @@ interface ActualizacionDeTelegram {
     chat?: { id?: number };
     from?: { first_name?: string };
   };
+  /**
+   * 🔴 **Esto es nuevo (19/8) y hasta hoy el webhook NI LO MIRABA.** Escuchaba
+   * sólo `message`, así que un toque de botón entraba, no encajaba con nada y
+   * se contestaba 200 en silencio. Es lo que hacía imposible el acuse de
+   * recibo: el botón se podía dibujar, pero apretarlo no llegaba a ningún lado.
+   */
+  callback_query?: {
+    id?: string;
+    data?: string;
+    from?: { first_name?: string };
+    message?: { message_id?: number; chat?: { id?: number } };
+  };
 }
 
 export async function POST(req: Request) {
@@ -36,6 +49,45 @@ export async function POST(req: Request) {
   }
 
   const actualizacion = (await req.json().catch(() => ({}))) as ActualizacionDeTelegram;
+
+  /* ── 🔵 El toque del botón «Lo vi», ANTES que nada ──────────────────────────
+     Va primero porque es otra clase de actualización: no trae texto ni `/start`
+     y nada de lo de abajo aplica. */
+  const toque = actualizacion.callback_query;
+  if (toque) {
+    const bot = new TransporteTelegram();
+    const token = tokenDeUnToque(toque.data);
+    const chatDelToque = toque.message?.chat?.id;
+
+    if (!token) {
+      if (toque.id) await bot.contestarToque(toque.id, "Este botón ya no hace nada.");
+      return NextResponse.json({ ok: true });
+    }
+
+    const acusado = await repositorio().marcarAcuse(token, new Date().toISOString());
+
+    /* 🔑 Que el token ya se haya usado NO es un error para el que aprieta: lo
+       vio igual. Se le dice que ya estaba, no que algo falló. */
+    if (toque.id) {
+      await bot.contestarToque(
+        toque.id,
+        acusado ? "Listo, quedó registrado que lo viste." : "Esto ya estaba registrado.",
+      );
+    }
+
+    /* ⚠ Se saca el botón. Un botón que sigue ahí después de usarse invita a
+       apretarlo de nuevo para no recibir nada, y eso enseña a desconfiar. */
+    if (chatDelToque && toque.message?.message_id) {
+      await bot.marcarComoVisto(
+        String(chatDelToque),
+        toque.message.message_id,
+        "✓ Dijiste que lo viste",
+      );
+    }
+
+    return NextResponse.json({ ok: true, acuse: acusado ? "registrado" : "ya_estaba" });
+  }
+
   const texto = actualizacion.message?.text ?? "";
   const chatId = actualizacion.message?.chat?.id;
 

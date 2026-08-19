@@ -13,6 +13,7 @@
  */
 
 import type { Envio, EstadoDeTransporte, ResultadoDeEnvio, Transporte } from "./tipos";
+import { ETIQUETA_DEL_ACUSE, callbackDelAcuse } from "./acuse";
 
 const API = "https://api.telegram.org";
 
@@ -56,6 +57,23 @@ export class TransporteTelegram implements Transporte {
           text: envio.texto,
           // Sin formato: el texto viene de la IA y un guion suelto rompería el parseo.
           disable_web_page_preview: true,
+          /* 🔑 El botón «Lo vi». Va sólo si quien manda generó un token, así el
+             transporte no tiene que saber a quién le corresponde y a quién no
+             — la orientación al chico nunca lo lleva. */
+          ...(envio.acuseToken
+            ? {
+                reply_markup: {
+                  inline_keyboard: [
+                    [
+                      {
+                        text: ETIQUETA_DEL_ACUSE,
+                        callback_data: callbackDelAcuse(envio.acuseToken),
+                      },
+                    ],
+                  ],
+                },
+              }
+            : {}),
         }),
       });
 
@@ -77,6 +95,52 @@ export class TransporteTelegram implements Transporte {
         ensayo: false,
         detalle: e instanceof Error ? e.message : "Error al enviar por Telegram",
       };
+    }
+  }
+
+  /**
+   * Contesta el toque de un botón.
+   *
+   * ⚠ **No es opcional, aunque no se vea:** hasta que no se contesta, Telegram
+   * deja el botón girando en el teléfono del que lo apretó. Alguien que
+   * confirmó que vio la alerta y ve una ruedita eterna no sabe si confirmó.
+   */
+  async contestarToque(idDelToque: string, aviso: string): Promise<boolean> {
+    if (!this.token) return false;
+    try {
+      const res = await fetch(`${API}/bot${this.token}/answerCallbackQuery`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ callback_query_id: idDelToque, text: aviso }),
+      });
+      return ((await res.json()) as { ok: boolean }).ok;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Saca el botón del mensaje ya mandado y deja escrito que se acusó.
+   *
+   * 🔑 **Es lo que hace que el token de un solo uso se note.** Sin esto el
+   * botón queda ahí, invitando a apretarlo de nuevo para no recibir nada — y
+   * un botón que a veces no hace nada enseña a desconfiar de los botones.
+   */
+  async marcarComoVisto(chatId: string, idDelMensaje: number, pie: string): Promise<boolean> {
+    if (!this.token) return false;
+    try {
+      const res = await fetch(`${API}/bot${this.token}/editMessageReplyMarkup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          message_id: idDelMensaje,
+          reply_markup: { inline_keyboard: [[{ text: pie, callback_data: "visto" }]] },
+        }),
+      });
+      return ((await res.json()) as { ok: boolean }).ok;
+    } catch {
+      return false;
     }
   }
 }

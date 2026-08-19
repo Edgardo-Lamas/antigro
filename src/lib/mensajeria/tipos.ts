@@ -21,6 +21,14 @@ export interface Envio {
   /** Sólo lo usa el correo. */
   asunto?: string;
   texto: string;
+  /**
+   * Si viene, el mensaje sale con el botón «Lo vi».
+   *
+   * 🔑 Lo decide quien manda, no el transporte: la orientación al chico nunca
+   * lo lleva, y eso se resuelve en `avisar()` no generando el token. Un
+   * transporte que no sepa dibujar botones lo ignora y manda el texto igual.
+   */
+  acuseToken?: string;
 }
 
 export interface ResultadoDeEnvio {

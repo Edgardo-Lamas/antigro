@@ -182,6 +182,15 @@ export interface Repositorio {
 
   registrarRespuesta(r: Omit<Respuesta, "id">): Promise<Respuesta>;
   respuestasDe(chicoId: string, desde: string, hasta: string): Promise<Respuesta[]>;
+  /**
+   * Alguien apretó «Lo vi». Devuelve el aviso que se acusó, o `null` si el
+   * token no existe **o ya se usó**.
+   *
+   * 🔴 De un solo uso, y lo garantiza el almacenamiento y no quien llama: en la
+   * demo tres desconocidos escanean el mismo QR, y sin esto uno podría cerrar
+   * el aviso de otro.
+   */
+  marcarAcuse(token: string, cuando: string): Promise<Respuesta | null>;
 
   registrarObservacion(o: Omit<ObservacionDelAdulto, "id">): Promise<ObservacionDelAdulto>;
   observacionesDe(chicoId: string, desde: string, hasta: string): Promise<ObservacionDelAdulto[]>;

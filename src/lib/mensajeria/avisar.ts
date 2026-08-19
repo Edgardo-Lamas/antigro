@@ -15,6 +15,7 @@ import { diaLocal, type Lectura } from "@/lib/motor";
 import { canalListo, repositorio, type AdultoResponsable, type Chico, type Familia } from "@/lib/datos";
 import type { ClaseDeRespuesta, Respuesta } from "@/lib/datos/tipos";
 import { transporteDe } from "./index";
+import { nuevoTokenDeAcuse } from "./acuse";
 import type { ResultadoDeEnvio } from "./tipos";
 
 export interface AvisoEmitido {
@@ -84,6 +85,13 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
     texto: string,
     asunto?: string,
   ) => {
+    /* 🔴 **El botón «Lo vi» va SÓLO en las alertas a los adultos, y la condición
+       está acá y no en el transporte a propósito.** El chico no recibe una
+       alerta para actuar: recibe orientación. Si su toque contara como acuse,
+       el sistema dejaría de insistir **porque lo vio la chica**, y eso da vuelta
+       el producto entero. Escrito así, la única forma de romperlo es cambiar
+       esta línea, que dice para qué está. */
+    const acuseToken = clase === "alerta_adultos" ? nuevoTokenDeAcuse() : undefined;
     /* 🔴 Sin vincular no se le puede escribir, y eso NO se disimula. Un adulto
        que cree que va a recibir avisos y no los recibe está peor que uno que
        sabe que le falta un clic. */
@@ -131,6 +139,7 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
       destino: canal.destino,
       asunto,
       texto,
+      acuseToken,
     });
 
     await repo.registrarRespuesta({
@@ -142,6 +151,11 @@ export async function avisar(aviso: Aviso): Promise<AvisoEmitido[]> {
       texto,
       senalesQueLaSostienen: lectura.senalesQueLaSostienen,
       entregado: resultado.entregado,
+      /* 🔑 El token va en la MISMA fila que el mensaje, así el acuse dice
+         también quién lo apretó sin que nadie lo declare. Es lo contrario del
+         cuestionario, donde la persona es una declaración: acá consta. */
+      acuseToken,
+      acusadoEn: null,
     });
 
     emitidos.push({

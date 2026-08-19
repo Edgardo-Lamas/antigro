@@ -323,7 +323,25 @@ export interface Respuesta {
    * afirmación sin respaldo, y el sistema no afirma nada que no pueda mostrar.
    */
   senalesQueLaSostienen: string[];
+  /**
+   * 🔴 **`entregado` significa «el transporte lo aceptó», y NADA MÁS.** Telegram
+   * contestó `ok`. Si el teléfono está robado, apagado, o el adulto deslizó la
+   * notificación sin leerla, esto vale `true` igual. Ese hueco es exactamente
+   * el que vienen a tapar los dos campos de abajo.
+   */
   entregado: boolean;
+  /**
+   * El token del botón «Lo vi». De **un solo uso** y atado a ESTA fila.
+   *
+   * 🔴 Sin eso, en la demo —donde tres desconocidos escanean el mismo QR—
+   * cualquiera podría acusar recibo del aviso de otro. Y como cada
+   * destinatario tiene su propia fila, el token dice también **quién** apretó,
+   * sin que nadie lo declare.
+   * 📌 Sólo lo llevan las alertas a los adultos. Ver `acuse.ts`.
+   */
+  acuseToken?: string | null;
+  /** Cuándo apretó «Lo vi». Vacío = no lo apretó, que es un dato en sí mismo. */
+  acusadoEn?: string | null;
 }
 
 /* ── La charla del adulto con el asistente ───────────────────────────────── */

@@ -7,6 +7,7 @@ import {
   sugerenciasParaLaFamilia,
 } from "@/lib/datos";
 import { enlaceDeVinculacion } from "@/lib/mensajeria/vinculacion";
+import { quienLoVio } from "@/lib/mensajeria/acuse";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
 import { evaluar, INDICADORES, juntarObservaciones, VENTANA_DIAS } from "@/lib/motor";
 import { EDAD_PARA_ELEGIR_REFERENTE, quienEligeAlReferente } from "@/lib/config";
@@ -112,6 +113,14 @@ export async function GET(req: Request) {
   // Queda registrado con fecha: sin eso no se puede medir persistencia.
   if (senales.length > 0) await repo.registrarSenales(senales);
 
+  /* ── Quién vio el último aviso (19/8) ──
+     🔴 Va acá porque el panel es el único lugar donde se puede ver que un
+     aviso salió y NADIE lo abrió. Hasta hoy `entregado` decía que Telegram lo
+     aceptó, y eso se leía como que alguien lo había visto. */
+  const avisos = chico
+    ? await repo.respuestasDe(chico.id, ventana.desde, ventana.hasta)
+    : [];
+
   /* ── Lo que contaron los adultos, que es la segunda entrada del motor ── */
   const observaciones = chico
     ? await repo.observacionesDe(chico.id, ventana.desde, ventana.hasta)
@@ -189,6 +198,10 @@ export async function GET(req: Request) {
       firmas: firmasDelCuestionario(observaciones, datos.adultos),
       deUnTotalDe: INDICADORES.length,
     },
+    /* 🔑 Quién vio el aviso. `loVioUnResponsable` es la condición que va a
+       frenar la escalada, y se calcula acá para que el panel muestre
+       exactamente lo mismo que va a mirar el reloj cuando exista. */
+    acuse: quienLoVio(avisos, datos.adultos),
     almacenamiento: repo.clase,
     ventana,
     fuente: { id: fuente.id, nombre: fuente.nombre, simulada, motivo },

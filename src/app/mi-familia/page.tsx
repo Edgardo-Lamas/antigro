@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import {
   ArrowRight,
+  BellRing,
   LoaderCircle,
   LogOut,
   Eye,
@@ -92,6 +93,28 @@ interface Respuesta {
       respondidas: number;
     }[];
     deUnTotalDe: number;
+  };
+  /* 🔴 Quién vio el aviso, que NO es lo mismo que a quién se le entregó.
+     `entregado` significa que Telegram lo aceptó; esto, que alguien lo abrió. */
+  acuse: {
+    avisos: {
+      destino: string;
+      nombre: string | null;
+      esResponsable: boolean;
+      fecha: string;
+      entregado: boolean;
+      acusadoEn: string | null;
+    }[];
+    ultimaTanda: {
+      destino: string;
+      nombre: string | null;
+      esResponsable: boolean;
+      fecha: string;
+      entregado: boolean;
+      acusadoEn: string | null;
+    }[];
+    loVioUnResponsable: boolean;
+    hayAvisosQueNoSalieron: boolean;
   };
   ventana: { dias: number };
   fuente: { simulada: boolean };
@@ -324,6 +347,9 @@ export default function MiFamilia() {
           )}
         </div>
       </section>
+
+      {/* ── Quién vio el aviso ─────────────────────────────────────────── */}
+      <ElAcuse acuse={datos.acuse} />
 
       {/* ── Lo que ven los adultos ─────────────────────────────────────── */}
       <ElCuestionario
@@ -591,6 +617,139 @@ interface TurnoEnPantalla {
  *  preguntas contestó cada uno y cuándo. Qué significa todo eso junto lo dice
  *  el informe, y lo dice en señales, nunca en un número sobre un chico.
  */
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  QUIÉN VIO EL AVISO — el acuse de recibo, 19/8
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  **Lo pidió Edgardo el 16/8** y lo cerró el 19: *"supongamos que al padre le
+ *  robaron el celular, o que muy atareado lo dejó pasar"*.
+ *
+ *  🔴 **El agujero que muestra:** hasta hoy el sistema decía «entregado», y eso
+ *  significaba nada más que Telegram aceptó el mensaje. Teléfono robado,
+ *  apagado o notificación deslizada sin leer se veían igual que leído. Esta
+ *  sección es el primer lugar del producto donde se puede ver la diferencia.
+ *
+ *  🔑 **La regla que ordena el bloque, y la definió él:** *"el acuse es de uno
+ *  de los responsables"*. No se cuentan acuses — se mira si acusó alguien con
+ *  la responsabilidad. Por eso el estado de arriba no dice «2 de 3 vieron el
+ *  aviso»: dice si lo vio un responsable o no.
+ *
+ *  ⚠ **Y separa lo que no hay que confundir:** a quien le falta apretar
+ *  «Iniciar» el mensaje **nunca le salió**. Eso no es desatención, es una
+ *  configuración a medias, y la respuesta correcta no es insistirle: es
+ *  decirle que le falta un clic.
+ */
+function ElAcuse({
+  acuse,
+}: {
+  acuse: {
+    avisos: {
+      destino: string;
+      nombre: string | null;
+      esResponsable: boolean;
+      fecha: string;
+      entregado: boolean;
+      acusadoEn: string | null;
+    }[];
+    ultimaTanda: {
+      destino: string;
+      nombre: string | null;
+      esResponsable: boolean;
+      fecha: string;
+      entregado: boolean;
+      acusadoEn: string | null;
+    }[];
+    loVioUnResponsable: boolean;
+    hayAvisosQueNoSalieron: boolean;
+  };
+}) {
+  /* 📌 Sin avisos no se dibuja nada. Un bloque vacío que dice «nadie vio el
+     aviso» cuando no hubo ningún aviso es un cartel que miente en calma. */
+  if (acuse.avisos.length === 0) return null;
+
+  const nadieResponsable = !acuse.loVioUnResponsable;
+  const anteriores = acuse.avisos.length - acuse.ultimaTanda.length;
+
+  return (
+    <section
+      className={`mt-8 rounded-lg border px-5 py-5 ${
+        nadieResponsable ? "border-atencion/40 bg-atencionSuave" : "border-borde bg-superficie"
+      }`}
+    >
+      <h2
+        className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] ${
+          nadieResponsable ? "text-atencion" : "text-acento"
+        }`}
+      >
+        <BellRing size={13} /> Quién vio el aviso
+      </h2>
+
+      <p className="mt-3 text-sm leading-relaxed text-tinta">
+        {acuse.loVioUnResponsable
+          ? "Del último aviso, al menos uno de los responsables confirmó que lo vio."
+          : "Del último aviso, todavía no lo confirmó ninguno de los responsables."}
+      </p>
+
+      {/* 🔴 Sólo la ÚLTIMA tanda, y no el historial. Mezclarlos fue el error del
+          19/8: con todo junto, un acuse de hace dos días se leía como que el
+          aviso de hoy estaba visto. */}
+      <ul className="mt-4 flex flex-col gap-2">
+        {acuse.ultimaTanda.map((a) => (
+          <li
+            key={a.destino + a.fecha}
+            className="flex items-start justify-between gap-3 rounded-md border border-borde bg-fondo px-4 py-3"
+          >
+            <div>
+              <p className="text-sm text-tinta">
+                {a.nombre ?? "Un contacto que ya no está en la familia"}
+                {!a.esResponsable && (
+                  <span className="text-apagado"> · recibe avisos, no es responsable</span>
+                )}
+              </p>
+              <p className="mt-0.5 text-xs text-apagado">Se le mandó {fechaEnCriollo(a.fecha)}</p>
+            </div>
+
+            {/* 🔴 Tres estados y no dos, y el del medio es el que faltaba: que
+                el mensaje haya salido no dice que alguien lo haya visto. */}
+            {!a.entregado ? (
+              /* ⚠ Esto NO es «no tiene canal conectado» — a ése `avisar()` ni
+                 le registra fila. Es que el transporte lo rechazó: chat que no
+                 existe, cuenta borrada, correo que rebotó. */
+              <span className="shrink-0 text-xs text-apagado">No se pudo entregar</span>
+            ) : a.acusadoEn ? (
+              <span className="flex shrink-0 items-center gap-1 text-xs text-calma">
+                <Check size={12} /> Lo vio
+              </span>
+            ) : (
+              <span className="shrink-0 text-xs text-tenue">Sin confirmar</span>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {acuse.hayAvisosQueNoSalieron && (
+        <p className="mt-3 text-xs leading-relaxed text-tenue">
+          Donde dice «no se pudo entregar», el mensaje salió y el canal lo rechazó. Eso no se
+          arregla esperando: hay que revisar ese contacto más abajo.
+        </p>
+      )}
+
+      {anteriores > 0 && (
+        <p className="mt-3 text-xs text-tenue">
+          Antes de éste hubo {anteriores} {anteriores === 1 ? "aviso" : "avisos"} en estos días.
+          Lo que se mira acá es el último: confirmar uno viejo no dice nada del de ahora.
+        </p>
+      )}
+
+      <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+        «Lo vio» quiere decir que esa persona apretó el botón del mensaje. No quiere decir que
+        haya hecho algo, y el sistema no supone que sí.
+      </p>
+    </section>
+  );
+}
+
 function ElCuestionario({
   chico,
   firmas,

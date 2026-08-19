@@ -298,6 +298,14 @@ export class RepositorioEnMemoria implements Repositorio {
     return respuesta;
   }
 
+  /** Un solo uso: si ya tiene fecha, el segundo toque no escribe nada. */
+  async marcarAcuse(token: string, cuando: string): Promise<Respuesta | null> {
+    const aviso = this.respuestas.find((r) => r.acuseToken === token && !r.acusadoEn);
+    if (!aviso) return null;
+    aviso.acusadoEn = cuando;
+    return aviso;
+  }
+
   async respuestasDe(chicoId: string, desde: string, hasta: string) {
     return this.respuestas
       .filter((r) => r.chicoId === chicoId && dentroDe(r.fecha, desde, hasta))

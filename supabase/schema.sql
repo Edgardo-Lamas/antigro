@@ -636,3 +636,39 @@ alter table observaciones add column if not exists hogar text;
 
 comment on column observaciones.hogar is
   'Desde qué casa se contestó. Es un HECHO: sale de la sesión, no del formulario. Se lee junto a adulto_id, que es una DECLARACION de quien contestó. Null = casa única, no dato faltante.';
+
+
+-- ─── 16. EL ACUSE DE RECIBO ──────────────────────────────────────
+--  Lo planteó Edgardo el 16/8: *"tenemos que crear un método que confirme que
+--  el padre recibió el alerta… supongamos que al padre le robaron el celular,
+--  o que muy atareado lo dejó pasar"*.
+--
+--  🔴 **El agujero que tapa, y hasta hoy ni se podía medir:** `entregado`
+--  significa que Telegram aceptó el mensaje. Teléfono robado, apagado, o la
+--  notificación deslizada sin leer: quedaba registrado como entregado igual.
+--
+--  🔑 **El token va POR FILA, y cada destinatario tiene la suya.** Por eso el
+--  token dice también QUIÉN apretó, sin que nadie lo declare — es lo contrario
+--  del cuestionario, donde la persona es una declaración. Acá consta.
+--
+--  🔴 **De un solo uso**, y lo garantiza la base: `acusado_en` se escribe sólo
+--  donde todavía está en null (el mismo criterio que la vinculación por
+--  código). Sin eso, en la demo —tres desconocidos con el mismo QR— alguien
+--  podría acusar recibo del aviso de otro.
+--
+--  ⚠ Nullable, y significan cosas distintas: sin token = ese mensaje no lleva
+--  botón (la orientación al chico nunca lo lleva); con token y sin fecha = se
+--  mandó y **nadie lo vio**, que es justamente lo que dispara la escalada.
+
+alter table respuestas add column if not exists acuse_token text;
+alter table respuestas add column if not exists acusado_en timestamptz;
+
+--  Único, porque es una credencial: dos filas con el mismo token harían que
+--  apretar un botón cerrara el aviso de otra persona.
+create unique index if not exists respuestas_acuse_token_idx
+  on respuestas (acuse_token) where acuse_token is not null;
+
+comment on column respuestas.acuse_token is
+  'Token del boton «Lo vi». De un solo uso y atado a esta fila, asi el acuse dice quien lo apreto sin que nadie lo declare. Solo lo llevan las alertas a adultos.';
+comment on column respuestas.acusado_en is
+  'Cuando apreto «Lo vi». Vacio con token presente = se mando y nadie lo vio: eso es lo que dispara la escalada.';

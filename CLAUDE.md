@@ -13,8 +13,6 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 **Leer este bloque entero antes de tocar nada.**
 
-🔴 **LO PRIMERO: PROMOVER.** El cuestionario está construido, probado y **la migración 15 ya está
-aplicada a producción**, pero el código **todavía no se promovió**. Ver «Cómo se publica».
 ⏳ **El código congela MAÑANA, jueves 20.**
 
 ### Dónde está todo
@@ -23,10 +21,62 @@ aplicada a producción**, pero el código **todavía no se promovió**. Ver «C�
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
 | **En producción** | `4d92bbd` — ⚠ **atrasado**: no tiene el cuestionario |
-| **La base** | ✅ Migración 14 (`terminos`) y ✅ **migración 15** (`observaciones.hogar`, 19/8) |
-| **Verificación** | `npm run probar` — **252 comprobaciones**: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + **73 del cuestionario**. **En verde el 19/8** |
-| **En el navegador** | `node prueba-navegador.mjs` — el recorrido entero del cuestionario contra producción. **En verde el 19/8** |
+| **La base** | ✅ Migración 14 (`terminos`) · ✅ 15 (`observaciones.hogar`) · ✅ **16 (`respuestas.acuse_token` + `acusado_en`)**, las dos del 19/8 |
+| **Verificación** | `npm run probar` — **281 comprobaciones**: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + **29 del acuse**. **En verde el 19/8** |
+| **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) y `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real). **En verde el 19/8** |
 | **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
+
+### ✅ EL ACUSE DE RECIBO — construido el 19/8. **La escalada NO, y va después**
+
+**Lo pidió Edgardo el 16/8** —*"supongamos que al padre le robaron el celular, o que muy atareado
+lo dejó pasar"*— y el 19 acordamos el orden: **el acuse primero, la escalada después, y el cron al
+final.** El acuse es barato y sin él estamos ciegos: no se puede diseñar la escalada sin saber
+cuántas veces pasa de verdad.
+
+🔴 **El agujero que tapa:** `entregado` significaba **«el transporte aceptó el mensaje»**. Telegram
+contestó `ok`. Teléfono robado, apagado, o la notificación deslizada sin leer: quedaba registrado
+como entregado igual, y el panel lo mostraba como si alguien lo hubiera visto.
+
+| Dónde | Qué |
+|---|---|
+| `src/lib/mensajeria/acuse.ts` | **Dueño del acuse**: el token, el callback, y `quienLoVio` |
+| `avisar.ts` | Genera el token **sólo para `alerta_adultos`** |
+| `telegram.ts` | Dibuja el botón, contesta el toque y lo saca después |
+| `/api/telegram/webhook` | **Escucha `callback_query`**, que hasta hoy ni miraba |
+| `respuestas.acuse_token` + `acusado_en` (migración 16) | Dónde queda |
+| `npm run probar-acuse` (29) · `prueba-acuse-circuito.mjs` | Las dos verificaciones |
+
+🔑 **El botón dice «Lo vi», no «OK»** — elegido por él. «OK» se lee como *«está bien / estoy de
+acuerdo»*, y esto no es algo con lo que uno esté de acuerdo. «Lo vi» dice exactamente lo que el
+sistema aprende: que esa persona lo vio. **No que se haga cargo, no que vaya a hacer algo.**
+
+🔴 **LA REGLA, y él la afinó en dos pasos.** Primero la trajo contando —*"si enviamos tres mensajes
+y dos contestan, no deberíamos pasar a la escalada"*— y cuando le mostré dónde se rompe la cerró
+así: **«el acuse es de uno de los responsables»**.
+🔑 **Dónde se rompe contar, que es el caso que está escrito como prueba:** tres mensajes, dos
+acuses, **y que los dos sean el referente y el chico**. Contando, no se escala; y sin embargo
+ningún progenitor lo vio, que es exactamente el caso para el que existe la escalada.
+🔴 **Con UNO alcanza** — no es lista de asistencia. Y el acuse del referente **se registra igual**
+porque es información, pero no cierra.
+🔴 **El chico NO lleva botón, y es estructural.** El token se genera sólo para `alerta_adultos`, así
+que no hay ninguna condición que alguien pueda invertir por error. Si su toque contara, el sistema
+se callaría **porque lo vio la chica**, y eso da vuelta el producto entero.
+
+🔴 **EL ERROR QUE APARECIÓ MIRANDO EL PANEL, y era grave:** `loVioUnResponsable` miraba la ventana
+entera, así que **un acuse de hace dos días decía que el aviso de hoy estaba visto**. Con eso la
+escalada no se dispararía nunca más después del primer acuse de la vida de esa familia. ✅ Ahora se
+mira sólo la **última tanda** (`HORAS_DE_UNA_TANDA = 6`), y hay tres casos que lo comprueban.
+**El acuse es de cada aviso, no de la persona para siempre.**
+
+⚠ **«No acusó» y «nunca le llegó» NO son lo mismo**, y confundirlos haría que la escalada se
+disparara por una configuración a medias disfrazada de desatención. 📌 Y ojo con un caso que
+**no existe**: a un adulto sin canal conectado `avisar()` **no le registra ninguna fila** — eso el
+panel lo dice en «Quiénes están», no acá. Lo que sí se registra con `entregado: false` es un
+mensaje que salió y **el canal rechazó**.
+
+⬜ **LO QUE SIGUE, en este orden:** la **escalada** (la política ya está decidida: cuelga de la
+persistencia, no de un cronómetro) y después **el cron**, que es la pieza que no existe — AntiGro
+nunca se despierta solo, y no hay `vercel.json` ni `vercel.ts`.
 
 ### ✅ EL CUESTIONARIO DEL ADULTO — construido el 19/8. Era lo próximo y ya está
 
@@ -488,7 +538,8 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 3. ~~**El cuestionario del adulto.**~~ ✅ **HECHO el 19/8** — pantalla, ruta, migración 15
    aplicada, 73 comprobaciones y el recorrido verificado en el navegador. Ver el bloque «EL
    CUESTIONARIO DEL ADULTO» arriba. ✅ **Promovido y verificado en vivo el 19/8** (`8a7316e`).
-4. **El acuse de recibo y la escalada.** Diseñado el 16/8, sin construir — sección propia abajo.
+4. **El acuse de recibo y la escalada.** ✅ **El acuse, HECHO el 19/8** — ver su bloque arriba.
+   ⬜ **Falta la escalada**, y después el **cron**, que es la pieza que no existe.
 5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
 6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
    operativo."* No empezarlo antes. El guion que hay todavía es el de Criterio Térmico.

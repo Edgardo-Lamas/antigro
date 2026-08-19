@@ -521,6 +521,8 @@ export class RepositorioSupabase implements Repositorio {
         texto: r.texto,
         senales_que_la_sostienen: r.senalesQueLaSostienen,
         entregado: r.entregado,
+        acuse_token: r.acuseToken ?? null,
+        acusado_en: r.acusadoEn ?? null,
       })
       .select("id")
       .single<{ id: string }>();
@@ -548,6 +550,8 @@ export class RepositorioSupabase implements Repositorio {
           texto: string;
           senales_que_la_sostienen: string[];
           entregado: boolean;
+          acuse_token: string | null;
+          acusado_en: string | null;
         }[]
       >();
 
@@ -561,7 +565,55 @@ export class RepositorioSupabase implements Repositorio {
       texto: r.texto,
       senalesQueLaSostienen: r.senales_que_la_sostienen ?? [],
       entregado: r.entregado,
+      acuseToken: r.acuse_token,
+      acusadoEn: r.acusado_en,
     }));
+  }
+
+  /**
+   * Marca que alguien apretó «Lo vi».
+   *
+   * 🔴 **De un solo uso, y lo garantiza la BASE, no el código.** El
+   * `.is("acusado_en", null)` es lo que hace que el segundo toque no escriba
+   * nada — mismo criterio que la vinculación por código. Comprobar antes y
+   * escribir después sería una carrera: dos toques en el mismo segundo
+   * pasarían los dos.
+   */
+  async marcarAcuse(token: string, cuando: string): Promise<Respuesta | null> {
+    const { data } = await this.db
+      .from("respuestas")
+      .update({ acusado_en: cuando })
+      .eq("acuse_token", token)
+      .is("acusado_en", null)
+      .select("*")
+      .maybeSingle<{
+        id: string;
+        chico_id: string;
+        fecha: string;
+        clase: Respuesta["clase"];
+        canal: Respuesta["canal"];
+        destino: string;
+        texto: string;
+        senales_que_la_sostienen: string[];
+        entregado: boolean;
+        acuse_token: string | null;
+        acusado_en: string | null;
+      }>();
+
+    if (!data) return null;
+    return {
+      id: data.id,
+      chicoId: data.chico_id,
+      fecha: data.fecha,
+      clase: data.clase,
+      canal: data.canal,
+      destino: data.destino,
+      texto: data.texto,
+      senalesQueLaSostienen: data.senales_que_la_sostienen ?? [],
+      entregado: data.entregado,
+      acuseToken: data.acuse_token,
+      acusadoEn: data.acusado_en,
+    };
   }
 
   async registrarObservacion(o: Omit<ObservacionDelAdulto, "id">): Promise<ObservacionDelAdulto> {
