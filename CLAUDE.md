@@ -129,9 +129,18 @@ encontró la auditoría del 17/8. ➡ **El primer aviso sigue necesitando que al
 
 🔐 **Falla cerrado:** sin `CRON_SECRET` en el entorno, la ruta contesta 503 y no corre nadie. El
 secreto ya está en Vercel (producción y preview) y en `.env.local`.
-⚠ **Verificar en el panel de Vercel que el cron corra CADA HORA.** En el plan gratuito los cron
-sólo corren una vez por día, y con eso una espera de 8 horas queda inservible. `vercel.json` pide
-`0 * * * *`; si el plan lo baja, hay que saberlo.
+🔴 **EL RELOJ CORRE UNA VEZ POR DÍA, Y NO ES UNA ELECCIÓN: es el plan gratuito.** Con
+`0 * * * *` **el deploy FALLA entero**, con este mensaje: *"Hobby accounts are limited to daily
+cron jobs"*. No es que corra menos: no publica. Quedó en **`0 11 * * *`** (8 de la mañana en
+Argentina), que es la hora útil: un aviso de la madrugada se escala a la mañana siguiente.
+⚠ **La consecuencia hay que decirla: la espera de 8 horas y la de 2 con evasión quedan
+aspiracionales.** El código las respeta, pero el reloj sólo pregunta una vez al día, así que en el
+peor caso la escalada tarda ~24 h. **La lógica está bien; lo que falta es el pulso.**
+🔑 **Las tres salidas, para cuando se decida:** Vercel Pro (US$ 20/mes, y desbloquea el cron por
+hora) · **un pinger externo gratis** —GitHub Actions programado, o cron-job.org— pegándole a
+`/api/cron/revisar` con el `CRON_SECRET`, que en Hobby es lo que la mayoría hace · o dejarlo diario
+y decirlo. ⚠ **No enganchar la escalada a una visita de página:** una ruta que ENTREGA mensajes
+colgada de un GET es exactamente lo que la auditoría del 17/8 borró.
 📌 Se usó `vercel.json` y no `vercel.ts` a propósito: `vercel.ts` es lo recomendado hoy pero pide
 `@vercel/config`, y no se agrega una dependencia el día antes del congelamiento por tres líneas.
 
