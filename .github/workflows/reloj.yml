@@ -1,0 +1,70 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  EL RELOJ DE AFUERA — le da el pulso a la escalada
+# ─────────────────────────────────────────────────────────────────────────────
+#
+#  🔴 **Existe por un límite del plan, no por gusto.** El cron de Vercel en el
+#  plan gratuito corre UNA VEZ POR DÍA — y con un cron por hora el deploy ni
+#  siquiera sale: *"Hobby accounts are limited to daily cron jobs"*. Con eso, la
+#  espera de 8 horas de la escalada (y la de 2 con evasión) quedaban
+#  aspiracionales: la lógica estaba bien y le faltaba el pulso.
+#
+#  🔑 **El de Vercel SE DEJA PUESTO igual**, y no es redundancia inútil: si esto
+#  se cae o GitHub lo desactiva, queda un latido diario en vez de ninguno.
+#  Llamar dos veces no hace daño — `decidirEscalada` no escala dos veces por la
+#  misma tanda (`yaSeEscalo`), así que la ruta se puede llamar cuantas veces
+#  sea sin duplicar un solo mensaje.
+#
+#  ⚠ **GitHub no promete puntualidad.** Los `schedule` se atrasan entre 5 y 20
+#  minutos y en horas cargadas pueden saltearse. Para esto no importa: lo que
+#  se mide son horas, no minutos.
+#
+#  🔴 **Y hay una trampa que conviene saber antes de que muerda: GitHub
+#  DESACTIVA los workflows programados a los 60 días sin actividad en el repo.**
+#  Si algún día la escalada deja de salir y nadie tocó nada, mirar acá primero.
+#
+#  🔐 El secreto NO está en este archivo: el repositorio es público. Vive en los
+#  Secrets del repo y en las variables de Vercel.
+
+name: Reloj de la escalada
+
+on:
+  schedule:
+    # Cada hora en punto. Es el pulso que el plan gratuito de Vercel no da.
+    - cron: "0 * * * *"
+  # Para poder correrlo a mano desde la pestaña Actions.
+  workflow_dispatch:
+
+# Sólo lectura: este workflow no toca el repositorio, sólo llama a una URL.
+permissions:
+  contents: read
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preguntarle al sistema si hay que insistir
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::Falta el secret CRON_SECRET en el repositorio."
+            exit 1
+          fi
+
+          # -sS: sin barra de progreso pero con errores a la vista.
+          # El cuerpo va a un archivo para poder mostrarlo sin el encabezado.
+          codigo=$(curl -sS -o respuesta.json -w '%{http_code}' \
+            --max-time 60 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            https://antigro.vercel.app/api/cron/revisar)
+
+          echo "Respuesta $codigo:"
+          cat respuesta.json
+          echo
+
+          # 🔴 Falla ruidosamente. Un reloj que se rompe en silencio es peor que
+          # no tenerlo: la escalada dejaría de salir y nadie se enteraría.
+          if [ "$codigo" != "200" ]; then
+            echo "::error::El reloj no pudo revisar (HTTP $codigo)."
+            exit 1
+          fi
