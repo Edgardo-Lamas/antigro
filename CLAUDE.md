@@ -19,7 +19,7 @@ estadísticas oficiales sobre qué pesa cuánto.
 
 | | |
 |---|---|
-| **Rama** | `fase-4-consola-y-observatorio` — **no** es la de producción |
+| **Rama** | `fase-4-consola-y-observatorio`. 🔴 **Desde el 19/8 `main` SÍ es la de producción y se mergeó** — ver «Cómo se publica» |
 | **En producción** | `4d92bbd` — ⚠ **atrasado**: no tiene el cuestionario |
 | **La base** | ✅ 14 (`terminos`) · ✅ 15 (`observaciones.hogar`) · ✅ 16 (`respuestas.acuse_token` + `acusado_en`) · ✅ **17 (`escalada_adultos`)**. Las tres últimas del 19/8 |
 | **Verificación** | `npm run probar` — **314 comprobaciones** en 8 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + **33 escalada**. **En verde el 19/8** |
@@ -136,11 +136,21 @@ Argentina), que es la hora útil: un aviso de la madrugada se escala a la mañan
 ⚠ **La consecuencia hay que decirla: la espera de 8 horas y la de 2 con evasión quedan
 aspiracionales.** El código las respeta, pero el reloj sólo pregunta una vez al día, así que en el
 peor caso la escalada tarda ~24 h. **La lógica está bien; lo que falta es el pulso.**
-🔑 **Las tres salidas, para cuando se decida:** Vercel Pro (US$ 20/mes, y desbloquea el cron por
-hora) · **un pinger externo gratis** —GitHub Actions programado, o cron-job.org— pegándole a
-`/api/cron/revisar` con el `CRON_SECRET`, que en Hobby es lo que la mayoría hace · o dejarlo diario
-y decirlo. ⚠ **No enganchar la escalada a una visita de página:** una ruta que ENTREGA mensajes
-colgada de un GET es exactamente lo que la auditoría del 17/8 borró.
+✅ **RESUELTO EL 19/8 CON UN PINGER EXTERNO, y lo eligió Edgardo.** `.github/workflows/reloj.yml`
+le pega a `/api/cron/revisar` **cada hora**, con el `CRON_SECRET` en los Secrets del repo.
+Verificado a mano: HTTP 200 y la decisión correcta.
+🔑 **El cron de Vercel se DEJA PUESTO igual** (`0 11 * * *`), y no es redundancia inútil: si GitHub
+se cae o desactiva el workflow, queda un latido diario en vez de ninguno. **Llamar dos veces no
+hace daño**: `decidirEscalada` no escala dos veces por la misma tanda (`yaSeEscalo`), así que la
+ruta se puede llamar cuantas veces sea sin duplicar un solo mensaje.
+🔴 **La trampa que hay que saber antes de que muerda: GitHub DESACTIVA los workflows programados a
+los 60 días sin actividad en el repo.** Si algún día la escalada deja de salir y nadie tocó nada,
+mirar ahí primero. ⚠ Y los `schedule` de GitHub **se atrasan entre 5 y 20 minutos**; acá no
+importa, porque lo que se mide son horas.
+⚠ **Y lo que NO se hizo: enganchar la escalada a una visita de página.** Una ruta que ENTREGA
+mensajes colgada de un GET es exactamente lo que la auditoría del 17/8 borró.
+📌 La otra salida, si algún día hace falta más precisión: **Vercel Pro, US$ 20/mes**, que desbloquea
+el cron por hora nativo.
 📌 Se usó `vercel.json` y no `vercel.ts` a propósito: `vercel.ts` es lo recomendado hoy pero pide
 `@vercel/config`, y no se agrega una dependencia el día antes del congelamiento por tres líneas.
 
@@ -550,8 +560,15 @@ npx vercel promote <url-de-la-preview> --yes      # esa misma build pasa a produ
 verificado, sin recompilar.
 ⚠ **El alias tarda hasta un minuto en cambiar.** Comprobar enseguida da resultados viejos y
 confunde — pasó dos veces el 17/8. Esperar y volver a mirar.
-⬜ Para que sea automático falta **una sola cosa: mergear a `main`**. ⚠ No antes del congelamiento:
-ahí cualquier push sale en vivo, trabajo a medias incluido.
+🔴 **CAMBIÓ EL 19/8: YA SE MERGEÓ A `main`, y ahora un push a `main` SALE EN VIVO SOLO.**
+Se hizo antes de lo previsto por un motivo concreto: **GitHub sólo corre los workflows programados
+desde la rama por defecto**, y sin eso el pinger de la escalada quedaba inerte —ni siquiera se
+podía disparar a mano—. Se pudo hacer sin riesgo porque **la rama entera ya estaba promovida y
+verificada**: la única diferencia con lo que corría era el YAML del reloj, que no toca la
+aplicación. El merge fue *fast-forward* y disparó un deploy automático que quedó sano.
+⚠ **La regla de ahora en más: se sigue trabajando en `fase-4-consola-y-observatorio`**, que genera
+vistas previas. **A `main` se mergea a propósito, nunca de paso** — ahí cualquier cosa sale en vivo,
+trabajo a medias incluido.
 
 ### 🔑 Cómo se aplica SQL a producción — costó encontrarlo
 
