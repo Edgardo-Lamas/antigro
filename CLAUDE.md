@@ -5,26 +5,95 @@ un solo mensaje suyo. Cruza lo que ve la red, lo que observan los adultos, y lo 
 estadísticas oficiales sobre qué pesa cuánto.
 
 **Entrega: domingo 2026-08-23, 23:59 hora Argentina** (CoderCup AI de Coderhouse).
-**El código se congela el jueves 20** — después hay que grabar y editar el video de 2 minutos.
+⚠ **NO hay congelamiento el jueves 20.** Esa fecha era un colchón nuestro, no de las bases, y
+Edgardo lo volteó el 19/8: *"tenemos margen con un buen colchón, no tiene sentido que me
+autoimponga una soga al cuello"*. Lo que sí queda del criterio: **el último día no se toca motor,
+base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el video de 2 minutos.
 
 ---
 
-## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-19
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-19, cierre
 
-**Leer este bloque entero antes de tocar nada.**
+**Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio, todo promovido.**
 
-⏳ **El código congela MAÑANA, jueves 20.**
+🗓 **ENTREGA: domingo 23. NO hay congelamiento el jueves 20** — esa fecha era un colchón nuestro,
+no de las bases, y Edgardo lo volteó el 19/8: *"tenemos margen con un buen colchón, no tiene
+sentido que me autoimponga una soga al cuello"*. ⚠ Igual conviene no tocar motor, base ni entrega
+de mensajes el último día: ahí un cambio no se ve fallar hasta que falla.
+
+🔴 **LO PRIMERO DE LA PRÓXIMA SESIÓN: preguntarle cómo le fue con las psicólogas.** Les mandó el
+enlace del alta el 19/8 para que probaran **el asistente**. Lo que traigan entra en
+`src/lib/ia/recomendaciones.ts`, que es donde vive el consejo con fuente.
 
 ### Dónde está todo
 
 | | |
 |---|---|
-| **Rama** | `fase-4-consola-y-observatorio`. 🔴 **Desde el 19/8 `main` SÍ es la de producción y se mergeó** — ver «Cómo se publica» |
-| **En producción** | `4d92bbd` — ⚠ **atrasado**: no tiene el cuestionario |
-| **La base** | ✅ 14 · 15 · 16 · 17 · ✅ **18 (`parte_periodico` + `aviso_de_ceguera`)**. De la 15 a la 18, todas del 19/8 |
-| **Verificación** | `npm run probar` — **349 comprobaciones** en 10 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + **35 parte**. **En verde el 19/8** |
-| **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) y `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real). **En verde el 19/8** |
-| **Comprobado en vivo** | 18/8 noche: `/` `/guia` `/terminos` `/entrar` dan 200 · `/alta` redirige · **`/entrar` sin código no dibuja «es mi primera vez»** · y `/api/alta/hogar` sin aceptación contesta *"Falta aceptar los términos de uso"* |
+| **Rama** | `fase-4-consola-y-observatorio`, y **`main` está sincronizada**. 🔴 Desde el 19/8 `main` ES producción: **un push ahí sale EN VIVO** |
+| **En producción** | `c01805c`, promovido y **verificado en vivo el 19/8** |
+| **La base** | ✅ 14 · 15 · 16 · 17 · 18. **De la 15 a la 18, todas del 19/8 y todas aplicadas** |
+| **Verificación** | `npm run probar` — **349 comprobaciones** en 10 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte. **En verde** |
+| **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente) |
+| **Comprobado en vivo (19/8)** | `/` `/guia` `/terminos` `/entrar` dan 200 · **`/entrar` sin código NO dibuja «es mi primera vez» y con el enlace SÍ** (verificado en navegador) · el reloj da 401 sin secreto · el webhook 401 sin el suyo |
+| **En la base de producción** | **Una sola familia** (la sembrada) y dos usuarios: `demo@antigro.app` y `mariana@ejemplo.ar`. Cero respuestas |
+
+### 🔴 LO QUE HAY QUE VIGILAR ESTA SEMANA
+
+⚠ **Las psicólogas están creando familias de verdad en producción.** Cada alta que hagan queda en
+la base. **Antes de grabar el video hay que limpiarlas** — `delete from familias where id = …`
+cascadea a chicos, adultos y usuarios. Tiene que quedar sólo la sembrada.
+📌 Tope: 40 altas por día en todo el sistema, 3 por minuto por IP. Con unas pocas personas sobra.
+
+### ✅ EL CONSEJO DEL ASISTENTE YA TIENE FUENTE — 19/8, y salió de leer respuestas reales
+
+🔴 **El desbalance que apareció:** las CIFRAS del asistente estaban todas citadas y **los CONSEJOS
+no**. Cuando decía *"entrá por lo de afuera"* o *"no digas «no hables con desconocidos»"*, eso no
+salía de ninguna fuente — era conocimiento general del modelo con la voz de AntiGro encima. Y es
+la parte **más accionable** de todo lo que dice.
+
+**Lo levantó Edgardo:** *"esas respuestas deberían estar validadas por gente con experiencia como
+la que debe haber en la Asociación Argentina de Grooming o entes similares"*.
+
+| Dónde | Qué |
+|---|---|
+| `src/lib/ia/recomendaciones.ts` | **28 recomendaciones TEXTUALES**, con organismo, enlace y fecha |
+| `recomendacionesParaElPrompt()` | Se arma sola: nadie puede meter un consejo sin decir de dónde salió |
+| El corpus (`asistente.ts`) | Sección propia + la regla de atribuir |
+
+**Las dos fuentes, verificadas el 19/8:** Ministerio de Justicia de la Nación («Con Vos en la Web»,
+actualizada 6/2026) y Ministerio Público de la PBA (Procuración General de la SCBA).
+
+🔑 **Las tres que el asistente NO decía y son las que más se hacen mal:** *no borrar nada* del
+teléfono (es la prueba), *no amenazar al acosador* (se asusta, borra todo y desaparece), y *no
+interrogar al chico* cuando cuenta algo. Las tres van contra el instinto.
+🔴 **Y una que vale por sí sola:** el Ministerio dice *"respetá la privacidad… no ingreses a
+escondidas a sus cuentas"*. **Es el organismo diciendo lo mismo que las reglas 2 y 3.** Deja de
+ser una postura nuestra.
+📌 Se agregó también: **que no repita la misma sugerencia en cada respuesta.** De cuatro respuestas
+medidas, tres terminaban empujando el cuestionario — una vez es útil, tres se lee como reclamo.
+
+⚠ **El borde que sigue sin fuente, y conviene saberlo antes de que lo marque alguien:** ante «ya
+borré las conversaciones» el asistente dice que WhatsApp suele guardar copia en Drive/iCloud. **Eso
+no está en la guía oficial** — es conocimiento técnico del modelo. Es plausible y útil; no está
+respaldado.
+
+### 📌 DECIDIDO EL 19/8: NO se conecta NextDNS
+
+**Es de él:** *"el jurado es gente que entiende bien todo esto, con una buena explicación y el
+simulador se va a entender bien cómo funciona AntiGro"*.
+🔑 **Y hay un argumento a favor que conviene no perder:** el simulador muestra **tres semanas en
+veinte segundos**, con el sistema callado los primeros catorce días. Con datos reales de dos días
+**no pasa nada** — que es justamente lo que el producto promete, y no se filma.
+📌 Verificado igual, por si vuelve el tema: **plan gratuito de NextDNS = 300.000 consultas/mes**,
+se reinicia el 1º, avisa a las 250k. 🔴 **Pasado el tope deja de FILTRAR y de REGISTRAR** — y el
+registro es lo único que AntiGro usa, así que pasarse **lo deja ciego**. Pro: **US$ 1,99/mes**,
+ilimitado. Ese es el costo por familia para el modelo de suscripción.
+⚠ Y sigue en pie: **`FuenteNextDNS.leer()` devuelve vacío.** Falta traducir la analítica a las
+cuatro señales, y eso se escribe mirando datos reales, no a ciegas.
+
+⬜ **SIN DECIDIR, y lo está pensando él: si el chico recibe su propio parte.** Coherente con la
+regla 3 y quizá lo más fuerte del producto para su confianza (*«seguimos sin leer tus mensajes»*),
+pero también puede leerse como recordatorio de que lo miran. **No construir hasta que lo diga.**
 
 ### ✅ EL ACUSE DE RECIBO — construido el 19/8
 
@@ -692,19 +761,47 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 4. ~~**El acuse de recibo y la escalada.**~~ ✅ **HECHOS los tres el 19/8**: acuse, escalada y el
    reloj. Ver sus bloques arriba. ✅ **Y el 19/8 a la noche, el primer aviso automático y el
    parte** — el circuito quedó cerrado de punta a punta sin que intervenga nadie.
-5. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil. Recomendación: tres teléfonos filmados.
-6. **El trailer, AL FINAL.** 🔴 *"El trailer lo vemos al final, recién cuando tengamos el sistema
-   operativo."* No empezarlo antes. El guion que hay todavía es el de Criterio Térmico.
+5. ~~**El consejo del asistente con fuente.**~~ ✅ **HECHO el 19/8** — 28 recomendaciones
+   textuales de dos organismos. Ver su bloque arriba. ⏳ **Esperando lo que traigan las psicólogas.**
+
+**Y a partir de acá, lo que de verdad queda. El producto está en ~92%:**
+
+6. 🔴 **EL VIDEO DE 2 MINUTOS.** Es lo único que no se puede saltear: **Claridad son 25 puntos y
+   decide DOS VECES**, porque hay un filtro previo sobre la explicación escrita. 🔴 Regla de él:
+   *"el trailer lo vemos al final, recién cuando tengamos el sistema operativo"*. ⚠ El guion que
+   hay en `docs/` **todavía es el de Criterio Térmico** y hay que reescribirlo entero.
+7. **Cómo se filma el QR.** ⚠ Escanear en vivo es frágil y ya le falló a él. Recomendación: tres
+   teléfonos ya logueados, filmados.
+8. **El modelo de suscripción EN PALABRAS.** No es código. Ya está el costo: **US$ 1,99/mes por
+   familia** (NextDNS Pro). Falta qué incluye, por familia o por chico, cuántos referentes.
+9. ⚠ **Verificar las cifras en fuente antes de que entren al video.** Sólo la Línea 137 y
+   Wisniewski están verificadas; el resto vino de modelos.
+
+**Lo chico que falta del producto, todo de media hora:**
+
+10. **La segunda puerta de padres separados.** El recorrido ya la explica y `crearHogar` ya la sabe
+    hacer (`familiaId` + `hogar`). **Falta sólo la pantalla en `/mi-familia`.**
+11. **Cambiar la clave.** No existe en ningún lado, ni antes ni ahora.
+12. **El registro de accesos** que pidió él el 18/8. El del cuestionario ya está; falta el resto.
+13. **El recorrido no cuenta cómo se vinculan los adultos** (por QR, después, desde el panel).
+    Es texto, no código.
+14. **El observatorio: la acumulación.** `analizar()` está escrita y probada; necesita más de una
+    familia para significar algo.
 
 📌 Y hay **cuatro temas parqueados con acuerdo para después del 23** — ver «DESPUÉS DEL 23».
 
 ### ⚠ Lo que le toca a él, no al código
 
-- 🔴 **Decidir si saca una cuenta de NextDNS antes del jueves.** Sin perfil real la instalación
-  queda explicada pero **no demostrable en el video**, y la pantalla lo dice con todas las letras.
+- 🔴 **LO QUE TRAIGAN LAS PSICÓLOGAS.** Les mandó el enlace del alta el 19/8 para que probaran el
+  asistente. **Preguntárselo apenas arranque la sesión.** Lo que digan entra en
+  `recomendaciones.ts`. 📌 Él quiere además validación de la Asociación Argentina de Grooming o
+  un ente similar — eso es de más largo plazo y no llega para el 23.
+- ~~Decidir si saca una cuenta de NextDNS.~~ ✅ **Decidido el 19/8: NO se conecta.** Ver arriba.
 - **Leer las respuestas del asistente con calma.** Es el único que puede decir si el registro está
-  bien, y va a ser lo más citado del producto.
+  bien, y va a ser lo más citado del producto. 🔑 `npx tsx preguntas-dia-uno.mjs` se las imprime, y
+  las preguntas se cambian editando el archivo.
 - **Activar la verificación en dos pasos de Telegram.** Ese bot es por donde AntiGro entrega todo.
+- ⬜ **Decidir si el chico recibe su propio parte.** Lo está pensando.
 
 ### 🔑 Por qué el asistente NO transmite mientras escribe
 
