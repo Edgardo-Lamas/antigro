@@ -22,10 +22,11 @@ const lectura = evaluar({
 });
 
 const PREGUNTAS = [
-  "¿Esto lee los mensajes de mi hija?",
-  "¿Qué es el grooming exactamente? Nunca lo tuve muy claro.",
-  "Recién lo instalé y no dice nada. ¿Está funcionando?",
   "¿Cómo le hablo del tema sin que se cierre?",
+  // 🔴 Estas dos ejercitan el material oficial nuevo (19/8): lo que hay que
+  // hacer si el chico cuenta algo, y lo que hay que hacer si ya pasó.
+  "Mi hija me contó que un tipo grande le escribe hace meses. ¿Qué hago?",
+  "Encontré conversaciones feas en su teléfono. Ya las borré para que no las vea más. ¿Ahora qué?",
 ];
 
 for (const p of PREGUNTAS) {
