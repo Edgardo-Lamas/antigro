@@ -63,12 +63,12 @@ enlace del alta el 19/8 para que probaran **el asistente**. Lo que traigan entra
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio`, y **`main` está sincronizada**. 🔴 Desde el 19/8 `main` ES producción: **un push ahí sale EN VIVO** |
-| **En producción** | `c01805c`, promovido y **verificado en vivo el 19/8**. ⚠ **Lo del 20/8 NO está promovido todavía** |
+| **En producción** | `8ec4bd9`, **promovido y verificado EN VIVO el 20/8** (`main` fast-forward → deploy automático). Las 33 comprobaciones del navegador corrieron **contra `antigro.vercel.app`**, no contra localhost |
 | **La base** | ✅ 14 · 15 · 16 · 17 · 18 · **19** (el registro de accesos, aplicada y verificada el 20/8) |
 | **Verificación** | `npm run probar` — **383 comprobaciones** en 11 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte + **34 hogares**. **En verde** |
 | **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) · **`node prueba-puertas.mjs`** (las dos puertas y la clave, 33 comprobaciones) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente) |
 | **Comprobado en vivo (19/8)** | `/` `/guia` `/terminos` `/entrar` dan 200 · **`/entrar` sin código NO dibuja «es mi primera vez» y con el enlace SÍ** (verificado en navegador) · el reloj da 401 sin secreto · el webhook 401 sin el suyo |
-| **En la base de producción** | **Una sola familia** (la sembrada) y dos usuarios: `demo@antigro.app` y `mariana@ejemplo.ar`. Cero respuestas |
+| **En la base de producción** | **Una sola familia** (la sembrada), un chico (Ana) y dos usuarios: `demo@antigro.app` y `mariana@ejemplo.ar`. **Cero accesos, cero observaciones.** Verificado el 20/8 después de probar en vivo |
 
 ### 🔴 LO QUE HAY QUE VIGILAR ESTA SEMANA
 
@@ -526,6 +526,27 @@ que sea el dueño hoy — un teléfono desbloqueado sobre la mesa alcanzaría.
 
 📌 **La sesión NO se cierra al cambiar la clave.** El que la cambia está probando que es el dueño;
 echarlo de su propio panel sería castigarlo por hacer lo correcto.
+
+### ⚠ DOS TRAMPAS DE LA PRUEBA EN EL NAVEGADOR — costaron media hora el 20/8
+
+**Las dos hicieron que una prueba dijera «roto» sobre algo que andaba perfecto.** Van acá porque
+cualquiera de las dos vuelve sola la próxima vez que se escriba una prueba de pantalla.
+
+🔴 **1. Un localizador de texto agarra el REGISTRO.** `getByText("Casa de papá")` no matcheaba sólo
+la entrada: también el `· Casa de papá` de la línea *«Se cerró una entrada que nadie había usado»*.
+Entonces la prueba esperaba que el texto desapareciera, el texto seguía ahí **porque el cierre había
+funcionado**, y el resultado se leía como que no se había cerrado. ✅ Se acota a la sección:
+`locator("section", { hasText: "Las entradas" })`.
+
+🔴 **2. Un `429` no es un fallo del producto: es el tope andando.** Los topes son **5 por hora**
+(`segunda-puerta:<familia>`, `cerrar-puerta:<familia>`, `clave:<usuario>`) y **correr la prueba dos
+veces seguidas los agota**. Contra producción la puerta no se abría y parecía un error grave.
+✅ Ahora la prueba mira la respuesta y lo dice con todas las letras en vez de contarlo como fallo.
+🔑 **Y para volver a correrla sin esperar la hora**, se borran esas tres claves de `frecuencia` —
+**esas tres, nombradas una por una, nunca la tabla entera**.
+
+⚠ **Y la de siempre, que volvió a aparecer: `waitForTimeout` no sirve contra la red.** Tres segundos
+alcanzan en localhost y no contra producción. **Se espera la condición, no el reloj.**
 
 ### ✅ EL REGISTRO DE ACCESOS — migración 19, del 20/8
 
