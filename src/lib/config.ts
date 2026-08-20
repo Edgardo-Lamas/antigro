@@ -60,6 +60,21 @@ export const BAJADA =
   "Percibe señales de que un chico puede estar siendo acosado en internet, sin leer un solo mensaje suyo.";
 
 /**
+ * La segunda mitad de la frase con la que se presenta el producto: el CÓMO.
+ *
+ * 🔑 **Van separadas porque se usan separadas.** `BAJADA` es la descripción del
+ * sitio y responde *qué hace*; ésta responde *de dónde saca lo que dice*, y es
+ * lo que sostiene la credibilidad de la otra. Juntas son el primer párrafo del
+ * README, palabra por palabra.
+ *
+ * 📌 Vive acá desde el 20/8, cuando la imagen de vista previa la necesitó. Antes
+ * estaba sólo en el README y en `/guia`, o sea escrita dos veces y sin dueño.
+ */
+export const LO_QUE_CRUZA =
+  "Cruza lo que ve la red, lo que observan los adultos y lo que dicen las estadísticas " +
+  "oficiales sobre qué pesa cuánto.";
+
+/**
  * Recursos oficiales a los que el sistema deriva.
  * 🔴 Cuando la respuesta correcta es un adulto o la Línea 137, el sistema lo dice.
  */

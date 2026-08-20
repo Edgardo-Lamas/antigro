@@ -527,6 +527,39 @@ que sea el dueño hoy — un teléfono desbloqueado sobre la mesa alcanzaría.
 📌 **La sesión NO se cierra al cambiar la clave.** El que la cambia está probando que es el dueño;
 echarlo de su propio panel sería castigarlo por hacer lo correcto.
 
+### ✅ LA IMAGEN AL COMPARTIR EL ENLACE — 20/8, la pidió Edgardo
+
+**No había ninguna.** `layout.tsx` declaraba `openGraph` completo —título, bajada, `siteName`,
+`locale`, `url`— **sin `images`**, y `public/` tenía sólo `robots.txt`. El enlace se compartía
+pelado: un renglón gris. Y ese enlace es el que se les manda a las psicólogas por WhatsApp y el que
+va a ir a LinkedIn con el video del CoderCup.
+
+| Dónde | Qué |
+|---|---|
+| `src/app/opengraph-image.tsx` | La imagen, 1200×630, generada con `next/og` |
+| `src/app/twitter-image.tsx` | La misma, **reexportada**. Dos archivos que dibujan lo mismo se desincronizan |
+| `layout.tsx` → `twitter.card` | 🔴 Sin `summary_large_image`, X la muestra CHICA aunque haya imagen |
+| `config.ts` → `LO_QUE_CRUZA` | El *cómo*, que estaba sólo en el README y en `/guia` |
+
+🔑 **Se genera, no es un archivo en `public/`, y eso esquiva de raíz las dos trampas de Sabiduría
+para el Corazón** (ver [[project-spc-seo-indexacion]]):
+1. **El JPEG progressive.** Allá una imagen correcta —200, `image/jpeg`, 1200×630, 32 KB— se
+   compartía sin foto igual, y la única diferencia con las que andaban era la codificación. Acá sale
+   **PNG**, donde eso no existe.
+2. **El caché envenenado.** La regla era *«al reemplazarla se cambia el NOMBRE»*. Next le pone a la
+   URL un **hash de su propio contenido** (`/opengraph-image?375194832d…`): cambia el archivo y
+   cambia la URL sola. **Ya no hay que acordarse de nada.**
+
+⚠ **Las tipografías se leen de `node_modules/geist` en tiempo de BUILD**, y si fallara la imagen
+sale igual con la de por defecto. Fea, pero un build caído el día antes de la entrega es peor.
+📌 Las dos rutas quedan **estáticas** (`○` en la salida del build): se generan una vez y no cuestan
+nada en vivo.
+
+🔴 **Lo que se corrigió del primer intento, y vale para cualquier vista previa:** la imagen decía
+**tres veces lo mismo** — el titular *«sin leer un solo mensaje»*, la bajada repitiéndolo, y el pie
+con *«la red · los adultos · las estadísticas oficiales»* que también estaba en el medio. **Una
+vista previa se mira un segundo.** Quedó: qué (titular) → cómo (bajada) → dónde (la dirección).
+
 ### ⚠ DOS TRAMPAS DE LA PRUEBA EN EL NAVEGADOR — costaron media hora el 20/8
 
 **Las dos hicieron que una prueba dijera «roto» sobre algo que andaba perfecto.** Van acá porque

@@ -21,6 +21,17 @@ export const metadata: Metadata = {
     locale: "es_AR",
     siteName: PRODUCTO,
     url: SITIO,
+    /* 🔑 La imagen NO se declara acá: la pone `opengraph-image.tsx`, que le
+       agrega a la URL un hash de su propio contenido. Escribirla a mano
+       además dejaría dos fuentes para lo mismo, y la de acá ganaría — sin
+       hash, o sea con el caché de WhatsApp pegado para siempre. */
+  },
+  /* 🔴 Sin esto, X muestra la tarjeta CHICA aunque haya imagen: el tamaño de la
+     vista previa lo decide esta línea, no la imagen. */
+  twitter: {
+    card: "summary_large_image",
+    title: `${PRODUCTO} — señales de grooming, sin leer un solo mensaje`,
+    description: BAJADA,
   },
 };
 
