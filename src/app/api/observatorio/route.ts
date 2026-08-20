@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { repositorio } from "@/lib/datos";
 import { analizar, type FilaDelObservatorio, type Universo } from "@/lib/observatorio";
 
 /**
@@ -93,15 +94,27 @@ export async function GET(req: Request) {
   if (!ejemplo) {
     /* 📌 Cuando el registro agregado exista de verdad, acá se lo lee y se lo
        pasa por `analizar`. La función ya está escrita y probada: lo que falta
-       es la acumulación, que necesita más de una familia para significar algo. */
+       es la acumulación, que necesita más de una familia para significar algo.
+
+       🔴 **El universo se MIDE, no se afirma — corregido el 20/8.** Acá estaba
+       escrito a mano (`{ chicos: 1 }`) junto con la frase «hay una sola familia
+       sembrada». Era verdad el día que se escribió y deja de serlo el primer día
+       que alguien se da de alta, **sin que nada avise**. Y es justo el reproche
+       que la guía del producto le hace a los demás: *un observatorio que informa
+       un hallazgo sin decir sobre cuántos casos se apoya*. */
+    const universo = await repositorio().universoObservado();
+
     return NextResponse.json({
       ejemplo: false,
-      universo: { chicos: 1, chicosConAlerta: 0 },
+      universo,
       hallazgos: [],
       nota:
-        "El observatorio no tiene datos todavía: hay una sola familia sembrada. " +
-        "Con un solo chico no hay nada que comparar, y publicar un hallazgo así sería " +
-        "el error que este módulo existe para evitar. Probá con ?ejemplo=1 para ver el método.",
+        `El observatorio se apoya hoy en ${universo.chicos} ` +
+        `${universo.chicos === 1 ? "chico observado" : "chicos observados"}, ` +
+        `${universo.chicosConAlerta} con alerta. ` +
+        "Todavía no informa nada: para comparar hacen falta chicos de casas distintas, " +
+        "y publicar un hallazgo sin eso sería el error que este módulo existe para evitar. " +
+        "Probá con ?ejemplo=1 para ver el método.",
     });
   }
 

@@ -12,9 +12,42 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
-## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-19, cierre
+## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-20, cierre
 
-**Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio, todo promovido.**
+**Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio.**
+
+### ✅ LO DEL 20/8 — se cerró TODO lo chico del producto (ítems 10 a 14)
+
+**Él lo pidió así:** *"antes quiero dejar al 100% el sistema, vamos por lo que falta"* — el video
+queda para después, por decisión suya.
+
+| Qué | Dónde |
+|---|---|
+| **La segunda puerta** de padres separados | `/api/mi-familia/hogar` (POST) + la sección «Las entradas» en el panel |
+| **Cambiar la clave** | `/api/mi-familia/clave` + la sección «La clave de esta casa» |
+| **El registro de accesos** | Migración 19: `accesos` + `usuarios.ultimo_acceso`. Sección «Qué se cambió en esta cuenta» |
+| **Las reglas, aparte y probadas** | `src/lib/hogares.ts` + `npm run probar-hogares` (**34 comprobaciones**) |
+| **El recorrido cuenta cómo se vinculan los adultos** | `Recorrido.tsx`, bloque «Cómo se conecta cada uno» |
+| **El universo del observatorio se MIDE** | `repo.universoObservado()` — estaba escrito a mano |
+
+🔴 **LA LÍNEA QUE SE ELIGIÓ EN EL REGISTRO, y conviene no perderla:** se registra lo que una casa
+**APORTA o CAMBIA**, nunca lo que **MIRA**. Abrir el informe, leer al asistente o mirar la línea de
+tiempo no deja rastro. Con padres separados un historial de lecturas deja de ser un registro y pasa
+a ser vigilancia de uno sobre el otro — **AntiGro no puede hacerles a los padres lo que promete no
+hacerle al chico**. Por eso son dos cosas y no una: `ultimo_acceso` (un dato, se pisa) y `accesos`
+(los hechos que no dejan rastro en ningún otro lado).
+
+🔑 **Y `ultimo_acceso` habilita lo único reversible:** una segunda puerta con el correo mal tipeado
+se puede cerrar **mientras nadie haya entrado por ella**. En cuanto entran una vez, es de esa casa
+y no se cierra — que es la regla del 18/8, ahora sostenida por la base y no por la buena voluntad
+de una ruta.
+
+⬜ **PENDIENTE SUYO, y es de él, no del código: la segunda puerta NO acepta términos.** Se guarda
+`terminos_version = null` porque **quien la abre no puede aceptarlos por otro** — marcarla como que
+aceptó sería inventar un consentimiento, lo mismo que la migración 14 se negó a hacer. Si quiere que
+la otra casa los acepte al entrar por primera vez, es una pantalla más. ⚠ **Cuidado con portonearlo
+en el `layout`:** las cuentas viejas tienen ese campo en null, **la sembrada incluida**, y un portón
+mal puesto las deja a todas afuera de su propio panel.
 
 🗓 **ENTREGA: domingo 23. NO hay congelamiento el jueves 20** — esa fecha era un colchón nuestro,
 no de las bases, y Edgardo lo volteó el 19/8: *"tenemos margen con un buen colchón, no tiene
@@ -30,10 +63,10 @@ enlace del alta el 19/8 para que probaran **el asistente**. Lo que traigan entra
 | | |
 |---|---|
 | **Rama** | `fase-4-consola-y-observatorio`, y **`main` está sincronizada**. 🔴 Desde el 19/8 `main` ES producción: **un push ahí sale EN VIVO** |
-| **En producción** | `c01805c`, promovido y **verificado en vivo el 19/8** |
-| **La base** | ✅ 14 · 15 · 16 · 17 · 18. **De la 15 a la 18, todas del 19/8 y todas aplicadas** |
-| **Verificación** | `npm run probar` — **349 comprobaciones** en 10 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte. **En verde** |
-| **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente) |
+| **En producción** | `c01805c`, promovido y **verificado en vivo el 19/8**. ⚠ **Lo del 20/8 NO está promovido todavía** |
+| **La base** | ✅ 14 · 15 · 16 · 17 · 18 · **19** (el registro de accesos, aplicada y verificada el 20/8) |
+| **Verificación** | `npm run probar` — **383 comprobaciones** en 11 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte + **34 hogares**. **En verde** |
+| **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) · **`node prueba-puertas.mjs`** (las dos puertas y la clave, 33 comprobaciones) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente) |
 | **Comprobado en vivo (19/8)** | `/` `/guia` `/terminos` `/entrar` dan 200 · **`/entrar` sin código NO dibuja «es mi primera vez» y con el enlace SÍ** (verificado en navegador) · el reloj da 401 sin secreto · el webhook 401 sin el suyo |
 | **En la base de producción** | **Una sola familia** (la sembrada) y dos usuarios: `demo@antigro.app` y `mariana@ejemplo.ar`. Cero respuestas |
 
@@ -451,6 +484,75 @@ muestran distinto. Decir «verificado» sería afirmar lo que el sistema no pued
 ⬜ **Sin construir todavía:** la pantalla de la segunda puerta en `/mi-familia` y el registro de
 accesos. ✅ **La firma del cuestionario se hizo el 19/8** — ver su bloque arriba.
 
+### ✅ LAS PUERTAS DE LA CASA — construido el 20/8
+
+**Cierra lo que el recorrido venía prometiendo desde el 17/8** —*"la segunda entrada se crea desde
+el panel, cuando termines acá"*— y que ese panel no tenía.
+
+| Dónde | Qué |
+|---|---|
+| `src/lib/hogares.ts` | **Las reglas, sin base y sin pantalla.** El tope de dos, el nombre de cada casa, cuándo se puede cerrar una puerta, el largo de la clave |
+| `npm run probar-hogares` | **34 comprobaciones.** La que sostiene el diseño: *una puerta que la otra casa YA USÓ no se cierra* |
+| `/api/mi-familia/hogar` | `POST` abre la segunda · `DELETE` cierra una que nadie usó |
+| `/api/mi-familia/clave` | Cambia la de ESTA casa. Exige la actual. **5 por hora por puerta** |
+| Panel: «Las entradas» · «La clave de esta casa» · «Qué se cambió en esta cuenta» | Las tres secciones nuevas |
+| `node prueba-puertas.mjs` | El recorrido entero en el navegador, **33 comprobaciones**. Deja la base como la encontró |
+
+🔴 **El diseño es de él, del 18/8, y la ley lo respalda:** el responsable decide si se abre la
+segunda puerta, y **abierta, no la puede cerrar** (CCyC 641 inc. b y 654). Así el acceso a cómo está
+un hijo no se usa como moneda de cambio. ⚠ Si hay medida judicial, esa manda: AntiGro no pide
+sentencias ni las puede verificar.
+
+🔑 **Lo único reversible es un error de tipeo**, y lo decide la base: `ultimo_acceso is null` va
+adentro del propio `delete`, no en una consulta previa. Entre mirar y borrar hay un hueco, y en ese
+hueco la otra casa puede haber entrado por primera vez. **La pantalla avisa ANTES**, no después: es
+lo único de todo el panel que no se puede deshacer.
+
+🔑 **Por qué el nombre de la casa se pide al abrir la segunda:** con una sola, `hogar` en null es el
+caso normal y nadie tuvo que escribir «mi casa». Con dos, el nombre es **lo único que en el informe
+distingue quién aportó qué**. Por eso el nombre propio se pide en el mismo formulario, y se guarda
+ANTES de crear la otra puerta: si fallara al revés, quedarían dos casas y una sin nombre.
+
+⚠ **El nombre de la casa ahora sale de la BASE, no de la sesión** (`/api/mi-familia`). El token dura
+treinta días: leerlo de ahí mostraría el nombre viejo hasta el próximo ingreso. Se intenta además
+refrescar la sesión (`unstable_update`), y **si eso no aplica no se rompe nada** — degrada a «la
+casa», que es impreciso y no falso.
+
+🔴 **Cambiar la clave toca UNA fila.** Con padres separados la otra puerta no se entera y sigue
+entrando igual: es lo que el recorrido promete cuando dice que *ninguno puede dejar al otro afuera
+cambiando la clave*. Si esto tocara las dos, esa promesa sería mentira y nadie se enteraría hasta
+el día que pasara. **Y exige la clave actual:** la sesión prueba que alguien entró alguna vez, no
+que sea el dueño hoy — un teléfono desbloqueado sobre la mesa alcanzaría.
+
+📌 **La sesión NO se cierra al cambiar la clave.** El que la cambia está probando que es el dueño;
+echarlo de su propio panel sería castigarlo por hacer lo correcto.
+
+### ✅ EL REGISTRO DE ACCESOS — migración 19, del 20/8
+
+Lo pidió él el 18/8: *"tener un registro de quien interactuó que luego iría en el informe"*.
+
+🔴 **La línea que lo hace defendible: se registra lo que una casa APORTA o CAMBIA, nunca lo que
+MIRA.** Abrir el informe, leer al asistente o mirar la línea de tiempo **no deja rastro**, y es una
+decisión y no un olvido: con padres separados un historial de lecturas —*«entró a las tres de la
+mañana»*— deja de ser un registro y pasa a ser vigilancia entre ellos.
+
+Por eso son **dos cosas distintas**:
+
+1. **`usuarios.ultimo_acceso`** — un DATO, no un historial: se pisa. Contesta «¿la otra casa está
+   participando?» sin dejar reconstruir a qué hora entra nadie. Y es lo que habilita cerrar una
+   segunda puerta mal tipeada.
+2. **`accesos`** — los cinco hechos que **no dejan rastro en ningún otro lado**: abrió la segunda
+   puerta, cerró una, cambió la clave, dio de baja a un adulto, borró la charla. La lista es cerrada
+   y la base la vuelve a exigir con un `check`.
+
+📌 **El cuestionario NO está en esa lista** aunque sea un aporte: ya firma en `observaciones`, se
+muestra en el panel y entra al motor. Contarlo dos veces haría que el panel diga una cosa y el
+informe otra. **Hay una comprobación que lo verifica**, para que nadie lo agregue sin ver lo que
+está duplicando.
+
+🔑 **Se anota QUE se cambió la clave, nunca nada DE la clave** — ni un fragmento, ni el largo. Hay
+una comprobación en el navegador que lo mira.
+
 ### 🚫 EL REFERENTE NO ENTRA AL PANEL — NUNCA. Cerrado por Edgardo el 18/8
 
 **Lo dijo sin lugar a dudas y cierra una pregunta que yo había dejado abierta como si fuera
@@ -777,16 +879,20 @@ el 17/8 estaban las tres en este mismo lugar. Ver «LA AUDITORÍA DEL 17/8».
 9. ⚠ **Verificar las cifras en fuente antes de que entren al video.** Sólo la Línea 137 y
    Wisniewski están verificadas; el resto vino de modelos.
 
-**Lo chico que falta del producto, todo de media hora:**
+**~~Lo chico que falta del producto~~ — ✅ CERRADO ENTERO EL 20/8:**
 
-10. **La segunda puerta de padres separados.** El recorrido ya la explica y `crearHogar` ya la sabe
-    hacer (`familiaId` + `hogar`). **Falta sólo la pantalla en `/mi-familia`.**
-11. **Cambiar la clave.** No existe en ningún lado, ni antes ni ahora.
-12. **El registro de accesos** que pidió él el 18/8. El del cuestionario ya está; falta el resto.
-13. **El recorrido no cuenta cómo se vinculan los adultos** (por QR, después, desde el panel).
-    Es texto, no código.
-14. **El observatorio: la acumulación.** `analizar()` está escrita y probada; necesita más de una
-    familia para significar algo.
+10. ~~**La segunda puerta de padres separados.**~~ ✅ **HECHA.** Ver «LAS PUERTAS DE LA CASA» abajo.
+11. ~~**Cambiar la clave.**~~ ✅ **HECHO**, con la clave actual exigida y tope de 5 por hora.
+12. ~~**El registro de accesos.**~~ ✅ **HECHO** — migración 19, con la línea aporta/cambia vs. mira.
+13. ~~**El recorrido no cuenta cómo se vinculan los adultos.**~~ ✅ **HECHO**, y era peor de lo que
+    decía la ficha: el que terminaba el recorrido se iba **creyendo que el sistema ya les había
+    escrito**, y no les escribió nadie.
+14. **El observatorio: la acumulación.** 🔑 **Revisado el 20/8 y se decidió NO construirla, con
+    motivo:** hoy las señales de la familia sembrada son **simuladas**, así que acumularlas sería
+    fabricar un hallazgo — exactamente el error que el módulo existe para evitar. `analizar()` sigue
+    escrita y probada, y la ruta lo dice. ✅ **Lo que sí se arregló:** el universo (`{chicos: 1}`)
+    estaba **escrito a mano**, y dejaba de ser cierto el primer día que alguien se diera de alta.
+    Ahora se mide contra la base.
 
 📌 Y hay **cuatro temas parqueados con acuerdo para después del 23** — ver «DESPUÉS DEL 23».
 

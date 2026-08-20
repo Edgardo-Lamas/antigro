@@ -88,8 +88,14 @@ export interface AltaDeHogar {
    *
    * 🔑 **Se guarda la VERSIÓN, no un booleano.** «Aceptó» no dice qué aceptó. Si
    * el texto cambia en septiembre, un `true` de agosto no prueba nada.
+   *
+   * 🔴 **`null` cuando nadie aceptó nada, y eso pasa en un caso real: la segunda
+   * puerta de padres separados.** Quien la abre no puede aceptar los términos
+   * por el otro — marcar esa cuenta como que aceptó sería inventar un
+   * consentimiento, exactamente lo que la migración 14 se negó a hacer con las
+   * cuentas viejas. Se guarda lo que pasó: nada.
    */
-  terminosVersion: string;
+  terminosVersion: string | null;
 }
 
 /**
@@ -120,6 +126,63 @@ export interface DatosDeLaFamilia {
   adultos: AltaDeFamilia["adultos"];
 }
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LAS PUERTAS DE UNA FAMILIA — lo que el panel necesita saber de ellas
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔑 Una familia tiene una puerta, o dos cuando el chico vive en dos casas. Las
+ * reglas de qué se puede hacer con ellas viven en `@/lib/hogares`, sin base y
+ * probadas aparte; acá está sólo cómo se leen.
+ *
+ * 📌 **El correo viaja porque es lo único que identifica una puerta para quien
+ * la abrió.** Un progenitor que tipeó mal la dirección de la otra casa no tiene
+ * otra forma de darse cuenta, y ese error es el único que se puede corregir.
+ */
+export interface PuertaDeLaCasa {
+  id: string;
+  email: string;
+  /** Cómo se llama esa casa. `null` cuando la familia tiene una sola. */
+  hogar: string | null;
+  /**
+   * 🔴 **Se pisa, no acumula.** Es un dato, no un historial: contesta «¿la otra
+   * casa está participando?» sin dejar reconstruir a qué hora entra nadie. Ver
+   * la migración 19 y el porqué en `hogares.ts`.
+   */
+  ultimoAcceso: string | null;
+  creado: string;
+}
+
+/** Cómo salió un cambio de clave. Cada motivo se le cuenta distinto al que espera. */
+export type ResultadoDeCambioDeClave =
+  | { ok: true }
+  /** La clave de ahora no es la que escribió. */
+  | { ok: false; motivo: "clave_actual_no_coincide" }
+  | { ok: false; motivo: "sin_base" };
+
+/**
+ * Cómo salió cerrar una puerta.
+ *
+ * 🔴 `ya_se_uso` **no es un error del sistema, es la regla**: si alguien entró
+ * alguna vez por esa puerta, la puerta es de esa casa y no se cierra desde acá.
+ * Ver `hogares.ts`.
+ */
+export type ResultadoDeCierre =
+  | { ok: true }
+  | { ok: false; motivo: "no_existe" | "ya_se_uso" | "sin_base" };
+
+/** Un hecho fechado de los que sí dejan registro. Ver `QUE_SE_REGISTRA`. */
+export interface AccesoRegistrado {
+  id: string;
+  familiaId: string;
+  usuarioId: string | null;
+  /** Copiado al momento: si la casa se renombra, lo que pasó siguió pasando desde aquélla. */
+  hogar: string | null;
+  que: string;
+  detalle: string | null;
+  fecha: string;
+}
+
 export interface Repositorio {
   readonly clase: "supabase" | "memoria";
 
@@ -132,6 +195,96 @@ export interface Repositorio {
    * Ver `AltaDeHogar` — es el primer paso del recorrido, antes de los datos.
    */
   crearHogar(alta: AltaDeHogar): Promise<ResultadoDeAlta>;
+
+  /* ── Las puertas, una vez que la familia ya está adentro ──────────────── */
+
+  /**
+   * Las puertas de una familia: una, o dos cuando el chico vive en dos casas.
+   *
+   * 📌 Nunca devuelve la clave ni su hash, ni siquiera para compararlos afuera.
+   * Lo que se compara contra el hash se compara acá adentro (`cambiarClave`).
+   */
+  puertasDe(familiaId: string): Promise<PuertaDeLaCasa[]>;
+
+  /**
+   * Le pone nombre a una casa, o se lo cambia.
+   *
+   * 🔑 Hace falta el día que se abre la segunda: con una sola casa nadie tuvo
+   * que escribir «mi casa» —y está bien—, pero con dos, el nombre es lo único
+   * que en el informe distingue quién aportó qué.
+   *
+   * 🔐 Pide la familia además del usuario a propósito, igual que la baja de un
+   * adulto: así el repositorio mismo se niega a tocar la puerta de otra casa.
+   */
+  renombrarPuerta(familiaId: string, usuarioId: string, hogar: string): Promise<boolean>;
+
+  /**
+   * Cambia la clave de una puerta, comprobando la que tenía.
+   *
+   * 🔴 **Exige la clave actual, y no es un trámite.** Sin eso, cualquiera que
+   * agarre una sesión abierta —un teléfono desbloqueado sobre la mesa— se queda
+   * con la casa: cambia la clave y los dueños quedan afuera del informe de su
+   * propio hijo.
+   *
+   * 📌 Cambia la de ESA puerta y ninguna otra. Con padres separados, la otra
+   * casa no se entera y sigue entrando igual: es lo que el recorrido promete
+   * cuando dice que ninguno puede dejar al otro afuera.
+   */
+  cambiarClave(
+    familiaId: string,
+    usuarioId: string,
+    actual: string,
+    nueva: string,
+  ): Promise<ResultadoDeCambioDeClave>;
+
+  /**
+   * Cierra una puerta **que nadie usó nunca**.
+   *
+   * 🔴 Existe para un solo caso: el correo mal tipeado al abrir la segunda
+   * entrada. La comprobación de que nadie entró la hace el almacenamiento y no
+   * quien llama —`ultimo_acceso is null` va en el propio `delete`—, porque si
+   * dependiera de una consulta previa, dos pedidos a la vez podrían cerrar una
+   * puerta que en el medio alguien estrenó.
+   */
+  cerrarPuerta(familiaId: string, usuarioId: string): Promise<ResultadoDeCierre>;
+
+  /* ── El registro fechado de lo que hace una casa ──────────────────────── */
+
+  /**
+   * Deja constancia de que se abrió sesión con esta credencial.
+   *
+   * 🔴 **Se pisa: es un dato, no un historial.** Guardar todas las entradas
+   * convertiría el panel en vigilancia de una casa sobre la otra, que es lo
+   * contrario de para qué existe AntiGro. Ver la migración 19.
+   */
+  marcarAcceso(usuarioId: string): Promise<void>;
+
+  /**
+   * Registra un hecho de los que **no dejan rastro en ningún otro lado**.
+   *
+   * 🔴 Lo que una casa APORTA o CAMBIA, nunca lo que MIRA. La lista cerrada
+   * está en `QUE_SE_REGISTRA` (`@/lib/hogares`) y la base la vuelve a exigir
+   * con un `check`: si alguien inventa un hecho nuevo, falla acá y no queda un
+   * registro con una palabra que nadie sabe leer.
+   */
+  registrarAcceso(a: Omit<AccesoRegistrado, "id" | "fecha">): Promise<void>;
+
+  /** Los últimos hechos de esa familia, del más nuevo al más viejo. */
+  accesosDe(familiaId: string, limite: number): Promise<AccesoRegistrado[]>;
+
+  /**
+   * Sobre cuántos chicos se apoya el observatorio, y cuántos tienen alerta.
+   *
+   * 🔴 **Existe para que el observatorio pueda DECIR sobre cuánto se apoya en
+   * vez de afirmarlo de memoria.** Estaba escrito a mano —«hay una sola familia
+   * sembrada»— y eso deja de ser verdad el primer día que alguien se da de alta,
+   * sin que nada avise. Un observatorio que informa sin decir sobre cuántos
+   * casos se apoya es exactamente lo que la guía del producto denuncia.
+   *
+   * 📌 No trae ni un identificador: dos números. Es la misma disciplina del
+   * módulo — por dominio se guarda cuántos chicos distintos, nunca cuáles.
+   */
+  universoObservado(): Promise<{ chicos: number; chicosConAlerta: number }>;
 
   /**
    * Carga el chico y los adultos de una familia que ya tiene puerta.

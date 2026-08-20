@@ -13,6 +13,10 @@ import {
   Send,
   ShieldOff,
   Trash2,
+  DoorOpen,
+  KeyRound,
+  History,
+  X,
   UserMinus,
   MessageCircle,
   Download,
@@ -25,6 +29,16 @@ import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senale
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
 import { COMO_FUNCIONA } from "@/lib/config";
+import {
+  CLAVE_MINIMA,
+  COMO_SE_LEE,
+  LARGO_MAXIMO_DE_CASA,
+  comoSeLlama,
+  porQueNoSePuedeCerrar,
+  sePuedeAbrirOtraPuerta,
+  type Puerta,
+  type QueSeRegistra,
+} from "@/lib/hogares";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -67,7 +81,7 @@ interface Sugerencia {
 interface Respuesta {
   /* 🔴 Sin `adultoId`: desde el 17/8 la clave es del HOGAR, así que la pantalla
      NO sabe cuál de los dos padres la está mirando — y no puede inventarlo. */
-  yo: { nombre: string | null; hogar: string | null };
+  yo: { nombre: string | null; hogar: string | null; puertaId: string | null };
   familia: { nombre: string; impedimentos: string[]; sugerencias: Sugerencia[] };
   chico: {
     id: string;
@@ -116,6 +130,28 @@ interface Respuesta {
     loVioUnResponsable: boolean;
     hayAvisosQueNoSalieron: boolean;
   };
+  /* 🔴 Las entradas de la familia: una, o dos cuando el chico vive en dos casas.
+     El correo viene porque es lo único que identifica una entrada para quien la
+     abrió — sin eso, un correo mal tipeado no hay forma de detectarlo. La clave
+     no sale de la base nunca. */
+  puertas: {
+    id: string;
+    email: string;
+    hogar: string | null;
+    esLaMia: boolean;
+    ultimoAcceso: string | null;
+    creado: string;
+  }[];
+  /* 🔴 Lo que una casa APORTA o CAMBIA, nunca lo que MIRA. Abrir el informe o
+     leer al asistente no deja rastro, y es una decisión: con padres separados un
+     historial de lecturas deja de ser un registro y pasa a ser vigilancia. */
+  accesos: {
+    id: string;
+    hogar: string | null;
+    que: string;
+    detalle: string | null;
+    fecha: string;
+  }[];
   ventana: { dias: number };
   fuente: { simulada: boolean };
   senales: SenalDeRed[];
@@ -413,6 +449,19 @@ export default function MiFamilia() {
           </div>
         )}
       </section>
+
+      {/* ── Las entradas de la casa ────────────────────────────────────── */}
+      {datos.puertas.length > 0 && (
+        <LasPuertas puertas={datos.puertas} alCambiar={cargar} />
+      )}
+
+      {/* ── La clave ───────────────────────────────────────────────────── */}
+      {datos.puertas.length > 0 && (
+        <LaClave hayMasDeUnaCasa={datos.puertas.length > 1} alCambiar={cargar} />
+      )}
+
+      {/* ── El registro ────────────────────────────────────────────────── */}
+      <ElRegistro accesos={datos.accesos ?? []} />
 
       {/* ── La línea de tiempo ─────────────────────────────────────────── */}
       <section className="mt-8">
@@ -1293,6 +1342,566 @@ interface DatosDeInstalacion {
   motivo: string | null;
   comprobacion: string;
   guias: GuiaDeInstalacion[];
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAS PUERTAS DE LA CASA — 20/8
+   ═══════════════════════════════════════════════════════════════════════════
+
+   El recorrido de alta lo viene prometiendo desde el 17/8 —*"la segunda
+   entrada se crea desde el panel, cuando termines acá"*— y hasta hoy ese panel
+   no la tenía. Esto es esa entrada.
+
+   🔴 **El diseño lo cerró Edgardo el 18/8, con la ley al lado:** el responsable
+   decide si se abre la segunda puerta, y **abierta, no la puede cerrar** — CCyC
+   641 inc. b y 654. Así el acceso al informe de un chico no se usa como moneda
+   de cambio entre dos adultos peleados.
+
+   ⚠ **Por eso la pantalla avisa ANTES, no después.** Es lo único de todo el
+   panel que no se puede deshacer, y una persona tiene derecho a saberlo antes
+   de apretar y no cuando ya no hay vuelta atrás. */
+
+function LasPuertas({
+  puertas,
+  alCambiar,
+}: {
+  puertas: (Puerta & { email: string })[];
+  alCambiar: () => void;
+}) {
+  const [abriendo, setAbriendo] = useState(false);
+  const [estaCasa, setEstaCasa] = useState("");
+  const [otraCasa, setOtraCasa] = useState("");
+  const [email, setEmail] = useState("");
+  const [clave, setClave] = useState("");
+  const [claveRepetida, setClaveRepetida] = useState("");
+  const [confirmando, setConfirmando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState("");
+  const [cerrando, setCerrando] = useState<string | null>(null);
+
+  const laMia = puertas.find((p) => p.esLaMia);
+  const hayQueNombrarEstaCasa = !laMia?.hogar?.trim();
+  const sePuede = sePuedeAbrirOtraPuerta(puertas);
+
+  const campo =
+    "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
+  const etiqueta = "mb-1.5 block text-[11px] uppercase tracking-[0.06em] text-apagado";
+
+  function limpiar() {
+    setAbriendo(false);
+    setConfirmando(false);
+    setEstaCasa("");
+    setOtraCasa("");
+    setEmail("");
+    setClave("");
+    setClaveRepetida("");
+    setError("");
+  }
+
+  async function abrir() {
+    setError("");
+    setEnviando(true);
+    try {
+      const res = await fetch("/api/mi-familia/hogar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          estaCasa: hayQueNombrarEstaCasa ? estaCasa : undefined,
+          otraCasa,
+          email,
+          clave,
+          claveRepetida,
+        }),
+      });
+      const datos = await res.json();
+      if (!res.ok) {
+        setError(datos.error ?? "No pudimos abrir la entrada.");
+        setConfirmando(false);
+        return;
+      }
+      limpiar();
+      alCambiar();
+    } catch {
+      setError("No pudimos abrir la entrada. Probá de nuevo en un momento.");
+      setConfirmando(false);
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  async function cerrar(id: string) {
+    setError("");
+    setEnviando(true);
+    try {
+      const res = await fetch(`/api/mi-familia/hogar?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const datos = await res.json();
+      if (!res.ok) {
+        setError(datos.error ?? "No pudimos cerrar esa entrada.");
+        return;
+      }
+      setCerrando(null);
+      alCambiar();
+    } catch {
+      setError("No pudimos cerrar esa entrada. Probá de nuevo en un momento.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <section className="mt-8">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+        <DoorOpen size={13} /> Las entradas
+      </h2>
+
+      <ul className="mt-3 flex flex-col gap-2">
+        {puertas.map((p) => {
+          const motivo = porQueNoSePuedeCerrar(p, puertas);
+          return (
+            <li key={p.id} className="rounded-lg border border-borde bg-superficie px-4 py-3">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <p className="text-sm text-tinta first-letter:uppercase">
+                  {comoSeLlama(p)}
+                  {p.esLaMia && (
+                    <span className="ml-2 text-[11px] text-apagado">— por acá entraste vos</span>
+                  )}
+                </p>
+                <p className="font-mono text-[11px] text-apagado">{p.email}</p>
+              </div>
+
+              {/* 🔑 «Todavía no entró nadie» no es un reproche: es el dato que
+                  dice si el correo llegó a la persona correcta, y el único que
+                  permite corregirlo. */}
+              <p className="mt-1 text-xs text-apagado">
+                {p.ultimoAcceso ? (
+                  <>Entraron por última vez {fechaEnCriollo(p.ultimoAcceso)}.</>
+                ) : (
+                  <>Todavía no entró nadie por acá.</>
+                )}
+              </p>
+
+              {motivo === null && (
+                <div className="mt-2.5 border-t border-borde pt-2.5">
+                  {cerrando === p.id ? (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs leading-relaxed text-tenue">
+                        Se cierra esta entrada y se borra su clave. Tiene sentido{" "}
+                        <strong className="text-tinta">si te equivocaste al escribir el correo</strong>
+                        , porque nadie la usó todavía.
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => cerrar(p.id)}
+                          disabled={enviando}
+                          className="rounded-md bg-riesgo px-3 py-1.5 text-xs font-semibold text-fondo disabled:opacity-50"
+                        >
+                          Sí, cerrarla
+                        </button>
+                        <button
+                          onClick={() => setCerrando(null)}
+                          className="rounded-md border border-borde px-3 py-1.5 text-xs text-tenue"
+                        >
+                          Dejarla como está
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setCerrando(p.id)}
+                      className="flex items-center gap-1.5 text-xs text-apagado transition hover:text-riesgo"
+                    >
+                      <X size={12} /> Cerrar esta entrada
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* 🔴 El motivo se dice siempre, y sobre todo cuando es la regla y
+                  no una falla: quien no lo entiende cree que el sistema se
+                  rompió. */}
+              {motivo !== null && !p.esLaMia && (
+                <p className="mt-2 border-t border-borde pt-2 text-[11px] leading-relaxed text-apagado">
+                  {motivo}
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
+      {error && <p className="mt-3 text-xs text-riesgo">{error}</p>}
+
+      {/* ── Abrir la segunda ─────────────────────────────────────────────── */}
+      {sePuede && !abriendo && (
+        <div className="mt-4 rounded-lg border border-borde bg-superficie px-5 py-4">
+          {/* 🔑 Gris y con su porqué, no naranja de alerta: a una familia que
+              vive en una sola casa esto NO le falta. Es la misma corrección del
+              17/8 que separó los impedimentos de las sugerencias. */}
+          <p className="text-sm text-tinta">Si el chico vive en dos casas, la otra puede tener su propia entrada.</p>
+          <p className="mt-1.5 text-xs leading-relaxed text-tenue">
+            Un solo panel con dos entradas. Los dos ven exactamente lo mismo, cada casa tiene su
+            clave, y <strong className="text-tinta">ninguno puede dejar al otro afuera</strong>.
+          </p>
+          <button
+            onClick={() => setAbriendo(true)}
+            className="mt-3 rounded-md border border-acento px-3.5 py-1.5 text-xs font-semibold text-acento"
+          >
+            Abrir la entrada de la otra casa
+          </button>
+        </div>
+      )}
+
+      {abriendo && (
+        <div className="mt-4 rounded-lg border border-borde bg-superficie px-5 py-4">
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-sm font-medium text-tinta">La entrada de la otra casa</p>
+            <button onClick={limpiar} className="text-apagado transition hover:text-tinta" aria-label="Cancelar">
+              <X size={14} />
+            </button>
+          </div>
+
+          <div className="mt-4 flex flex-col gap-3">
+            {hayQueNombrarEstaCasa && (
+              <div>
+                <label className={etiqueta} htmlFor="esta-casa">Cómo se llama esta casa</label>
+                <input
+                  id="esta-casa"
+                  value={estaCasa}
+                  onChange={(e) => setEstaCasa(e.target.value)}
+                  maxLength={LARGO_MAXIMO_DE_CASA}
+                  placeholder="Casa de mamá"
+                  className={campo}
+                />
+                {/* 🔴 No es un adorno: con dos casas, el nombre es lo único que
+                    en el informe distingue quién contestó qué. */}
+                <p className="mt-1 text-[11px] text-apagado">
+                  Con dos casas hace falta, porque es lo que después distingue quién contestó el
+                  cuestionario desde dónde.
+                </p>
+              </div>
+            )}
+
+            <div>
+              <label className={etiqueta} htmlFor="otra-casa">Cómo se llama la otra casa</label>
+              <input
+                id="otra-casa"
+                value={otraCasa}
+                onChange={(e) => setOtraCasa(e.target.value)}
+                maxLength={LARGO_MAXIMO_DE_CASA}
+                placeholder="Casa de papá"
+                className={campo}
+              />
+            </div>
+
+            <div>
+              <label className={etiqueta} htmlFor="correo-otra-casa">Con qué correo entra</label>
+              <input
+                id="correo-otra-casa"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="correo@ejemplo.com"
+                className={campo}
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={etiqueta} htmlFor="clave-otra-casa">Con qué clave</label>
+                <input
+                  id="clave-otra-casa"
+                  type="password"
+                  value={clave}
+                  onChange={(e) => setClave(e.target.value)}
+                  className={campo}
+                />
+              </div>
+              <div>
+                <label className={etiqueta} htmlFor="clave-otra-casa-repetida">Repetila</label>
+                <input
+                  id="clave-otra-casa-repetida"
+                  type="password"
+                  value={claveRepetida}
+                  onChange={(e) => setClaveRepetida(e.target.value)}
+                  className={campo}
+                />
+              </div>
+            </div>
+            <p className="text-[11px] leading-relaxed text-apagado">
+              Al menos {CLAVE_MINIMA} caracteres. Esta clave la ponés vos y se la pasás:{" "}
+              <strong className="text-tenue">cambiala desde el panel</strong> es lo primero que
+              conviene que haga esa casa, para que quede sólo suya.
+            </p>
+          </div>
+
+          {/* ── 🔴 Lo que no se puede deshacer, dicho ANTES ─────────────── */}
+          <div className="mt-4 rounded-md border border-atencion/40 bg-atencionSuave px-4 py-3">
+            <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-atencion">
+              <TriangleAlert size={12} /> Esto no se puede deshacer
+            </p>
+            <p className="mt-1.5 text-xs leading-relaxed text-atencion">
+              Una vez que entren por esta entrada, es de esa casa y no la podés cerrar. Es a
+              propósito: el acceso a cómo está un hijo no puede usarse como moneda de cambio.
+              Mientras nadie haya entrado, sí se puede cerrar — por si te equivocaste con el correo.
+            </p>
+          </div>
+
+          {error && <p className="mt-3 text-xs text-riesgo">{error}</p>}
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {confirmando ? (
+              <>
+                <button
+                  onClick={abrir}
+                  disabled={enviando}
+                  className="rounded-md bg-acento px-4 py-2 text-sm font-semibold text-fondo disabled:opacity-50"
+                >
+                  {enviando ? "Abriendo…" : `Sí, abrir la entrada de ${otraCasa.trim() || "la otra casa"}`}
+                </button>
+                <button
+                  onClick={() => setConfirmando(false)}
+                  className="rounded-md border border-borde px-4 py-2 text-sm text-tenue"
+                >
+                  Volver
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setError("");
+                  setConfirmando(true);
+                }}
+                disabled={!otraCasa.trim() || !email.trim() || !clave}
+                className="rounded-md bg-acento px-4 py-2 text-sm font-semibold text-fondo disabled:opacity-40"
+              >
+                Abrir la entrada
+              </button>
+            )}
+          </div>
+
+          {/* 📌 Se dice lo que el correo NO hace, porque el que lo escribe da por
+              hecho que el sistema avisa. Hoy no avisa: se lo pasa él. */}
+          {confirmando && (
+            <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+              AntiGro no le manda ningún correo: el aviso se lo das vos, con la dirección y la
+              clave que acabás de poner.
+            </p>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CAMBIAR LA CLAVE — no existía en ningún lado, ni antes ni ahora
+   ═══════════════════════════════════════════════════════════════════════════
+
+   🔴 **Cambia la de ESTA casa y ninguna otra.** Con padres separados la otra
+   puerta no se entera y sigue entrando igual: es exactamente lo que el
+   recorrido de alta promete cuando dice que ninguno puede dejar al otro afuera.
+
+   🔴 **Y pide la clave de ahora.** La sesión prueba que alguien entró alguna
+   vez, no que sea el dueño hoy: un teléfono desbloqueado sobre la mesa
+   alcanzaría para quedarse con la casa. */
+
+function LaClave({
+  hayMasDeUnaCasa,
+  alCambiar,
+}: {
+  hayMasDeUnaCasa: boolean;
+  alCambiar: () => void;
+}) {
+  const [abierta, setAbierta] = useState(false);
+  const [actual, setActual] = useState("");
+  const [nueva, setNueva] = useState("");
+  const [repetida, setRepetida] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState("");
+  const [lista, setLista] = useState(false);
+
+  const campo =
+    "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
+  const etiqueta = "mb-1.5 block text-[11px] uppercase tracking-[0.06em] text-apagado";
+
+  async function cambiar() {
+    setError("");
+    setEnviando(true);
+    try {
+      const res = await fetch("/api/mi-familia/clave", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actual, nueva, repetida }),
+      });
+      const datos = await res.json();
+      if (!res.ok) {
+        setError(datos.error ?? "No pudimos cambiar la clave.");
+        return;
+      }
+      setActual("");
+      setNueva("");
+      setRepetida("");
+      setAbierta(false);
+      setLista(true);
+      /* 🔑 Se vuelve a pedir el panel: el cambio de clave deja una línea en el
+         registro, y sin esto el registro seguiría mostrando lo de antes. Un
+         registro que no muestra lo que acaba de pasar se lee como que no quedó
+         anotado — que es exactamente lo contrario de para qué existe. */
+      alCambiar();
+    } catch {
+      setError("No pudimos cambiar la clave. Probá de nuevo en un momento.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <section className="mt-8">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+        <KeyRound size={13} /> La clave de esta casa
+      </h2>
+
+      {lista && (
+        <p className="mt-3 rounded-md border border-calma/30 bg-calma/10 px-4 py-3 text-sm text-calma">
+          Listo, la clave quedó cambiada. Tu sesión sigue abierta.
+          {hayMasDeUnaCasa
+            ? " La otra casa no se ve afectada: sigue entrando con la suya."
+            : " Si alguien más de esta casa la usaba, pasale la nueva."}
+        </p>
+      )}
+
+      {!abierta ? (
+        <button
+          onClick={() => {
+            setLista(false);
+            setAbierta(true);
+          }}
+          className="mt-3 rounded-md border border-borde px-3.5 py-1.5 text-xs text-tenue transition hover:text-tinta"
+        >
+          Cambiar la clave
+        </button>
+      ) : (
+        <div className="mt-3 rounded-lg border border-borde bg-superficie px-5 py-4">
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className={etiqueta} htmlFor="clave-actual">La clave de ahora</label>
+              <input
+                id="clave-actual"
+                type="password"
+                value={actual}
+                onChange={(e) => setActual(e.target.value)}
+                className={campo}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className={etiqueta} htmlFor="clave-nueva">La nueva</label>
+                <input
+                  id="clave-nueva"
+                  type="password"
+                  value={nueva}
+                  onChange={(e) => setNueva(e.target.value)}
+                  className={campo}
+                />
+              </div>
+              <div>
+                <label className={etiqueta} htmlFor="clave-nueva-repetida">Repetila</label>
+                <input
+                  id="clave-nueva-repetida"
+                  type="password"
+                  value={repetida}
+                  onChange={(e) => setRepetida(e.target.value)}
+                  className={campo}
+                />
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+            Al menos {CLAVE_MINIMA} caracteres.{" "}
+            {hayMasDeUnaCasa
+              ? "Cambia sólo la de esta casa: la otra sigue entrando con la suya."
+              : "La clave es de la casa, así que si la comparten, pasale la nueva."}
+          </p>
+
+          {error && <p className="mt-3 text-xs text-riesgo">{error}</p>}
+
+          <div className="mt-4 flex gap-2">
+            <button
+              onClick={cambiar}
+              disabled={enviando || !actual || !nueva || !repetida}
+              className="rounded-md bg-acento px-4 py-2 text-sm font-semibold text-fondo disabled:opacity-40"
+            >
+              {enviando ? "Cambiando…" : "Cambiar la clave"}
+            </button>
+            <button
+              onClick={() => {
+                setAbierta(false);
+                setError("");
+              }}
+              className="rounded-md border border-borde px-4 py-2 text-sm text-tenue"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL REGISTRO — lo pidió Edgardo el 18/8
+   ═══════════════════════════════════════════════════════════════════════════
+
+   *"Tener un registro de quien interactuó que luego iría en el informe"*, con
+   la distinción que lo hace honesto: **desde qué casa se entró es un HECHO** —la
+   credencial es del hogar y el sistema lo comprobó al abrir la sesión— y **quién
+   de las personas es una DECLARACIÓN**.
+
+   🔴 **Y una línea elegida a propósito: acá está lo que una casa APORTA o
+   CAMBIA, nunca lo que MIRA.** Abrir el informe, leer al asistente o mirar la
+   línea de tiempo no deja rastro. Con padres separados, un historial de
+   lecturas deja de ser un registro y pasa a ser vigilancia de uno sobre el
+   otro — y AntiGro no puede hacerles a los padres lo que promete no hacerle al
+   chico. */
+
+function ElRegistro({
+  accesos,
+}: {
+  accesos: { id: string; hogar: string | null; que: string; detalle: string | null; fecha: string }[];
+}) {
+  if (accesos.length === 0) return null;
+
+  return (
+    <section className="mt-8">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+        <History size={13} /> Qué se cambió en esta cuenta
+      </h2>
+
+      <ul className="mt-3 divide-y divide-borde border-y border-borde">
+        {accesos.map((a) => (
+          <li key={a.id} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 py-2.5">
+            <span className="text-sm text-tinta">
+              {COMO_SE_LEE[a.que as QueSeRegistra] ?? a.que}
+            </span>
+            {a.detalle && <span className="text-xs text-tenue">· {a.detalle}</span>}
+            <span className="text-xs text-apagado">
+              {/* Esto consta: la sesión se abrió con la credencial de esa casa. */}
+              · desde {a.hogar ?? "la casa"} · {fechaEnCriollo(a.fecha)}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+        Acá va lo que se cambia, no lo que se mira. Abrir el informe o leer al asistente no queda
+        registrado: el sistema comprueba desde qué casa se hizo cada cambio, y nada más.
+      </p>
+    </section>
+  );
 }
 
 function Instalacion({ chico }: { chico?: string }) {

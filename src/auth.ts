@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { baseDeDatos, hayBase } from "@/lib/supabase";
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   providers: [
     Credentials({
       credentials: {
@@ -90,7 +90,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           familiaId = usuario.familia_id as string;
         }
 
+        /* ─────────────────────────────────────────────────────────────────
+           🔴 QUEDA CONSTANCIA DE QUE SE ENTRÓ — 20/8, migración 19
+           ─────────────────────────────────────────────────────────────────
+
+           **Se PISA, no acumula.** Es un dato y no un historial, y la
+           diferencia es todo: contesta «¿la otra casa está participando?» sin
+           dejar reconstruir a qué hora se levanta nadie. Con padres separados
+           un historial de entradas deja de ser un registro y pasa a ser
+           vigilancia de uno sobre el otro — y AntiGro no puede hacerles a los
+           padres lo que promete no hacerle al chico.
+
+           🔑 Y habilita algo concreto: una segunda puerta con el correo mal
+           tipeado se puede cerrar **mientras nadie haya entrado por ella**.
+           Este `update` es lo que hace que deje de poder cerrarse.
+
+           ⚠ Nunca frena el ingreso. Si esto falla, la persona entra igual: la
+           credencial ya se comprobó, y dejar afuera al dueño de la casa porque
+           no se pudo anotar la fecha sería el peor cambio posible. */
+        try {
+          await db
+            .from("usuarios")
+            .update({ ultimo_acceso: new Date().toISOString() })
+            .eq("id", usuario.id);
+        } catch (e) {
+          console.error("[auth] no se pudo anotar el acceso:", e);
+        }
+
         return {
+          /* 🔑 El id de la PUERTA. Viaja porque hay cosas que sólo se pueden
+             hacer sobre la propia: cambiar su clave, ponerle nombre a la casa.
+             Sin esto, una ruta tendría que adivinar cuál de las dos filas de la
+             familia es la que está mirando. */
+          usuarioId: usuario.id,
           id: usuario.id,
           email: usuario.email,
           name: usuario.nombre,
@@ -104,13 +136,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 
   callbacks: {
-    jwt({ token, user }) {
+    jwt({ token, user, trigger, session }) {
       if (user) {
-        const u = user as { rol?: string; familiaId?: string | null; hogar?: string | null };
+        const u = user as {
+          id?: string;
+          usuarioId?: string;
+          rol?: string;
+          familiaId?: string | null;
+          hogar?: string | null;
+        };
         token.rol = u.rol;
         token.familiaId = u.familiaId ?? null;
         token.hogar = u.hogar ?? null;
+        token.usuarioId = u.usuarioId ?? u.id ?? null;
       }
+
+      /* ── El nombre de la casa puede cambiar con la sesión abierta ────────
+         🔑 Pasa una sola vez y en un momento concreto: cuando se abre la
+         segunda puerta hay que ponerle nombre a ésta, porque con dos casas el
+         nombre es lo que en el informe distingue quién aportó qué.
+
+         ⚠ **Si esto no llegara a aplicarse, no se rompe nada**: la base ya
+         tiene el nombre bueno y lo que queda viejo es la etiqueta que viaja en
+         la sesión, hasta el próximo ingreso. Degrada a lo que había antes —«la
+         casa», sin nombre—, que es impreciso pero no falso. */
+      if (trigger === "update") {
+        const nuevo = (session as { hogar?: unknown } | undefined)?.hogar;
+        if (typeof nuevo === "string") token.hogar = nuevo;
+      }
+
       return token;
     },
     session({ session, token }) {
@@ -118,10 +172,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         rol?: unknown;
         familiaId?: unknown;
         hogar?: unknown;
+        usuarioId?: unknown;
       };
       u.rol = token.rol;
       u.familiaId = token.familiaId;
       u.hogar = token.hogar;
+      /* 📌 `token.sub` de respaldo: las sesiones abiertas ANTES del 20/8 no
+         llevan `usuarioId`, y sin esto quedarían sin poder cambiar su clave
+         hasta que vencieran (treinta días). */
+      u.usuarioId = token.usuarioId ?? token.sub ?? null;
       return session;
     },
   },

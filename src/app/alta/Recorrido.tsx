@@ -501,6 +501,32 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
                   : `A los ${edad} lo eligen ustedes, y está bien que sea así.`}
               </p>
             )}
+
+            {/* ── 🔴 CÓMO SE CONECTAN, que el recorrido no contaba ──────────
+                Hasta el 20/8 esta pantalla cargaba a los adultos **sin destino**:
+                quedaban anotados y nadie decía cómo les llegaba un aviso. El que
+                terminaba el recorrido se iba creyendo que el sistema les había
+                escrito, y no les escribió nadie — así que el día que hubiera algo
+                que avisar, el aviso no salía y la familia se enteraba ahí.
+
+                🔑 Es texto, no código: la vinculación por QR ya funcionaba y ya
+                estaba en el panel. Lo que faltaba era decirlo. */}
+            <div className="rounded-md border border-borde bg-fondo px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-acento">
+                Cómo se conecta cada uno
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-tenue">
+                Acá los anotás; <strong className="text-tinta">todavía no les llega nada</strong>.
+                Cuando termines, en tu panel vas a ver un código QR por persona:{" "}
+                {nombre.trim() || "el chico"} y cada adulto lo escanean con su propio teléfono, y
+                recién ahí queda abierto el canal por el que AntiGro les va a escribir.
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-apagado">
+                ⚠ Es cada uno con su teléfono, y a propósito: es lo que hace que el aviso llegue a
+                esa persona y no a un contacto que alguien anotó por ella. Mientras un código no se
+                escanee, el panel lo muestra pendiente en vez de dar por hecho que llegó.
+              </p>
+            </div>
           </div>
         </section>
       )}

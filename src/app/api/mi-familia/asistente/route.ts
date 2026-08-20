@@ -72,11 +72,15 @@ const VENTANA_ASISTENTE_SEG = 60 * 60;
 async function hogarDeLaSesion() {
   const sesion = await auth();
   const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; hogar?: string | null }
+    | { rol?: string; familiaId?: string | null; hogar?: string | null; usuarioId?: string | null }
     | undefined;
 
   if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) return null;
-  return { familiaId: usuario.familiaId, hogar: usuario.hogar ?? null };
+  return {
+    familiaId: usuario.familiaId,
+    hogar: usuario.hogar ?? null,
+    usuarioId: usuario.usuarioId ?? null,
+  };
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -107,7 +111,22 @@ export async function DELETE() {
   /* ⚠ Borra la charla de la CASA, no la de quien aprieta. Con una sola clave
      por hogar no hay forma de que fuera de otro modo — y la pantalla lo dice
      antes de borrar, para que nadie se lleve la sorpresa. */
-  await repositorio().borrarCharla(yo.familiaId);
+  const repo = repositorio();
+  await repo.borrarCharla(yo.familiaId);
+
+  /* 🔑 Queda constancia, y es de los pocos casos donde hace falta: el borrado
+     de la charla es de verdad —no una baja blanda— así que después no queda
+     nada que mirar. Si la otra casa vuelve y su charla no está, el registro es
+     lo único que puede contestarle qué pasó. ⚠ Se anota QUE se borró, nunca
+     qué decía. */
+  await repo.registrarAcceso({
+    familiaId: yo.familiaId,
+    usuarioId: yo.usuarioId,
+    hogar: yo.hogar,
+    que: "borro_la_charla",
+    detalle: null,
+  });
+
   return NextResponse.json({ borrada: true });
 }
 

@@ -44,7 +44,9 @@ const Pedido = z.object({
 
 export async function POST(req: Request) {
   const sesion = await auth();
-  const usuario = sesion?.user as { rol?: string; familiaId?: string | null } | undefined;
+  const usuario = sesion?.user as
+    | { rol?: string; familiaId?: string | null; hogar?: string | null; usuarioId?: string | null }
+    | undefined;
 
   if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
@@ -78,6 +80,19 @@ export async function POST(req: Request) {
 
   const dadoDeBaja = await repo.darDeBajaAdulto(usuario.familiaId, adultoId, motivo);
   if (!dadoDeBaja) return NextResponse.json({ error: "no_encontrado" }, { status: 404 });
+
+  /* 🔑 Queda constancia de DESDE QUÉ CASA se dio de baja, que es lo único que
+     la baja misma no guarda: `adultos.baja_motivo` y `baja_en` dicen qué pasó y
+     cuándo, y no dicen quién. Con padres separados esa diferencia importa —dar
+     de baja al referente que eligió el chico es una decisión, no un trámite— y
+     el registro es lo que permite conversarla después. */
+  await repo.registrarAcceso({
+    familiaId: usuario.familiaId,
+    usuarioId: usuario.usuarioId ?? null,
+    hogar: usuario.hogar ?? null,
+    que: "dio_de_baja_un_adulto",
+    detalle: dadoDeBaja.nombre,
+  });
 
   /* ── El aviso al chico ────────────────────────────────────────────────── */
   const chico = antes.chicos.find((c) => c.activo) ?? antes.chicos[0];

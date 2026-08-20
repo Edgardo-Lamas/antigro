@@ -22,11 +22,15 @@ import type {
   TurnoDeCharla,
 } from "./tipos";
 import type {
+  AccesoRegistrado,
   AltaDeFamilia,
   AltaDeHogar,
   DatosDeLaFamilia,
+  PuertaDeLaCasa,
   Repositorio,
   ResultadoDeAlta,
+  ResultadoDeCambioDeClave,
+  ResultadoDeCierre,
 } from "./repositorio";
 
 /* ── Traducción fila ⇄ dominio ───────────────────────────────────────────── */
@@ -260,7 +264,10 @@ export class RepositorioSupabase implements Repositorio {
            quedaría una credencial viva sin ninguna aceptación detrás — que es
            justo el estado que estos campos existen para que no pase. */
         terminos_version: alta.terminosVersion,
-        terminos_en: new Date().toISOString(),
+        /* 🔑 La fecha acompaña a la versión o no va: una fecha de aceptación
+           sin saber QUÉ se aceptó no prueba nada, y con `terminos_version` en
+           null diría que alguien aceptó algo cuando no aceptó nada. */
+        terminos_en: alta.terminosVersion ? new Date().toISOString() : null,
       })
       .select("id")
       .single<{ id: string }>();
@@ -278,6 +285,187 @@ export class RepositorioSupabase implements Repositorio {
     }
 
     return { ok: true, familia, usuarioId: usuario.id };
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LAS PUERTAS DE LA CASA — 20/8
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  async puertasDe(familiaId: string): Promise<PuertaDeLaCasa[]> {
+    const { data } = await this.db
+      .from("usuarios")
+      .select("id, email, hogar, ultimo_acceso, created_at")
+      /* 🔐 Sólo cuentas de familia. Una de administración no pertenece a
+         ninguna —lo dice el check `usuarios_familia_coherente`— así que esto
+         no debería traer ninguna; el filtro está igual, porque una puerta de
+         más en esta lista sería una puerta de más en la pantalla. */
+      .eq("familia_id", familiaId)
+      .eq("rol", "adulto")
+      .order("created_at", { ascending: true })
+      .returns<
+        { id: string; email: string; hogar: string | null; ultimo_acceso: string | null; created_at: string }[]
+      >();
+
+    return (data ?? []).map((f) => ({
+      id: f.id,
+      email: f.email,
+      hogar: f.hogar,
+      ultimoAcceso: f.ultimo_acceso,
+      creado: f.created_at,
+    }));
+  }
+
+  async renombrarPuerta(familiaId: string, usuarioId: string, hogar: string): Promise<boolean> {
+    const { data } = await this.db
+      .from("usuarios")
+      .update({ hogar: hogar.trim() })
+      .eq("id", usuarioId)
+      // 🔐 En el UPDATE, no en una comprobación aparte: una puerta de otra
+      // familia simplemente no entra en la consulta.
+      .eq("familia_id", familiaId)
+      .select("id")
+      .maybeSingle<{ id: string }>();
+
+    return Boolean(data);
+  }
+
+  async cambiarClave(
+    familiaId: string,
+    usuarioId: string,
+    actual: string,
+    nueva: string,
+  ): Promise<ResultadoDeCambioDeClave> {
+    const { data: usuario } = await this.db
+      .from("usuarios")
+      .select("id, password_hash")
+      .eq("id", usuarioId)
+      .eq("familia_id", familiaId)
+      .maybeSingle<{ id: string; password_hash: string }>();
+
+    /* 📌 Se contesta lo mismo que si la clave estuviera mal. Una puerta que no
+       existe y una clave equivocada son el mismo callejón para quien está del
+       otro lado, y distinguirlos deja averiguar qué cuentas hay. */
+    if (!usuario) return { ok: false, motivo: "clave_actual_no_coincide" };
+
+    const ok = await bcrypt.compare(actual, usuario.password_hash);
+    if (!ok) return { ok: false, motivo: "clave_actual_no_coincide" };
+
+    // 12 vueltas, el mismo costo que en el alta. Ver `crearHogar`.
+    const hash = await bcrypt.hash(nueva, 12);
+    const { error } = await this.db
+      .from("usuarios")
+      .update({ password_hash: hash })
+      .eq("id", usuarioId)
+      .eq("familia_id", familiaId);
+
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  }
+
+  async cerrarPuerta(familiaId: string, usuarioId: string): Promise<ResultadoDeCierre> {
+    /* 🔴 `is("ultimo_acceso", null)` es lo que hace que esto NO pueda sacar a
+       nadie del informe de su hijo. Va adentro del delete y no en una consulta
+       previa: entre mirar y borrar hay un hueco, y en ese hueco la otra casa
+       puede haber entrado por primera vez. Es el mismo criterio que la
+       vinculación por código, que sólo sirve una vez. */
+    const { data } = await this.db
+      .from("usuarios")
+      .delete()
+      .eq("id", usuarioId)
+      .eq("familia_id", familiaId)
+      .is("ultimo_acceso", null)
+      .select("id")
+      .maybeSingle<{ id: string }>();
+
+    if (data) return { ok: true };
+
+    /* No se borró: o no existe, o alguien ya entró. Son cosas distintas y se
+       cuentan distinto — la segunda no es un error, es la regla. */
+    const { data: existe } = await this.db
+      .from("usuarios")
+      .select("id")
+      .eq("id", usuarioId)
+      .eq("familia_id", familiaId)
+      .maybeSingle<{ id: string }>();
+
+    return { ok: false, motivo: existe ? "ya_se_uso" : "no_existe" };
+  }
+
+  async marcarAcceso(usuarioId: string): Promise<void> {
+    await this.db
+      .from("usuarios")
+      .update({ ultimo_acceso: new Date().toISOString() })
+      .eq("id", usuarioId);
+  }
+
+  async registrarAcceso(a: Omit<AccesoRegistrado, "id" | "fecha">): Promise<void> {
+    const { error } = await this.db.from("accesos").insert({
+      familia_id: a.familiaId,
+      usuario_id: a.usuarioId,
+      hogar: a.hogar,
+      que: a.que,
+      detalle: a.detalle,
+    });
+
+    /* ⚠ Se avisa y se sigue. Este registro acompaña a un hecho que YA pasó —la
+       clave ya cambió, la puerta ya se abrió—: hacer fallar el pedido porque no
+       se pudo anotar dejaría a la persona creyendo que no pasó nada cuando sí
+       pasó, que es peor que un registro con un agujero. */
+    if (error) console.error("[accesos] no se pudo registrar:", error.message);
+  }
+
+  async accesosDe(familiaId: string, limite: number): Promise<AccesoRegistrado[]> {
+    const { data } = await this.db
+      .from("accesos")
+      .select("id, familia_id, usuario_id, hogar, que, detalle, fecha")
+      .eq("familia_id", familiaId)
+      .order("fecha", { ascending: false })
+      .limit(limite)
+      .returns<
+        {
+          id: string;
+          familia_id: string;
+          usuario_id: string | null;
+          hogar: string | null;
+          que: string;
+          detalle: string | null;
+          fecha: string;
+        }[]
+      >();
+
+    return (data ?? []).map((f) => ({
+      id: f.id,
+      familiaId: f.familia_id,
+      usuarioId: f.usuario_id,
+      hogar: f.hogar,
+      que: f.que,
+      detalle: f.detalle,
+      fecha: f.fecha,
+    }));
+  }
+
+  async universoObservado(): Promise<{ chicos: number; chicosConAlerta: number }> {
+    /* 🔑 `head: true` con `count: exact`: cuenta en el servidor y no trae una
+       sola fila. Acá no hace falta ningún dato de ningún chico — hace falta
+       cuántos son. */
+    const { count: chicos } = await this.db
+      .from("chicos")
+      .select("id", { count: "exact", head: true })
+      .eq("activo", true);
+
+    /* Cuántos chicos DISTINTOS tuvieron alguna alerta. Se traen los ids de las
+       alertas y se cuentan únicos: son pocos por definición —una alerta es un
+       hecho raro— y `count distinct` no existe en esta interfaz. */
+    const { data: alertas } = await this.db
+      .from("respuestas")
+      .select("chico_id")
+      .in("clase", ["alerta_adultos", "escalada_adultos"])
+      .returns<{ chico_id: string }[]>();
+
+    return {
+      chicos: chicos ?? 0,
+      chicosConAlerta: new Set((alertas ?? []).map((a) => a.chico_id)).size,
+    };
   }
 
   /**

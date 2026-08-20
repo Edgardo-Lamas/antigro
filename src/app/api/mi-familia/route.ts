@@ -33,6 +33,15 @@ const DIA_MS = 24 * 60 * 60 * 1000;
 const ESCENARIOS_VALIDOS = ["normal", "cambio_leve", "persistente", "evasion"];
 
 /**
+ * Cuántos hechos del registro se traen.
+ *
+ * 📌 Veinte alcanza de sobra: acá sólo entran cosas que pasan una vez cada
+ * mucho —abrir la segunda puerta, cambiar la clave, dar de baja a un adulto—,
+ * no la navegación de nadie.
+ */
+const LIMITE_DE_ACCESOS = 20;
+
+/**
  * Hace cuántos días el sistema observa a este chico.
  *
  * 🔑 Sale del alta, **nunca de las señales**: contar desde la primera señal
@@ -81,7 +90,13 @@ function firmasDelCuestionario(
 export async function GET(req: Request) {
   const sesion = await auth();
   const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; hogar?: string | null; name?: string | null }
+    | {
+        rol?: string;
+        familiaId?: string | null;
+        hogar?: string | null;
+        name?: string | null;
+        usuarioId?: string | null;
+      }
     | undefined;
 
   if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
@@ -142,11 +157,43 @@ export async function GET(req: Request) {
      y al revés. */
   const eleccion = chico ? quienEligeAlReferente(chico.edad) : null;
 
+  /* ── Las puertas de la casa, y lo que se hizo desde ellas (20/8) ──────
+     🔑 Van juntas porque se leen juntas: la lista de entradas no significa
+     nada sin saber cuál es la propia, y el registro no significa nada sin
+     saber desde qué casa salió cada cosa. */
+  const puertas = await repo.puertasDe(usuario.familiaId);
+  const laMia = puertas.find((p) => p.id === usuario.usuarioId);
+  const accesos = await repo.accesosDe(usuario.familiaId, LIMITE_DE_ACCESOS);
+
   return NextResponse.json({
     /* 🔴 Ya no viaja un `adultoId`: la sesión es de la CASA, no de una persona.
        Ver `auth.ts`. Lo que sí viaja es cuál de las dos casas, para que el
-       panel lo pueda decir cuando los padres están separados. */
-    yo: { nombre: usuario.name ?? null, hogar: usuario.hogar ?? null },
+       panel lo pueda decir cuando los padres están separados.
+
+       📌 **El nombre de la casa sale de la BASE, no de la sesión.** Se le puede
+       poner nombre el mismo día que se abre la segunda puerta, y la sesión
+       viaja en un token que dura treinta días: leerlo de ahí mostraría el
+       nombre viejo hasta el próximo ingreso. */
+    yo: {
+      nombre: usuario.name ?? null,
+      hogar: laMia?.hogar ?? usuario.hogar ?? null,
+      puertaId: laMia?.id ?? null,
+    },
+    /* 🔴 El correo de cada puerta viaja, y es lo único que identifica una
+       entrada para quien la abrió: sin eso, un correo mal tipeado no hay forma
+       de detectarlo. Lo que NUNCA sale de la base es la clave ni su hash. */
+    puertas: puertas.map((p) => ({
+      id: p.id,
+      email: p.email,
+      hogar: p.hogar,
+      esLaMia: p.id === usuario.usuarioId,
+      ultimoAcceso: p.ultimoAcceso,
+      creado: p.creado,
+    })),
+    /* 🔴 Lo que una casa APORTA o CAMBIA, nunca lo que MIRA. Ver `hogares.ts`:
+       con padres separados, un historial de lecturas deja de ser un registro y
+       pasa a ser vigilancia de uno sobre el otro. */
+    accesos,
     familia: {
       nombre: datos.familia.nombre,
       /* 🔴 Antes acá iban «faltantes» y era una lista de reproches: a un hogar

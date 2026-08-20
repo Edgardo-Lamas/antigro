@@ -26,15 +26,46 @@ const url = linea
   .replace(/^"|"$/g, "")
   .replace(/\?sslmode=require/, "");
 
-/* ── Migración 18: el parte y la ceguera ──────────────────────────────────
-   Dos clases nuevas, y son dos y no una porque son cosas distintas: el parte
-   cuenta lo que el sistema miró y NO pide nada; el aviso de ceguera es una
-   avería y sí pide una acción. Sólo afloja un check. */
+/* ── Migración 19: el registro de accesos ─────────────────────────────────
+   Dos cosas distintas y por eso dos formas distintas:
+
+   1. `usuarios.ultimo_acceso` — un DATO, no un historial: se pisa cada vez.
+      Contesta «¿la otra casa está participando?» sin dejar reconstruir a qué
+      hora entra nadie, y habilita cerrar una segunda puerta mal tipeada
+      mientras nadie la haya usado.
+   2. `accesos` — los hechos que no dejan rastro en ningún otro lado. Lo que
+      una casa APORTA o CAMBIA, nunca lo que MIRA.
+
+   ⚠ Todo aditivo: ninguna columna se borra y ninguna restricción se endurece
+   sobre datos que ya están. El código viejo sigue andando con este esquema. */
 const PASOS = [
-  "alter table respuestas drop constraint if exists respuestas_clase_check",
-  `alter table respuestas add constraint respuestas_clase_check
-     check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos',
-                      'parte_periodico', 'aviso_de_ceguera'))`,
+  "alter table usuarios add column if not exists ultimo_acceso timestamptz",
+
+  `comment on column usuarios.ultimo_acceso is
+     'Ultima vez que se abrio sesion con esta credencial. Se PISA, no acumula: es un dato, no un historial. Con padres separados un historial de entradas se vuelve vigilancia entre ellos.'`,
+
+  `create table if not exists accesos (
+     id          uuid primary key default gen_random_uuid(),
+     familia_id  uuid not null references familias(id) on delete cascade,
+     usuario_id  uuid references usuarios(id) on delete set null,
+     hogar       text,
+     que         text not null,
+     detalle     text,
+     fecha       timestamptz not null default now()
+   )`,
+
+  "alter table accesos drop constraint if exists accesos_que_check",
+
+  `alter table accesos add constraint accesos_que_check
+     check (que in ('abrio_la_segunda_puerta', 'cerro_una_puerta', 'cambio_la_clave',
+                    'dio_de_baja_un_adulto', 'borro_la_charla'))`,
+
+  "create index if not exists accesos_familia_fecha_idx on accesos (familia_id, fecha desc)",
+
+  "alter table accesos enable row level security",
+
+  `comment on table accesos is
+     'Lo que una casa APORTA o CAMBIA, fechado. Nunca lo que MIRA: leer el informe o al asistente no deja rastro, a proposito. El cuestionario no esta aca porque ya firma en observaciones.'`,
 ];
 
 const cliente = new pg.Client({ connectionString: url, ssl: { rejectUnauthorized: false } });
@@ -44,20 +75,37 @@ try {
   await cliente.query("begin");
   for (const paso of PASOS) await cliente.query(paso);
   await cliente.query("commit");
-  console.log("✅ Migración 18 aplicada");
+  console.log("✅ Migración 19 aplicada");
 } catch (e) {
   await cliente.query("rollback");
   console.error("❌ Revertida entera:", e.message);
   process.exit(1);
 }
 
-const { rows } = await cliente.query(
+/* ── Comprobar contra la base, no contra la intención ──────────────────── */
+const { rows: cols } = await cliente.query(
   `select column_name, data_type, is_nullable from information_schema.columns
-    where table_name = 'respuestas' order by ordinal_position`,
+    where table_name = 'accesos' order by ordinal_position`,
 );
-console.table(rows);
+console.table(cols);
 
-const { rows: n } = await cliente.query("select count(*)::int as n from respuestas");
-console.log("Respuestas que ya había:", n[0].n);
+const { rows: ua } = await cliente.query(
+  `select column_name, data_type from information_schema.columns
+    where table_name = 'usuarios' and column_name = 'ultimo_acceso'`,
+);
+console.log("usuarios.ultimo_acceso:", ua[0] ?? "❌ NO ESTÁ");
+
+/* 🔴 Que el check exista de verdad: si alguien inventa un hecho nuevo tiene que
+   fallar acá, y no quedar un registro con una palabra que nadie sabe leer. */
+const { rows: chk } = await cliente.query(
+  `select pg_get_constraintdef(oid) as def from pg_constraint
+    where conname = 'accesos_que_check'`,
+);
+console.log("check:", chk[0]?.def ?? "❌ NO ESTÁ");
+
+const { rows: puertas } = await cliente.query(
+  `select familia_id, hogar, email, ultimo_acceso from usuarios where rol = 'adulto' order by created_at`,
+);
+console.table(puertas);
 
 await cliente.end();

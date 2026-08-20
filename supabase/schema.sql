@@ -707,3 +707,63 @@ alter table respuestas drop constraint if exists respuestas_clase_check;
 alter table respuestas add constraint respuestas_clase_check
   check (clase in ('alerta_adultos', 'orientacion_chico', 'escalada_adultos',
                    'parte_periodico', 'aviso_de_ceguera'));
+
+
+-- ─── 19. EL REGISTRO DE ACCESOS ──────────────────────────────────
+--  Lo pidió Edgardo el 18/8: *"tener un registro de quien interactuó que luego
+--  iría en el informe"*, con la distinción que lo hace honesto: **desde qué
+--  casa se entró es un HECHO** —la credencial es del hogar, el sistema lo
+--  comprobó al abrir la sesión— y **quién de las personas es una DECLARACIÓN**.
+--
+--  🔴 **Y hay una línea que se eligió a propósito, porque este producto no
+--  puede hacer con los padres lo que promete no hacer con el chico: se
+--  registra lo que una casa APORTA o CAMBIA, nunca lo que MIRA.**
+--  Abrir el informe, leer al asistente o mirar la línea de tiempo no deja
+--  rastro. Con padres separados un historial de lecturas se convierte en otra
+--  cosa —*«entró a las tres de la mañana»*— y eso no es lo que se pidió.
+--
+--  🔑 Y por eso son DOS cosas distintas, no una:
+--
+--  1. `usuarios.ultimo_acceso` — **un dato, no un historial.** Se pisa cada vez.
+--     Contesta «¿la otra casa está participando?» sin permitir reconstruir a qué
+--     hora se levanta nadie. Y habilita algo concreto: una segunda puerta con el
+--     correo mal tipeado se puede cerrar **mientras nadie haya entrado por ella**.
+--  2. `accesos` — los hechos que **no dejan rastro en ningún otro lado**.
+--     El cuestionario no está acá porque ya firma en `observaciones`, y contarlo
+--     dos veces haría que el panel diga una cosa y el informe otra.
+
+alter table usuarios add column if not exists ultimo_acceso timestamptz;
+
+comment on column usuarios.ultimo_acceso is
+  'Ultima vez que se abrio sesion con esta credencial. Se PISA, no acumula: es un dato, no un historial. Con padres separados un historial de entradas se vuelve vigilancia entre ellos.';
+
+create table if not exists accesos (
+  id          uuid primary key default gen_random_uuid(),
+  familia_id  uuid not null references familias(id) on delete cascade,
+
+  --  🔑 Se suelta, no se borra: que la puerta ya no exista no borra lo que se
+  --  hizo desde ella. Si se fuera en cascada, cerrar una puerta reescribiria
+  --  la historia de esa familia.
+  usuario_id  uuid references usuarios(id) on delete set null,
+
+  --  🔴 Copiado AL MOMENTO, y por eso no se lee de `usuarios` cuando se
+  --  muestra: si la casa se renombra despues, lo que paso siguio pasando desde
+  --  la casa que se llamaba asi ese dia.
+  hogar       text,
+
+  que         text not null,
+  detalle     text,
+  fecha       timestamptz not null default now()
+);
+
+alter table accesos drop constraint if exists accesos_que_check;
+alter table accesos add constraint accesos_que_check
+  check (que in ('abrio_la_segunda_puerta', 'cerro_una_puerta', 'cambio_la_clave',
+                 'dio_de_baja_un_adulto', 'borro_la_charla'));
+
+create index if not exists accesos_familia_fecha_idx on accesos (familia_id, fecha desc);
+
+alter table accesos enable row level security;
+
+comment on table accesos is
+  'Lo que una casa APORTA o CAMBIA, fechado. Nunca lo que MIRA: leer el informe o al asistente no deja rastro, a proposito. El cuestionario no esta aca porque ya firma en observaciones.';

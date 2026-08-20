@@ -22,10 +22,14 @@ import type {
 } from "./tipos";
 import {
   dentroDe,
+  type AccesoRegistrado,
   type AltaDeFamilia,
   type DatosDeLaFamilia,
+  type PuertaDeLaCasa,
   type Repositorio,
   type ResultadoDeAlta,
+  type ResultadoDeCambioDeClave,
+  type ResultadoDeCierre,
 } from "./repositorio";
 
 let contador = 0;
@@ -174,6 +178,52 @@ export class RepositorioEnMemoria implements Repositorio {
    */
   async crearHogar(): Promise<ResultadoDeAlta> {
     return { ok: false, motivo: "sin_base" };
+  }
+
+  /* ── Las puertas de la casa ─────────────────────────────────────────────
+     🔴 **El modo demo no tiene puertas, y eso no es una carencia: es lo que
+     el modo demo ES.** Se entra sin cuenta, así que no hay ninguna credencial
+     que mostrar, renombrar o cerrar. Todo esto contesta lo mismo que
+     `crearHogar` —`sin_base`— y la pantalla lo dice con todas las letras en
+     lugar de fingir que anduvo. */
+
+  async puertasDe(): Promise<PuertaDeLaCasa[]> {
+    return [];
+  }
+
+  async renombrarPuerta(): Promise<boolean> {
+    return false;
+  }
+
+  async cambiarClave(): Promise<ResultadoDeCambioDeClave> {
+    return { ok: false, motivo: "sin_base" };
+  }
+
+  async cerrarPuerta(): Promise<ResultadoDeCierre> {
+    return { ok: false, motivo: "sin_base" };
+  }
+
+  /* ── El registro fechado ────────────────────────────────────────────────
+     📌 Sin credenciales no hay «desde qué casa», que es la mitad que hace
+     honesto al registro. Se queda vacío en vez de inventar una casa. */
+
+  async marcarAcceso(): Promise<void> {}
+
+  async registrarAcceso(): Promise<void> {}
+
+  async accesosDe(): Promise<AccesoRegistrado[]> {
+    return [];
+  }
+
+  /** 📌 En modo demo hay una familia sembrada, y se cuenta de verdad igual. */
+  async universoObservado(): Promise<{ chicos: number; chicosConAlerta: number }> {
+    const activos = this.chicos.filter((c) => c.activo);
+    const conAlerta = new Set(
+      this.respuestas
+        .filter((r) => r.clase === "alerta_adultos" || r.clase === "escalada_adultos")
+        .map((r) => r.chicoId),
+    );
+    return { chicos: activos.length, chicosConAlerta: conAlerta.size };
   }
 
   async cargarDatosDeLaFamilia(
