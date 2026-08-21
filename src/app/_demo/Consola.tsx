@@ -57,6 +57,13 @@ interface Redactado {
 interface Mensajes {
   paraLosAdultos?: Redactado;
   paraElChico?: Redactado;
+  /**
+   * 🔴 **Existe porque no existir escondió una función rota cuatro días.**
+   * El `catch` de acá abajo dejaba `{}` y la pantalla dibujaba los dos mensajes
+   * en «—», iguales en los cuatro escenarios. La ruta devolvía 404 desde el
+   * 17/8 y no había forma de saberlo mirando. Si no sale, ahora se dice.
+   */
+  fallo?: string;
 }
 
 export default function Consola() {
@@ -122,20 +129,42 @@ export default function Consola() {
     setCorriendo(true);
   }, []);
 
+  /**
+   * 🔴 **Va por `POST` a `/api/demo/mensajes`, y las dos cosas importan.**
+   * Antes era un `GET` a `/api/mensajes`, una ruta que la auditoría del 17/8
+   * borró creyendo que no la llamaba nadie — la llamaba esto. El `POST` es lo
+   * que impide que una etiqueta `img` dispare una llamada al modelo, que era
+   * el agujero real por el que se la había sacado.
+   */
   const pedirMensajes = useCallback(async () => {
     setPidiendoMensajes(true);
     try {
-      const q = new URLSearchParams({
-        escenario,
-        dia: String(dia),
-        edad: String(edad),
-        genero,
-        nombre: genero === "varon" ? "Tomás" : "Ana",
+      const r = await fetch("/api/demo/mensajes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          escenario,
+          dia,
+          edad,
+          genero,
+          nombre: genero === "varon" ? "Tomás" : "Ana",
+        }),
       });
-      const r = await fetch(`/api/mensajes?${q}`);
+
+      if (!r.ok) {
+        const d = await r.json().catch(() => ({}));
+        setMensajes({
+          fallo:
+            r.status === 429
+              ? `Se pidieron muchos seguidos. Probá de nuevo en ${Math.ceil((d.esperaSeg ?? 60) / 1)} segundos.`
+              : `No se pudo pedir el texto (${r.status}).`,
+        });
+        return;
+      }
+
       setMensajes(await r.json());
     } catch {
-      setMensajes({});
+      setMensajes({ fallo: "No se pudo conectar para pedir el texto." });
     } finally {
       setPidiendoMensajes(false);
     }
@@ -328,7 +357,16 @@ export default function Consola() {
           </p>
         )}
 
-        {mensajes && (
+        {/* 🔴 Si no salió, se dice. Un guion en el lugar del texto se lee como
+            «el sistema no tenía nada que decir», que es una respuesta
+            legítima del producto — y taparía con ella una función caída. */}
+        {mensajes?.fallo && (
+          <p className="mt-4 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
+            {mensajes.fallo}
+          </p>
+        )}
+
+        {mensajes && !mensajes.fallo && (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <Mensaje titulo="A los adultos responsables" cuerpo={mensajes.paraLosAdultos} />
             <Mensaje titulo={`Al propio chico (${edad} años)`} cuerpo={mensajes.paraElChico} />

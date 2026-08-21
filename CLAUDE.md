@@ -238,6 +238,60 @@ respuesta nunca llega a la base—, por eso la columna `causa` sigue aceptando s
 
 ---
 
+## 🔴🔴 «VER EL MENSAJE» ESTABA MUERTO HACE CUATRO DÍAS — arreglado el 21/8
+
+**Lo levantó Edgardo probando la consola:** *"en el simulador en cualquier variable el texto que se
+envía es el mismo… no puede ser"*. **Tenía razón, y era peor que eso: no había ningún texto.**
+
+`Consola.tsx` pedía `/api/mensajes`, **y esa ruta no existe desde el 17/8.** Devolvía 404 en los
+cuatro escenarios; el `catch` de la consola dejaba `mensajes = {}` y la pantalla dibujaba los dos
+cuadros con un guion. **El mismo guion siempre, en todos los escenarios.**
+
+### 🔴 Cómo se rompió, porque el error de método es lo que hay que no repetir
+
+La borró **la auditoría del 17/8**, con un motivo válido y un dato falso:
+
+| | |
+|---|---|
+| El motivo, **cierto y sigue en pie** | era un `GET` público que llamaba a Opus 5 sin sesión ni límite — *«bastaba una etiqueta `img` para gastar en bucle»* |
+| El dato, **falso** | «no la llamaba nadie». **La llamaba `Consola.tsx`, que es la home.** |
+
+⚠ **Borrar código «que no llama nadie» exige buscar quién llama, no suponerlo.** Y la razón de que
+nadie lo notara en cuatro días es la misma que ya había costado una sesión con `motivos`: **un
+`catch` que no escribe en ningún lado convierte una función rota en una función silenciosa.**
+
+### ✅ Cómo volvió
+
+Está en **`/api/demo/mensajes`**, junto a la otra ruta pública de la demo, con las dos protecciones
+que la auditoría pedía:
+1. **Es `POST`.** Una etiqueta `img`, un `link` o un prefetch no la pueden disparar. Ése era el
+   agujero concreto. ✓ Verificado: un `GET` devuelve **405**.
+2. **Seis por minuto por IP**, mismo tope y mismo mecanismo que `/api/demo/telegram`.
+
+📌 Sigue pública, y corresponde: la demo ES la home.
+✅ **Y la consola ya no se come el error:** si no sale el texto, lo dice en pantalla. Un guion se
+lee como «el sistema no tenía nada que decir» —que es una respuesta legítima del producto— y taparía
+con ella una función caída.
+
+### Lo que se ve ahora, medido
+
+| Escenario | Estado | Mensaje |
+|---|---|---|
+| normal | en calma | **silencio** — el sistema no escribe, y es lo correcto |
+| cambio_leve | en calma | **silencio** |
+| persistente | patrón sostenido | «10 de los últimos 21 días quedaron fuera de lo habitual…» |
+| evasion | patrón sostenido | «**13** de los últimos 21 días…» |
+
+🔑 **Y una cosa que parece un defecto y no lo es: el mensaje AL CHICO es el mismo en `persistente`
+y en `evasion`.** `redactarMensajeAlChico` recibe nombre, edad, género y estado — **nunca qué se
+vio**. Es deliberado: al chico no se le cuenta lo que el sistema observó. Los dos escenarios dan
+`patron_sostenido` en la misma banda de edad, así que el texto es el mismo con o sin crédito. **El
+que sí cambia por escenario es el de los adultos, porque lleva el «por qué» adentro.**
+
+⚠ Hoy los dos salen del respaldo, porque la cuenta no tiene crédito.
+
+---
+
 ## 🔴 EL CAMPO DE LA PREGUNTA EN EL TELÉFONO — arreglado el 21/8
 
 **Lo levantó Edgardo:** *"el espacio para la pregunta es muy chico en mobile, ocupa la mitad de la
