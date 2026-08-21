@@ -66,7 +66,7 @@ enlace del alta el 19/8 para que probaran **el asistente**. Lo que traigan entra
 | **En producción** | `8ec4bd9`, **promovido y verificado EN VIVO el 20/8** (`main` fast-forward → deploy automático). Las 33 comprobaciones del navegador corrieron **contra `antigro.vercel.app`**, no contra localhost |
 | **La base** | ✅ 14 · 15 · 16 · 17 · 18 · **19** (el registro de accesos, aplicada y verificada el 20/8) |
 | **Verificación** | `npm run probar` — **383 comprobaciones** en 11 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte + **34 hogares**. **En verde** |
-| **En el navegador** | `node prueba-navegador.mjs` (el cuestionario) · **`node prueba-puertas.mjs`** (las dos puertas y la clave, 33 comprobaciones) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente) |
+| **En el navegador** | **`node prueba-entrar.mjs`** (la puerta: el logueo que fallaba en silencio y el ojo, 13 · **no escribe en la base**) · `node prueba-navegador.mjs` (el cuestionario) · `node prueba-puertas.mjs` (las dos entradas y la clave, 33) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente). 🔑 Las tres primeras aceptan `SITIO=https://antigro.vercel.app` |
 | **Comprobado en vivo (19/8)** | `/` `/guia` `/terminos` `/entrar` dan 200 · **`/entrar` sin código NO dibuja «es mi primera vez» y con el enlace SÍ** (verificado en navegador) · el reloj da 401 sin secreto · el webhook 401 sin el suyo |
 | **En la base de producción** | **Una sola familia** (la sembrada), un chico (Ana) y dos usuarios: `demo@antigro.app` y `mariana@ejemplo.ar`. **Cero accesos, cero observaciones.** Verificado el 20/8 después de probar en vivo |
 
@@ -526,6 +526,54 @@ que sea el dueño hoy — un teléfono desbloqueado sobre la mesa alcanzaría.
 
 📌 **La sesión NO se cierra al cambiar la clave.** El que la cambia está probando que es el dueño;
 echarlo de su propio panel sería castigarlo por hacer lo correcto.
+
+### 🔴🔴 LA PUERTA FALLABA EN SILENCIO — encontrado por Edgardo el 20/8
+
+**Lo levantó él probando el alta:** *"nunca dijo «email y/o contraseña no coinciden» pero debería
+decirlo"*. Tenía razón, y detrás del cartel que faltaba había algo bastante peor.
+
+🔴 **NextAuth v5 devuelve `ok: true` con las credenciales RECHAZADAS.** Medido contra la pantalla:
+
+```json
+{"error":"CredentialsSignin","code":"credentials","status":200,"ok":true,"url":null}
+```
+
+**Es un cambio respecto de v4**, donde `ok` sí era `false`. Con la condición que había —`if
+(res?.ok)`— una clave equivocada **se daba por buena**: se hacía `router.push("/mi-familia")`, el
+middleware rebotaba a `/entrar` por no haber sesión, y la persona volvía a ver la pantalla de
+logueo **muda**. Sin cartel, sin error en consola, sin nada. Se lee como que el botón no funciona.
+
+✅ **Arreglado en las DOS puertas** (`/entrar` y `/panel/login`): manda `error`, no `ok`. **`ok` no
+se mira más — mintió una vez y no hay forma de saber en qué otros casos miente.**
+
+🔴 **Y había un segundo agujero, de la misma familia: `try { … } finally { … }` SIN `catch`.** Un
+pedido cortado —el teléfono perdiendo señal, que es exactamente donde se usa esto— se iba por
+arriba y dejaba la pantalla igual de muda. Ahora las dos dicen algo. **Regla: nunca dejar sin voz
+al que está del otro lado.**
+
+🔑 **Por qué no lo vio nada de lo que ya teníamos, y es la lección que importa:** el typecheck no
+puede verlo —no hay nada mal tipeado— y `npm run probar` tampoco —no hay lógica rota—. **Cambió de
+significado el contrato de una librería.** Eso sólo se ve escribiendo una clave mal y mirando la
+pantalla. Por eso ahora hay `node prueba-entrar.mjs`.
+
+⚠ **Y ojo con el diagnóstico apurado:** al principio dije que él no había visto el cartel porque le
+faltaba el enlace de invitación (`/entrar` sin `?i=…` no dibuja «es mi primera vez»). Eso era cierto
+y no era la causa. **Él insistió con que el mensaje nunca apareció, y ahí estaba el bug.**
+
+### ✅ EL OJO EN LA CONTRASEÑA — 20/8, lo pidió Edgardo
+
+`src/components/CampoDeClave.tsx`, y va en **los seis** campos de clave del sistema: la puerta de la
+familia, la de administración, la que se le pone a la otra casa y las tres de cambiar la clave.
+
+🔴 **No es una comodidad: es lo que evita quedarse afuera de la propia casa.** AntiGro **no manda
+correos** —el remitente de Resend no tiene dominio verificado, Telegram es el único canal real— así
+que una clave mal tipeada en el alta **no se recupera**. Un carácter de más y esa familia queda con
+una cuenta cuya clave no es la que cree.
+
+🔑 Arranca siempre oculta y no se acuerda de nada: ver la clave es una decisión de ese momento y de
+esa pantalla. ⚠ **El botón es `type="button"`** — adentro de un `<form>`, uno sin tipo envía el
+formulario, o sea que tocar el ojo mandaría el alta a medio escribir. Hay una comprobación que lo
+mira.
 
 ### ✅ LA IMAGEN AL COMPARTIR EL ENLACE — 20/8, la pidió Edgardo
 

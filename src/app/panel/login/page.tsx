@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Lock, LoaderCircle } from "lucide-react";
+import CampoDeClave from "@/components/CampoDeClave";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,8 +19,18 @@ export default function LoginPage() {
     setCargando(true);
     try {
       const res = await signIn("credentials", { email, password, redirect: false });
-      if (res?.ok) router.push("/panel");
+
+      /* 🔴 **`error`, no `ok`.** NextAuth v5 devuelve `ok: true` con las
+         credenciales rechazadas —`{"error":"CredentialsSignin", …, "ok":true}`—
+         así que la condición vieja daba por bueno un logueo fallido: empujaba a
+         `/panel`, el middleware rebotaba por no haber sesión, y esta pantalla
+         volvía muda. Medido y arreglado el 20/8; el mismo cambio está en
+         `/entrar`, que es la puerta de las familias. */
+      if (!res?.error) router.push("/panel");
       else setError("El email o la contraseña no coinciden.");
+    } catch {
+      /* Sin esto, un pedido cortado dejaba la pantalla sin decir nada. */
+      setError("No pudimos conectar. Probá de nuevo en un momento.");
     } finally {
       setCargando(false);
     }
@@ -61,14 +72,12 @@ export default function LoginPage() {
             <label className={etiqueta} htmlFor="password">
               Contraseña
             </label>
-            <input
+            <CampoDeClave
               id="password"
-              type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               required
               autoComplete="current-password"
-              className={campo}
             />
           </div>
 

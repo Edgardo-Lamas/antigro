@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ShieldCheck, LoaderCircle } from "lucide-react";
 import { VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
 import { DECLARACIONES } from "@/app/terminos/terminos";
+import CampoDeClave from "@/components/CampoDeClave";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -100,7 +101,31 @@ function Puerta() {
       }
 
       const res = await signIn("credentials", { email, password: clave, redirect: false });
-      if (res?.ok) {
+
+      /* ─────────────────────────────────────────────────────────────────────
+         🔴 EL FRACASO VIAJA EN `error`, NO EN `ok` — arreglado el 20/8
+         ─────────────────────────────────────────────────────────────────────
+
+         **Lo encontró Edgardo probando el alta:** *"nunca dijo «email y/o
+         contraseña no coinciden» pero debería decirlo"*. Tenía razón, y lo que
+         había detrás era peor que un mensaje que falta.
+
+         🔴 **NextAuth v5 devuelve `ok: true` con las credenciales RECHAZADAS.**
+         Textual, medido contra esta misma pantalla:
+
+             {"error":"CredentialsSignin","code":"credentials",
+              "status":200,"ok":true,"url":null}
+
+         Es un cambio respecto de v4, donde `ok` sí era `false`. Con la
+         condición vieja (`if (res?.ok)`) una clave equivocada se daba por
+         buena: se hacía `router.push("/mi-familia")`, el middleware rebotaba a
+         `/entrar` por no haber sesión, y la persona volvía a ver la pantalla de
+         logueo **muda**. Ni un cartel, ni un error en consola. Se leía como que
+         el botón no hacía nada.
+
+         🔑 **Por eso ahora manda `error`.** `ok` no se mira más: mintió una vez
+         y no hay forma de saber en qué otros casos miente. */
+      if (!res?.error) {
         /* 🔑 Recién creada, la familia todavía no tiene chico: va al recorrido,
            no al panel. Un panel vacío no le explica a nadie qué hacer. */
         router.push(modo === "crear" ? "/alta" : "/mi-familia");
@@ -112,6 +137,13 @@ function Puerta() {
          cualquiera podría averiguar qué direcciones tienen cuenta en un
          sistema que cuida chicos. */
       setError("El email o la contraseña no coinciden.");
+    } catch {
+      /* 🔴 Acá no había NADA: un `try` con `finally` y sin `catch`. Si el
+         pedido se cortaba —el teléfono perdiendo señal, que es exactamente
+         donde se usa esto— la excepción se iba por arriba y la pantalla
+         quedaba igual de muda que en el caso de arriba. Nunca dejar sin voz al
+         que está del otro lado: si algo falla, algo se dice. */
+      setError("No pudimos conectar. Fijate la señal y probá de nuevo.");
     } finally {
       setCargando(false);
     }
@@ -200,15 +232,17 @@ function Puerta() {
               <label className={etiqueta} htmlFor="clave">
                 Contraseña
               </label>
-              <input
+              {/* 🔑 Con el ojo para verla. En el alta es lo que evita que
+                  alguien se quede afuera de su propia casa por un carácter de
+                  más: AntiGro no manda correos, así que una clave mal tipeada
+                  no se recupera. Ver `CampoDeClave`. */}
+              <CampoDeClave
                 id="clave"
-                type="password"
                 value={clave}
-                onChange={(e) => setClave(e.target.value)}
+                onChange={setClave}
                 required
                 minLength={creando ? CLAVE_MINIMA : undefined}
                 autoComplete={creando ? "new-password" : "current-password"}
-                className={campo}
               />
               {creando && (
                 <p className="mt-1.5 text-xs leading-relaxed text-apagado">

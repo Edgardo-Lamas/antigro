@@ -29,6 +29,7 @@ import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senale
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
 import { COMO_FUNCIONA } from "@/lib/config";
+import CampoDeClave from "@/components/CampoDeClave";
 import {
   CLAVE_MINIMA,
   COMO_SE_LEE,
@@ -1610,22 +1611,22 @@ function LasPuertas({
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className={etiqueta} htmlFor="clave-otra-casa">Con qué clave</label>
-                <input
+                <CampoDeClave
                   id="clave-otra-casa"
-                  type="password"
                   value={clave}
-                  onChange={(e) => setClave(e.target.value)}
-                  className={campo}
+                  onChange={setClave}
+                  autoComplete="new-password"
+                  minLength={CLAVE_MINIMA}
                 />
               </div>
               <div>
                 <label className={etiqueta} htmlFor="clave-otra-casa-repetida">Repetila</label>
-                <input
+                <CampoDeClave
                   id="clave-otra-casa-repetida"
-                  type="password"
                   value={claveRepetida}
-                  onChange={(e) => setClaveRepetida(e.target.value)}
-                  className={campo}
+                  onChange={setClaveRepetida}
+                  autoComplete="new-password"
+                  minLength={CLAVE_MINIMA}
                 />
               </div>
             </div>
@@ -1722,8 +1723,8 @@ function LaClave({
   const [error, setError] = useState("");
   const [lista, setLista] = useState(false);
 
-  const campo =
-    "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
+  /* 📌 Acá ya no hace falta `campo`: los tres campos de esta pantalla son
+     claves, y el estilo del recuadro vive adentro de `CampoDeClave`. */
   const etiqueta = "mb-1.5 block text-[11px] uppercase tracking-[0.06em] text-apagado";
 
   async function cambiar() {
@@ -1787,33 +1788,32 @@ function LaClave({
           <div className="flex flex-col gap-3">
             <div>
               <label className={etiqueta} htmlFor="clave-actual">La clave de ahora</label>
-              <input
+              <CampoDeClave
                 id="clave-actual"
-                type="password"
                 value={actual}
-                onChange={(e) => setActual(e.target.value)}
-                className={campo}
+                onChange={setActual}
+                autoComplete="current-password"
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className={etiqueta} htmlFor="clave-nueva">La nueva</label>
-                <input
+                <CampoDeClave
                   id="clave-nueva"
-                  type="password"
                   value={nueva}
-                  onChange={(e) => setNueva(e.target.value)}
-                  className={campo}
+                  onChange={setNueva}
+                  autoComplete="new-password"
+                  minLength={CLAVE_MINIMA}
                 />
               </div>
               <div>
                 <label className={etiqueta} htmlFor="clave-nueva-repetida">Repetila</label>
-                <input
+                <CampoDeClave
                   id="clave-nueva-repetida"
-                  type="password"
                   value={repetida}
-                  onChange={(e) => setRepetida(e.target.value)}
-                  className={campo}
+                  onChange={setRepetida}
+                  autoComplete="new-password"
+                  minLength={CLAVE_MINIMA}
                 />
               </div>
             </div>
