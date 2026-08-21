@@ -12,6 +12,53 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
+## 🔴🔴 SIN RESOLVER — DOS CIFRAS MAL ATRIBUIDAS, EN ONCE LUGARES DEL PRODUCTO
+
+**Encontrado el 21/8 verificando el PDF para las psicólogas, contra el documento oficial.**
+🔗 https://www.argentina.gob.ar/sites/default/files/2024/10/encuesta_nacional_grooming_-_ano_2021.pdf
+
+El sistema dice, en once archivos, que estas tres cifras son del **Estudio nacional (Ministerio de
+Justicia, 2023)**. **Sólo una lo es.**
+
+| Cifra | Verdad |
+|---|---|
+| **74,3% de los casos pasa por WhatsApp** | ✅ **SÍ es del estudio.** Textual: *"la aplicación más usada por los perpetradores es el Whatsapp, con un 74,3% de los casos"* |
+| **63% no sabe qué es el grooming** | ❌ **NO.** Es una nota de **El Litoral del 6/4/2018** sobre una encuesta del área metropolitana, citada en el *estado del arte* del estudio |
+| **43% no habla de estos temas con sus padres** | ❌ **NO.** Es una encuesta en **11 escuelas**, también citada en el estado del arte — y dice *"no hablar sobre los riesgos en Internet"*, que no es lo mismo |
+
+⚠ **Los números no están inventados: están mal atribuidos** — y encima el 43% viene reformulado. Para
+un jurado o una psicóloga que abra la fuente, es un golpe a la credibilidad de todo lo demás.
+
+### ✅ Las cifras PROPIAS del estudio, verificadas, que son más fuertes
+
+- **57,5%** de los hogares con internet declara tener controles — **y aun así, en dos tercios de
+  esos hogares los adultos conocen poco o nada de lo que hacen los chicos.** 🔑 **Ése es AntiGro en
+  una línea, y es dato argentino oficial.**
+- **23,1%** conoce el nombre con el que se denomina el acoso sexual online. *(Reemplaza al 63% mal
+  atribuido, y dice lo mismo mejor.)*
+- **27,6%** recibió comentarios eróticos o sexuales sin solicitarlos · **8,3%** de los hogares
+  recibió o le solicitaron imágenes de chicos en situaciones sexuales.
+- **72,3%** de las víctimas tenía **12 a 14 años** · **66,3%** femenino · **37,3%** no denunció ·
+  **61,4%** no sabía quién era el agresor.
+- 🔴 **Y la que vale oro:** ante un caso, el **73,9%** denunciaría a la policía, pero el **62,9%
+  borraría al agresor de todas las cuentas** y el **31%** prohibiría conectarse. **Las dos últimas
+  son exactamente lo que las guías piden NO hacer.** El instinto mayoritario va contra la indicación
+  oficial — y eso es lo que el asistente existe para corregir en el momento justo.
+
+### ⬜ Qué falta hacer, y es decisión de Edgardo
+
+**El arreglo es de atribución, no de números**: se conservan las cifras y se dice de dónde salen de
+verdad, o se reemplazan por las propias del estudio. Los once lugares: `asistente.ts` (el corpus),
+`redactar.ts`, `cuestionario.ts`, `config.ts`, `tipos.ts`, `respaldo.ts`, `guia/page.tsx`,
+`panel/page.tsx`, `Recorrido.tsx`, `adultos/baja/route.ts`.
+⚠ **El 43% sostiene el argumento del referente** («el chico no habla con sus padres»), así que
+cambiarlo por otra cifra cambia un razonamiento del producto. Por eso no se tocó solo.
+
+✅ **El PDF para las psicólogas ya salió con las cifras verificadas** (`~/Desktop/AntiGro -
+presentacion profesional.pdf`).
+
+---
+
 ## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-20, cierre
 
 **Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio.**

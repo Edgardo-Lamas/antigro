@@ -1,0 +1,657 @@
+<title>Sin leer un solo mensaje</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap">
+
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   La paleta NO se inventó acá: es la de AntiGro (`tailwind.config.ts`), la
+   misma que ve cualquiera que después abra el sistema. Un documento que
+   presenta un producto con otros colores que el producto es dos productos.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Claro: el mismo criterio, dado vuelta con cuidado — no invertido. */
+  --fondo:      #fbfcfd;
+  --superficie: #f2f5f8;
+  --borde:      #dde4ea;
+  --tinta:      #12171d;
+  --texto:      #333c46;
+  --tenue:      #5f6b78;
+  --apagado:    #7d8894;
+  --acento:     #2f6e88;
+  --acentoTen:  #e4eef3;
+  --atencion:   #9a6a1c;
+  --riesgo:     #9e2f1b;
+  --calma:      #3f7355;
+
+  /* Los tres estados del gráfico, ya validados para fondo claro. */
+  --g-calma:  #9aa5b1;
+  --g-mirar:  #d89b33;
+  --g-patron: #9e2f1b;
+  --g-superficie: #fbfcfd;
+
+  --medida: 34rem;
+  --paso: clamp(1.1rem, 2.4vw, 1.6rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fondo:      #0d1117;
+    --superficie: #151b23;
+    --borde:      #232b36;
+    --tinta:      #e6eaef;
+    --texto:      #c3ccd5;
+    --tenue:      #8b95a1;
+    --apagado:    #5a6572;
+    --acento:     #4e9bb9;
+    --acentoTen:  #16303b;
+    --atencion:   #d08a3e;
+    --riesgo:     #c4553d;
+    --calma:      #5e9c76;
+
+    --g-calma:  #6f7d8b;
+    --g-mirar:  #d08a3e;
+    --g-patron: #c4553d;
+    --g-superficie: #0d1117;
+  }
+}
+:root[data-theme="dark"] {
+  --fondo:      #0d1117;
+  --superficie: #151b23;
+  --borde:      #232b36;
+  --tinta:      #e6eaef;
+  --texto:      #c3ccd5;
+  --tenue:      #8b95a1;
+  --apagado:    #5a6572;
+  --acento:     #4e9bb9;
+  --acentoTen:  #16303b;
+  --atencion:   #d08a3e;
+  --riesgo:     #c4553d;
+  --calma:      #5e9c76;
+
+  --g-calma:  #6f7d8b;
+  --g-mirar:  #d08a3e;
+  --g-patron: #c4553d;
+  --g-superficie: #0d1117;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.06rem;
+  line-height: 1.66;
+  font-optical-sizing: auto;
+}
+
+.hoja {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: clamp(1.4rem, 4vw, 3.2rem) clamp(1.2rem, 4vw, 2.4rem) 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--paso);
+}
+
+/* ── Portada ──────────────────────────────────────────────────────────── */
+.marca {
+  display: flex; align-items: center; gap: .6rem;
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: .72rem; font-weight: 600;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--acento);
+}
+.marca b { width: .58rem; height: .58rem; background: var(--acento); display: block; }
+
+h1 {
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: clamp(1.9rem, 5.4vw, 3rem);
+  line-height: 1.1; font-weight: 700; letter-spacing: -.025em;
+  color: var(--tinta); margin: .5rem 0 0; text-wrap: balance;
+}
+.tesis {
+  font-size: clamp(1.05rem, 2.6vw, 1.22rem);
+  color: var(--tenue); margin: .9rem 0 0; max-width: var(--medida);
+}
+
+#motivo { width: 100%; height: auto; display: block; margin-top: .4rem; }
+
+.leyenda {
+  display: flex; flex-wrap: wrap; gap: .35rem 1.2rem;
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: .76rem; color: var(--tenue); margin-top: .7rem;
+}
+.leyenda span { display: flex; align-items: center; gap: .45rem; }
+.leyenda i { width: .62rem; height: .62rem; border-radius: 2px; display: block; }
+
+.credito {
+  display: flex; flex-wrap: wrap; gap: .8rem; justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--borde); padding-top: .9rem; margin-top: .4rem;
+  font-family: "Geist", system-ui, sans-serif; font-size: .82rem; color: var(--tenue);
+}
+.credito .quien { color: var(--tinta); font-weight: 600; font-size: .95rem; }
+.credito a { color: var(--acento); text-decoration: none; border-bottom: 1px solid transparent; }
+.credito a:hover, .credito a:focus-visible { border-bottom-color: currentColor; }
+
+/* ── Cuerpo ───────────────────────────────────────────────────────────── */
+h2 {
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: clamp(1.15rem, 3vw, 1.4rem); font-weight: 600; letter-spacing: -.015em;
+  color: var(--tinta); margin: 1.6rem 0 0;
+  padding-bottom: .45rem; border-bottom: 2px solid var(--acento);
+  text-wrap: balance;
+}
+h3 {
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: .78rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--acento); margin: 1.1rem 0 -.4rem;
+}
+p { margin: 0; max-width: var(--medida); }
+strong { color: var(--tinta); font-weight: 500; }
+em { color: var(--tinta); }
+
+ul { margin: 0; padding-left: 1.1rem; max-width: var(--medida); display: flex; flex-direction: column; gap: .5rem; }
+li::marker { color: var(--apagado); }
+
+.cita {
+  border-left: 3px solid var(--acento);
+  background: var(--superficie);
+  padding: 1rem 1.1rem; border-radius: 0 4px 4px 0;
+  display: flex; flex-direction: column; gap: .6rem;
+  max-width: var(--medida);
+}
+.fuente {
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: .74rem; line-height: 1.5; color: var(--tenue);
+  max-width: var(--medida);
+}
+.fuente em { color: var(--tenue); }
+
+/* ── Las reglas: la numeración ES información (son cinco, ordenadas) ──── */
+.reglas { display: flex; flex-direction: column; max-width: var(--medida); }
+.regla {
+  display: grid; grid-template-columns: 1.55rem 1fr; gap: .75rem;
+  padding: .75rem 0; border-top: 1px solid var(--borde);
+}
+.regla:last-child { border-bottom: 1px solid var(--borde); }
+.regla .n {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-size: .74rem; color: var(--acento);
+  border: 1px solid var(--acento); border-radius: 50%;
+  width: 1.55rem; height: 1.55rem;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: .15rem;
+}
+.regla p { font-size: .98rem; }
+
+/* ── Figuras ──────────────────────────────────────────────────────────── */
+figure { margin: .4rem 0; display: flex; flex-direction: column; gap: .6rem; }
+.lienzo { overflow-x: auto; padding-bottom: .2rem; }
+.lienzo svg { display: block; min-width: 30rem; width: 100%; height: auto; }
+figcaption {
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: .78rem; line-height: 1.55; color: var(--tenue); max-width: var(--medida);
+}
+figcaption b { color: var(--tinta); font-weight: 600; }
+
+.nunca {
+  border: 1px solid var(--riesgo); border-radius: 4px;
+  padding: .75rem .95rem; max-width: var(--medida);
+  font-family: "Geist", system-ui, sans-serif; font-size: .86rem;
+  display: flex; flex-direction: column; gap: .2rem;
+}
+.nunca b { color: var(--riesgo); font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; }
+
+/* El detalle al pasar el mouse: en papel esto no se puede. */
+#pista {
+  position: fixed; pointer-events: none; opacity: 0;
+  background: var(--tinta); color: var(--fondo);
+  font-family: "Geist", system-ui, sans-serif; font-size: .76rem; line-height: 1.35;
+  padding: .4rem .55rem; border-radius: 4px;
+  transition: opacity .12s ease; z-index: 9;
+  max-width: 14rem;
+}
+@media (prefers-reduced-motion: reduce) { #pista { transition: none; } }
+
+.pie {
+  margin-top: 1.6rem; padding-top: 1.1rem; border-top: 2px solid var(--acento);
+  font-family: "Geist", system-ui, sans-serif; font-size: .88rem;
+  display: flex; flex-direction: column; gap: .15rem;
+}
+.pie .quien { color: var(--tinta); font-weight: 600; font-size: 1.05rem; }
+.pie a { color: var(--acento); text-decoration: none; border-bottom: 1px solid transparent; }
+.pie a:hover, .pie a:focus-visible { border-bottom-color: currentColor; }
+
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
+</style>
+
+<div class="hoja">
+
+  <header>
+    <div class="marca"><b></b> AntiGro</div>
+    <h1>Percibir señales de grooming sin leer un solo mensaje del chico</h1>
+    <p class="tesis">Un chico casi nunca lo cuenta. Este documento explica qué problema resuelve
+    AntiGro, cómo funciona, y —sobre todo— qué es lo que no puede ver.</p>
+  </header>
+
+  <div>
+    <canvas id="motivo" width="1156" height="680" aria-label="Un campo de días de actividad de red: casi todo es ruido, y un bloque de días consecutivos se sostiene sin cortarse."></canvas>
+    <div class="leyenda">
+      <span><i style="background:var(--acento);opacity:.3"></i> actividad de red, día por día</span>
+      <span><i style="background:var(--g-mirar)"></i> algo se corre de lo habitual</span>
+      <span><i style="background:var(--g-patron)"></i> y no se corta: eso es lo que el sistema mira</span>
+    </div>
+  </div>
+
+  <div class="credito">
+    <div>
+      <div class="quien">Edgardo Lamas</div>
+      <div>Studio Lamas · <a href="https://studio-lamas.vercel.app" target="_blank" rel="noopener">studio-lamas.vercel.app</a></div>
+    </div>
+    <div>Agosto de 2026 · para lectura profesional</div>
+  </div>
+
+  <p class="fuente" style="margin-top:.6rem"><em>Todas las cifras citan su fuente. Las que no se
+  pudieron verificar contra el documento original no están en esta página.</em></p>
+
+  <h2>El problema</h2>
+
+  <p>Un chico que está siendo contactado por un adulto en internet <strong>casi nunca lo
+  cuenta</strong>, y cuando lo cuenta ya pasó bastante tiempo. El estudio nacional argentino
+  describe un hogar donde los controles existen <em>y no producen conocimiento</em>:</p>
+
+  <div class="cita">
+    <p>El <strong>57,5%</strong> de los hogares con internet declara tener controles sobre su uso.
+    Y aun así, <strong>en dos tercios de esos hogares los adultos conocen poco o nada de lo que
+    hacen los chicos en internet</strong>. Sólo el <strong>23,1%</strong> conoce el nombre con el
+    que se denomina el acoso sexual a chicos en internet.</p>
+    <p>Entre quienes se contactaron con desconocidos, el <strong>27,6%</strong> recibió comentarios
+    de tipo erótico o sexual sin haberlos solicitado. En el <strong>8,3%</strong> de los hogares con
+    internet <strong>recibieron o les solicitaron imágenes de chicos en situaciones
+    sexuales</strong>.</p>
+    <p class="fuente">Estudio nacional sobre conocimiento y experiencias sobre acoso sexual a niñas,
+    niños y adolescentes mediante tecnologías de la información y comunicación. Ministerio de
+    Justicia y Derechos Humanos de la Nación, Dirección Nacional de Política Criminal en Materia de
+    Justicia y Legislación Penal. Buenos Aires, 2023. Unidad de relevamiento: el hogar.</p>
+  </div>
+
+  <p><strong>Ese contraste es el problema entero en una línea:</strong> más de la mitad de las casas
+  tiene algún control puesto, y en dos de cada tres nadie sabe qué está pasando.</p>
+
+  <p>El mismo estudio describe dónde y a quién le pasa: la aplicación más usada por los agresores es
+  <strong>WhatsApp, con el 74,3% de los casos</strong>; el <strong>72,3%</strong> de las víctimas
+  tenía entre <strong>12 y 14 años</strong> y el <strong>66,3%</strong> era de género femenino; y en
+  el <strong>37,3%</strong> de los casos <strong>no se hizo ninguna denuncia</strong>. En el
+  <strong>61,4%</strong>, la familia no sabía quién era el agresor.</p>
+
+  <p>La Línea 137 —Equipo Niñ@s contra la Explotación Sexual y Grooming, del Programa Las Víctimas
+  contra las Violencias— registró <strong>823 consultas entre enero y octubre de 2022</strong>, de
+  las que <strong>309 fueron de grooming</strong>: el <strong>59%</strong> de esas víctimas tenía
+  entre 12 y 17 años, el <strong>22%</strong> entre 6 y 11, y el <strong>76% eran mujeres</strong>.</p>
+
+  <p>El adulto responsable queda entonces frente a un problema sin buenas salidas: <em>o no ve nada,
+  o entra a leer.</em> Y leer tiene costos que se pagan después.</p>
+
+  <h2>Lo que ya se intenta, y lo que dice la investigación</h2>
+
+  <p>La respuesta habitual es una aplicación de control parental. La línea de trabajo de
+  <strong>Pamela Wisniewski</strong> (UCF / Vanderbilt) viene midiendo qué hacen esas aplicaciones y
+  qué efecto tienen, y los resultados van en contra de la intuición.</p>
+
+  <div class="cita">
+    <p>Sobre <strong>74 aplicaciones Android</strong> de seguridad para adolescentes, el
+    <strong>89% de las funciones eran de control parental</strong> —monitoreo, restricción— y sólo
+    el <strong>11% apoyaba la autorregulación del adolescente</strong>.</p>
+    <p class="fuente">Wisniewski, Ghosh, Xu, Rosson &amp; Carroll. <em>«Parental Control vs. Teen
+    Self-Regulation: Is there a middle ground for mobile online safety?»</em> ACM CSCW, 2017.</p>
+  </div>
+
+  <div class="cita">
+    <p><strong>La involucración parental y la supervisión directa se asociaron con menos
+    victimización online</strong> —y con menos problemas con pares—, <strong>pero el uso de
+    aplicaciones de control no mostró esa correlación</strong>. Más aún: su uso se asoció con
+    <strong>más</strong> riesgos, no menos, incluidos contenido explícito no deseado, hostigamiento
+    y solicitudes sexuales.</p>
+    <p class="fuente">Ghosh &amp; Wisniewski et al., ACM CHI 2018 (Montreal). Encuesta a 215 pares
+    de padre/madre e hijo adolescente, más el análisis de 736 reseñas públicas de estas
+    aplicaciones. · Línea continuada en Park, Akter, Wisniewski &amp; Badillo-Urquiola, <em>«It's
+    Still Complicated: From Privacy-Invasive Parental Control to Teen-Centric Solutions for Digital
+    Resilience»</em>, IEEE Security &amp; Privacy, enero de 2024.</p>
+  </div>
+
+  <p><strong>La conclusión práctica es incómoda y es el punto de partida de AntiGro:</strong>
+  vigilar más no protege más. Lo que protege es que el adulto esté cerca — y una herramienta que
+  rompe la confianza le saca al chico justamente al adulto al que iba a poder recurrir.</p>
+
+  <h2>Qué hace AntiGro</h2>
+
+  <p>AntiGro no mira <em>qué</em> escribe un chico. Mira <strong>cuándo y hacia dónde hubo actividad
+  de red</strong>, y sólo habla cuando eso se sostiene en el tiempo.</p>
+
+  <p>Técnicamente: el dispositivo del chico resuelve sus consultas de nombres de dominio a través de
+  un servicio que las deja registradas. Eso devuelve <strong>nombres de sitios y horarios</strong>.
+  Los mensajes no pasan por ahí — no es que no se quieran leer: <strong>por ese camino no se
+  pueden</strong>.</p>
+
+  <figure>
+    <div class="lienzo" id="lienzoMecanismo"></div>
+    <figcaption><b>Cómo trabaja.</b> Tres entradas, un motor que exige persistencia, y dos salidas —
+    porque el chico también recibe algo, no sólo los adultos.</figcaption>
+  </figure>
+
+  <div class="nunca">
+    <b>Lo que nunca entra al sistema</b>
+    <span>mensajes · fotos · audios · con quién habla · el contenido de nada</span>
+  </div>
+
+  <h3>Las cinco reglas, que son de diseño y no de estilo</h3>
+
+  <div class="reglas">
+    <div class="regla"><div class="n">1</div><p><strong>El sistema nunca afirma</strong> que un
+      chico está siendo acosado — ni que está a salvo. Señala, no diagnostica. Las dos mitades
+      importan: afirmar que está a salvo también le saca al adulto la decisión de mirar.</p></div>
+    <div class="regla"><div class="n">2</div><p><strong>No se lee el contenido.</strong> El chico
+      tiene derecho a su vida privada, y esa privacidad es la condición para que el sistema sea
+      aceptable — para él y para quien lo instala.</p></div>
+    <div class="regla"><div class="n">3</div><p><strong>El chico sabe desde el minuto cero.</strong>
+      No hay instalación a escondidas. Un chico que sabe que hay una red que lo cuida es un aliado;
+      uno que se siente espiado es un adversario.</p></div>
+    <div class="regla"><div class="n">4</div><p><strong>La conversación con el chico es la primera
+      intervención</strong>, y va antes que la parte técnica. El alta obliga a pasar por esa
+      pantalla antes de instalar nada.</p></div>
+    <div class="regla"><div class="n">5</div><p><strong>No se alerta por un evento: se alerta por un
+      patrón que se sostiene.</strong> Cualquier chico se queda una noche despierto por algo
+      puntual. Un sistema que avisa por eso se apaga en una semana.</p></div>
+  </div>
+
+  <figure>
+    <div class="lienzo" id="lienzoTiempo"></div>
+    <figcaption><b>Por qué no alerta enseguida.</b> El día 5 el valor cruza el umbral y el sistema
+    se calla: un pico aislado no es información. Recién cuando el corrimiento se sostiene varios
+    días seguidos hay algo que decir — y entonces dice desde cuándo.
+    <em>Esquema del mecanismo; los valores son ilustrativos, no una medición.</em>
+    Pasá el mouse por cada día para ver su estado.</figcaption>
+  </figure>
+
+  <h2>Lo que AntiGro no hace, dicho antes de que lo pregunten</h2>
+
+  <ul>
+    <li><strong>No lee mensajes, ni fotos, ni audios</strong>, y no sabe con quién habla el chico.</li>
+    <li><strong>No dice que hay grooming.</strong> Dice qué se observó, en qué días, y qué es lo que
+      explícitamente no puede ver. Esa última parte va siempre, sobre todo cuando el sistema habla.</li>
+    <li><strong>No puntúa al chico ni a su familia.</strong> No hay perfiles de riesgo por estructura
+      familiar, escuela ni condición alguna.</li>
+    <li><strong>No reemplaza a nadie.</strong> Cuando la respuesta correcta es un adulto o la Línea
+      137, el sistema lo dice y se corre.</li>
+    <li><strong>No ve lo que pasa fuera de la red</strong> — que es donde ocurre buena parte de lo
+      que importa.</li>
+  </ul>
+
+  <h2>Por qué les pido a ustedes que lo miren</h2>
+
+  <p>Hay tres puntos donde el criterio clínico decide, y donde yo no soy la fuente.</p>
+
+  <h3>1 · Qué se le dice al adulto, y qué no</h3>
+  <p>Cuando el sistema habla, un padre asustado hace algo. Las guías oficiales coinciden en tres
+  indicaciones que <strong>van contra el instinto</strong>, y son las que más se hacen mal:
+  <strong>no borrar nada</strong> del teléfono —es la prueba—, <strong>no amenazar al
+  acosador</strong> —se asusta, borra todo y desaparece— y <strong>no interrogar al chico</strong>
+  cuando cuenta algo.</p>
+  <p class="fuente">Ministerio de Justicia de la Nación, «Guía para padres, familias y docentes»
+  (Con Vos en la Web) · Ministerio Público de la Provincia de Buenos Aires, Procuración General de
+  la SCBA. El asistente del sistema cita el organismo cada vez que da una de estas indicaciones.</p>
+
+  <div class="cita">
+    <p>El mismo estudio nacional midió qué haría un adulto si un chico fuera víctima: el
+    <strong>73,9%</strong> haría la denuncia a la policía, pero el <strong>62,9% borraría a la
+    persona agresora de todas las cuentas del chico</strong> y el <strong>31%</strong> le prohibiría
+    conectarse.</p>
+    <p><strong>Las dos últimas son exactamente lo que las guías piden no hacer</strong> — borrar es
+    destruir la prueba, y prohibir aísla al chico justo cuando más necesita hablar. El instinto
+    mayoritario va en contra de la indicación oficial, y eso no se corrige con más vigilancia: se
+    corrige diciéndoselo al adulto en el momento en que va a actuar.</p>
+    <p class="fuente">Misma fuente: Estudio nacional, Ministerio de Justicia y DDHH de la Nación, 2023.</p>
+  </div>
+
+  <p><strong>La tercera es la que más me interesa discutir con ustedes.</strong> Un interrogatorio
+  parental bienintencionado puede contaminar el relato del chico antes de que intervenga nadie con
+  formación — y ese relato es, muchas veces, la pieza principal de una causa. El sistema está
+  diseñado para <em>evitar</em> ese momento: le da al adulto un registro fechado en vez de una
+  conclusión, precisamente para que no salga corriendo a preguntar.</p>
+
+  <h3>2 · El registro fechado, y qué no es</h3>
+  <p>Lo que el sistema entrega es una cronología: qué se vio, en qué días, y qué no se puede ver.
+  <strong>No es prueba y no pretende serlo.</strong> Es material para ordenar una consulta o una
+  denuncia, que hoy suelen empezar con una impresión y una fecha aproximada.</p>
+
+  <h3>3 · Qué se le dice al chico</h3>
+  <p>Cuando el sistema habla, al chico también le llega un mensaje, escrito para su edad. Ese texto
+  pasa por un control automático que frena cualquier afirmación prohibida antes de enviarlo — pero
+  que una frase sea <em>correcta</em> no la vuelve <em>adecuada</em>. Ahí necesito ojos clínicos.</p>
+
+  <h2>Proyecciones</h2>
+
+  <ul>
+    <li><strong>El informe para denunciar.</strong> Hoy el registro existe adentro del panel; falta
+      convertirlo en un documento que un adulto pueda llevar. No una conclusión: una cronología.</li>
+    <li><strong>Perfil de vulnerabilidad como contexto, nunca como puntaje.</strong> La literatura
+      señala factores —comunicación familiar deficiente, historia previa de abuso— que hoy el
+      sistema no usa. Si algún día entran, entran como contexto para leer una señal, no como un
+      número sobre un chico.</li>
+    <li><strong>El mismo motor para hostigamiento entre pares.</strong> La arquitectura transfiere;
+      los números no, porque están calibrados sobre estudios de grooming y buena parte del
+      hostigamiento escolar no deja huella en la red. Es una dirección, no algo que ya haga.</li>
+    <li><strong>Investigación con acceso real.</strong> Los datos que de verdad describen esta
+      conducta están en el ámbito policial y judicial, no en la web abierta. Es la puerta que me
+      gustaría que me ayuden a golpear.</li>
+  </ul>
+
+  <h2>Lo que les pido</h2>
+  <p>El sistema está funcionando y se puede probar entrando. No busco una validación de cortesía:
+  busco que me digan <strong>dónde el sistema dice de más</strong>, <strong>dónde una recomendación
+  puede hacer daño</strong>, y <strong>qué le falta al registro para que le sirva a alguien que
+  trabaja con esto</strong>. Si algo está mal, prefiero saberlo antes de que lo use una familia.</p>
+
+  <div class="pie">
+    <div class="quien">Edgardo Lamas</div>
+    <div>Studio Lamas · desarrollo de software</div>
+    <div><a href="https://studio-lamas.vercel.app" target="_blank" rel="noopener">studio-lamas.vercel.app</a></div>
+  </div>
+</div>
+
+<div id="pista" role="status" aria-live="polite"></div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────────
+   EL MOTIVO DE PORTADA — en canvas, no 680 rects escritos a mano.
+   No es decoración: son días de actividad de red. Casi todo es ruido, y un
+   bloque de días consecutivos se sostiene. Es la tesis del producto dibujada.
+   ───────────────────────────────────────────────────────────────────────── */
+(function () {
+  const cv = document.getElementById("motivo");
+  const cx = cv.getContext("2d");
+  const COLS = 34, FILAS = 20, CEL = 26, GAP = 8;   // ×2 para pantallas densas
+
+  // Generador con semilla: el patrón es el mismo siempre, no cambia al recargar.
+  let s = 11;
+  const rnd = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
+
+  const tinta = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  function dibujar() {
+    const acento = tinta("--acento"), mirar = tinta("--g-mirar"), patron = tinta("--g-patron");
+    cx.clearRect(0, 0, cv.width, cv.height);
+    s = 11;
+    const c0 = 23, c1 = 30, f0 = FILAS - 8, f1 = FILAS - 4;
+    for (let f = 0; f < FILAS; f++) {
+      for (let c = 0; c < COLS; c++) {
+        const x = c * (CEL + GAP), y = f * (CEL + GAP);
+        let color, op;
+        if (c >= c0 && c <= c1 && f >= f0 && f <= f1) { color = patron; op = .92; }
+        else {
+          const r = rnd();
+          if (r > 0.96)      { color = mirar;  op = .5; }
+          else if (r > 0.84) { color = acento; op = .28; }
+          else               { color = acento; op = .09 + rnd() * .15; }
+        }
+        cx.globalAlpha = op;
+        cx.fillStyle = color;
+        cx.beginPath();
+        cx.roundRect(x, y, CEL, CEL, 3);
+        cx.fill();
+      }
+    }
+    cx.globalAlpha = 1;
+  }
+
+  dibujar();
+  // El canvas no hereda las variables CSS: se vuelve a dibujar si cambia el tema.
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", dibujar);
+})();
+
+/* ─────────────────────────────────────────────────────────────────────────
+   LAS DOS FIGURAS
+   ───────────────────────────────────────────────────────────────────────── */
+const ns = "http://www.w3.org/2000/svg";
+const el = (t, a, txt) => {
+  const n = document.createElementNS(ns, t);
+  for (const k in a) n.setAttribute(k, a[k]);
+  if (txt != null) n.textContent = txt;
+  return n;
+};
+
+/* ── El mecanismo ─────────────────────────────────────────────────────── */
+(function () {
+  const svg = el("svg", { viewBox: "0 0 720 200", role: "img",
+    "aria-label": "Tres entradas —la red, los adultos y las estadísticas oficiales— llegan a un motor que compara contra la conducta habitual del chico y exige persistencia; de ahí salen dos avisos: uno a los adultos y otro al chico." });
+
+  const caja = (x, y, w, h, titulo, linea1, linea2) => {
+    svg.appendChild(el("rect", { x, y, width: w, height: h, rx: 4,
+      fill: "var(--superficie)", stroke: "var(--borde)" }));
+    svg.appendChild(el("text", { x: x + 14, y: y + 22, "font-size": 13, "font-weight": 600,
+      fill: "var(--tinta)", "font-family": "Geist, sans-serif" }, titulo));
+    if (linea1) svg.appendChild(el("text", { x: x + 14, y: y + 40, "font-size": 11,
+      fill: "var(--tenue)", "font-family": "Geist, sans-serif" }, linea1));
+    if (linea2) svg.appendChild(el("text", { x: x + 14, y: y + 54, "font-size": 11,
+      fill: "var(--tenue)", "font-family": "Geist, sans-serif" }, linea2));
+  };
+
+  const flecha = (x1, y1, x2, y2) => {
+    svg.appendChild(el("path", { d: `M${x1},${y1} L${x2 - 7},${y2}`,
+      stroke: "var(--apagado)", fill: "none", "stroke-width": 1.2 }));
+    svg.appendChild(el("path", { d: `M${x2 - 8},${y2 - 3.5} L${x2},${y2} L${x2 - 8},${y2 + 3.5} Z`,
+      fill: "var(--apagado)" }));
+  };
+
+  svg.appendChild(el("text", { x: 4, y: 12, "font-size": 10, fill: "var(--apagado)",
+    "letter-spacing": 1.6, "font-family": "Geist, sans-serif" }, "LAS TRES ENTRADAS"));
+
+  caja(4, 22, 180, 44, "La red", "dominios y horarios");
+  caja(4, 76, 180, 44, "Los adultos", "nueve preguntas sobre lo que ven");
+  caja(4, 130, 180, 44, "Las estadísticas", "oficiales: qué pesa cuánto");
+
+  flecha(190, 44, 250, 88);
+  flecha(190, 98, 250, 98);
+  flecha(190, 152, 250, 108);
+
+  svg.appendChild(el("rect", { x: 256, y: 56, width: 184, height: 86, rx: 5,
+    fill: "none", stroke: "var(--acento)", "stroke-width": 2 }));
+  svg.appendChild(el("text", { x: 348, y: 82, "font-size": 14, "font-weight": 600,
+    fill: "var(--tinta)", "text-anchor": "middle", "font-family": "Geist, sans-serif" }, "El motor"));
+  svg.appendChild(el("text", { x: 348, y: 101, "font-size": 11, fill: "var(--tenue)",
+    "text-anchor": "middle", "font-family": "Geist, sans-serif" }, "compara contra la conducta"));
+  svg.appendChild(el("text", { x: 348, y: 115, "font-size": 11, fill: "var(--tenue)",
+    "text-anchor": "middle", "font-family": "Geist, sans-serif" }, "habitual de ESE chico"));
+  svg.appendChild(el("text", { x: 348, y: 132, "font-size": 11, "font-weight": 600,
+    fill: "var(--acento)", "text-anchor": "middle", "font-family": "Geist, sans-serif" }, "y exige persistencia"));
+
+  flecha(446, 80, 506, 52);
+  flecha(446, 120, 506, 148);
+
+  caja(512, 26, 204, 52, "Aviso a los adultos", "qué se vio, en qué días,", "y qué NO se puede ver");
+  caja(512, 122, 204, 52, "Orientación al chico", "escrita para su edad,", "y él sabe desde el día uno");
+
+  document.getElementById("lienzoMecanismo").appendChild(svg);
+})();
+
+/* ── La línea de tiempo ───────────────────────────────────────────────── */
+(function () {
+  const vals = [18,26,21,33,72,24,19,30,27,22,35,29,31,55,62,66,70,74,79,84,88];
+  const est  = [...Array(13).fill("c"), ...Array(6).fill("a"), ...Array(2).fill("p")];
+  const NOMBRE = { c: "Sin novedad", a: "Para mirar", p: "Un patrón que se sostiene" };
+  const VAR    = { c: "--g-calma",   a: "--g-mirar",  p: "--g-patron" };
+
+  const W = 720, BASE = 156, MAXH = 112, UMBRAL = 60, BW = 30, GAP = 2;
+  const X0 = (W - (vals.length * BW + (vals.length - 1) * GAP)) / 2;
+  const y = (v) => BASE - (v / 100) * MAXH;
+
+  const svg = el("svg", { viewBox: `0 0 ${W} 216`, role: "img",
+    "aria-label": "Veintiún días. El día 5 cruza el umbral y el sistema no dice nada porque es un pico aislado. Desde el día 14 el corrimiento se sostiene y el sistema habla el día 20." });
+
+  // Punteado porque ES un umbral. La base va sólida: es un eje.
+  svg.appendChild(el("line", { x1: X0 - 10, y1: y(UMBRAL), x2: W - X0 + 10, y2: y(UMBRAL),
+    stroke: "var(--riesgo)", "stroke-width": 1, "stroke-dasharray": "5 4", opacity: .55 }));
+  svg.appendChild(el("text", { x: X0 - 10, y: y(UMBRAL) - 6, "font-size": 10,
+    fill: "var(--riesgo)", "font-family": "Geist, sans-serif" }, "umbral"));
+
+  const pista = document.getElementById("pista");
+  vals.forEach((v, i) => {
+    const x = X0 + i * (BW + GAP), h = (v / 100) * MAXH, r = Math.min(4, h / 2);
+    const barra = el("path", {
+      d: `M${x},${BASE} L${x},${y(v) + r} Q${x},${y(v)} ${x + r},${y(v)} L${x + BW - r},${y(v)} ` +
+         `Q${x + BW},${y(v)} ${x + BW},${y(v) + r} L${x + BW},${BASE} Z`,
+      fill: `var(${VAR[est[i]]})`, tabindex: 0, role: "img",
+      "aria-label": `Día ${i + 1}: ${NOMBRE[est[i]]}`
+    });
+    const mostrar = (ev) => {
+      const p = ev.touches ? ev.touches[0] : ev;
+      pista.textContent = `Día ${i + 1} · ${NOMBRE[est[i]]}`;
+      pista.style.opacity = 1;
+      pista.style.left = Math.min(p.clientX + 12, innerWidth - 180) + "px";
+      pista.style.top = (p.clientY - 40) + "px";
+    };
+    barra.addEventListener("mousemove", mostrar);
+    barra.addEventListener("focus", (e) => {
+      const b = e.target.getBoundingClientRect();
+      mostrar({ clientX: b.left, clientY: b.top });
+    });
+    barra.addEventListener("mouseleave", () => (pista.style.opacity = 0));
+    barra.addEventListener("blur", () => (pista.style.opacity = 0));
+    svg.appendChild(barra);
+  });
+
+  svg.appendChild(el("line", { x1: X0 - 10, y1: BASE, x2: W - X0 + 10, y2: BASE,
+    stroke: "var(--borde)", "stroke-width": 1 }));
+
+  const x5 = X0 + 4 * (BW + GAP) + BW / 2, x20 = X0 + 19 * (BW + GAP) + BW / 2;
+
+  svg.appendChild(el("line", { x1: x5, y1: y(72) - 6, x2: x5, y2: 26,
+    stroke: "var(--apagado)", "stroke-width": .9 }));
+  svg.appendChild(el("text", { x: x5 - 6, y: 22, "font-size": 10.5, fill: "var(--texto)",
+    "text-anchor": "end", "font-family": "Geist, sans-serif" }, "un pico suelto no alcanza"));
+
+  svg.appendChild(el("circle", { cx: x20, cy: y(84) - 11, r: 3.2, fill: "var(--riesgo)" }));
+  svg.appendChild(el("line", { x1: x20, y1: y(84) - 9, x2: x20, y2: 46,
+    stroke: "var(--riesgo)", "stroke-width": 1 }));
+  svg.appendChild(el("text", { x: x20 - 7, y: 42, "font-size": 11, "font-weight": 600,
+    fill: "var(--riesgo)", "text-anchor": "end", "font-family": "Geist, sans-serif" }, "acá el sistema habla"));
+
+  [["día 1", X0, "start"], ["día 11", X0 + 10 * (BW + GAP), "start"], ["día 21", W - X0, "end"]]
+    .forEach(([t, x, anchor]) => svg.appendChild(el("text", { x, y: BASE + 16, "font-size": 10,
+      fill: "var(--tenue)", "text-anchor": anchor, "font-family": "Geist, sans-serif" }, t)));
+
+  // Leyenda: la identidad nunca queda sólo en el color.
+  Object.keys(NOMBRE).forEach((k, i) => {
+    const x = X0 + i * 118;
+    svg.appendChild(el("rect", { x, y: BASE + 32, width: 10, height: 10, rx: 2, fill: `var(${VAR[k]})` }));
+    svg.appendChild(el("text", { x: x + 16, y: BASE + 41, "font-size": 10.5, fill: "var(--tenue)",
+      "font-family": "Geist, sans-serif" }, NOMBRE[k]));
+  });
+
+  document.getElementById("lienzoTiempo").appendChild(svg);
+})();
+</script>

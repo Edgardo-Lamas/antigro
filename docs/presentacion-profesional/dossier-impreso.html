@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<title>AntiGro — documento de presentación</title>
+<style>
+  @page { size: A4; margin: 18mm 17mm 16mm 17mm; }
+
+  :root {
+    --tinta:   #14181d;
+    --texto:   #2b3138;
+    --tenue:   #5c6672;
+    --acento:  #2f6e88;
+    --acento2: #4e9bb9;
+    --linea:   #d8dee5;
+    --fondo2:  #f4f7f9;
+    --alerta:  #a8562f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Georgia, "Charter", "Times New Roman", serif;
+    font-size: 10.4pt;
+    line-height: 1.58;
+    color: var(--texto);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  h1, h2, h3, .sans { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+  /* ── Encabezado ─────────────────────────────────────────────────────── */
+  .marca {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 8.6pt; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--acento); font-weight: 600;
+  }
+  .marca .cuadro { width: 9px; height: 9px; background: var(--acento2); }
+
+  h1 {
+    font-size: 19pt; line-height: 1.2; color: var(--tinta);
+    margin: 13px 0 0; letter-spacing: -.4px; font-weight: 700;
+  }
+  .bajada { margin: 9px 0 0; font-size: 11pt; color: var(--tenue); }
+
+  .meta {
+    margin-top: 15px; padding-top: 9px; border-top: 1px solid var(--linea);
+    font-size: 8.4pt; color: var(--tenue); display: flex; justify-content: space-between;
+  }
+
+  h2 {
+    font-size: 11.6pt; color: var(--tinta); margin: 26px 0 9px;
+    padding-bottom: 5px; border-bottom: 2px solid var(--acento2);
+    font-weight: 700; letter-spacing: -.2px;
+  }
+  h3 {
+    font-size: 9.6pt; color: var(--acento); margin: 17px 0 5px;
+    text-transform: uppercase; letter-spacing: .07em; font-weight: 700;
+  }
+
+  p { margin: 0 0 9px; }
+  strong { color: var(--tinta); font-weight: 700; }
+  em { color: var(--tinta); }
+
+  ul { margin: 0 0 10px; padding-left: 17px; }
+  li { margin-bottom: 5px; }
+
+  .cita {
+    border-left: 3px solid var(--acento2);
+    background: var(--fondo2);
+    padding: 10px 13px; margin: 12px 0;
+    font-size: 9.8pt;
+  }
+  .cita p:last-child { margin-bottom: 0; }
+
+  .fuente {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 7.9pt; color: var(--tenue); line-height: 1.42;
+    display: block; margin-top: 5px;
+  }
+
+  /* ── Las reglas ─────────────────────────────────────────────────────── */
+  .reglas { margin: 12px 0 4px; }
+  .regla {
+    display: flex; gap: 11px; padding: 7px 0;
+    border-top: 1px solid var(--linea);
+  }
+  .regla:last-child { border-bottom: 1px solid var(--linea); }
+  .regla .n {
+    flex: 0 0 20px; height: 20px; border-radius: 50%;
+    background: var(--acento); color: #fff;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 8.6pt; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .regla .t { font-size: 9.9pt; }
+
+  /* ── Figuras ────────────────────────────────────────────────────────── */
+  figure { margin: 16px 0; }
+  figcaption {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 8.1pt; color: var(--tenue); margin-top: 6px; line-height: 1.45;
+  }
+  figcaption b { color: var(--tinta); }
+
+  .nolee {
+    background: #fdf6f1; border: 1px solid #e8cdbb;
+    padding: 9px 13px; margin: 12px 0; font-size: 9.6pt;
+  }
+  .nolee b { color: var(--alerta); }
+
+  .firma {
+    margin-top: 26px; padding-top: 12px; border-top: 2px solid var(--acento2);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 9pt;
+  }
+  .firma .nombre { color: var(--tinta); font-weight: 700; font-size: 10.4pt; }
+  .firma a { color: var(--acento); text-decoration: none; }
+
+  .juntos { page-break-inside: avoid; }
+
+  /* ── La portada ─────────────────────────────────────────────────────── */
+  .portada {
+    height: 247mm; display: flex; flex-direction: column;
+    justify-content: space-between; page-break-after: always;
+  }
+  .portada .motivo { margin: 0 0 0 -2mm; }
+  .portada h1 { font-size: 27pt; line-height: 1.14; margin-top: 16px; }
+  .portada .tesis {
+    font-size: 12pt; color: var(--tenue); margin-top: 12px;
+    max-width: 118mm; line-height: 1.5;
+  }
+  .portada .pie {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 8.4pt; color: var(--tenue);
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-top: 1px solid var(--linea); padding-top: 10px;
+  }
+  .leyenda {
+    display: flex; gap: 18px; flex-wrap: wrap; margin-top: 9px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 8.2pt;
+    color: var(--tenue);
+  }
+  .leyenda span { display: flex; align-items: center; gap: 6px; }
+  .leyenda i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  h2, h3 { page-break-after: avoid; break-after: avoid; }
+  .cita, .regla, figure, ul { page-break-inside: avoid; break-inside: avoid; }
+</style>
+</head>
+<body>
+
+<section class="portada">
+  <div>
+    <div class="marca"><span class="cuadro"></span> AntiGro</div>
+    <h1>Percibir señales de grooming<br>sin leer un solo mensaje<br>del chico</h1>
+    <p class="tesis">Un chico casi nunca lo cuenta. Este documento explica qué problema resuelve
+    AntiGro, cómo funciona, y —sobre todo— qué es lo que no puede ver.</p>
+  </div>
+
+  <div class="motivo">
+    <svg viewBox="0 0 578 340" width="100%" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="17" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="34" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="51" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="68" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="85" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="102" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="119" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="136" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="153" y="0" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="170" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="187" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="204" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="221" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="238" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="255" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="272" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="289" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="306" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="323" y="0" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="340" y="0" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="357" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="374" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="391" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="408" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="425" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="442" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="459" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="476" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="493" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="510" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="527" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="544" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="561" y="0" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="0" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="17" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="34" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="51" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="68" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="85" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="102" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="119" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="136" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="153" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="170" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="187" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="204" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="221" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="238" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="255" y="17" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="272" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="289" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="306" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="323" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="340" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="357" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="374" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="391" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="408" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="425" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="442" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="459" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="476" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="493" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="510" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="527" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="544" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="561" y="17" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="0" y="34" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="17" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="34" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="51" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="68" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="85" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="102" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="119" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="136" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="153" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="170" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="187" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="204" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="221" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="238" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="255" y="34" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="272" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="289" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="306" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="323" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="340" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="357" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="374" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="391" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="408" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="425" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="442" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="459" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="476" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="493" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="510" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="527" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="544" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="34" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="0" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="17" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="34" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="51" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="68" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="85" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="102" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="119" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="136" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="153" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="170" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="187" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="204" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="221" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="238" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="255" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="272" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="289" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="306" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="323" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="340" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="357" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="374" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="391" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="408" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="425" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="442" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="459" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="476" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="493" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="510" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="527" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="544" y="51" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="561" y="51" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="0" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="17" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="34" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="51" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="68" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="85" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="102" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="119" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="136" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="153" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="170" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="187" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="204" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="221" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="238" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="255" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="272" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="289" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="306" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="323" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="340" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="357" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="374" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="391" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="408" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="425" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="442" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="459" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="476" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="493" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="510" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="527" y="68" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="544" y="68" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="561" y="68" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="0" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="17" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="34" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="51" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="68" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="85" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="102" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="119" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="136" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="153" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="170" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="187" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="204" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="221" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="238" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="255" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="272" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="289" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="306" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="323" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="340" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="357" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="374" y="85" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="391" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="408" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="425" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="442" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="459" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="476" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="493" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="510" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="527" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="544" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="85" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="0" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="17" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="34" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="51" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="68" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="85" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="102" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="119" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="136" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="153" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="170" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="187" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="204" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="221" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="238" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="255" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="272" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="289" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="306" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="323" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="340" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="357" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="374" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="391" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="408" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="425" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="442" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="459" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="476" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="493" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="510" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="527" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="544" y="102" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="102" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="0" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="17" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="34" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="51" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="68" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="85" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="102" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="119" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="136" y="119" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="153" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="170" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="187" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="204" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="221" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="238" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="255" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="272" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="289" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="306" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="323" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="340" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="357" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="374" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="391" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="408" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="425" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="442" y="119" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="459" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="476" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="493" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="510" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="527" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="544" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="119" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="0" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="17" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="34" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="51" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="68" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="85" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="102" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="119" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="136" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="153" y="136" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="170" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="187" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="204" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="221" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="238" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="255" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="272" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="289" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="306" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="323" y="136" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="340" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="357" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="374" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="391" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="408" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="425" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="442" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="459" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="476" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="493" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="510" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="527" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="544" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="561" y="136" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="0" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="17" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="34" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="51" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="68" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="85" y="153" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="102" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="119" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="136" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="153" y="153" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="170" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="187" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="204" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="221" y="153" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="238" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="255" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="272" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="289" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="306" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="323" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="340" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="357" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="374" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="391" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="408" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="425" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="442" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="459" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="476" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="493" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="510" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="527" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="544" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="153" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="0" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="17" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="34" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="51" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="68" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="85" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="102" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="119" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="136" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="153" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="170" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="187" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="204" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="221" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="238" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="255" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="272" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="289" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="306" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="323" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="340" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="357" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="374" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="391" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="408" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="425" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="442" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="459" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="476" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="493" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="510" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="527" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="544" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="170" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="0" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="17" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="34" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="51" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="68" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="85" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="102" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="119" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="136" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="153" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="170" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="187" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="204" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="221" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="238" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="255" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="272" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="289" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="306" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="323" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="340" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="357" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="374" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="391" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="408" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="425" y="187" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="442" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="459" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="476" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="493" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="510" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="527" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="544" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="187" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="0" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="17" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="34" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="51" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="68" y="204" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="85" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="102" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="119" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="136" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="153" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="170" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="187" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="204" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="221" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="238" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="255" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="272" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="289" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="306" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="323" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="340" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="357" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="374" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="391" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="408" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="425" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="442" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="459" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="476" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="493" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="510" y="204" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="527" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="544" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="204" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="0" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="17" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="34" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="51" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="68" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="85" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="102" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="119" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="136" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="153" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="170" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="187" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="204" y="221" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="221" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="238" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="255" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="272" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="289" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="306" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="323" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="340" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="357" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="374" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="391" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="408" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="425" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="442" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="459" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="476" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="493" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="510" y="221" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="527" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="544" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="561" y="221" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="0" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="17" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="34" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="51" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="68" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="85" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="102" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="119" y="238" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="136" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="153" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="170" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="187" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="204" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="221" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="238" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="255" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="272" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="289" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="306" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="323" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="340" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="357" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="374" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="391" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="408" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="425" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="442" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="459" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="476" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="493" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="510" y="238" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="527" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="544" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="561" y="238" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="0" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="17" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="34" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="51" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="68" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="85" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="102" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="119" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="136" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="153" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="170" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="187" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="204" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="221" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="238" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="255" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="272" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="289" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="306" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="323" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="340" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="357" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="374" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="391" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="408" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="425" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="442" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="459" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="476" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="493" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="510" y="255" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="527" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="544" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="255" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="0" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="17" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="34" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="51" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="68" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.24"/><rect x="85" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="102" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="119" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="136" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="153" y="272" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="170" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="187" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="204" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="221" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="238" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="255" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="272" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="289" y="272" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="306" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="323" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="340" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="357" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="374" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="391" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="408" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="425" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="442" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="459" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="476" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="493" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="510" y="272" width="13" height="13" rx="1.5" fill="#9E2F1B" opacity="0.92"/><rect x="527" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="544" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="561" y="272" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="0" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="17" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="34" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="51" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="68" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="85" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="102" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="119" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="136" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="153" y="289" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="170" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="187" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="204" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="221" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="238" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="255" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="272" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="289" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="306" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="323" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="340" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="357" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="374" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="391" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="408" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="425" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="442" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="459" y="289" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="476" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="493" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="510" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.20"/><rect x="527" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="544" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="561" y="289" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="0" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="17" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="34" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="51" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="68" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="85" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="102" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.09"/><rect x="119" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="136" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="153" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="170" y="306" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="187" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="204" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="221" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="238" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="255" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="272" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="289" y="306" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="306" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="323" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="340" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="357" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="374" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="391" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="408" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/><rect x="425" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="442" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="459" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.14"/><rect x="476" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="493" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="510" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="527" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="544" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="306" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="0" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.23"/><rect x="17" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="34" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="51" y="323" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="68" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="85" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.10"/><rect x="102" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="119" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="136" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="153" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="170" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="187" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="204" y="323" width="13" height="13" rx="1.5" fill="#D89B33" opacity="0.50"/><rect x="221" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="238" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.15"/><rect x="255" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="272" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="289" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="306" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.19"/><rect x="323" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="340" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.22"/><rect x="357" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.17"/><rect x="374" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="391" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="408" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="425" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="442" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.21"/><rect x="459" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.13"/><rect x="476" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.12"/><rect x="493" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.16"/><rect x="510" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="527" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.18"/><rect x="544" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.28"/><rect x="561" y="323" width="13" height="13" rx="1.5" fill="#2F6E88" opacity="0.11"/></svg>
+    <div class="leyenda">
+      <span><i style="background:#2F6E88;opacity:.22"></i> actividad de red, día por día</span>
+      <span><i style="background:#D89B33;opacity:.55"></i> algo se corre de lo habitual</span>
+      <span><i style="background:#9E2F1B"></i> y no se corta: eso es lo que el sistema mira</span>
+    </div>
+  </div>
+
+  <div class="pie">
+    <div>
+      <div style="color:var(--tinta);font-weight:700;font-size:10pt">Edgardo Lamas</div>
+      <div>Studio Lamas · studio-lamas.vercel.app</div>
+    </div>
+    <div style="text-align:right">
+      Documento de presentación<br>Agosto de 2026 · para lectura profesional
+    </div>
+  </div>
+</section>
+
+<header class="juntos">
+  <div class="marca"><span class="cuadro"></span> AntiGro</div>
+  <h1 style="font-size:17pt">El problema, la solución y sus límites</h1>
+  <div class="meta">
+    <span>Todas las cifras citan su fuente. Las que no se pudieron verificar no están.</span>
+  </div>
+</header>
+
+<h2>El problema</h2>
+
+<p>Un chico que está siendo contactado por un adulto en internet <strong>casi nunca lo cuenta</strong>,
+y cuando lo cuenta ya pasó bastante tiempo. El estudio nacional argentino describe un hogar donde
+los controles existen <em>y no producen conocimiento</em>:</p>
+
+<div class="cita">
+  <p>El <strong>57,5%</strong> de los hogares con internet declara tener controles sobre su uso.
+  Y aun así, <strong>en dos tercios de esos hogares los adultos conocen poco o nada de lo que hacen
+  los chicos en internet</strong>. Sólo el <strong>23,1%</strong> de las personas entrevistadas
+  conoce el nombre con el que se denomina el acoso sexual a chicos en internet.</p>
+  <p style="margin-top:7px">Entre quienes se contactaron con desconocidos, el <strong>27,6%</strong>
+  recibió comentarios de tipo erótico o sexual sin haberlos solicitado. En el <strong>8,3%</strong>
+  de los hogares con internet <strong>recibieron o les solicitaron imágenes de chicos en situaciones
+  sexuales</strong>.</p>
+  <span class="fuente">Estudio nacional sobre conocimiento y experiencias sobre acoso sexual a
+  niñas, niños y adolescentes mediante tecnologías de la información y comunicación. Ministerio de
+  Justicia y Derechos Humanos de la Nación, Dirección Nacional de Política Criminal en Materia de
+  Justicia y Legislación Penal. Buenos Aires, 2023. Unidad de relevamiento: el hogar.</span>
+</div>
+
+<p><strong>Ese contraste es el problema entero en una línea:</strong> más de la mitad de las casas
+tiene algún control puesto, y en dos de cada tres nadie sabe qué está pasando.</p>
+
+<p>El mismo estudio describe dónde y a quién le pasa: la aplicación más usada por los agresores es
+<strong>WhatsApp, con el 74,3% de los casos</strong>; el <strong>72,3%</strong> de las víctimas
+tenía entre <strong>12 y 14 años</strong> y el <strong>66,3%</strong> era de género femenino; y en
+el <strong>37,3%</strong> de los casos <strong>no se hizo ninguna denuncia</strong>. En el
+<strong>61,4%</strong>, la familia no sabía quién era el agresor.</p>
+
+<p>La Línea 137 —Equipo Niñ@s contra la Explotación Sexual y Grooming, del Programa Las Víctimas
+contra las Violencias— registró <strong>823 consultas entre enero y octubre de 2022</strong>, de las
+que <strong>309 fueron de grooming</strong>: el <strong>59%</strong> de esas víctimas tenía entre 12
+y 17 años, el <strong>22%</strong> entre 6 y 11, y el <strong>76% eran mujeres</strong>.</p>
+
+<p>El adulto responsable queda entonces frente a un problema sin buenas salidas: <em>o no ve nada,
+o entra a leer.</em> Y leer tiene costos que se pagan después.</p>
+
+<h2>Lo que ya se intenta, y lo que dice la investigación</h2>
+
+<p>La respuesta habitual es una aplicación de control parental. La línea de trabajo de
+<strong>Pamela Wisniewski</strong> (UCF / Vanderbilt) viene midiendo qué hacen esas aplicaciones y
+qué efecto tienen, y los resultados van en contra de la intuición.</p>
+
+<div class="cita">
+  <p>Sobre <strong>74 aplicaciones Android</strong> de seguridad para adolescentes, el
+  <strong>89% de las funciones eran de control parental</strong> —monitoreo, restricción— y sólo el
+  <strong>11% apoyaba la autorregulación del adolescente</strong>.</p>
+  <span class="fuente">Wisniewski, Ghosh, Xu, Rosson &amp; Carroll. <em>«Parental Control vs. Teen
+  Self-Regulation: Is there a middle ground for mobile online safety?»</em> ACM CSCW, 2017.</span>
+</div>
+
+<div class="cita">
+  <p><strong>La involucración parental y la supervisión directa se asociaron con menos victimización
+  online</strong> —y con menos problemas con pares—, <strong>pero el uso de aplicaciones de control
+  no mostró esa correlación</strong>. Más aún: su uso se asoció con <strong>más</strong> riesgos, no
+  menos, incluidos contenido explícito no deseado, hostigamiento y solicitudes sexuales.</p>
+  <span class="fuente">Ghosh &amp; Wisniewski et al., ACM CHI 2018 (Montreal). Encuesta a 215 pares
+  de padre/madre e hijo adolescente, más el análisis de 736 reseñas públicas de estas aplicaciones.
+  · Línea de trabajo continuada en Park, Akter, Wisniewski &amp; Badillo-Urquiola, <em>«It's Still
+  Complicated: From Privacy-Invasive Parental Control to Teen-Centric Solutions for Digital
+  Resilience»</em>, IEEE Security &amp; Privacy, enero de 2024.</span>
+</div>
+
+<p><strong>La conclusión práctica es incómoda y es el punto de partida de AntiGro:</strong> vigilar
+más no protege más. Lo que protege es que el adulto esté cerca — y una herramienta que rompe la
+confianza le saca al chico justamente al adulto al que iba a poder recurrir.</p>
+
+<h2>Qué hace AntiGro</h2>
+
+<p>AntiGro no mira <em>qué</em> escribe un chico. Mira <strong>cuándo y hacia dónde hubo actividad
+de red</strong>, y sólo habla cuando eso se sostiene en el tiempo.</p>
+
+<p>Técnicamente: el dispositivo del chico resuelve sus consultas de nombres de dominio a través de
+un servicio que las deja registradas. Eso devuelve <strong>nombres de sitios y horarios</strong>. Los
+mensajes no pasan por ahí — no es que no se quieran leer: <strong>por ese camino no se pueden</strong>.</p>
+
+<figure class="juntos">
+<svg viewBox="0 0 720 258" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="f" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+      <path d="M0,1 L8,4.5 L0,8 z" fill="#8b95a1"/>
+    </marker>
+  </defs>
+
+  <text x="8" y="14" font-size="9.5" fill="#5c6672" letter-spacing="1.6">LAS TRES ENTRADAS</text>
+
+  <g font-size="10.5">
+    <rect x="8" y="26" width="176" height="46" rx="4" fill="#f4f7f9" stroke="#d8dee5"/>
+    <text x="20" y="45" fill="#14181d" font-weight="700">La red</text>
+    <text x="20" y="61" fill="#5c6672" font-size="9">dominios y horarios</text>
+
+    <rect x="8" y="82" width="176" height="46" rx="4" fill="#f4f7f9" stroke="#d8dee5"/>
+    <text x="20" y="101" fill="#14181d" font-weight="700">Los adultos</text>
+    <text x="20" y="117" fill="#5c6672" font-size="9">nueve preguntas sobre lo que ven</text>
+
+    <rect x="8" y="138" width="176" height="46" rx="4" fill="#f4f7f9" stroke="#d8dee5"/>
+    <text x="20" y="157" fill="#14181d" font-weight="700">Las estadísticas</text>
+    <text x="20" y="173" fill="#5c6672" font-size="9">oficiales: qué pesa cuánto</text>
+  </g>
+
+  <path d="M188 49 L246 100" stroke="#8b95a1" fill="none" marker-end="url(#f)"/>
+  <path d="M188 105 L246 105" stroke="#8b95a1" fill="none" marker-end="url(#f)"/>
+  <path d="M188 161 L246 112" stroke="#8b95a1" fill="none" marker-end="url(#f)"/>
+
+  <rect x="252" y="60" width="182" height="92" rx="5" fill="#fff" stroke="#2f6e88" stroke-width="2"/>
+  <text x="343" y="86" font-size="11" font-weight="700" fill="#14181d" text-anchor="middle">El motor</text>
+  <text x="343" y="105" font-size="9" fill="#5c6672" text-anchor="middle">compara contra la conducta</text>
+  <text x="343" y="119" font-size="9" fill="#5c6672" text-anchor="middle">habitual de ESE chico</text>
+  <text x="343" y="139" font-size="9" font-weight="700" fill="#2f6e88" text-anchor="middle">y exige persistencia</text>
+
+  <path d="M438 84 L496 60" stroke="#8b95a1" fill="none" marker-end="url(#f)"/>
+  <path d="M438 128 L496 152" stroke="#8b95a1" fill="none" marker-end="url(#f)"/>
+
+  <g font-size="10.5">
+    <rect x="502" y="34" width="210" height="52" rx="4" fill="#f4f7f9" stroke="#d8dee5"/>
+    <text x="514" y="53" fill="#14181d" font-weight="700">Aviso a los adultos</text>
+    <text x="514" y="69" fill="#5c6672" font-size="9">qué se vio, en qué días,</text>
+    <text x="514" y="80" fill="#5c6672" font-size="9">y qué NO se puede ver</text>
+
+    <rect x="502" y="126" width="210" height="52" rx="4" fill="#f4f7f9" stroke="#d8dee5"/>
+    <text x="514" y="145" fill="#14181d" font-weight="700">Orientación al chico</text>
+    <text x="514" y="161" fill="#5c6672" font-size="9">escrita para su edad,</text>
+    <text x="514" y="172" fill="#5c6672" font-size="9">y él sabe desde el día uno</text>
+  </g>
+
+  <rect x="8" y="204" width="704" height="44" rx="4" fill="#fdf6f1" stroke="#e8cdbb"/>
+  <text x="22" y="223" font-size="9.5" font-weight="700" fill="#a8562f">Lo que NUNCA entra al sistema</text>
+  <text x="22" y="239" font-size="9.5" fill="#5c6672">mensajes · fotos · audios · con quién habla · el contenido de nada</text>
+</svg>
+<figcaption><b>Cómo trabaja.</b> Tres entradas, un motor que exige persistencia, y dos salidas —
+porque el chico también recibe algo, no sólo los adultos.</figcaption>
+</figure>
+
+<h3>Las cinco reglas, que son de diseño y no de estilo</h3>
+
+<div class="reglas">
+  <div class="regla"><div class="n">1</div><div class="t"><strong>El sistema nunca afirma</strong>
+    que un chico está siendo acosado — ni que está a salvo. Señala, no diagnostica. Las dos mitades
+    importan: afirmar que está a salvo también le saca al adulto la decisión de mirar.</div></div>
+  <div class="regla"><div class="n">2</div><div class="t"><strong>No se lee el contenido.</strong>
+    El chico tiene derecho a su vida privada, y esa privacidad es la condición para que el sistema
+    sea aceptable — para él y para quien lo instala.</div></div>
+  <div class="regla"><div class="n">3</div><div class="t"><strong>El chico sabe desde el minuto
+    cero.</strong> No hay instalación a escondidas. Un chico que sabe que hay una red que lo cuida
+    es un aliado; uno que se siente espiado es un adversario.</div></div>
+  <div class="regla"><div class="n">4</div><div class="t"><strong>La conversación con el chico es
+    la primera intervención</strong>, y va antes que la parte técnica. El alta obliga a pasar por
+    esa pantalla antes de instalar nada.</div></div>
+  <div class="regla"><div class="n">5</div><div class="t"><strong>No se alerta por un evento: se
+    alerta por un patrón que se sostiene.</strong> Cualquier chico se queda una noche despierto por
+    algo puntual. Un sistema que avisa por eso se apaga en una semana.</div></div>
+</div>
+
+<figure class="juntos">
+<svg viewBox="0 0 720 216" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <!-- El umbral va punteado porque ES un umbral. La base va sólida: es un eje. -->
+  <line x1="15" y1="88.8" x2="705" y2="88.8" stroke="#9E2F1B" stroke-width="1" stroke-dasharray="5 4" opacity=".55"/>
+  <text x="15" y="82.8" font-size="8.4" fill="#9E2F1B" opacity=".9">umbral</text>
+
+  <path d="M25.0,156 L25.0,139.8 Q25.0,135.8 29.0,135.8 L51.0,135.8 Q55.0,135.8 55.0,139.8 L55.0,156 Z" fill="#9AA5B1"/><path d="M57.0,156 L57.0,130.9 Q57.0,126.9 61.0,126.9 L83.0,126.9 Q87.0,126.9 87.0,130.9 L87.0,156 Z" fill="#9AA5B1"/><path d="M89.0,156 L89.0,136.5 Q89.0,132.5 93.0,132.5 L115.0,132.5 Q119.0,132.5 119.0,136.5 L119.0,156 Z" fill="#9AA5B1"/><path d="M121.0,156 L121.0,123.0 Q121.0,119.0 125.0,119.0 L147.0,119.0 Q151.0,119.0 151.0,123.0 L151.0,156 Z" fill="#9AA5B1"/><path d="M153.0,156 L153.0,79.4 Q153.0,75.4 157.0,75.4 L179.0,75.4 Q183.0,75.4 183.0,79.4 L183.0,156 Z" fill="#9AA5B1"/><path d="M185.0,156 L185.0,133.1 Q185.0,129.1 189.0,129.1 L211.0,129.1 Q215.0,129.1 215.0,133.1 L215.0,156 Z" fill="#9AA5B1"/><path d="M217.0,156 L217.0,138.7 Q217.0,134.7 221.0,134.7 L243.0,134.7 Q247.0,134.7 247.0,138.7 L247.0,156 Z" fill="#9AA5B1"/><path d="M249.0,156 L249.0,126.4 Q249.0,122.4 253.0,122.4 L275.0,122.4 Q279.0,122.4 279.0,126.4 L279.0,156 Z" fill="#9AA5B1"/><path d="M281.0,156 L281.0,129.8 Q281.0,125.8 285.0,125.8 L307.0,125.8 Q311.0,125.8 311.0,129.8 L311.0,156 Z" fill="#9AA5B1"/><path d="M313.0,156 L313.0,135.4 Q313.0,131.4 317.0,131.4 L339.0,131.4 Q343.0,131.4 343.0,135.4 L343.0,156 Z" fill="#9AA5B1"/><path d="M345.0,156 L345.0,120.8 Q345.0,116.8 349.0,116.8 L371.0,116.8 Q375.0,116.8 375.0,120.8 L375.0,156 Z" fill="#9AA5B1"/><path d="M377.0,156 L377.0,127.5 Q377.0,123.5 381.0,123.5 L403.0,123.5 Q407.0,123.5 407.0,127.5 L407.0,156 Z" fill="#9AA5B1"/><path d="M409.0,156 L409.0,125.3 Q409.0,121.3 413.0,121.3 L435.0,121.3 Q439.0,121.3 439.0,125.3 L439.0,156 Z" fill="#9AA5B1"/><path d="M441.0,156 L441.0,98.4 Q441.0,94.4 445.0,94.4 L467.0,94.4 Q471.0,94.4 471.0,98.4 L471.0,156 Z" fill="#D89B33"/><path d="M473.0,156 L473.0,90.6 Q473.0,86.6 477.0,86.6 L499.0,86.6 Q503.0,86.6 503.0,90.6 L503.0,156 Z" fill="#D89B33"/><path d="M505.0,156 L505.0,86.1 Q505.0,82.1 509.0,82.1 L531.0,82.1 Q535.0,82.1 535.0,86.1 L535.0,156 Z" fill="#D89B33"/><path d="M537.0,156 L537.0,81.6 Q537.0,77.6 541.0,77.6 L563.0,77.6 Q567.0,77.6 567.0,81.6 L567.0,156 Z" fill="#D89B33"/><path d="M569.0,156 L569.0,77.1 Q569.0,73.1 573.0,73.1 L595.0,73.1 Q599.0,73.1 599.0,77.1 L599.0,156 Z" fill="#D89B33"/><path d="M601.0,156 L601.0,71.5 Q601.0,67.5 605.0,67.5 L627.0,67.5 Q631.0,67.5 631.0,71.5 L631.0,156 Z" fill="#D89B33"/><path d="M633.0,156 L633.0,65.9 Q633.0,61.9 637.0,61.9 L659.0,61.9 Q663.0,61.9 663.0,65.9 L663.0,156 Z" fill="#9E2F1B"/><path d="M665.0,156 L665.0,61.4 Q665.0,57.4 669.0,57.4 L691.0,57.4 Q695.0,57.4 695.0,61.4 L695.0,156 Z" fill="#9E2F1B"/>
+
+  <line x1="15" y1="156" x2="705" y2="156" stroke="#d8dee5" stroke-width="1"/>
+
+  <!-- Etiqueta directa 1: el pico que NO dispara. Es la mitad de la lección. -->
+  <line x1="168.0" y1="69.4" x2="168.0" y2="26" stroke="#5c6672" stroke-width=".8" opacity=".5"/>
+  <text x="162.0" y="22" font-size="8.8" fill="#2b3138" text-anchor="end">un pico suelto no alcanza</text>
+
+  <!-- Etiqueta directa 2: cuando habla. -->
+  <circle cx="648.0" cy="50.9" r="3.2" fill="#9E2F1B"/>
+  <line x1="648.0" y1="52.9" x2="648.0" y2="46" stroke="#9E2F1B" stroke-width=".9"/>
+  <text x="641.0" y="42" font-size="9" font-weight="700" fill="#9E2F1B" text-anchor="end">acá el sistema habla</text>
+
+  <text x="25" y="171" font-size="8.4" fill="#5c6672">día 1</text>
+  <text x="345" y="171" font-size="8.4" fill="#5c6672">día 11</text>
+  <text x="695" y="171" font-size="8.4" fill="#5c6672" text-anchor="end">día 21</text>
+
+  <!-- Leyenda: la identidad nunca queda sólo en el color. -->
+  <g font-size="8.6" fill="#5c6672">
+    <rect x="25" y="186" width="10" height="10" rx="2" fill="#9AA5B1"/>
+    <text x="41" y="195">Sin novedad</text>
+    <rect x="143" y="186" width="10" height="10" rx="2" fill="#D89B33"/>
+    <text x="159" y="195">Para mirar</text>
+    <rect x="253" y="186" width="10" height="10" rx="2" fill="#9E2F1B"/>
+    <text x="269" y="195">Un patrón que se sostiene</text>
+  </g>
+</svg>
+<figcaption><b>Por qué no alerta enseguida.</b> El día 5 el valor cruza el umbral y el sistema se
+calla: un pico aislado no es información. Recién cuando el corrimiento se sostiene varios días
+seguidos hay algo que decir — y entonces dice desde cuándo. <i>Esquema del mecanismo; los valores
+son ilustrativos, no una medición.</i></figcaption>
+</figure>
+
+<h2>Lo que AntiGro no hace, dicho antes de que lo pregunten</h2>
+
+<ul>
+  <li><strong>No lee mensajes, ni fotos, ni audios</strong>, y no sabe con quién habla el chico.</li>
+  <li><strong>No dice que hay grooming.</strong> Dice qué se observó, en qué días, y qué es lo que
+    explícitamente no puede ver. Esa última parte va siempre, sobre todo cuando el sistema habla.</li>
+  <li><strong>No puntúa al chico ni a su familia.</strong> No hay perfiles de riesgo por estructura
+    familiar, escuela ni condición alguna.</li>
+  <li><strong>No reemplaza a nadie.</strong> Cuando la respuesta correcta es un adulto o la Línea
+    137, el sistema lo dice y se corre.</li>
+  <li><strong>No ve lo que pasa fuera de la red</strong> — que es donde ocurre buena parte de lo que
+    importa.</li>
+</ul>
+
+<h2>Por qué les pido a ustedes que lo miren</h2>
+
+<p>Hay tres puntos donde el criterio clínico decide, y donde yo no soy la fuente.</p>
+
+<h3>1 · Qué se le dice al adulto, y qué NO se le dice</h3>
+<p>Cuando el sistema habla, un padre asustado hace algo. Las guías oficiales coinciden en tres
+indicaciones que <strong>van contra el instinto</strong>, y son las que más se hacen mal:
+<strong>no borrar nada</strong> del teléfono —es la prueba—, <strong>no amenazar al acosador</strong>
+—se asusta, borra todo y desaparece— y <strong>no interrogar al chico</strong> cuando cuenta algo.</p>
+<span class="fuente">Ministerio de Justicia de la Nación, «Guía para padres, familias y docentes»
+(Con Vos en la Web) · Ministerio Público de la Provincia de Buenos Aires, Procuración General de la
+SCBA. El asistente del sistema cita el organismo cada vez que da una de estas indicaciones.</span>
+
+<div class="cita" style="margin-top:11px">
+  <p>El mismo estudio nacional midió qué haría un adulto si un chico fuera víctima: el
+  <strong>73,9%</strong> haría la denuncia a la policía, pero el <strong>62,9% borraría a la persona
+  agresora de todas las cuentas del chico</strong> y el <strong>31%</strong> le prohibiría
+  conectarse.</p>
+  <p style="margin-top:6px"><strong>Las dos últimas son exactamente lo que las guías piden no
+  hacer</strong> — borrar es destruir la prueba, y prohibir aísla al chico justo cuando más necesita
+  hablar. El instinto mayoritario va en contra de la indicación oficial, y eso no se corrige con más
+  vigilancia: se corrige diciéndoselo al adulto en el momento en que va a actuar.</p>
+  <span class="fuente">Misma fuente: Estudio nacional, Ministerio de Justicia y DDHH de la Nación, 2023.</span>
+</div>
+
+<p style="margin-top:10px"><strong>La tercera es la que más me interesa discutir con ustedes.</strong>
+Un interrogatorio parental bienintencionado puede contaminar el relato del chico antes de que
+intervenga nadie con formación — y ese relato es, muchas veces, la pieza principal de una causa. El
+sistema está diseñado para <em>evitar</em> ese momento: le da al adulto un registro fechado en vez
+de una conclusión, precisamente para que no salga corriendo a preguntar.</p>
+
+<h3>2 · El registro fechado, y qué NO es</h3>
+<p>Lo que el sistema entrega es una cronología: qué se vio, en qué días, y qué no se puede ver.
+<strong>No es prueba y no pretende serlo.</strong> Es material para ordenar una consulta o una
+denuncia, que hoy suelen empezar con una impresión y una fecha aproximada.</p>
+
+<h3>3 · Qué se le dice al chico</h3>
+<p>Cuando el sistema habla, al chico también le llega un mensaje, escrito para su edad. Ese texto
+pasa por un control automático que frena cualquier afirmación prohibida antes de enviarlo — pero
+que una frase sea <em>correcta</em> no la vuelve <em>adecuada</em>. Ahí necesito ojos clínicos.</p>
+
+<h2>Proyecciones</h2>
+
+<ul>
+  <li><strong>El informe para denunciar.</strong> Hoy el registro existe adentro del panel; falta
+    convertirlo en un documento que un adulto pueda llevar. No una conclusión: una cronología.</li>
+  <li><strong>Perfil de vulnerabilidad como contexto, nunca como puntaje.</strong> La literatura
+    señala factores —comunicación familiar deficiente, historia previa de abuso— que hoy el sistema
+    no usa. Si algún día entran, entran como contexto para leer una señal, no como un número sobre
+    un chico.</li>
+  <li><strong>El mismo motor para hostigamiento entre pares.</strong> La arquitectura transfiere;
+    los números no, porque están calibrados sobre estudios de grooming y buena parte del
+    hostigamiento escolar no deja huella en la red. Es una dirección, no algo que ya haga.</li>
+  <li><strong>Investigación con acceso real.</strong> Los datos que de verdad describen esta
+    conducta están en el ámbito policial y judicial, no en la web abierta. Es la puerta que me
+    gustaría que me ayuden a golpear.</li>
+</ul>
+
+<h2>Lo que les pido</h2>
+<p>El sistema está funcionando y se puede probar entrando. No busco una validación de cortesía:
+busco que me digan <strong>dónde el sistema dice de más</strong>, <strong>dónde una recomendación
+puede hacer daño</strong>, y <strong>qué le falta al registro para que le sirva a alguien que
+trabaja con esto</strong>. Si algo está mal, prefiero saberlo antes de que lo use una familia.</p>
+
+<div class="firma juntos">
+  <div class="nombre">Edgardo Lamas</div>
+  <div style="color:#5c6672; margin-top:2px">Studio Lamas · desarrollo de software</div>
+  <div style="margin-top:6px"><a href="https://studio-lamas.vercel.app">studio-lamas.vercel.app</a></div>
+</div>
+
+</body>
+</html>
