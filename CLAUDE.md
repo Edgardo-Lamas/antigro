@@ -120,6 +120,35 @@ de las 40 altas del día.
 
 ---
 
+## 🔴 EL ASISTENTE NO SE ENCONTRABA — arreglado el 21/8
+
+**Lo levantó Edgardo antes de mandar el enlace:** *"no se ve el botón para el agente en ninguna de
+las pantallas"*. **Medido, y no era una impresión.**
+
+| Qué pasaba | Medido |
+|---|---|
+| El asistente **no era un botón en ningún lado** | Es una sección en el medio del panel |
+| En el teléfono arrancaba a | **1.865 px — 2,2 pantallas de scroll** |
+| Arriba del panel había | sólo «Saltar al contenido» y «Salir» |
+| En la home y en el recorrido | no existe ni se lo menciona |
+
+⚠ **Y es justo lo que se les pide probar a las psicólogas.** Que la pieza más consultada del
+producto fuera la más difícil de encontrar es un defecto de producto, no de estilo: **si no la
+encuentran, el feedback no llega nunca.** Puede explicar por sí solo que hubiera cero charlas.
+
+✅ **`BotonDelAsistente`** en `mi-familia/page.tsx`: fijo abajo a la derecha, baja hasta la sección
+y **deja el cursor en el campo** —el que lo toca viene a escribir, y en el teléfono eso abre el
+teclado solo—. 🔑 **Se apaga cuando la sección ya está en pantalla**: un botón fijo que sigue ahí
+mientras escribís taparía el propio campo. Con `IntersectionObserver`, no con un `scroll` a mano.
+📌 Respeta `prefers-reduced-motion`. 📌 Sólo vive en `/mi-familia`: en la home no hay familia ni
+informe, y en el recorrido todavía no hay nada que preguntar.
+
+⚠ **Cómo se comprueba, porque el typecheck no lo ve:** con `viewport` de teléfono, logueado, que el
+botón se vea desde arriba de todo, que al tocarlo el foco quede en `#pregunta-al-asistente`, que la
+opacidad pase a 0 con la sección a la vista, y que desde ahí el asistente conteste de verdad.
+
+---
+
 ## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-20, cierre
 
 **Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio.**

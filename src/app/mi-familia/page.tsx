@@ -397,6 +397,9 @@ export default function MiFamilia() {
 
       {/* ── El asistente ───────────────────────────────────────────────── */}
       <Asistente chico={datos.chico?.nombre} />
+      {/* 🔴 Y el atajo, porque la sección de arriba queda a dos pantallas de
+          scroll y nadie la encontraba. Ver `BotonDelAsistente`. */}
+      <BotonDelAsistente />
 
       {/* ── La instalación ─────────────────────────────────────────────── */}
       <Instalacion chico={datos.chico?.nombre} />
@@ -980,7 +983,10 @@ function Asistente({ chico }: { chico?: string }) {
   const deOtroDia = ultima ? diaLocal(ultima) !== diaLocal(new Date().toISOString()) : false;
 
   return (
-    <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+    <section
+      id="asistente"
+      className="mt-8 scroll-mt-4 rounded-lg border border-borde bg-superficie px-5 py-5"
+    >
       <div className="flex items-center gap-2">
         <MessageCircle size={15} className="text-acento" />
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
@@ -1116,6 +1122,7 @@ function Asistente({ chico }: { chico?: string }) {
         className="mt-4 flex gap-2"
       >
         <input
+          id="pregunta-al-asistente"
           value={pregunta}
           onChange={(e) => setPregunta(e.target.value)}
           placeholder="Escribí tu pregunta"
@@ -1131,6 +1138,77 @@ function Asistente({ chico }: { chico?: string }) {
         </button>
       </form>
     </section>
+  );
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL BOTÓN FLOTANTE DEL ASISTENTE — 21/8
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  🔴 **Lo levantó Edgardo antes de mandarle el enlace a las psicólogas:** *"no
+ *  se ve el botón para el agente en ninguna de las pantallas"*. Medido: no era
+ *  una impresión. **El asistente no era un botón en ningún lado** — es una
+ *  sección en el medio del panel, y en el teléfono arranca a **1.865 px, dos
+ *  pantallas y media de scroll**, con nada arriba que lleve hasta ella.
+ *
+ *  ⚠ **Y es justo lo que se les pide probar.** Que la pieza más consultada del
+ *  producto sea la más difícil de encontrar es un defecto de producto, no de
+ *  estilo: si no la encuentran, el feedback no llega nunca.
+ *
+ *  🔑 **Se esconde cuando la sección ya está en pantalla.** Un botón fijo que
+ *  sigue tapando la esquina cuando ya estás escribiendo la pregunta es ruido —
+ *  y encima taparía el propio campo en el que estás escribiendo.
+ *
+ *  📌 Sólo vive en `/mi-familia`. En la home no va: ahí no hay familia, no hay
+ *  informe y no hay de qué hablar. En el recorrido tampoco — el que está dando
+ *  de alta todavía no tiene nada que preguntar.
+ */
+function BotonDelAsistente() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const seccion = document.getElementById("asistente");
+    if (!seccion) return;
+
+    /* Se muestra cuando la sección NO está a la vista. `IntersectionObserver`
+       y no un `scroll` a mano: el navegador lo resuelve sin que la página se
+       trabe en cada píxel. */
+    const ojo = new IntersectionObserver(
+      ([e]) => setVisible(!(e?.isIntersecting ?? false)),
+      { threshold: 0 },
+    );
+    ojo.observe(seccion);
+    return () => ojo.disconnect();
+  }, []);
+
+  function ir() {
+    const seccion = document.getElementById("asistente");
+    if (!seccion) return;
+    /* ⚠ `prefers-reduced-motion` se respeta: un salto animado de dos pantallas
+       le cae mal a quien pidió que no se mueva nada. */
+    const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    seccion.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "start" });
+    /* El foco va al campo, no a la sección: el que tocó el botón viene a
+       escribir. En el teléfono eso además abre el teclado solo. */
+    window.setTimeout(
+      () => document.getElementById("pregunta-al-asistente")?.focus({ preventScroll: true }),
+      quieto ? 0 : 600,
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={ir}
+      aria-label="Ir al asistente y escribir una pregunta"
+      className={`fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-acento/60 bg-acento px-4 py-3 text-sm font-semibold text-fondo shadow-lg transition-all duration-200 hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acento motion-reduce:transition-none ${
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
+      }`}
+    >
+      <MessageCircle size={16} />
+      Preguntar
+    </button>
   );
 }
 
