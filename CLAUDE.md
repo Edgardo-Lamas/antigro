@@ -238,6 +238,33 @@ respuesta nunca llega a la base—, por eso la columna `causa` sigue aceptando s
 
 ---
 
+## ⚠ EL PANEL DE UNA FAMILIA REAL NUNCA ALERTA — encontrado el 21/8, sin tocar
+
+**No es un bug: es la consecuencia, no dicha hasta ahora, de no conectar NextDNS para el CoderCup.**
+Salió mientras Edgardo preguntaba qué iba a ver una psicóloga que se diera de alta.
+
+| Quién pide las señales | Con qué escenario |
+|---|---|
+| `/api/mi-familia` | el que venga en `?escenario=`, y **si no viene, `normal`** |
+| `mi-familia/page.tsx:223` | **manda el `fetch` pelado: nunca manda ninguno** |
+| `/api/cron/revisar` | `"normal"` fijo |
+| `/api/mi-familia/asistente` | `"normal"` fijo |
+
+➡ **La ruta acepta el parámetro y la pantalla nunca se lo manda**, así que toda cuenta real cae en
+`normal`, que es plano por diseño (intensidad 0,05). **Medido para el día 1, el 3 y el 7: «Sin
+novedad» en los tres, 0 días fuera de lo habitual.** Y como el cron corre con el mismo escenario
+fijo, **la escalada tampoco se dispara nunca** desde una familia de verdad.
+
+🔑 **Dónde SÍ se ve el sistema alertando: la consola de la home**, que es pública y no pide cuenta.
+Ahí se eligen los cuatro escenarios y el motor decide de verdad, con la misma regla.
+
+⬜ **Decisión abierta, de producto y de Edgardo:** enganchar `?escenario=` en el `fetch` del panel
+serían unas cinco líneas y permitiría ver el panel real alertando. **No se hizo, y el motivo no es
+técnico:** el panel pasaría a mostrar una alerta que se elige desde la barra de direcciones, en un
+producto cuyo argumento entero es que no afirma nada que no vio. **No tocarlo sin que él lo diga.**
+
+---
+
 ## 🔴🔴 «VER EL MENSAJE» ESTABA MUERTO HACE CUATRO DÍAS — arreglado el 21/8
 
 **Lo levantó Edgardo probando la consola:** *"en el simulador en cualquier variable el texto que se
