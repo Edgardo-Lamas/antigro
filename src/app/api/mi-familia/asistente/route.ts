@@ -152,7 +152,13 @@ export async function POST(req: Request) {
     /* ⚠ El texto sale por `texto`, el mismo campo que usa una respuesta normal,
        para que la pantalla lo muestre en el hilo como cualquier otra cosa que
        diga el asistente. Un cartel de error rojo acá dejaría al adulto sin
-       saber si el sistema se rompió o si hizo algo mal. */
+       saber si el sistema se rompió o si hizo algo mal.
+
+       🔴 **La causa es `limite`, y hasta el 21/8 decía `falla`.** Con eso, el
+       tope funcionando quedaba registrado igual que el modelo caído — que es
+       justo la distinción por la que existe el campo. Registrar las dos como
+       una sola cosa no es un detalle de etiqueta: deja el registro sin poder
+       contestar la única pregunta que se le hace, que es si el sistema anduvo. */
     return NextResponse.json(
       {
         texto:
@@ -160,7 +166,7 @@ export async function POST(req: Request) {
           `Volvé en ${Math.ceil(turno.esperaSeg / 60)} minutos y seguimos.\n\n` +
           "Si es algo que no puede esperar, la Línea 137 atiende las 24 horas.",
         origen: "respaldo",
-        causa: "falla",
+        causa: "limite",
         motivos: ["Demasiadas preguntas seguidas."],
       },
       { status: 429 },

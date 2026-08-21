@@ -29,9 +29,16 @@ import { Eye, EyeOff } from "lucide-react";
  *  envía el formulario: tocar el ojo mandaría el alta a medio escribir.
  */
 
-/** El mismo borde y fondo que el resto de los campos del sistema. */
+/**
+ * El mismo borde y fondo que el resto de los campos del sistema.
+ *
+ * 🔑 **16 px en el teléfono, y no es un gusto — 21/8.** Safari de iOS hace zoom
+ * solo cuando enfocás un campo con letra de menos de 16 px, y ese zoom queda
+ * puesto y descoloca la pantalla entera. Acá pesa doble: la clave es lo segundo
+ * que toca el que entra por primera vez. De `sm` para arriba vuelve a 14.
+ */
 const CAMPO =
-  "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
+  "w-full rounded-md border border-borde bg-fondo px-3 py-2.5 text-base text-tinta outline-none focus:border-acento sm:py-2 sm:text-sm";
 
 interface Props {
   id?: string;

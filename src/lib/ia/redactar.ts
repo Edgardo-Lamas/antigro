@@ -52,6 +52,14 @@ export interface Redaccion {
    * escribió el modelo" cuando en realidad se cayó la llamada es inventar una
    * causa — el mismo error que el producto entero existe para no cometer, y
    * encima se atribuiría un mérito que no hubo.
+   *
+   * 📌 **Hay una tercera causa, `limite`, y a propósito NO está acá.** El tope de
+   * preguntas por hora no lo produce esta capa: lo produce la ruta, antes de que
+   * el modelo llegue a existir. Hasta el 21/8 esa ruta devolvía `falla`, así que
+   * «hablamos demasiado seguido» quedaba escrito igual que «se cayó la llamada»
+   * —opuestas: una es el sistema funcionando como se diseñó, la otra es el
+   * sistema roto— y mientras se vieron iguales el registro no servía para
+   * diagnosticar nada. Vive en `api/mi-familia/asistente/route.ts`.
    */
   causa?: "control" | "falla";
   /** Por qué se cayó al respaldo, si es el caso. */
@@ -146,9 +154,24 @@ lo que hiciste y sin ofrecer alternativas. Lo que escribas se manda tal cual.`;
 
 /* ── La llamada ──────────────────────────────────────────────────────────── */
 
+/**
+ * Anota en el registro del servidor por qué no salió el texto, y devuelve el
+ * mismo motivo para que suba.
+ *
+ * 🔴 **Misma lección que en `asistente.ts`, y acá pesa más:** de esto salen el
+ * mensaje al chico y la lectura de los adultos, que se mandan solos por la
+ * escalada. Si el modelo deja de contestar, lo que llega es el respaldo y nadie
+ * lo mira: no hay pantalla del otro lado. Sin esta línea, un sistema caído y uno
+ * andando se ven exactamente igual.
+ */
+function noSalio(motivo: string): { error: string } {
+  console.error("[redactar] \u2717 no se pudo pedir el texto \u00b7", motivo);
+  return { error: motivo };
+}
+
 async function pedirTexto(datos: string): Promise<{ texto: string } | { error: string }> {
   const api = anthropic();
-  if (!api) return { error: "Falta ANTHROPIC_API_KEY" };
+  if (!api) return noSalio("Falta ANTHROPIC_API_KEY");
 
   try {
     const respuesta = await api.messages.create({
@@ -161,7 +184,7 @@ async function pedirTexto(datos: string): Promise<{ texto: string } | { error: s
 
     // Los clasificadores pueden declinar. Hay que mirar esto ANTES del contenido.
     if (respuesta.stop_reason === "refusal") {
-      return { error: "El modelo declinó la solicitud" };
+      return noSalio("El modelo declinó la solicitud");
     }
 
     const texto = respuesta.content
@@ -170,10 +193,10 @@ async function pedirTexto(datos: string): Promise<{ texto: string } | { error: s
       .join("")
       .trim();
 
-    if (!texto) return { error: "El modelo no devolvió texto" };
+    if (!texto) return noSalio("El modelo no devolvió texto");
     return { texto };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : "Error al llamar al modelo" };
+    return noSalio(e instanceof Error ? e.message : "Error al llamar al modelo");
   }
 }
 

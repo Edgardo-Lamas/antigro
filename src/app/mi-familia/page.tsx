@@ -934,6 +934,10 @@ function Asistente({ chico }: { chico?: string }) {
        navegador sale la pregunta y nada más. */
     setTurnos((t) => [...t, { quien: "adulto", texto: limpio }]);
     setPregunta("");
+    /* Vuelve a dos renglones: si se quedara con el alto de la pregunta que se
+       acaba de ir, taparía la respuesta que está por llegar. */
+    const campo = document.getElementById("pregunta-al-asistente");
+    if (campo instanceof HTMLTextAreaElement) campo.style.height = "";
     setPensando(true);
     setConfirmandoBorrado(false);
 
@@ -975,6 +979,48 @@ function Asistente({ chico }: { chico?: string }) {
     setTurnos([]);
     setConfirmandoBorrado(false);
     await fetch("/api/mi-familia/asistente", { method: "DELETE" }).catch(() => undefined);
+  }
+
+  /**
+   * Le da al campo el alto del texto que tiene adentro, hasta seis renglones.
+   *
+   * 🔑 **Sin esto, dos renglones fijos serían el mismo problema más grande.**
+   * El que escribe acá está contando algo difícil, y lo que no ve mientras
+   * escribe no lo puede releer ni corregir.
+   * 📌 El tope existe para que el campo no se coma la charla que tiene arriba.
+   */
+  function crecer(campo: HTMLTextAreaElement) {
+    const est = getComputedStyle(campo);
+    const renglon = parseFloat(est.lineHeight) || 22;
+
+    /* ⚠ `scrollHeight` trae el relleno pero NO el borde, y con `border-box` el
+       alto que se escribe sí lo incluye. Sin sumarlo, el campo se achica 1 px
+       por lado apenas escribís la primera letra — medido. */
+    const borde = parseFloat(est.borderTopWidth) + parseFloat(est.borderBottomWidth);
+    const relleno = parseFloat(est.paddingTop) + parseFloat(est.paddingBottom);
+    const afuera = borde + relleno;
+
+    /* ⚠ Poner el alto en `auto` para medir tira a cero a dónde estaba mirando
+       el campo, y hay que devolverlo: sin esto, pasada la pregunta que entra en
+       seis renglones, el teléfono deja de mostrar el renglón que estás
+       escribiendo y se escribe a ciegas. Medido — en el monitor no se ve,
+       porque ahí el campo es más ancho y casi nunca llega al tope. */
+    const mirando = campo.scrollTop;
+
+    campo.style.height = "auto";
+    /* Nunca menos de los dos renglones con los que arranca, nunca más de seis:
+       abajo de dos daría un salto al escribir, arriba de seis se comería la
+       charla que tiene encima. */
+    const alto = Math.min(
+      Math.max(campo.scrollHeight + borde, renglon * 2 + afuera),
+      renglon * 6 + afuera,
+    );
+    campo.style.height = `${alto}px`;
+
+    /* Escribiendo al final —que es lo que pasa casi siempre— el campo sigue al
+       cursor. Corrigiendo en el medio, se queda donde estaba. */
+    const alFinal = campo.selectionStart === campo.value.length;
+    campo.scrollTop = alFinal ? campo.scrollHeight : mirando;
   }
 
   /* Si el último turno guardado no es de hoy, se dice: el que vuelve al otro
@@ -1100,9 +1146,11 @@ function Asistente({ chico }: { chico?: string }) {
                       <p className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-atencion">
                         {t.causa === "control"
                           ? "texto de respaldo · el control no dejó pasar lo que escribió el modelo"
-                          : t.causa === "falla"
-                            ? "texto de respaldo · no se pudo pedir la respuesta"
-                            : "texto de respaldo"}
+                          : t.causa === "limite"
+                            ? "texto de respaldo · se hicieron muchas preguntas seguidas, no falló nada"
+                            : t.causa === "falla"
+                              ? "texto de respaldo · no se pudo pedir la respuesta"
+                              : "texto de respaldo"}
                       </p>
                     )}
                   </div>
@@ -1114,24 +1162,56 @@ function Asistente({ chico }: { chico?: string }) {
         </>
       )}
 
+      {/* 🔴 **EN EL TELÉFONO VA APILADO, Y NO ES ESTÉTICA — 21/8.**
+          Lo levantó Edgardo: *"el espacio para la pregunta es muy chico en
+          mobile, ocupa la mitad de la pantalla"*. Medido: **196 px de 390, el
+          50 %**. El botón «Preguntar» se lleva 114 px fijos de la fila, y lo que
+          queda no alcanza para ver lo que uno escribe.
+
+          ⚠ **Y acá el campo chico se paga más caro que en cualquier otro lado
+          del sistema:** el que escribe es un padre asustado contando algo
+          difícil, no alguien llenando un formulario. Un campo donde no entra la
+          pregunta empuja a escribir corto, y una pregunta corta es una peor
+          respuesta.
+
+          ✅ En teléfono el campo se lleva el ancho entero y el botón va abajo,
+          también entero —más fácil de acertar con el pulgar—. De `sm` para
+          arriba queda la fila de siempre, que ahí sí entra.
+
+          🔑 **Y el texto va en 16 px en el teléfono.** No es un gusto: Safari de
+          iOS **hace zoom solo** cuando el campo que enfocás tiene menos de 16 px,
+          y ese zoom queda puesto y descoloca la pantalla entera. Es lo que hace
+          que el asistente «se vea mal en el celular» aunque el campo esté bien.
+          De `sm` para arriba vuelve a 14, que es la medida del resto. */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           preguntar(pregunta);
         }}
-        className="mt-4 flex gap-2"
+        className="mt-4 flex flex-col gap-2 sm:flex-row"
       >
-        <input
+        <textarea
           id="pregunta-al-asistente"
           value={pregunta}
           onChange={(e) => setPregunta(e.target.value)}
+          onInput={(e) => crecer(e.currentTarget)}
+          onKeyDown={(e) => {
+            /* Enter manda, Shift+Enter hace renglón. Es como venía andando
+               cuando esto era un `input` de un renglón, y en el teléfono no
+               molesta: ahí abajo está el botón, entero. */
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              preguntar(pregunta);
+            }
+          }}
+          rows={2}
           placeholder="Escribí tu pregunta"
-          className="flex-1 rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento"
+          className="w-full resize-none rounded-md border border-borde bg-fondo px-3 py-3 text-base leading-relaxed text-tinta outline-none focus:border-acento sm:w-auto sm:flex-1 sm:py-2 sm:text-sm"
         />
         <button
           type="submit"
           disabled={pensando || !pregunta.trim()}
-          className="flex items-center gap-1.5 rounded-md bg-acento px-3.5 py-2 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+          className="flex w-full items-center justify-center gap-1.5 rounded-md bg-acento px-3.5 py-3 text-base font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado sm:w-auto sm:py-2 sm:text-sm"
         >
           {pensando ? <LoaderCircle size={13} className="animate-spin" /> : <Send size={13} />}
           Preguntar
@@ -1171,15 +1251,44 @@ function BotonDelAsistente() {
     const seccion = document.getElementById("asistente");
     if (!seccion) return;
 
-    /* Se muestra cuando la sección NO está a la vista. `IntersectionObserver`
-       y no un `scroll` a mano: el navegador lo resuelve sin que la página se
-       trabe en cada píxel. */
-    const ojo = new IntersectionObserver(
-      ([e]) => setVisible(!(e?.isIntersecting ?? false)),
+    /* 🔴 **DOS OBSERVADORES, Y LA RAZÓN ES EL TELÉFONO — 21/8.**
+       Lo levantó Edgardo el mismo día que se puso el botón: *"aparece y
+       desaparece muy rápido"*. Medido en pantalla de teléfono: **doce cambios
+       de estado con seis movimientos de la barra de direcciones**, sin tocar
+       el scroll.
+
+       Pasaba porque apagar y encender eran la MISMA raya —el borde de abajo de
+       la pantalla—. En el teléfono esa raya no se queda quieta: la barra del
+       navegador se esconde al bajar y vuelve al subir, y la pantalla crece y
+       se achica entre 60 y 100 px sola. Parado en esa franja, cada movimiento
+       del dedo cruzaba la raya de ida y de vuelta.
+
+       🔑 Ahora son dos rayas separadas por media pantalla, y entre las dos el
+       botón se queda como está:
+       - **Se apaga** cuando la sección llegó a la mitad de la pantalla — o sea
+         cuando de verdad la estás mirando, no cuando asoma un borde.
+       - **Vuelve** recién cuando la sección se fue del todo.
+       Ninguna barra de navegador mide media pantalla, así que el vaivén ya no
+       puede cruzar las dos. 📌 Sigue sin haber un `scroll` a mano: el navegador
+       avisa en las dos rayas y nada más. */
+    const ojoApagar = new IntersectionObserver(
+      ([e]) => {
+        if (e?.isIntersecting) setVisible(false);
+      },
+      { threshold: 0, rootMargin: "0px 0px -50% 0px" },
+    );
+    const ojoEncender = new IntersectionObserver(
+      ([e]) => {
+        if (!e?.isIntersecting) setVisible(true);
+      },
       { threshold: 0 },
     );
-    ojo.observe(seccion);
-    return () => ojo.disconnect();
+    ojoApagar.observe(seccion);
+    ojoEncender.observe(seccion);
+    return () => {
+      ojoApagar.disconnect();
+      ojoEncender.disconnect();
+    };
   }, []);
 
   function ir() {

@@ -12,6 +12,15 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
+## 🔴 LO PRIMERO, HOY: LA CUENTA DE ANTHROPIC NO TIENE CRÉDITO
+
+**Toda la IA del sistema está caída por eso, y sólo por eso** — el asistente contesta el respaldo y
+la escalada manda texto de respaldo. La clave está bien; lo que falta es plata en la cuenta.
+**Hasta que se cargue, no tiene sentido mandarle el enlace a nadie a probar el asistente.**
+📌 El detalle y por qué costó una sesión encontrarlo, en «EL ASISTENTE CAÍA AL RESPALDO».
+
+---
+
 ## ✅ RESUELTO EL 21/8 — EL BARRIDO DE CIFRAS CONTRA LA FUENTE PRIMARIA
 
 **El PDF oficial está descargado y leído entero, no citado de memoria.**
@@ -147,41 +156,140 @@ informe, y en el recorrido todavía no hay nada que preguntar.
 botón se vea desde arriba de todo, que al tocarlo el foco quede en `#pregunta-al-asistente`, que la
 opacidad pase a 0 con la sección a la vista, y que desde ahí el asistente conteste de verdad.
 
+### 🔴 Y ESE MISMO DÍA TITILABA EN EL TELÉFONO — arreglado
+
+**Lo levantó Edgardo horas después de que se pusiera:** *"aparece y desaparece muy rápido el botón
+flotante"*. Medido en pantalla de 390×664: **doce cambios de estado con seis movimientos de la
+barra de direcciones, sin tocar el scroll.**
+
+🔑 **La causa: apagar y encender eran la MISMA raya** —el borde de abajo de la pantalla—. En el
+teléfono esa raya no se queda quieta: la barra del navegador se esconde al bajar y vuelve al subir,
+y la pantalla crece y se achica sola entre 60 y 100 px. Parado en esa franja, cada movimiento del
+dedo cruzaba la raya de ida y de vuelta. **En el monitor no pasa nunca, porque ahí la pantalla no
+cambia de alto.**
+
+✅ **Dos observadores en vez de uno, separados por media pantalla:**
+- **Se apaga** cuando la sección llegó a la mitad de la pantalla (`rootMargin: "0px 0px -50% 0px"`)
+  — o sea cuando de verdad la estás mirando, no cuando asoma un borde.
+- **Vuelve** recién cuando la sección se fue del todo.
+
+Entre las dos rayas el botón se queda como está. Ninguna barra de navegador mide media pantalla,
+así que el vaivén ya no puede cruzar las dos. 📌 Sigue sin haber un `scroll` a mano.
+
+**Medido después del arreglo:** 14 posiciones × 4 vaivenes de la barra = **1 solo cambio de estado
+en total** (antes: 12 en una sola posición), y el que queda no titila, se acomoda una vez y se
+queda. ✓ El botón se sigue viendo desde arriba de todo, se sigue apagando con el asistente a la
+vista, vuelve cuando quedó atrás, y sigue dejando el cursor en `#pregunta-al-asistente`.
+
+⚠ **La lección, que sirve para cualquier cosa fija en el teléfono:** un umbral apoyado en el borde
+de la pantalla es un umbral que se mueve solo. Si algo prende y apaga por posición, las dos rayas
+tienen que estar separadas — y separadas por más de lo que mide la barra del navegador.
+
 ---
 
-## 🔴🔴 SIN RESOLVER — EL ASISTENTE CAE AL RESPALDO POR LA RUTA. **ARRANCAR POR ACÁ.**
+## ✅ RESUELTO EL 21/8 — EL ASISTENTE CAÍA AL RESPALDO: LA CUENTA SE QUEDÓ SIN CRÉDITO
 
-**Apareció el 21/8 al cerrar, y es lo más grave que hay abierto:** Edgardo está por mandarle el
-enlace a las psicólogas **para que prueben el asistente**, y por la pantalla el asistente **no
-contesta**: sale el respaldo con `causa: "falla"`.
+**Y la sesión anterior había escrito acá que era «el camino de la ruta». Era falso.** Queda anotado
+porque el error de diagnóstico es más caro que el bug: se midió que por la librería andaba y por la
+pantalla no, y de esa diferencia se dedujo una causa. La diferencia era el **momento**, no el
+camino — el crédito se agotó entre una medición y la otra.
 
-### Lo que está medido, para no volver a medirlo
+### Lo que era, con todas las letras
 
-| Camino | Resultado |
-|---|---|
-| `npx tsx preguntas-dia-uno.mjs` (llama a la librería directo) | ✅ **3 de 3 desde la IA**, respuestas largas y buenas |
-| Por la pantalla, en **localhost** | ❌ respaldo · «se cayó la llamada» |
-| Por la pantalla, en **producción** | ❌ respaldo · «se cayó la llamada» |
-| `ANTIGRO_ANTHROPIC_KEY` en Vercel producción | ✅ **está** (cargada hace 5 días) |
+```
+400 invalid_request_error
+"Your credit balance is too low to access the Anthropic API.
+ Please go to Plans & Billing to upgrade or purchase credits."
+```
 
-➡ **O sea que no es la clave y no es el modelo: es el camino de la ruta.** Lo que cambia entre los
-dos es el entorno del `route.ts`, no `responderAlAdulto`.
-📌 `maxDuration = 60` en la ruta, y el asistente tarda 10-18 s medidos. No debería alcanzar para
-un timeout, **pero es lo primero que hay que descartar** porque es lo único distinto que se ve.
-🔑 **Cómo se mira, y es lo que lo destapó:** `node leer-charlas.mjs` dice de cada respuesta si salió
-de la IA o del respaldo. **Sin eso el fallo es invisible** — el texto del respaldo es largo, bien
-escrito y no dice «error», así que desde la pantalla se lee como una respuesta normal.
+🔑 **La clave es válida.** Un 400 así ya pasó la autenticación: si la clave estuviera mal sería un
+401 `authentication_error`. No hay nada que cambiar en Vercel ni en `.env.local`.
+🔴 **Se cae TODA la capa de IA, no sólo el asistente:** `redactar.ts` también, o sea el mensaje al
+chico y la lectura de los adultos que salen solos por la escalada. Ahí no hay nadie mirando una
+pantalla, así que un sistema caído y uno andando se ven exactamente igual.
+📌 **Lo único que lo destraba es cargar crédito en la cuenta de Anthropic.** Es plata, así que lo
+decide Edgardo.
 
-### 🔴 Y un mislabel que va a hacer perder tiempo si no se arregla primero
+### 🔴 Por qué costó una sesión encontrarlo, y qué se cambió para que no vuelva a pasar
 
-`route.ts` línea ~163: **el límite de frecuencia devuelve `causa: "falla"`**. O sea que «hiciste
-demasiadas preguntas seguidas» queda registrado igual que «se cayó la llamada al modelo». Son dos
-cosas completamente distintas —una es el sistema andando, la otra es el sistema roto— y hoy en el
-registro no se distinguen. **Arreglar esto ANTES de diagnosticar lo de arriba**, o se va a estar
-persiguiendo un fantasma. Debería ser una causa propia (`limite`).
+**La API decía la causa exacta en el texto del error, y ese texto no se escribía en ningún lado.**
+Viajaba en `motivos`, que no se guarda en la base y que la pantalla no muestra. Todo lo que quedaba
+era `causa: "falla"` — «se cayó la llamada» — que es cierto y no sirve para nada.
 
-⚠ **Esto puede explicar solo que hubiera cero charlas útiles**, y explica por qué conviene mirar el
-registro y no la pantalla.
+✅ **Ahora se escribe en el registro del servidor**, con una marca que se busca igual en la terminal
+que en los registros de Vercel:
+- `[asistente] ✗ se cayó la llamada al modelo · <motivo>`
+- `[redactar] ✗ no se pudo pedir el texto · <motivo>`
+
+**Antes de diagnosticar cualquier cosa del asistente: mirar esa línea.** `node leer-charlas.mjs`
+dice QUE falló; el registro del servidor dice POR QUÉ.
+
+### ✅ Y el mislabel del límite, arreglado — era la otra mitad del fantasma
+
+`route.ts` devolvía `causa: "falla"` cuando lo que había pasado era el tope de 30 preguntas por
+hora. O sea que **el sistema funcionando como se diseñó quedaba registrado igual que el sistema
+roto**, que es justo la distinción por la que existe el campo. ✅ Ahora es una causa propia,
+`limite`, y la pantalla y `leer-charlas.mjs` la dicen distinto.
+
+📌 **Vive en la ruta y NO en `Redaccion`, a propósito:** el tope se aplica antes de que el modelo
+llegue a existir, así que no es una causa de la capa de IA. Y **no se guarda en `charlas`** —esa
+respuesta nunca llega a la base—, por eso la columna `causa` sigue aceptando sólo `control` y
+`falla` y no hizo falta migración.
+
+---
+
+## 🔴 EL CAMPO DE LA PREGUNTA EN EL TELÉFONO — arreglado el 21/8
+
+**Lo levantó Edgardo:** *"el espacio para la pregunta es muy chico en mobile, ocupa la mitad de la
+pantalla, al ser mobile debería ocupar el ancho de la pantalla"*. **Medido: 196 px de 390, el
+50 %.** El botón «Preguntar» se llevaba 114 px fijos de la fila y lo que quedaba no alcanzaba.
+
+⚠ **Acá el campo chico se paga más caro que en cualquier otra pantalla del sistema:** el que
+escribe es un padre asustado contando algo difícil, no alguien llenando un formulario. Un campo
+donde no entra la pregunta empuja a escribir corto, **y una pregunta corta es una peor respuesta.**
+
+### Lo que se cambió, y por qué son tres cosas y no una
+
+| | Antes | Ahora |
+|---|---|---|
+| Ancho en teléfono | 196 px (50 % de la pantalla) | **300 px, la fila entera** (el botón va abajo) |
+| Alto | un renglón, `<input>` | **`<textarea>` que crece de 2 a 6 renglones** |
+| Letra en teléfono | 14 px | **16 px** |
+
+🔴 **Lo del ancho solo no alcanzaba, y la foto lo mostró:** una pregunta normal de 61 caracteres
+mide 471 px de texto. Aun a 300 px de ancho, en un renglón el arranque queda cortado y **no podés
+releer lo que escribiste**. Por eso es `<textarea>`. Entran ~200 caracteres sin desplazar en
+teléfono y ~260 en monitor; el tope de seis renglones existe para que el campo no se coma la charla
+que tiene encima.
+
+🔑 **Y los 16 px NO son estética: Safari de iOS hace zoom solo** cuando enfocás un campo con letra
+de menos de 16 px, y ese zoom **queda puesto** y descoloca la pantalla entera. Es una parte de que
+«el asistente se vea mal en el celular» que no se ve mirando el campo. De `sm` para arriba vuelve a
+14, que es la medida del resto.
+
+⚠ **El mismo defecto estaba en las otras cuatro pantallas con campos**, y una es la PRIMERA que
+toca el que viene a probar: `/entrar`, `CampoDeClave.tsx`, el recorrido del alta y el login del
+panel. ✅ Corregidas las cuatro. 📌 **La clase del campo está copiada en cuatro archivos** — por eso
+el defecto estuvo en los cuatro. Si se toca una, tocarlas todas; unificarla en una constante
+compartida es deuda anotada, no hecha.
+
+### Dos detalles que sólo aparecen midiendo
+
+1. **`scrollHeight` trae el relleno pero no el borde**, y con `border-box` el alto que se escribe sí
+   lo incluye: sin sumarlo, el campo **se achica 1 px por lado** apenas escribís la primera letra.
+2. **Poner el alto en `auto` para medir tira a cero a dónde estaba mirando el campo.** Pasado el
+   tope de seis renglones, el teléfono dejaba de mostrar el renglón que estabas escribiendo — se
+   escribía a ciegas. ⚠ **En el monitor no se ve**, porque ahí el campo es más ancho y casi nunca
+   llega al tope. Ahora, si el cursor está al final, el campo lo sigue; si estás corrigiendo en el
+   medio, se queda donde estaba.
+
+📌 **Enter manda y Shift+Enter hace renglón**, como cuando era un `input`. En el teléfono no
+molesta: ahí abajo está el botón, entero.
+
+⚠ **Cómo se comprueba, porque el typecheck no ve nada de esto:** `viewport` de teléfono y de
+monitor, que el campo se lleve la fila entera, que la letra sea de 16 px en teléfono, que crezca y
+nunca se achique, que tenga tope, que pasado el tope se siga viendo lo último que escribís, que
+Enter mande y que el botón flotante siga dejando el cursor en `#pregunta-al-asistente`.
 
 ---
 

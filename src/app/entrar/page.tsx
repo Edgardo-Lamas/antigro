@@ -149,8 +149,13 @@ function Puerta() {
     }
   }
 
+  /* 🔑 **16 px en el teléfono, y no es un gusto — 21/8.** Safari de iOS hace
+     zoom solo cuando enfocás un campo con letra de menos de 16 px, y ese zoom
+     queda puesto: la pantalla entera se descoloca en la PRIMERA que ve el que
+     viene a probar el sistema. De `sm` para arriba vuelve a 14, que es la
+     medida del resto. 📌 Mismo motivo que en el campo del asistente. */
   const campo =
-    "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
+    "w-full rounded-md border border-borde bg-fondo px-3 py-2.5 text-base text-tinta outline-none focus:border-acento sm:py-2 sm:text-sm";
   const etiqueta = "mb-1.5 block text-[11px] uppercase tracking-[0.06em] text-apagado";
   const creando = modo === "crear";
 

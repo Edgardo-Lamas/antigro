@@ -105,8 +105,10 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
   const [error, setError] = useState("");
   const [guardado, setGuardado] = useState(false);
 
+  /* 🔑 16 px en el teléfono: menos que eso y Safari de iOS hace zoom solo al
+     enfocar, y el zoom queda puesto. Ver `CampoDeClave.tsx`. */
   const campo =
-    "w-full rounded-md border border-borde bg-fondo px-3 py-2 text-sm text-tinta outline-none focus:border-acento";
+    "w-full rounded-md border border-borde bg-fondo px-3 py-2.5 text-base text-tinta outline-none focus:border-acento sm:py-2 sm:text-sm";
   const etiqueta = "mb-1.5 block text-[11px] uppercase tracking-[0.06em] text-apagado";
 
   /* ── Lo único que impide seguir ─────────────────────────────────────────── */

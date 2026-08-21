@@ -91,7 +91,9 @@ for (const [id, turnos] of porFamilia) {
         t.origen === "respaldo"
           ? t.causa === "control"
             ? "⛔ RESPALDO · lo frenó el control"
-            : "⚠ RESPALDO · se cayó la llamada"
+            : t.causa === "limite"
+              ? "⏸ RESPALDO · fueron muchas preguntas seguidas, no falló nada"
+              : "⚠ RESPALDO · se cayó la llamada — el motivo está en el registro del servidor"
           : "🤖 el asistente";
       console.log(`\n   [${sello}]`);
       console.log(

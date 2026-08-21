@@ -250,6 +250,14 @@ function anthropic(): Anthropic | null {
   return cliente;
 }
 
+/**
+ * Con qué se marca en el registro del servidor que la llamada no salió.
+ *
+ * ⚠ Es una constante y no un texto suelto para que se pueda buscar igual en los
+ * registros de Vercel que en la terminal: `[asistente] ✗`.
+ */
+const FALLO = "[asistente] \u2717 se cay\u00f3 la llamada al modelo \u00b7";
+
 /* ═══════════════════════════════════════════════════════════════════════════
    EL RESPALDO
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -349,6 +357,7 @@ export async function responderAlAdulto(entrada: {
 }): Promise<Redaccion> {
   const api = anthropic();
   if (!api) {
+    console.error(FALLO, "no hay clave de Anthropic en el entorno");
     return {
       texto: respaldo(entrada.chico.nombre, entrada.lectura),
       origen: "respaldo",
@@ -418,11 +427,23 @@ export async function responderAlAdulto(entrada: {
 
     return { texto, origen: "ia" };
   } catch (e) {
+    const motivo = e instanceof Error ? e.message : "Falló la llamada al modelo.";
+
+    /* 🔴 **Esta línea existe porque no existir costó una sesión entera.** El 21/8
+       el asistente contestaba el respaldo por la pantalla y en el registro sólo
+       decía «se cayó la llamada»: el motivo se devolvía en `motivos`, que no se
+       guarda en la base y que la pantalla no muestra. Se llegó a escribir que el
+       problema era «el camino de la ruta» —y era que la cuenta de Anthropic se
+       había quedado sin crédito, cosa que la API dice con todas las letras en el
+       texto del error—. **Un fallo que no se escribe en ningún lado se
+       diagnostica a ciegas.** */
+    console.error(FALLO, motivo);
+
     return {
       texto: respaldo(entrada.chico.nombre, entrada.lectura),
       origen: "respaldo",
       causa: "falla",
-      motivos: [e instanceof Error ? e.message : "Falló la llamada al modelo."],
+      motivos: [motivo],
     };
   }
 }
