@@ -125,8 +125,11 @@ export interface Hogar {
  * señales y cambian el texto del mensaje.
  *
  * ⚠ Guardarraíl de género: se diferencia sólo **qué tipo de riesgo se
- * enfatiza**, y sólo donde hay dato que lo respalde (el 80% de las víctimas de
- * acoso virtual son nenas). El tono y el respeto son iguales para todos.
+ * enfatiza**, y sólo donde hay dato que lo respalde: el estudio nacional midió
+ * que el **66,3% de las víctimas de grooming fue de género femenino**. El tono y
+ * el respeto son iguales para todos.
+ * ⚠ Acá decía «el 80% de las víctimas de acoso virtual son nenas». Corregido el
+ * 21/8: ese 80% es de UNESCO/CIPDH y mide bullying virtual, no grooming.
  */
 export type Genero = "nena" | "varon" | "otro";
 
@@ -250,8 +253,9 @@ export type RolDeAdulto = "progenitor" | "referente";
  * referentes, siempre sugerimos para que el sistema de protección del chico sea
  * más completo"*.
  *
- * 🔑 Y tiene un fundamento que no cambió: el 43% de los chicos no habla de estos
- * temas con sus padres. Por eso el referente sirve. Pero un hogar con un solo
+ * 🔑 Y tiene un fundamento que no cambió: el 43% de los chicos dice no hablar
+ * sobre los riesgos en Internet con sus padres (encuesta en 11 escuelas, citada
+ * en el estudio nacional 2023). Por eso el referente sirve. Pero un hogar con un solo
  * progenitor **no está incompleto: es otra forma de familia**, y decirle que le
  * falta algo es a la vez falso y desalentador.
  */
@@ -533,8 +537,9 @@ export function sugerenciasParaLaFamilia(
     sugerencias.push({
       que: `Preguntarle a ${chico.nombre} a quién elegiría.`,
       porQue:
-        "El 43% de los chicos no habla de estos temas con sus padres. Un adulto que " +
-        "eligió él es alguien a quien de verdad le va a escribir.",
+        "El 43% de los chicos dice no hablar sobre los riesgos en Internet con sus padres " +
+        "(encuesta en 11 escuelas, citada en el estudio nacional). Un adulto que eligió él es " +
+        "alguien a quien de verdad le va a escribir.",
     });
   }
 

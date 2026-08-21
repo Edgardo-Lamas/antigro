@@ -63,8 +63,8 @@ export const FUENTES: Fuente[] = [
           "a sus verdaderos amigos.",
         porQue:
           "🔑 Es más fino que «no hables con desconocidos»: prohibir no saca al desconocido, " +
-          "saca al chico de la conversación. El 60% ya habla con desconocidos, así que la " +
-          "prohibición sólo le enseña a no contarlo.",
+          "saca al chico de la conversación. El 60,0% ya habla por internet con desconocidos " +
+          "(Informe Grooming LATAM), así que la prohibición sólo le enseña a no contarlo.",
       },
       {
         momento: "prevencion",

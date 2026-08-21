@@ -201,8 +201,8 @@ export async function redactarMensajeAlChico(entrada: {
       : "Hubo un cambio que todavía no se sostiene. El mensaje es preventivo, no urgente.",
     "",
     "Cifras que podés usar si te sirven (no hace falta usar ninguna):",
-    "· El 63% de los chicos no sabe qué es el grooming.",
-    "· El 43% no habla de estos temas con sus padres.",
+    "· El 72,8% de los chicos no sabe qué es el grooming (Informe Grooming LATAM 2024/2025).",
+    "· El 43% dice no hablar sobre los riesgos en Internet con sus padres (encuesta en 11 escuelas).",
   ].join("\n");
 
   const resultado = await pedirTexto(datos);

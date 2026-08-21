@@ -91,7 +91,9 @@ export const INDICADORES: Indicador[] = [
     peso: 0.9,
     procedencia: {
       clase: "estudio",
-      cita: "El 63% de los chicos no sabe qué es el grooming, y el 43% no habla del tema con sus padres (estudio nacional 2023).",
+      cita: "El 72,8% de los chicos no sabe qué es el grooming (Informe Grooming LATAM 2024/2025, n\u2248" +
+        "28.360), y el 43% dice no hablar sobre los riesgos en Internet con sus padres (encuesta en " +
+        "11 escuelas, citada en el estudio nacional 2023).",
     },
   },
   {

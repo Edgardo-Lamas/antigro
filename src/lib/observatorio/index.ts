@@ -60,7 +60,8 @@ import { fueraDelRadar, nombreDeLugar, puertaDe, type Puerta } from "@/lib/senal
  *  para notar que su público es imposible.
  *
  *  ⚠ **Lo que sostiene esto y lo que no.** Que las víctimas se concentran en un
- *  perfil está en las dos fuentes del proyecto (80% nenas; franja 9-13). Que
+ *  perfil está en las dos fuentes del proyecto (66,3% femenino y 72,3% de 12 a
+ *  14 en el estudio nacional; franja 9 a 13 en el LATAM). Que
  *  **cada acosador** persiga un perfil consistente es una inferencia razonable
  *  pero **no la verifiqué en fuente**: no se afirma. Igual el detector no depende
  *  de eso — mide contra la diversidad esperable de una plataforma, sea cual sea

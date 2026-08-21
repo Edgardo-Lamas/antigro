@@ -38,23 +38,35 @@ export const PESO_POR_TIPO: Record<TipoDeSenal, number> = {
 /* ── Factor por edad ─────────────────────────────────────────────────────── */
 
 /**
- * 📊 **Dos fuentes, y no dicen exactamente lo mismo. Por eso hay cuatro bandas
- * y no dos** (corregido el 15/8/2026):
+ * 📊 **Tres fuentes, y no dicen exactamente lo mismo. Por eso hay cuatro bandas
+ * y no dos** (armado el 15/8/2026, reatribuido el 21/8):
  *
- * 1. **Estudio nacional (Ministerio de Justicia, 2023):** el grueso de las
- *    víctimas está entre los 11 y los 15, con un segundo grupo importante
- *    entre los 7 y los 10.
- * 2. **Informe Grooming LATAM** (Red Grooming LATAM, presentado en mayo de
+ * 1. **Informe Grooming LATAM** (Red Grooming LATAM, presentado en mayo de
  *    2025; n≈28.360 encuestas anónimas a NNyA de 9 a 17 en 14 países,
  *    relevamiento 2024/2025): la franja **más vulnerable es de 9 a 13**.
+ *    Es, de lejos, la muestra más grande de las tres.
  *    https://groomingarg.org/informe-grooming-latam
+ * 2. **ESET**, citado en el estado del arte del estudio nacional: el grueso
+ *    entre **11 y 15** (52,9%), y un segundo grupo entre **7 y 10** (33,7%).
+ * 3. **La medición propia del estudio nacional (Ministerio de Justicia, 2023):**
+ *    **72,3% entre 12 y 14**, 14,5% entre 6 y 11, 14,5% entre 15 y 17.
+ *    ⚠ Base: 23 casos. El estudio mismo aclara que con esa cantidad no publica
+ *    cruces por no ser estadísticamente significativos.
  *
- * 🔴 **El error que esto corrige:** antes los de 9 y 10 caían en la banda de
- * 0,94 y quedaban por debajo de los de 11 a 15, cuando la fuente más grande y
- * más nueva de las dos los pone justo en el centro del riesgo.
+ * 🔴 **Lo que se corrigió el 21/8, y es de atribución, no de números:** las
+ * bandas de ESET —11 a 15, y 7 a 10— estaban acá firmadas como si las hubiera
+ * medido el Ministerio. No las midió: las resume en su estado del arte. Los
+ * pesos NO se movieron, porque el dato de ESET sigue existiendo y sigue
+ * sosteniendo lo mismo; lo que cambió es quién lo firma.
+ *
+ * ⬜ **Y queda una tensión abierta, que es decisión de producto y no de código:**
+ * los 15 años pesan 0,97 apoyados **sólo en ESET**, mientras la medición propia
+ * del estudio pone la franja de 15 a 17 en apenas 14,5%. Moverlo es elegir entre
+ * una fuente citada y una muestra de 23 casos, así que no se movió solo.
+ * 📌 Antes de tocarlo, leer la medición de abajo: la edad casi nunca mueve el DÍA.
  *
  * El criterio es simple y se puede defender delante de un padre: **pesa 1 donde
- * las dos fuentes coinciden** (11 a 13), un escalón menos donde lo nombra una
+ * las fuentes coinciden** (11 a 13), un escalón menos donde lo nombra una
  * sola, y el piso donde no lo nombra ninguna.
  *
  * ⚠ El rango sigue siendo angosto a propósito (0,88 a 1). Un factor agresivo
@@ -62,13 +74,14 @@ export const PESO_POR_TIPO: Record<TipoDeSenal, number> = {
  * dato: dice dónde se concentran los casos, no dónde dejan de existir.
  */
 export function factorEdad(edad: number): number {
-  // Las dos fuentes coinciden: 11-13 cae dentro de "11 a 15" y de "9 a 13".
+  // Las tres fuentes coinciden: 11-13 cae en "9 a 13", en "11 a 15" y —12 y 13—
+  // en el "12 a 14" que midió el estudio.
   if (edad >= 11 && edad <= 13) return 1;
   // Sólo Grooming LATAM los pone en la franja más vulnerable.
   if (edad >= 9 && edad <= 10) return 0.97;
-  // Sólo el estudio del Ministerio los pone en el grueso de los casos.
+  // 14: ESET y la medición propia del estudio. 15: ⬜ sólo ESET (ver arriba).
   if (edad >= 14 && edad <= 15) return 0.97;
-  // "Segundo grupo importante" del Ministerio (7 a 10): acá quedan 7 y 8.
+  // "Segundo grupo importante" de ESET (7 a 10): acá quedan 7 y 8.
   if (edad >= 7 && edad <= 8) return 0.94;
   return 0.88;
 }
@@ -213,13 +226,17 @@ export function factorMadrugada(edad: number, hora: number, turno?: TurnoEscolar
 /* ── Factor por género ───────────────────────────────────────────────────── */
 
 /**
- * 📊 Sostenido en el estudio: el 80% de las víctimas de acoso virtual infantil
- * son nenas.
+ * 📊 Medido por el estudio nacional: el **66,3% de las víctimas de grooming fue
+ * de género femenino** y el 33,7% masculino.
+ * ⚠ Acá decía «el 80% de las víctimas de acoso virtual infantil son nenas».
+ * Corregido el 21/8: ese 80% es de UNESCO/CIPDH, mide bullying virtual y estaba
+ * mal atribuido al estudio. **Y el dato real es bastante menos desparejo**, lo
+ * que refuerza el guardarraíl en vez de debilitarlo.
  *
  * 🔴 Guardarraíl. El rango es todavía más angosto (0,94 a 1) y por una razón
  * que no es de cortesía: si el factor bajara de verdad para los varones, el
- * sistema los detectaría más tarde. El 20% restante no es ruido — son chicos
- * reales, y son los que menos denuncian.
+ * sistema los detectaría más tarde. Un tercio de las víctimas no es ruido — son
+ * chicos reales, y son los que menos denuncian.
  *
  * 📌 Lo que sí cambia de verdad por género es **qué tipo de riesgo se enfatiza
  * en el mensaje**, no cuánto tarda el sistema en hablar.
@@ -347,9 +364,13 @@ export const REGULARIDAD_MINIMA = 0.6;
 /* ── La ventana ──────────────────────────────────────────────────────────── */
 
 /**
- * 📊 Sostenido en el estudio: el 90% de las víctimas sufre acoso cotidiano,
- * sostenido durante meses. Por eso la unidad de análisis es la semana y no
- * el evento.
+ * 📊 Lo que el estudio nacional mide de verdad sobre repetición: al **43,5% de
+ * las víctimas la acosaron más de una vez**, contra un 29,3% una sola. Eso
+ * sostiene que la unidad de análisis sea la semana y no el evento.
+ * ⚠ Acá decía «el 90% sufre acoso cotidiano sostenido durante meses». Corregido
+ * el 21/8: es de UNESCO/CIPDH, sobre bullying virtual. **El largo de la ventana
+ * —21 días— no lo dice ninguna fuente: es una decisión de producto**, y conviene
+ * no volver a presentarla como si saliera de un dato.
  */
 export const VENTANA_DIAS = 21;
 

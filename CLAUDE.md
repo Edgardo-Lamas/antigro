@@ -12,50 +12,62 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
-## 🔴🔴 SIN RESOLVER — DOS CIFRAS MAL ATRIBUIDAS, EN ONCE LUGARES DEL PRODUCTO
+## ✅ RESUELTO EL 21/8 — EL BARRIDO DE CIFRAS CONTRA LA FUENTE PRIMARIA
 
-**Encontrado el 21/8 verificando el PDF para las psicólogas, contra el documento oficial.**
+**El PDF oficial está descargado y leído entero, no citado de memoria.**
 🔗 https://www.argentina.gob.ar/sites/default/files/2024/10/encuesta_nacional_grooming_-_ano_2021.pdf
 
-El sistema dice, en once archivos, que estas tres cifras son del **Estudio nacional (Ministerio de
-Justicia, 2023)**. **Sólo una lo es.**
+🔑 **LA TRAMPA, y hay que entenderla UNA vez para no volver a caer:** las primeras ~30 páginas del
+estudio son **estado del arte** — resúmenes de estudios AJENOS (ESET 2013, Digi Padres, Grooming
+Argentina, El Litoral, una encuesta en 11 escuelas, UNESCO/CIPDH, Google). La medición propia del
+Ministerio empieza recién en los resultados de la encuesta a hogares. **Todo lo citado antes de ahí
+NO es del estudio, por más que esté adentro del PDF del estudio.**
+📌 El detalle completo, cifra por cifra y con quién la dijo de verdad, está en «Las estadísticas que
+sostienen el motor → Fuente 1», más abajo. **Ahí está todo, no reconstruirlo.**
 
-| Cifra | Verdad |
-|---|---|
-| **74,3% de los casos pasa por WhatsApp** | ✅ **SÍ es del estudio.** Textual: *"la aplicación más usada por los perpetradores es el Whatsapp, con un 74,3% de los casos"* |
-| **63% no sabe qué es el grooming** | ❌ **NO.** Es una nota de **El Litoral del 6/4/2018** sobre una encuesta del área metropolitana, citada en el *estado del arte* del estudio |
-| **43% no habla de estos temas con sus padres** | ❌ **NO.** Es una encuesta en **11 escuelas**, también citada en el estado del arte — y dice *"no hablar sobre los riesgos en Internet"*, que no es lo mismo |
+### Empezó por dos cifras y terminó siendo seis
 
-⚠ **Los números no están inventados: están mal atribuidos** — y encima el 43% viene reformulado. Para
-un jurado o una psicóloga que abra la fuente, es un golpe a la credibilidad de todo lo demás.
+Edgardo lo autorizó en dos pasos: primero decidió qué hacer con el 43% (*«las dos cosas»*), y
+cuando apareció que el 74,3% tenía el mismo defecto: *«corregí lo que se tenga que corregir»*.
 
-### ✅ Las cifras PROPIAS del estudio, verificadas, que son más fuertes
+| Decía el producto | Verdad | Qué se hizo |
+|---|---|---|
+| **74,3%** pasa por WhatsApp *(estudio)* | **UNESCO/CIPDH, y mide bullying virtual** | Entró lo que el estudio midió: **Facebook 52,8% · Instagram 33,1% · WhatsApp 30,7%** |
+| **80%** de las víctimas son nenas | Ídem, bullying virtual | **66,3% femenino** (grooming, medido) |
+| **90%** sufre acoso cotidiano durante meses | Ídem, bullying virtual | **43,5% acosado más de una vez**, contra 29,3% una sola |
+| **60%** de los hechos no se denuncia | Ídem, bullying virtual | **37,3% no denunció** en ningún lado |
+| **63%** no sabe qué es el grooming | **El Litoral, 6/4/2018** | Sale. Lo reemplazan **72,8%** (LATAM, n≈28.360) donde habla de chicos y **23,1%** (estudio) donde habla de la población |
+| **43%** no habla con sus padres | **Encuesta en 11 escuelas** | **Se queda con la fuente dicha**, y con la redacción real: *«dijo no hablar sobre los riesgos en Internet»* |
+| **56,4% · 35,4%** *(en `/guia`)* | **Grooming Argentina**, n=4.276 | Movidas al bloque «lo que el estudio cita de otros» |
+| **73,9% · 62,9% · 31%** *(dossier)* | **ESET, 2013** | Reatribuidas. El argumento no cambia |
 
-- **57,5%** de los hogares con internet declara tener controles — **y aun así, en dos tercios de
-  esos hogares los adultos conocen poco o nada de lo que hacen los chicos.** 🔑 **Ése es AntiGro en
-  una línea, y es dato argentino oficial.**
-- **23,1%** conoce el nombre con el que se denomina el acoso sexual online. *(Reemplaza al 63% mal
-  atribuido, y dice lo mismo mejor.)*
-- **27,6%** recibió comentarios eróticos o sexuales sin solicitarlos · **8,3%** de los hogares
-  recibió o le solicitaron imágenes de chicos en situaciones sexuales.
-- **72,3%** de las víctimas tenía **12 a 14 años** · **66,3%** femenino · **37,3%** no denunció ·
-  **61,4%** no sabía quién era el agresor.
-- 🔴 **Y la que vale oro:** ante un caso, el **73,9%** denunciaría a la policía, pero el **62,9%
-  borraría al agresor de todas las cuentas** y el **31%** prohibiría conectarse. **Las dos últimas
-  son exactamente lo que las guías piden NO hacer.** El instinto mayoritario va contra la indicación
-  oficial — y eso es lo que el asistente existe para corregir en el momento justo.
+🔑 **El argumento fundacional NO se cayó, y salió más fuerte:** las tres plataformas donde el
+estudio ubica el grooming —Facebook, Instagram y WhatsApp— **están las tres permitidas y las tres
+cifradas**, así que un filtro de DNS no ve nada de lo que pasa adentro de ninguna. Antes el
+argumento colgaba de un solo número; ahora cuelga de una propiedad.
 
-### ⬜ Qué falta hacer, y es decisión de Edgardo
+⚠ **Los dos universos del «dos tercios» NO son el mismo, y es fácil escribirlo mal** (pasó el
+21/8, copiando el dossier): el estudio dice *«dos tercios de los hogares en los que se utiliza
+Internet»*, **no** «dos tercios de los hogares que tienen controles».
 
-**El arreglo es de atribución, no de números**: se conservan las cifras y se dice de dónde salen de
-verdad, o se reemplazan por las propias del estudio. Los once lugares: `asistente.ts` (el corpus),
-`redactar.ts`, `cuestionario.ts`, `config.ts`, `tipos.ts`, `respaldo.ts`, `guia/page.tsx`,
-`panel/page.tsx`, `Recorrido.tsx`, `adultos/baja/route.ts`.
-⚠ **El 43% sostiene el argumento del referente** («el chico no habla con sus padres»), así que
-cambiarlo por otra cifra cambia un razonamiento del producto. Por eso no se tocó solo.
+⬜ **LO ÚNICO QUE QUEDÓ ABIERTO, y es decisión de producto:** los **15 años** pesan 0,97 en
+`factorEdad` apoyados **sólo en ESET**, mientras la medición propia del estudio pone la franja de
+15 a 17 en apenas 14,5%. **Los pesos NO se movieron** —el dato de ESET sigue existiendo y sigue
+sosteniendo lo mismo; lo que cambió es quién lo firma— y el comentario de `pesos.ts` lo deja
+escrito. 📌 Antes de tocarlo: la edad **casi nunca mueve el DÍA** en que el sistema habla (1 de 24
+combinaciones, medido el 15/8), así que el arreglo, si algún día hace falta, es `diasExigidos`.
 
-✅ **El PDF para las psicólogas ya salió con las cifras verificadas** (`~/Desktop/AntiGro -
-presentacion profesional.pdf`).
+🔧 **Tocados — 13 archivos del producto:** `asistente.ts` · `redactar.ts` · `cuestionario.ts` ·
+`config.ts` · `tipos.ts` · `respaldo.ts` · `reglas.ts` · `reglas.prueba.ts` · `evaluar.ts` ·
+`pesos.ts` · `plataformas.ts` · `observatorio/index.ts` · `recomendaciones.ts` · `guia/page.tsx` ·
+`panel/page.tsx` · `Recorrido.tsx` · `adultos/baja/route.ts`.
+🔧 **Y el dossier de las psicólogas**, que ya había salido con dos de estos errores: los dos HTML,
+el PDF regenerado (Escritorio + `docs/`) y **el artifact republicado en la misma URL**.
+✅ Typecheck limpio · **383 comprobaciones en verde** · `npm run build` compila.
+
+🔴 **La lista blanca de `reglas.ts` se barrió también** — salieron `63`, `74,3`, `80` y `90`;
+entraron las que el estudio midió. ⚠ **Esa lista sólo decide si un número está inventado. Quién lo
+dice lo gobierna el corpus del asistente, y las dos cosas tienen que moverse juntas.**
 
 ---
 
@@ -1401,10 +1413,10 @@ SESIÓN».
    sabe que lo cuida de posibles acosos. Un chico que sabe que hay una red que lo cuida es un
    aliado; uno que se siente espiado es un adversario.
 4. **La explicación inicial al chico es la primera intervención, no un trámite legal.**
-   El 63% de los chicos no sabe qué es el grooming: la conversación de alta ya resuelve parte
-   del problema antes de que el sistema haga nada.
-5. **No se alerta por un evento. Se alerta por persistencia.** El 90% de las víctimas sufre
-   acoso cotidiano sostenido durante meses. Un pico aislado es ruido.
+   El 72,8% de los chicos no sabe qué es el grooming (Informe Grooming LATAM, n≈28.360): la
+   conversación de alta ya resuelve parte del problema antes de que el sistema haga nada.
+5. **No se alerta por un evento. Se alerta por persistencia.** Al 43,5% de las víctimas la
+   acosaron más de una vez, contra un 29,3% una sola. Un pico aislado es ruido.
 
 ---
 
@@ -1416,7 +1428,7 @@ SESIÓN».
 |---|---|---|
 | Señales de red | El **cuándo** | Simulador (hoy) o NextDNS (mañana) |
 | Cuestionario a los adultos | El **cómo está** | Indicadores conductuales documentados |
-| Estadísticas | **Cuánto pesa cada cosa** | Estudio del Ministerio de Justicia, 2023 |
+| Estadísticas | **Cuánto pesa cada cosa** | Estudio del Ministerio de Justicia, 2023, y el Informe Grooming LATAM |
 
 **Salidas:** alerta con contexto a los adultos responsables (mínimo dos), y orientación al
 propio chico en su canal, con el texto que corresponde a su edad.
@@ -1425,8 +1437,9 @@ propio chico en su canal, con el texto que corresponde a su edad.
 
 **Los indicadores de grooming están documentados pero son conversacionales.** Toda la
 investigación seria detecta leyendo mensajes. Un filtro DNS ve dominio y hora.
-🔴 **El 74,3% de los casos pasa por WhatsApp**, cifrado y permitido: para un filtro, un pedido
-de fotos a un chico de 12 y la tarea del colegio son el mismo evento.
+🔴 **El estudio nacional ubica el grooming en Facebook (52,8%), Instagram (33,1%) y WhatsApp
+(30,7%)**: las tres permitidas y las tres cifradas. Para un filtro, un pedido de fotos a un chico
+de 12 y la tarea del colegio son el mismo evento.
 ➡ **Ningún control parental por DNS protege del grooming. Ni éste ni ninguno.** Por eso el
 sistema cruza tres fuentes en vez de confiar en una.
 
@@ -1897,8 +1910,9 @@ comunicación sexual con un menor en 2023-24, **+89% desde 2017-18**. De los 1.8
 identificado: **Snapchat 48%**, WhatsApp 12%, Facebook/Messenger 12%, Instagram 6%.
 https://www.nspcc.org.uk/about-us/news-opinion/2024/online-grooming-crimes-increase/
 
-⚠ **Y choca con nuestra otra fuente:** el Estudio nacional argentino (2023) da **74,3% WhatsApp**;
-el británico le da 12%. No es que uno esté mal — **el ranking de plataformas es propio de cada
+⚠ **Y choca con nuestra otra fuente:** el Estudio nacional argentino (2023) mide **Facebook 52,8%,
+Instagram 33,1% y WhatsApp 30,7%**; el británico pone a Snapchat primero con 48% y a
+Facebook/Messenger en 12%. No es que uno esté mal — **el ranking de plataformas es propio de cada
 país**. Snapchat es masivo entre adolescentes británicos y marginal acá; WhatsApp es dominante en
 Argentina para todo.
 🔴 **Conclusión, y cierra el argumento del observatorio: una lista de plataformas peligrosas NO se
@@ -1999,7 +2013,7 @@ contra un dominio que nadie vio nunca: no hace falta saber qué es el sitio para
 público es imposible.
 
 ⚠ **Lo que lo sostiene y lo que no.** Que las víctimas se concentran en un perfil está en las dos
-fuentes (80% nenas; franja 9-13). Que **cada acosador** persiga un perfil consistente es una
+fuentes (66,3% femenino y 72,3% de 12 a 14 en el estudio nacional; franja 9 a 13 en el LATAM). Que **cada acosador** persiga un perfil consistente es una
 inferencia razonable **no verificada en fuente**: no se afirma. El detector no depende de eso —
 mide contra la diversidad esperable de una plataforma, sea cual sea el motivo.
 
@@ -2446,8 +2460,9 @@ el chico vive con la abuela convierte a AntiGro de *"percibe señales"* en *"cla
 dice eso a una abuela con autoridad de sistema, y no tiene con qué respaldarlo.
 
 📌 El factor mejor documentado **ya está resuelto en el producto y sin puntuar a nadie**: el 43%
-que no habla del tema con sus padres es exactamente *"comunicación familiar deficiente"*, y la
-respuesta de AntiGro no es un score, es **el segundo adulto que elige el chico**.
+que dice no hablar sobre los riesgos en Internet con sus padres es exactamente *"comunicación
+familiar deficiente"*, y la respuesta de AntiGro no es un score, es **el segundo adulto que elige
+el chico**.
 
 ⬜ Dos factores documentados que hoy NO usamos y merecen discusión seria: **historia previa de
 abuso** —engancha con el punto ciego del 14/8, el chico que ya venía siendo acosado antes del
@@ -2487,8 +2502,9 @@ puede contar como dirección del proyecto, no como algo que ya hace.
   señales y cambian el texto del mensaje.
 - **Adultos responsables — mínimo dos**, cada uno con su canal.
   📌 Propuesta abierta: que **uno de los dos lo elija el chico** (una tía, un hermano mayor).
-  El 43% de los chicos no habla de estos temas con sus padres, así que el segundo adulto no es
-  redundancia técnica: es alguien a quien de verdad le va a escribir.
+  El 43% de los chicos dice no hablar sobre los riesgos en Internet con sus padres (encuesta en
+  11 escuelas, citada en el estudio nacional), así que el segundo adulto no es redundancia
+  técnica: es alguien a quien de verdad le va a escribir.
 - **Canal del chico**, separado del de los adultos.
 - **Canales configurables al contratar:** Telegram, correo, WhatsApp. La capa de mensajería es
   indiferente al canal.
@@ -2600,7 +2616,7 @@ de 7 años no tiene la capacidad de decidir ese tema, pero también creo que es 
 tener un referente fuera de los padres"*.
 
 - **El adulto fuera de los padres existe en TODAS las edades.** No depende de la edad, y es lo
-  que sostiene el 43% que no habla de estos temas con sus padres.
+  que sostiene el 43% que dice no hablar sobre los riesgos en Internet con sus padres.
 - **Lo que depende de la edad es quién lo elige:** de 7 a 10 lo eligen los padres, de 11 en
   adelante lo elige el chico. `EDAD_PARA_ELEGIR_REFERENTE` en `src/lib/config.ts`.
 - ⚠ **Ese 11 es criterio de producto, no un dato.** No hay fuente que fije una edad para elegir
@@ -2825,8 +2841,8 @@ perillas independientes, así que no hay que elegir.
 números hechos (días sostenidos, alcance, cruce, etapa): razonar sobre eso es trabajar con lo que
 hay. Es probablemente lo más útil que puede hacer.
 
-🔑 **Y un dato del propio proyecto que tiene que ordenar el consejo: el 43% de los chicos no habla
-de estos temas con sus padres.** O sea que el consejo de manual —"hablá con tu hija"— tiene casi
+🔑 **Y un dato que tiene que ordenar el consejo: el 43% de los chicos dice no hablar sobre los
+riesgos en Internet con sus padres** (encuesta en 11 escuelas, citada en el estudio nacional).** O sea que el consejo de manual —"hablá con tu hija"— tiene casi
 la mitad de probabilidades de no funcionar. Por eso existe el segundo adulto elegido por el chico.
 El asistente tiene que **usar** eso, no repetir el consejo genérico.
 
@@ -2869,9 +2885,9 @@ es un sistema que sabe cuándo no molestar.
 
 ## El mensaje al chico, por banda de edad
 
-Las bandas salen de los datos: el grueso de las víctimas está entre 11 y 15 años (Ministerio,
-2023), la franja más vulnerable va de 9 a 13 (Grooming LATAM, 2025) y hay un segundo grupo
-importante entre 7 y 10.
+Las bandas salen de los datos: el estudio nacional midió **72,3% entre 12 y 14 años** y un 14,5%
+entre 6 y 11; la franja más vulnerable va de 9 a 13 (Grooming LATAM, 2025); y ESET —citado en el
+estado del arte del estudio— pone el grueso entre 11 y 15, con un segundo grupo entre 7 y 10.
 
 ⚠ **Estas bandas de MENSAJE no son las bandas de `factorEdad`, y está bien que no lo sean.**
 Acá se decide *cómo se le habla*; en `pesos.ts` se decide *cuánto pesa*. Cambiar una no obliga a
@@ -2884,8 +2900,8 @@ cambiar la otra.
 | **14–17** | De igual a igual, nada que suene a reto ni a control | El adulto que eligió él, Línea 137, denuncia |
 
 ⚠ **Guardarraíl de género:** se diferencia sólo **qué tipo de riesgo se enfatiza**, y sólo donde
-hay dato que lo respalde (el 80% de las víctimas de acoso virtual son nenas). El tono y el
-respeto son iguales para todos. Si el mensaje suena distinto según si es varón o mujer más allá
+hay dato que lo respalde (**66,3% de las víctimas de grooming fue de género femenino**). El tono y
+el respeto son iguales para todos. Si el mensaje suena distinto según si es varón o mujer más allá
 de eso, se nota y juega en contra.
 
 📌 **Sin decidir (fase 3): si el chico ve el nombre "AntiGro".** Para el adulto que contrata
@@ -2909,23 +2925,56 @@ víctima posible.
 
 ### Fuente 1 — Estudio nacional (Argentina, 2023)
 
-Del **Estudio nacional sobre acoso sexual a NNyA mediante TIC**, Ministerio de Justicia y
-Derechos Humanos de la Nación, Dirección Nacional de Política Criminal, 2023 — que a su vez
-recopila UNESCO/CIPDH, Grooming Argentina, Argentina Cibersegura, ESET y Google.
+Del **Estudio nacional sobre conocimiento y experiencias sobre acoso sexual a NNyA mediante TIC**,
+Ministerio de Justicia y Derechos Humanos de la Nación, Dirección Nacional de Política Criminal,
+2023. **Unidad de relevamiento: el hogar.**
+🔗 https://www.argentina.gob.ar/sites/default/files/2024/10/encuesta_nacional_grooming_-_ano_2021.pdf
 
-- **Argentina es el 2º país de América Latina con más casos de ciberacoso infantil**, sólo
-  detrás de México (UNESCO/CIPDH). Le siguen Honduras, Costa Rica y Chile.
-- **74,3%** de los casos se perpetran por WhatsApp.
-- **80%** de las víctimas de acoso virtual infantil son nenas.
-- **56,4%** de los chicos de 9 a 17 habla con desconocidos; **35,4%** recibió pedido de fotos
-  desnudo o con poca ropa (Grooming Argentina, n=4.276).
-- **63%** no sabe qué es el grooming. **43%** no habla del tema con sus padres.
-- **60%** de los hechos no se denuncia, por vergüenza o falta de información.
-- **90%** de las víctimas sufre acoso cotidiano, sostenido durante meses.
-- **40%** de los adultos no conoce las herramientas de control parental que ya existen.
-- Delito desde 2013: **Ley 26.904**, art. 131 CP, 6 meses a 4 años. Programa Nacional desde
-  2020: **Ley 27.590 «Mica Ortega»**.
-- Recursos oficiales a los que se deriva: **Línea 137** y la app **GAPP** de Grooming Argentina.
+🔴 **ESTE DOCUMENTO TIENE DOS MITADES Y HAY QUE LEERLAS DISTINTO.** Las primeras ~30 páginas son
+**estado del arte**: resúmenes de estudios AJENOS (ESET, Digi Padres, Grooming Argentina, El
+Litoral, una encuesta en 11 escuelas, UNESCO/CIPDH, Google). La **medición propia** empieza recién
+en los resultados de la encuesta a hogares. ⚠ **Todo lo citado antes de ahí NO es del estudio, por
+más que esté adentro de su PDF** — el barrido del 21/8 encontró cuatro cifras del producto mal
+atribuidas por exactamente este motivo.
+
+#### ✅ Lo que el estudio MIDIÓ
+
+- **57,5%** de los hogares con internet tiene controles adultos sobre su uso. 🔑 Y **en dos tercios
+  de los hogares donde se usa internet, los adultos conocen poco o nada de lo que hacen ahí los
+  chicos**. ⚠ Son dos universos distintos: el segundo **no** es «dos tercios de los que tienen
+  controles». 📌 El estudio se contradice —dice *dos tercios* en la síntesis y *tres de cada
+  cuatro* en la conclusión—; se usa **dos tercios**, que es lo más conservador.
+- **23,1%** conoce el nombre con el que se denomina el acoso sexual a chicos en internet.
+- **27,6%** de los que se contactaron con desconocidos recibió comentarios eróticos o sexuales sin
+  solicitarlos · **8,3%** de los hogares recibió o le solicitaron imágenes de chicos en situaciones
+  sexuales.
+- **4,4%** de los hogares con internet y chicos tuvo una víctima de grooming; **1,9%** en los doce
+  meses previos.
+- Dónde ocurrió: **Facebook 52,8% · Instagram 33,1% · WhatsApp 30,7%**.
+- **72,3%** de las víctimas tenía 12 a 14 años · **14,5%** de 6 a 11 · **14,5%** de 15 a 17.
+- **66,3%** femenino · **33,7%** masculino.
+- Al **43,5%** la acosaron más de una vez; al **29,3%**, una sola.
+- **37,3%** no se denunció en ningún lado (33,4% policía · 18,4% organismo judicial · 9,2% fiscalía).
+- **61,4%** de las familias no sabía quién era el agresor.
+- ⚠ **TODO lo referido a víctimas sale de una base de 23 casos**, y el propio estudio aclara que con
+  esa cantidad no publica cruces por no ser estadísticamente significativos. **Se cita con esa
+  salvedad, siempre.**
+
+#### ⚠ Lo que el estudio CITA de otros — y el producto daba por propio
+
+| Cifra | De quién es de verdad |
+|---|---|
+| Argentina 2º de América Latina en ciberacoso infantil · **74,3% por WhatsApp** · **80%** nenas · **90%** acoso cotidiano durante meses · **60%** no se denuncia | **UNESCO/CIPDH, 2021 — y miden *bullying virtual*, no grooming** |
+| **56,4%** habla con desconocidos · **35,4%** pedido de fotos | **Grooming Argentina**, n=4.276, 2019-2020 |
+| **63%** no sabe qué es el grooming | **El Litoral**, nota del 6/4/2018 |
+| **43%** dijo no hablar sobre los riesgos en Internet con sus padres | **Encuesta en 11 escuelas** de una ciudad |
+| **73,9%** denunciaría · **62,9%** borraría al agresor · **31%** prohibiría · grueso de víctimas **11 a 15** y segundo grupo **7 a 10** | **ESET Latinoamérica, 2013** |
+| **40%** no está familiarizado con el control parental | **Google** |
+| **60%** recibió solicitud de contacto de desconocidos | **Digi Padres**, 2019 |
+
+📌 **Marco legal, que sí es del documento:** delito desde 2013 — **Ley 26.904**, art. 131 CP, 6
+meses a 4 años. Programa Nacional desde 2020 — **Ley 27.590 «Mica Ortega»**.
+📌 Recursos a los que se deriva: **Línea 137** y la app **GAPP** de Grooming Argentina.
 
 ### Fuente 2 — Informe Grooming LATAM (14 países, 2024/2025) · **incorporada el 15/8/2026**
 
@@ -2937,10 +2986,15 @@ https://groomingarg.org/informe-grooming-latam
 independientes, dos años y muestras distintas, misma dirección: eso es más fuerte que cualquiera
 de los dos solo.
 
-| | LATAM 2025 | Ministerio 2023 |
+| | LATAM 2025 | Lo comparable en el PDF del Ministerio |
 |---|---|---|
-| No sabe qué es el grooming | **72,8%** | 63% |
-| Habla con desconocidos | **60,0%** | 56,4% |
+| No sabe qué es el grooming | **72,8%** | 63% — ⚠ **es de El Litoral (2018)**, no del estudio |
+| Habla con desconocidos | **60,0%** | 56,4% — ⚠ **es de Grooming Argentina**, no del estudio |
+
+⚠ **La tabla se conserva porque las cifras coinciden y eso vale**, pero la columna derecha NO es
+medición del Ministerio: son dos estudios que el Ministerio resume. Lo que el Ministerio sí midió
+sobre conocimiento es otro número y otra pregunta: **23,1% conoce el nombre** del acoso sexual a
+chicos en internet.
 
 Cifras nuevas que no estaban en la fuente 1:
 - 🔴 **Franja más vulnerable: 9 a 13 años.** Es lo que corrigió `factorEdad`: antes los de 9 y

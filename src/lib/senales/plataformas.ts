@@ -32,8 +32,11 @@
  *  https://www.nspcc.org.uk/about-us/news-opinion/2024/online-grooming-crimes-increase/
  *
  *  ⚠ **Y acá aparece algo que hay que decir, porque choca con nuestra otra
- *  fuente:** el Estudio nacional argentino (Ministerio de Justicia, 2023) dice
- *  que el **74,3% de los casos pasa por WhatsApp**; el británico le da 12%.
+ *  fuente:** el Estudio nacional argentino (Ministerio de Justicia, 2023) mide
+ *  **Facebook 52,8%, Instagram 33,1% y WhatsApp 30,7%**; el británico pone a
+ *  Snapchat primero con 48% y a Facebook/Messenger en 12%.
+ *  ⚠ Acá decía «74,3% pasa por WhatsApp». Corregido el 21/8: ese número es de
+ *  UNESCO/CIPDH, mide bullying virtual y está en el estado del arte del estudio.
  *  No es que uno esté mal: **el ranking de plataformas es propio de cada país**
  *  —Snapchat es masivo entre adolescentes británicos y marginal acá, y WhatsApp
  *  es dominante en Argentina para todo—.

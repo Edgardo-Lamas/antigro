@@ -123,8 +123,9 @@ export function bandaDeEdad(edad: number): BandaDeEdad {
  * ─────────────────────────────────────────────────────────────────────────
  *
  * 🔑 **El adulto de confianza fuera de los padres existe en TODAS las edades.**
- * Eso no se discute y no depende de la edad: el 43% de los chicos no habla de
- * estos temas con sus padres, así que el segundo adulto no es redundancia.
+ * Eso no se discute y no depende de la edad: el 43% de los chicos dice no hablar
+ * sobre los riesgos en Internet con sus padres (encuesta en 11 escuelas, citada
+ * en el estudio nacional 2023), así que el segundo adulto no es redundancia.
  *
  * 🔴 **Lo que sí depende de la edad es quién lo elige.** Lo planteó Edgardo:
  * *"un chico de 7 años no tiene la capacidad de decidir ese tema"*. Tiene

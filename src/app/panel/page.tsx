@@ -86,8 +86,9 @@ export default async function Panel() {
           </li>
           <li>
             Que <strong className="text-tinta">al referente lo elija el chico</strong>, cuando
-            tiene edad de elegir. El 43% no habla de estos temas con sus padres: alguien que
-            eligió él es alguien a quien de verdad le va a escribir.
+            tiene edad de elegir. El 43% de los chicos dice no hablar sobre los riesgos en
+            Internet con sus padres (encuesta en 11 escuelas, citada en el estudio nacional):
+            alguien que eligió él es alguien a quien de verdad le va a escribir.
           </li>
         </ul>
         {/* 🔴 Acá decía que el formulario de alta «se arma en la fase 4» y que

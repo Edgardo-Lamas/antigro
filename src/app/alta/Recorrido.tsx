@@ -17,9 +17,9 @@
  *     todavía no vio funcionar.
  *  2. **El chico.** Edad, género y turno son datos del motor, no adornos.
  *  3. **La casa y los adultos.** Una casa o dos, y qué puede ver cada uno.
- *  4. **La conversación con el chico.** Es la regla 4 y no es un trámite: el 63%
- *     de los chicos no sabe qué es el grooming, así que esa charla ya resuelve
- *     parte del problema antes de que el sistema haga nada.
+ *  4. **La conversación con el chico.** Es la regla 4 y no es un trámite: el
+ *     72,8% de los chicos no sabe qué es el grooming, así que esa charla ya
+ *     resuelve parte del problema antes de que el sistema haga nada.
  *  5. **La instalación.** Recién acá, cuando ya se entendió qué hace el sistema.
  */
 
@@ -493,8 +493,9 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
             {adultos.filter((a) => a.nombre.trim()).length < 2 && (
               <p className="rounded-md border border-borde bg-fondo px-4 py-3 text-xs leading-relaxed text-tenue">
                 <strong className="text-tinta">Sugerencia, no requisito.</strong> Con un segundo
-                adulto no queda una sola persona pendiente de los avisos. El 43% de los chicos no
-                habla de estos temas con sus padres, así que un adulto de afuera —una tía, una
+                adulto no queda una sola persona pendiente de los avisos. El 43% de los chicos
+                dice no hablar sobre los riesgos en Internet con sus padres (encuesta en 11
+                escuelas, citada en el estudio nacional), así que un adulto de afuera —una tía, una
                 abuela, alguien de confianza— suele ser a quien de verdad le escriben.{" "}
                 {quienEligeAlReferente(edad) === "el_chico"
                   ? `A los ${edad}, ese adulto conviene que lo elija ${nombre.trim() || "el chico"}.`
@@ -545,7 +546,7 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
             Antes de instalar nada, hablá con {nombre.trim() || "tu hijo"}. No es un trámite legal
             ni un aviso de cortesía:{" "}
             <strong className="text-tinta">
-              el 63% de los chicos no sabe qué es el grooming
+              el 72,8% de los chicos no sabe qué es el grooming
             </strong>
             , así que esa conversación ya resuelve parte del problema antes de que el sistema haga
             absolutamente nada.

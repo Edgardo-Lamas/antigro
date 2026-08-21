@@ -74,7 +74,7 @@ const CASOS: Caso[] = [
     pasa: true,
     texto:
       `El informe dice que en un día de mirar horarios no apareció nada raro. Un día. Y ` +
-      `WhatsApp —por donde pasa el 74,3% de los casos— no aparece acá. Con eso no se ` +
+      `WhatsApp —donde el estudio nacional ubica el 30,7% de los casos— no aparece acá. Con eso no se ` +
       `construye un "quedate tranquila". Se construye un "seguimos mirando". Contestá el ` +
       `cuestionario, que es lo que hoy falta.`,
   },

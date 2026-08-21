@@ -94,8 +94,8 @@ export default function Guia() {
             Argentina es el segundo país de América Latina con más casos de ciberacoso infantil.
           </p>
           <p className="mt-1.5 text-sm leading-relaxed text-tenue">
-            Sólo detrás de México, según UNESCO y el CIPDH. Y el 60% de los hechos no se denuncia,
-            por vergüenza o falta de información.
+            Sólo detrás de México, según UNESCO y el CIPDH. Y el estudio nacional midió que el
+            37,3% de los casos de grooming no se denunció en ningún lado.
           </p>
         </div>
       </header>
@@ -109,9 +109,11 @@ export default function Guia() {
           <p className="text-sm leading-relaxed text-tinta">
             Los indicadores de grooming están documentados, pero son{" "}
             <strong>conversacionales</strong>: toda la investigación seria detecta leyendo
-            mensajes. Un filtro de red ve dominio y hora. Y el{" "}
-            <strong>74,3% de los casos pasa por WhatsApp</strong>, cifrado y permitido: para un
-            filtro, un pedido de fotos a un chico de 12 y la tarea del colegio son el mismo evento.
+            mensajes. Un filtro de red ve dominio y hora. Y el estudio nacional ubica el grooming
+            en{" "}
+            <strong>Facebook (52,8%), Instagram (33,1%) y WhatsApp (30,7%)</strong>: las tres
+            permitidas y las tres cifradas. Para un filtro, un pedido de fotos a un chico de 12 y la
+            tarea del colegio son el mismo evento.
           </p>
           <p className="mt-3 text-sm font-semibold leading-relaxed text-tinta">
             Ningún control parental por DNS protege del grooming. Ni éste ni ninguno.
@@ -143,7 +145,7 @@ export default function Guia() {
           />
           <Ficha
             que="No alerta por un evento: alerta por persistencia"
-            detalle="Un pico aislado es ruido. El sistema exige que el patrón se sostenga varios días antes de abrir la boca — el 90% de las víctimas sufre acoso cotidiano sostenido durante meses."
+            detalle="Un pico aislado es ruido. El sistema exige que el patrón se sostenga varios días antes de abrir la boca — el estudio nacional midió que al 43,5% de las víctimas la acosaron más de una vez, contra un 29,3% una sola."
           />
           <Ficha
             que="Aprende a este chico, no a un chico promedio"
@@ -253,8 +255,8 @@ export default function Guia() {
               "Es la línea que separa esto de un espía. De lo que escribe el chico no se guarda una palabra, y el modelo de datos está construido para que no se pueda.",
             ],
             [
-              "No ve lo que pasa dentro de WhatsApp.",
-              "Va cifrado, y ahí está el 74,3% de los casos. El sistema lo dice en cada informe en vez de disimularlo.",
+              "No ve lo que pasa dentro de WhatsApp, Instagram ni Facebook.",
+              "Van cifradas, y ahí es donde el estudio nacional ubica el grooming. El sistema lo dice en cada informe en vez de disimularlo.",
             ],
             /* 🔴 Reescrito el 17/8. Decía «decide el motor con el registro
                fechado, el modelo sólo escribe el texto y un control automático
@@ -364,23 +366,69 @@ export default function Guia() {
               Ministerio de Justicia y Derechos Humanos de la Nación, Dirección Nacional de
               Política Criminal, 2023
             </p>
-            <ul className="mt-3 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+              Lo que el estudio midió
+            </p>
+            <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
+              <li>
+                · Dónde ocurrió el hecho: <strong className="text-tinta">Facebook 52,8%</strong>,
+                Instagram 33,1%, WhatsApp 30,7%.
+              </li>
+              <li>· 66,3% de las víctimas fue de género femenino.</li>
+              <li>· 72,3% de las víctimas tenía entre 12 y 14 años. Un 14,5% entre 6 y 11.</li>
+              <li>· Al 43,5% la acosaron más de una vez; al 29,3%, una sola.</li>
+              <li>· 37,3% de los casos no se denunció en ningún lado.</li>
+              <li>· 61,4% de las familias no sabía quién era el agresor.</li>
+              <li>
+                · 4,4% de los hogares con internet y chicos tuvo una víctima de grooming; en la
+                mitad de esos casos, en los doce meses previos a la encuesta.
+              </li>
+              <li>
+                · 57,5% de los hogares con internet tiene controles adultos sobre su uso.{" "}
+                <strong className="text-tinta">
+                  Y en dos tercios de los hogares donde se usa internet, los adultos conocen poco o
+                  nada de lo que hacen ahí los chicos.
+                </strong>
+              </li>
+              <li>
+                · 23,1% conoce el nombre con el que se denomina el acoso sexual a chicos en
+                internet.
+              </li>
+            </ul>
+
+            <p className="mt-4 rounded-md border border-borde bg-fondo px-3 py-2 text-xs leading-relaxed text-apagado">
+              ⚠ Las cifras sobre las víctimas salen de <strong>23 casos</strong>. El propio estudio
+              aclara que con esa cantidad no publica cruces, por no ser estadísticamente
+              significativos.
+            </p>
+
+            {/* 🔴 21/8. Estas cuatro estaban arriba, como si el estudio las
+                hubiera medido. No las midió: las RESUME en su estado del arte,
+                que son treinta páginas de estudios ajenos antes de la encuesta
+                propia. Verificado contra el PDF oficial, no de memoria. */}
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.14em] text-apagado">
+              Lo que el estudio cita de otros
+            </p>
+            <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
               <li>
                 · Argentina es el <strong className="text-tinta">segundo país de América Latina</strong>{" "}
-                con más casos de ciberacoso infantil, sólo detrás de México (UNESCO y CIPDH,
-                recopilado en el estudio).
+                con más casos de ciberacoso infantil, sólo detrás de México. 74,3% del{" "}
+                <em>ciberacoso</em> pasa por WhatsApp · 80% de las víctimas son nenas · 90% sufre
+                acoso cotidiano durante meses · 60% no se denuncia. ⚠ Todo eso es{" "}
+                <strong className="text-tinta">UNESCO y CIPDH, 2021, y mide bullying virtual</strong>
+                , no grooming.
               </li>
-              <li>· 56,4% de los chicos de 9 a 17 habla por internet con gente que no conoce.</li>
-              <li>· 35,4% recibió un pedido de fotos desnudo o con poca ropa.</li>
-              <li>· 60% de los hechos no se denuncia, por vergüenza o falta de información.</li>
-              <li>· 74,3% de los casos pasa por WhatsApp.</li>
-              <li>· 90% de las víctimas sufre acoso cotidiano sostenido durante meses.</li>
-              <li>· 80% de las víctimas de acoso virtual infantil son nenas.</li>
-              <li>· 63% de los chicos no sabe qué es el grooming.</li>
-              <li>· 43% no habla de estos temas con sus padres.</li>
               <li>
-                · El grueso de las víctimas está entre los 11 y los 15, con un segundo grupo
-                importante entre los 7 y los 10.
+                · 56,4% de los chicos de 9 a 17 habla por internet con gente que no conoce · 35,4%
+                recibió un pedido de fotos desnudo o con poca ropa (Grooming Argentina, n=4.276).
+              </li>
+              <li>
+                · 43% de los chicos dijo no hablar sobre los riesgos en Internet con sus padres
+                (encuesta en 11 escuelas de una ciudad).
+              </li>
+              <li>
+                · El grueso de las víctimas entre 11 y 15, con un segundo grupo entre 7 y 10 (ESET).
+                ⚠ La medición propia del estudio dice otra cosa: 72,3% entre 12 y 14.
               </li>
             </ul>
           </div>

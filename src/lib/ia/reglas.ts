@@ -203,10 +203,24 @@ function infracciones(texto: string): string[] {
  * 15/8. ⚠ Las del LATAM se agregaron el 16/8 al escribir el asistente: sin
  * esto, citar el informe que el propio proyecto documenta caía al respaldo
  * como si fuera una invención.
+ *
+ * 🔴 **Barrido del 21/8, contra el PDF oficial descargado.** Salieron cuatro
+ * números que no eran del estudio: el **63%** (El Litoral, 2018) y el **74,3%**,
+ * **80%** y **90%** (UNESCO/CIPDH, y miden *bullying virtual*, no grooming).
+ * Entraron las cifras que el estudio SÍ midió. El **43%** y el **56,4/35,4%**
+ * se quedan porque el producto los usa diciendo de quién son —encuesta en 11
+ * escuelas y Grooming Argentina—, que es lo que gobierna el corpus.
+ * ⚠ Esta lista sólo decide si un número está inventado. **Quién lo dice lo
+ * gobierna el corpus del asistente**, y las dos cosas tienen que ir juntas.
  */
 const CIFRAS_CITABLES = [
-  // Estudio nacional 2023
-  "74,3", "74.3", "80", "56,4", "56.4", "35,4", "35.4", "63", "43", "60", "90", "40",
+  // Estudio nacional 2023 — lo que midió
+  "52,8", "52.8", "33,1", "33.1", "30,7", "30.7", "66,3", "66.3",
+  "72,3", "72.3", "43,5", "43.5", "29,3", "29.3", "37,3", "37.3",
+  "61,4", "61.4", "14,5", "14.5", "23,1", "23.1", "57,5", "57.5",
+  "27,6", "27.6", "8,3", "8.3",
+  // Citadas dentro del estudio, y el producto dice de quién son
+  "56,4", "56.4", "35,4", "35.4", "43", "60", "40",
   // Informe Grooming LATAM 2024/2025
   "72,8", "72.8", "33,3", "33.3", "64,9", "64.9", "25,5", "25.5",
   "62,2", "62.2", "12,3", "12.3", "57,9", "57.9", "36,8", "36.8", "21,1", "21.1",

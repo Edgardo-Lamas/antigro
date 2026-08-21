@@ -24,9 +24,19 @@ await pag.pdf({ path: "…/AntiGro - presentacion profesional.pdf", format: "A4"
 ## 🔴 Lo que hay que saber antes de tocarlo
 
 **Todas las cifras se verificaron el 21/8 contra la fuente primaria**, y esa verificación
-encontró dos errores que estaban en el producto — ver «DOS CIFRAS MAL ATRIBUIDAS» en el
-`CLAUDE.md`. El documento dice, en su encabezado, que sólo lleva cifras verificadas: **si se
+terminó encontrando **seis cifras mal atribuidas en el producto** — ver «EL BARRIDO DE CIFRAS» en
+el `CLAUDE.md`. El documento dice, en su encabezado, que sólo lleva cifras verificadas: **si se
 agrega una sin verificar, esa frase pasa a ser mentira.**
+
+🔴 **Y dos de esas seis estaban en ESTE documento, en la versión que ya salió el 21/8:** el
+*74,3% por WhatsApp* atribuido al estudio (es UNESCO/CIPDH y mide bullying virtual) y el
+*73,9% / 62,9% / 31%* de qué haría un adulto (es ESET, 2013). También decía «dos tercios de **esos**
+hogares» cuando el estudio dice «dos tercios de los hogares **en los que se utiliza Internet**» —
+son dos universos distintos. **Las tres corregidas**, con el PDF regenerado y el artifact
+republicado en la misma URL.
+⚠ Se agregó además la salvedad que un lector profesional va a buscar: **las cifras sobre víctimas
+del estudio salen de una base de 23 casos**, y el propio estudio aclara que con esa cantidad no
+publica cruces.
 
 📌 Las citas de Wisniewski también estaban mezcladas: el **89% / 11%** es de **CSCW 2017**
 (74 apps Android) y el hallazgo sobre victimización es de **CHI 2018** (215 pares

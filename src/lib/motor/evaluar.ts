@@ -4,10 +4,13 @@
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  🔴 No se alerta por un evento. Se alerta por un patrón que se sostiene.
- *  📊 El 90% de las víctimas sufre acoso cotidiano, sostenido durante meses
- *     (Estudio nacional sobre acoso sexual a NNyA mediante TIC, 2023).
- *     Un pico aislado es ruido, y un sistema que grita por cada pico se apaga
- *     a la semana.
+ *  📊 Al 43,5% de las víctimas la acosaron más de una vez, contra un 29,3% una
+ *     sola (Estudio nacional sobre acoso sexual a NNyA mediante TIC, 2023 — su
+ *     propia medición, base 23 casos). Un pico aislado es ruido, y un sistema
+ *     que grita por cada pico se apaga a la semana.
+ *  ⚠ Acá decía «el 90% sufre acoso cotidiano durante meses (estudio nacional)».
+ *     Corregido el 21/8: ese 90% es de UNESCO/CIPDH, citado en el estado del
+ *     arte del estudio, y mide BULLYING VIRTUAL, no grooming.
  *
  *  🔴 El motor NUNCA afirma que un chico está siendo acosado, ni que está a
  *  salvo. Devuelve qué se vio, cuánto hace que se sostiene, y qué NO puede ver.
@@ -576,7 +579,8 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
 
   const loQueNoSeVe = [
     "No se leyó ni se guardó nada de lo que escribió. El sistema ve horarios y volúmenes, no conversaciones.",
-    "El 74,3% de los casos pasa por WhatsApp, que va cifrado: nada de eso aparece acá.",
+    "El estudio nacional ubica el grooming en Facebook, Instagram y WhatsApp. Las tres van " +
+      "cifradas: nada de lo que pasa adentro aparece acá.",
     ...(huboMadrugada
       ? [
           "El sistema ve a qué hora hubo actividad, pero no conoce los horarios de esta casa: no " +

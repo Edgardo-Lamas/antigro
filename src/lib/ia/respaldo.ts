@@ -10,8 +10,12 @@
  * Un sistema de protección infantil que se queda mudo porque falló un
  * proveedor no es un sistema de protección.
  *
- * Las bandas salen de los datos: el grueso de las víctimas está entre 11 y 15
- * años, con un segundo grupo importante entre 7 y 10 (estudio nacional 2023).
+ * Las bandas salen de los datos: el estudio nacional midió que el 72,3% de las
+ * víctimas tenía entre 12 y 14 años y un 14,5% entre 6 y 11, y el informe LATAM
+ * (n≈28.360) pone la franja más vulnerable entre los 9 y los 13.
+ * ⚠ Acá decía «el grueso entre 11 y 15, con un segundo grupo entre 7 y 10
+ * (estudio nacional)». Corregido el 21/8: eso es de ESET, citado en el estado
+ * del arte del estudio, no medido por el estudio.
  */
 
 import type { BandaDeEdad } from "@/lib/config";
@@ -74,7 +78,8 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
 
 /**
  * 14–17 · De igual a igual. Nada que suene a reto ni a control.
- * 📊 El 43% no habla de esto con sus padres: el mensaje no puede dar por
+ * 📊 El 43% dice no hablar sobre los riesgos en Internet con sus padres (encuesta
+ * en 11 escuelas, citada en el estudio nacional): el mensaje no puede dar por
  * sentado que el adulto es la salida, por eso van las tres puertas.
  */
 const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {

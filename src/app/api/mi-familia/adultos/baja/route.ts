@@ -29,8 +29,9 @@ import { transporteDe } from "@/lib/mensajeria";
  *  conviene sumar otro, y el sistema le explica para qué.
  *
  *  🔑 **Y si al referente lo había elegido el chico, el chico se entera.** Ese
- *  segundo adulto existe justamente porque el 43% de los chicos no habla de
- *  estos temas con sus padres. Una baja silenciosa convertiría a AntiGro en un
+ *  segundo adulto existe justamente porque el 43% de los chicos dice no hablar
+ *  sobre los riesgos en Internet con sus padres (encuesta en 11 escuelas, citada
+ *  en el estudio nacional). Una baja silenciosa convertiría a AntiGro en un
  *  sistema que trabaja *sobre* el chico en vez de *para* él — que es la línea
  *  que el producto entero se comprometió a no cruzar.
  */
