@@ -71,6 +71,55 @@ dice lo gobierna el corpus del asistente, y las dos cosas tienen que moverse jun
 
 ---
 
+## 🔴 EL BOTÓN DE LA HOME MENTÍA — encontrado el 21/8, por la pregunta de Edgardo
+
+**Iba a mandarle el enlace del sitio a las psicólogas y preguntó lo correcto:** *"¿por qué el
+enlace tiene que llevar `?i=<código>`? yo quiero pasarles el enlace de vercel"*. Al ir a mirarlo,
+el enlace pelado **no servía para lo que él quería**, y encima el sistema lo decía al revés.
+
+🔴 **El botón decía «Entrar o empezar» SIEMPRE**, y abría `/entrar` pelado, que desde el 17/8 sólo
+ofrece el logueo. O sea: prometía *empezar*, llevaba a una pantalla donde empezar no se puede, y
+**no había una sola línea que explicara por qué**. Una psicóloga que llegara por ahí quedaba
+mirando un logueo sin salida.
+⚠ **Ni el typecheck ni las tandas podían verlo:** no hay nada roto: hay un botón que dice una cosa
+y una pantalla que hace otra. Se ve abriendo el enlace como lo abre una persona.
+
+✅ **Arreglado propagando el código, no abriendo el registro:**
+
+| Quién llega | Qué ve |
+|---|---|
+| `antigro.vercel.app` pelado | **«Entrar a mi familia»** → el logueo. Es la verdad, y no le cuenta al que pasa que el registro existe |
+| `antigro.vercel.app/?i=<código>` | **«Entrar o empezar»** → `/entrar?i=…`, con la pestaña de crear cuenta |
+| `antigro.vercel.app/entrar?i=<código>` | Directo a crear, como antes |
+
+🔑 **Así se puede mandar el enlace del SITIO y no el de la puerta**, que es lo que él quería: ven el
+sistema andando primero —el orden que el producto defiende en todos lados— y recién después la
+puerta. 🔴 **Y el registro sigue cerrado con llave**: la pantalla sólo arrastra el código, quien
+decide sigue siendo `/api/alta/hogar`. Una comprobación en la pantalla es una comodidad, **nunca la
+cerradura**.
+
+### ✅ `prueba-alta.mjs` — el alta de cero, que no la probaba nadie
+
+**Su otra pregunta la destapó:** *"quiero estar tranquilo que ellas crean un correo y contraseña y
+automáticamente ingresan"*. 🔴 **`prueba-entrar.mjs` NO contesta eso** —mira la puerta y a propósito
+no escribe en la base—, así que **el camino que hace una persona la primera vez no estaba cubierto**.
+
+Cubre: el botón de la home (con código y sin), que el código llegue a la puerta, que el botón no se
+habilite sin aceptar los términos, **que cree la cuenta y entre sola sin volver a loguearse**, que
+caiga en el recorrido y no en un panel vacío, que la sesión sirva en todo el sistema, y **que con
+esas credenciales vuelva a entrar desde un navegador limpio** —sin esto, «entró» podría significar
+sólo que la sesión de ese momento quedó abierta—.
+🧹 **Borra la familia al terminar**, así se puede correr las veces que haga falta. ⚠ Igual gasta una
+de las 40 altas del día.
+
+    SITIO=https://antigro.vercel.app node prueba-alta.mjs
+
+⚠ **En localhost falla y NO es el producto: es `UntrustedHost` de NextAuth.** Sin
+`AUTH_TRUST_HOST=true` el `signIn` posterior al alta cae en `/api/auth/error`. En Vercel no pasa.
+**Correrla con `AUTH_TRUST_HOST=true npx next start` o directamente contra producción.**
+
+---
+
 ## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-20, cierre
 
 **Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio.**

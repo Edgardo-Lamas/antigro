@@ -40,16 +40,37 @@ const ESCENARIO = "persistente";
  * es hacerle dar una vuelta para llegar al mismo lugar, y encima le hace dudar
  * de si su cuenta sigue andando.
  */
-async function laPuerta(): Promise<{ texto: string; destino: string }> {
+async function laPuerta(invitacion: string): Promise<{ texto: string; destino: string }> {
   const sesion = await auth();
   const rol = (sesion?.user as { rol?: string } | undefined)?.rol;
 
   if (rol === "adulto") return { texto: "Ir a mi familia", destino: "/mi-familia" };
   if (rol === "admin") return { texto: "Ir al panel", destino: "/panel" };
-  /* 🔑 Desde el 17/8 esta puerta abre las DOS cosas: entrar, y ponerlo en
-     marcha por primera vez. Decía sólo «entrar a mi familia», y con eso el que
-     todavía no tenía cuenta no tenía por dónde empezar. */
-  return { texto: "Entrar o empezar", destino: "/entrar" };
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     🔴 EL CÓDIGO DE INVITACIÓN VIAJA DESDE ACÁ — 21/8
+     ─────────────────────────────────────────────────────────────────────────
+
+     **El botón mentía, y lo encontró Edgardo por la pregunta correcta:** quería
+     mandarle a las psicólogas el enlace del sitio, no la puerta. Decía «Entrar
+     o empezar» **siempre**, y abría `/entrar` pelado, que desde el 17/8 sólo
+     ofrece el logueo. O sea que prometía «empezar» y llevaba a una pantalla
+     donde empezar no se podía, sin una línea que explicara por qué.
+
+     🔑 **Ahora el `?i=…` se propaga.** El que llega con el enlace de invitación
+     ve el sistema andando primero —que es el orden que el producto defiende en
+     todos lados— y recién después la puerta, con la pestaña de crear cuenta
+     donde corresponde.
+
+     🔴 **Y el que llega sin código lee «Entrar a mi familia», que es la verdad
+     de lo que le espera.** No es sólo prolijidad: la decisión del 17/8 fue que
+     un botón de registro que después rebota *"encima le cuenta al que pasa que
+     el registro existe"*. Con esto no se le cuenta nada y tampoco se lo manda
+     contra una puerta cerrada. */
+  if (invitacion) {
+    return { texto: "Entrar o empezar", destino: `/entrar?i=${encodeURIComponent(invitacion)}` };
+  }
+  return { texto: "Entrar a mi familia", destino: "/entrar" };
 }
 
 function version(): string {
@@ -60,10 +81,17 @@ function version(): string {
   return process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local";
 }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: { i?: string };
+}) {
   const fuentes = await estadoDeLasFuentes(ESCENARIO);
   const canales = await estadoDeLosCanales();
-  const puerta = await laPuerta();
+  /* ⚠ El código NO se comprueba acá: sólo se arrastra. Quien decide es
+     `/api/alta/hogar`, y tiene que seguir siendo así — una comprobación en la
+     pantalla es una comodidad, nunca la cerradura. */
+  const puerta = await laPuerta(searchParams?.i?.trim() ?? "");
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-12">
