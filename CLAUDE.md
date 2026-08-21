@@ -149,6 +149,63 @@ opacidad pase a 0 con la sección a la vista, y que desde ahí el asistente cont
 
 ---
 
+## 🔴🔴 SIN RESOLVER — EL ASISTENTE CAE AL RESPALDO POR LA RUTA. **ARRANCAR POR ACÁ.**
+
+**Apareció el 21/8 al cerrar, y es lo más grave que hay abierto:** Edgardo está por mandarle el
+enlace a las psicólogas **para que prueben el asistente**, y por la pantalla el asistente **no
+contesta**: sale el respaldo con `causa: "falla"`.
+
+### Lo que está medido, para no volver a medirlo
+
+| Camino | Resultado |
+|---|---|
+| `npx tsx preguntas-dia-uno.mjs` (llama a la librería directo) | ✅ **3 de 3 desde la IA**, respuestas largas y buenas |
+| Por la pantalla, en **localhost** | ❌ respaldo · «se cayó la llamada» |
+| Por la pantalla, en **producción** | ❌ respaldo · «se cayó la llamada» |
+| `ANTIGRO_ANTHROPIC_KEY` en Vercel producción | ✅ **está** (cargada hace 5 días) |
+
+➡ **O sea que no es la clave y no es el modelo: es el camino de la ruta.** Lo que cambia entre los
+dos es el entorno del `route.ts`, no `responderAlAdulto`.
+📌 `maxDuration = 60` en la ruta, y el asistente tarda 10-18 s medidos. No debería alcanzar para
+un timeout, **pero es lo primero que hay que descartar** porque es lo único distinto que se ve.
+🔑 **Cómo se mira, y es lo que lo destapó:** `node leer-charlas.mjs` dice de cada respuesta si salió
+de la IA o del respaldo. **Sin eso el fallo es invisible** — el texto del respaldo es largo, bien
+escrito y no dice «error», así que desde la pantalla se lee como una respuesta normal.
+
+### 🔴 Y un mislabel que va a hacer perder tiempo si no se arregla primero
+
+`route.ts` línea ~163: **el límite de frecuencia devuelve `causa: "falla"`**. O sea que «hiciste
+demasiadas preguntas seguidas» queda registrado igual que «se cayó la llamada al modelo». Son dos
+cosas completamente distintas —una es el sistema andando, la otra es el sistema roto— y hoy en el
+registro no se distinguen. **Arreglar esto ANTES de diagnosticar lo de arriba**, o se va a estar
+persiguiendo un fantasma. Debería ser una causa propia (`limite`).
+
+⚠ **Esto puede explicar solo que hubiera cero charlas útiles**, y explica por qué conviene mirar el
+registro y no la pantalla.
+
+---
+
+## ✅ LEER LAS CHARLAS — `node leer-charlas.mjs` (21/8)
+
+**Lo pidió Edgardo:** *"¿podemos hacer que queden registradas las preguntas y respuestas de las
+psicólogas?"*. 🔑 **Registradas ya quedaban** desde el 16/8 en `charlas`; lo que no había era dónde
+leerlas — el panel de administración no las muestra.
+
+Agrupa por familia (cada psicóloga se crea la suya, así que una familia es una persona) y de cada
+respuesta dice **si salió de la IA o del respaldo, y por qué**. 📌 `--frenadas` deja sólo las que
+frenó el control. 🔴 **Esa distinción es el valor entero de la herramienta:** una respuesta del
+respaldo no es una respuesta mala del asistente, **es una que el asistente no dio**, y confundirlas
+haría corregir el prompt por algo que nunca escribió.
+
+⬜ **Dos decisiones de Edgardo, pendientes:**
+1. **«Borrar la charla» hace un `delete` de verdad.** Una tester que ordena su pantalla borra el
+   material y no queda rastro. Fue una decisión de privacidad deliberada del 16/8: **no se toca sin
+   que él lo diga.**
+2. **Los términos no dicen nada del asistente ni de que la charla se guarda.** Si va a leer lo que
+   escriben, lo honesto es avisarles. Con decírselo en el mensaje alcanza — son testers.
+
+---
+
 ## 🔥 PARA ARRANCAR LA PRÓXIMA SESIÓN — al 2026-08-20, cierre
 
 **Leer este bloque entero antes de tocar nada. Nada quedó a medias: árbol limpio.**
