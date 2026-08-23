@@ -588,7 +588,7 @@ export default function Guia() {
       <div className="mt-12 flex flex-wrap gap-3 border-t border-borde pt-8">
         <Link
           href="/"
-          className="rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition"
+          className="rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90"
         >
           Ver el sistema funcionando
         </Link>
