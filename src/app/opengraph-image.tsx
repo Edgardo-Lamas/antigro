@@ -37,13 +37,16 @@ export const alt = `${PRODUCTO} — señales de grooming, sin leer un solo mensa
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/** La paleta, copiada de `tailwind.config.ts`. Satori no lee clases de Tailwind. */
-const FONDO = "#0D1117";
-const BORDE = "#232B36";
-const TINTA = "#E6EAEF";
+/** La paleta, copiada de `tailwind.config.ts` (v2, 22/8). Satori no lee
+ *  clases de Tailwind y tampoco degradados de texto, así que acá el acento
+ *  sigue siendo un color sólido: el violeta, que ancla el degradado en el
+ *  resto del sitio. */
+const FONDO = "#0A0E14";
+const BORDE = "#1E2530";
+const TINTA = "#E9ECF3";
 const TENUE = "#8B95A1";
 const APAGADO = "#5A6572";
-const ACENTO = "#4E9BB9";
+const ACENTO = "#7C6CF0";
 
 /**
  * Las tipografías del sitio, leídas del paquete que ya es dependencia.

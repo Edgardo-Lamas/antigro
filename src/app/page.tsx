@@ -119,7 +119,7 @@ export default async function Home({
         </Link>
         <Link
           href={puerta.destino}
-          className="flex items-center gap-2 rounded-md border border-acento/60 bg-acentoSuave px-4 py-2.5 text-sm font-semibold text-acento transition hover:border-acento hover:bg-acento hover:text-fondo"
+          className="flex items-center gap-2 rounded-md bg-degradado px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_28px_-8px_rgba(124,108,240,0.55)] transition hover:opacity-90"
         >
           <LogIn size={15} />
           {puerta.texto}
@@ -130,7 +130,7 @@ export default async function Home({
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-apagado">
           CoderCup AI · entrega 23 de agosto de 2026
         </p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-tinta">{PRODUCTO}</h1>
+        <h1 className="mt-3 text-4xl font-bold tracking-tight texto-degradado">{PRODUCTO}</h1>
         <p className="mt-3 max-w-2xl text-balance text-lg leading-relaxed text-tenue">
           {BAJADA}
         </p>
