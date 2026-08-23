@@ -37,6 +37,12 @@ const ADULTOS = [
   { id: "alto", nombre: "Bastantes cosas" },
 ] as const;
 
+const GENEROS = [
+  { id: "nena", label: "nena" },
+  { id: "varon", label: "varón" },
+  { id: "otro", label: "otro" },
+] as const;
+
 /** 🔴 Sólo se avisa con patrón sostenido: dos adultos y el chico. Si no, nadie. */
 function destinatarios(estado: Estado): number {
   return estado === "patron_sostenido" ? 3 : 0;
@@ -179,235 +185,248 @@ export default function Consola() {
 
   return (
     <div className="space-y-6">
-      {/* ── LOS CONTROLES ─────────────────────────────────────────────── */}
-      <section
-        id="tour-controles"
-        className="grid gap-px overflow-hidden rounded-xl border border-borde bg-borde md:grid-cols-3"
-      >
-        <Panel titulo="El chico">
-          <div className="flex flex-wrap items-center gap-3">
-            <label className="flex items-center gap-2 text-sm">
-              <span className="text-tenue">Edad</span>
-              <select
-                value={edad}
-                onChange={(e) => setEdad(Number(e.target.value))}
-                className="rounded-md border border-borde bg-fondo px-2 py-1 text-tinta"
-              >
-                {Array.from({ length: 11 }, (_, i) => i + 7).map((n) => (
-                  <option key={n} value={n}>{n} años</option>
-                ))}
-              </select>
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <span className="text-tenue">Género</span>
-              <select
-                value={genero}
-                onChange={(e) => setGenero(e.target.value)}
-                className="rounded-md border border-borde bg-fondo px-2 py-1 text-tinta"
-              >
-                <option value="nena">nena</option>
-                <option value="varon">varón</option>
-                <option value="otro">otro</option>
-              </select>
-            </label>
-          </div>
-          <p className="mt-3 text-xs leading-relaxed text-apagado">
-            No son adornos: cambian el peso de las señales y cambian el texto del mensaje.
-          </p>
-        </Panel>
-
-        <Panel titulo="La historia">
-          <div className="space-y-1.5">
-            {ESCENARIOS.map((e) => (
-              <Opcion
-                key={e.id}
-                activa={escenario === e.id}
-                onClick={() => setEscenario(e.id)}
-                titulo={e.nombre}
-                pie={e.pie}
-              />
-            ))}
-          </div>
-        </Panel>
-
-        <Panel titulo="Lo que ven los adultos">
-          <div className="space-y-1.5">
-            {ADULTOS.map((a) => (
-              <Opcion
-                key={a.id}
-                activa={adultos === a.id}
-                onClick={() => setAdultos(a.id)}
-                titulo={a.nombre}
-              />
-            ))}
-          </div>
-          <p className="mt-3 text-xs leading-relaxed text-apagado">
-            Nueve preguntas sobre hechos que ellos ven y la red no puede ver.
-          </p>
-        </Panel>
-      </section>
-
-      {/* ── EL RELOJ ──────────────────────────────────────────────────── */}
-      <section
-        id="tour-reloj"
-        className="flex flex-wrap items-center gap-4 rounded-xl border border-borde bg-superficie px-5 py-4"
-      >
-        <button
-          onClick={reproducir}
-          disabled={corriendo}
-          className="rounded-lg bg-acento px-4 py-2 text-sm font-semibold text-fondo transition hover:brightness-110 disabled:opacity-40"
-        >
-          {corriendo ? "Corriendo…" : "▶ Reproducir tres semanas"}
-        </button>
-        <input
-          type="range"
-          min={0}
-          max={DIAS - 1}
-          value={dia}
-          onChange={(e) => {
-            setCorriendo(false);
-            setDia(Number(e.target.value));
-          }}
-          className="h-1 min-w-[220px] flex-1 cursor-pointer appearance-none rounded-full bg-borde accent-acento"
-          aria-label="Día de la historia"
-        />
-        <span className="tabular-nums text-sm text-tenue">
-          día <strong className="text-tinta">{dia + 1}</strong> de {DIAS}
-        </span>
-      </section>
-
-      {/* ── LA LECTURA ────────────────────────────────────────────────── */}
-      <section
-        id="tour-lectura"
-        className={`rounded-xl border ${color.borde} ${color.fondo} transition-colors ${
-          cargando ? "opacity-70" : ""
-        }`}
-      >
-        <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-borde/60 px-5 py-4">
-          <h2 className={`text-xl font-semibold tracking-tight ${color.texto}`}>
-            {NOMBRE_DE_ESTADO[estado]}
-          </h2>
-          <p className="text-sm">
-            {aCuantos === 0 ? (
-              <span className="text-tenue">
-                No le escribió <strong className="text-tinta">a nadie</strong>
-              </span>
-            ) : (
-              <span className="text-tenue">
-                Le escribió a <strong className={color.texto}>{aCuantos}</strong>: los dos adultos
-                responsables y el propio chico
-              </span>
-            )}
-          </p>
-        </header>
-
-        <div className="space-y-5 px-5 py-5">
-          <Grafico
-            dias={lectura?.dias ?? []}
-            hasta={dia}
-            onElegirDia={(i) => {
-              setCorriendo(false);
-              setDia(i);
-            }}
-          />
-
-          {/* 🔑 El despliegue, visible: la protección no espera, se despliega. */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span className="text-tenue">
-              Conoce a este chico hace{" "}
-              <strong className="tabular-nums text-tinta">{diasDePerfil}</strong>{" "}
-              {diasDePerfil === 1 ? "día" : "días"}
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="text-apagado">alcance</span>
-              <span className="h-1.5 w-28 overflow-hidden rounded-full bg-borde">
-                <span
-                  className="block h-full rounded-full bg-acento transition-all duration-300"
-                  style={{ width: `${Math.round(alcance * 100)}%` }}
-                />
-              </span>
-              <span className="tabular-nums text-tinta">{alcance.toFixed(2)}</span>
-            </span>
-          </div>
-
-          <Lista
-            titulo="Por qué"
-            items={lectura?.porQue ?? []}
-            variante="evidencia"
-            colorTexto={color.texto}
-          />
-          <Lista titulo="Lo que no se ve" items={lectura?.loQueNoSeVe ?? []} variante="limite" />
-        </div>
-      </section>
-
-      {/* ── LO QUE SALDRÍA ────────────────────────────────────────────── */}
-      <section id="tour-mensajes" className="rounded-xl border border-borde bg-superficie px-5 py-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-tenue">
-            Lo que saldría
-          </h2>
-          <button
-            onClick={pedirMensajes}
-            disabled={pidiendoMensajes}
-            className="rounded-lg border border-borde px-3 py-1.5 text-sm text-tinta transition hover:border-acento disabled:opacity-40"
-          >
-            {pidiendoMensajes ? "Redactando…" : "Ver el mensaje"}
-          </button>
-        </div>
-
-        {/* 🔴 Reescrito el 17/8. Decía «los textos los escribe un modelo de
-            lenguaje… pasa por un control automático». Edgardo lo frenó con una
-            pregunta sin vuelta: *"¿qué puede saber el usuario/padres de qué es
-            «modelo» y de controles automáticos?"*. Nada — y ésta es la garantía
-            central del producto, así que no puede estar escrita en un idioma
-            que el que la necesita no habla. */}
-        {!mensajes && !pidiendoMensajes && (
-          <div className="mt-3 flex gap-3 rounded-lg border border-borde/70 bg-degradado-sutil px-4 py-3.5">
-            <ShieldCheck size={18} className="mt-0.5 shrink-0 text-acento" aria-hidden />
-            <p className="text-sm leading-relaxed text-tenue">
-              Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
-              artificial sólo lo pone en palabras, y antes de que ese texto salga se revisa que no
-              diga nada que el sistema no pueda sostener. Si no pasa esa revisión, sale un texto
-              escrito de antemano.
+      {/*
+       * ── DOS COLUMNAS ──────────────────────────────────────────────────
+       * 🔑 Izquierda angosta = lo que uno elige. Derecha ancha = lo que el
+       * motor devuelve. En una sola columna esos dos roles se mezclaban en
+       * una fila de controles arriba, después el reloj aparte, después la
+       * lectura — tres bloques para una sola idea. El reloj ahora vive
+       * DENTRO de la tarjeta de lectura, arriba de su propio gráfico, que es
+       * lo que controla: no tiene sentido en otro lado.
+       */}
+      <div className="grid gap-6 lg:grid-cols-[300px_1fr] lg:items-start">
+        {/* ── LOS CONTROLES ────────────────────────────────────────────── */}
+        <section id="tour-controles" className="space-y-4">
+          <PanelControl titulo="El chico">
+            <div className="flex items-baseline justify-between">
+              <span className="text-sm text-tenue">Edad</span>
+              <span className="text-sm font-semibold text-acento">{edad} años</span>
+            </div>
+            <input
+              type="range"
+              min={7}
+              max={17}
+              step={1}
+              value={edad}
+              onChange={(e) => setEdad(Number(e.target.value))}
+              className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-borde accent-acento"
+              aria-label="Edad"
+            />
+            <div className="mt-3 flex gap-2">
+              {GENEROS.map((g) => (
+                <button
+                  key={g.id}
+                  type="button"
+                  onClick={() => setGenero(g.id)}
+                  aria-pressed={genero === g.id}
+                  className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium transition ${
+                    genero === g.id
+                      ? "border-acento bg-acentoSuave text-tinta"
+                      : "border-borde text-tenue hover:border-tenue/60 hover:text-tinta"
+                  }`}
+                >
+                  {g.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-apagado">
+              No son adornos: cambian el peso de las señales y el texto del mensaje.
             </p>
-          </div>
-        )}
+          </PanelControl>
 
-        {/* 🔴 Si no salió, se dice. Un guion en el lugar del texto se lee como
-            «el sistema no tenía nada que decir», que es una respuesta
-            legítima del producto — y taparía con ella una función caída. */}
-        {mensajes?.fallo && (
-          <p className="mt-4 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
-            {mensajes.fallo}
-          </p>
-        )}
+          <PanelControl titulo="La historia">
+            <div className="space-y-1.5">
+              {ESCENARIOS.map((e) => (
+                <Opcion
+                  key={e.id}
+                  activa={escenario === e.id}
+                  onClick={() => setEscenario(e.id)}
+                  titulo={e.nombre}
+                  pie={e.pie}
+                />
+              ))}
+            </div>
+          </PanelControl>
 
-        {mensajes && !mensajes.fallo && (
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <Mensaje
-              titulo="A los adultos responsables"
-              cuerpo={mensajes.paraLosAdultos}
-              acento="border-t-acento"
-            />
-            <Mensaje
-              titulo={`Al propio chico (${edad} años)`}
-              cuerpo={mensajes.paraElChico}
-              acento="border-t-acentoDos"
-            />
-          </div>
-        )}
-      </section>
+          <PanelControl titulo="Lo que ven los adultos">
+            <div className="space-y-1.5">
+              {ADULTOS.map((a) => (
+                <Opcion
+                  key={a.id}
+                  activa={adultos === a.id}
+                  onClick={() => setAdultos(a.id)}
+                  titulo={a.nombre}
+                />
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-apagado">
+              Nueve preguntas sobre hechos que ellos ven y la red no puede ver.
+            </p>
+          </PanelControl>
+        </section>
 
-      {/* ── QUE LLEGUE DE VERDAD ──────────────────────────────────────── */}
-      <Entrega
-        escenario={escenario}
-        dia={dia}
-        edad={edad}
-        genero={genero}
-        estado={estado}
-      />
+        {/* ── LA LECTURA, con el reloj adentro ─────────────────────────── */}
+        <div className="space-y-6">
+          <section
+            id="tour-lectura"
+            className={`rounded-xl border ${color.borde} ${color.fondo} transition-colors ${
+              cargando ? "opacity-70" : ""
+            }`}
+          >
+            <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-borde/60 px-5 py-4">
+              <h2 className={`text-xl font-semibold tracking-tight ${color.texto}`}>
+                {NOMBRE_DE_ESTADO[estado]}
+              </h2>
+              <p className="text-sm">
+                {aCuantos === 0 ? (
+                  <span className="text-tenue">
+                    No le escribió <strong className="text-tinta">a nadie</strong>
+                  </span>
+                ) : (
+                  <span className="text-tenue">
+                    Le escribió a <strong className={color.texto}>{aCuantos}</strong>: los dos
+                    adultos responsables y el propio chico
+                  </span>
+                )}
+              </p>
+            </header>
 
-      {/* ── 🔴 La nota que blinda, no la que debilita ─────────────────── */}
+            <div className="space-y-5 px-5 py-5">
+              {/* ── EL RELOJ, ahora controla el gráfico que tiene debajo ── */}
+              <div
+                id="tour-reloj"
+                className="flex flex-wrap items-center gap-4 rounded-lg border border-borde/70 bg-fondo/40 px-4 py-3"
+              >
+                <button
+                  onClick={reproducir}
+                  disabled={corriendo}
+                  className="rounded-lg bg-acento px-4 py-2 text-sm font-semibold text-fondo transition hover:brightness-110 disabled:opacity-40"
+                >
+                  {corriendo ? "Corriendo…" : "▶ Reproducir tres semanas"}
+                </button>
+                <input
+                  type="range"
+                  min={0}
+                  max={DIAS - 1}
+                  value={dia}
+                  onChange={(e) => {
+                    setCorriendo(false);
+                    setDia(Number(e.target.value));
+                  }}
+                  className="h-1 min-w-[160px] flex-1 cursor-pointer appearance-none rounded-full bg-borde accent-acento"
+                  aria-label="Día de la historia"
+                />
+                <span className="tabular-nums text-sm text-tenue">
+                  día <strong className="text-tinta">{dia + 1}</strong> de {DIAS}
+                </span>
+              </div>
+
+              <Grafico
+                dias={lectura?.dias ?? []}
+                hasta={dia}
+                onElegirDia={(i) => {
+                  setCorriendo(false);
+                  setDia(i);
+                }}
+              />
+
+              {/* 🔑 El despliegue, visible: la protección no espera, se despliega. */}
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                <span className="text-tenue">
+                  Conoce a este chico hace{" "}
+                  <strong className="tabular-nums text-tinta">{diasDePerfil}</strong>{" "}
+                  {diasDePerfil === 1 ? "día" : "días"}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="text-apagado">alcance</span>
+                  <span className="h-1.5 w-28 overflow-hidden rounded-full bg-borde">
+                    <span
+                      className="block h-full rounded-full bg-acento transition-all duration-300"
+                      style={{ width: `${Math.round(alcance * 100)}%` }}
+                    />
+                  </span>
+                  <span className="tabular-nums text-tinta">{alcance.toFixed(2)}</span>
+                </span>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <Lista
+                  titulo="Por qué"
+                  items={lectura?.porQue ?? []}
+                  variante="evidencia"
+                  colorTexto={color.texto}
+                />
+                <Lista titulo="Lo que no se ve" items={lectura?.loQueNoSeVe ?? []} variante="limite" />
+              </div>
+            </div>
+          </section>
+
+          {/* ── LO QUE SALDRÍA ──────────────────────────────────────────── */}
+          <section id="tour-mensajes" className="rounded-xl border border-borde bg-superficie px-5 py-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-tenue">
+                Lo que saldría
+              </h2>
+              <button
+                onClick={pedirMensajes}
+                disabled={pidiendoMensajes}
+                className="rounded-lg border border-borde px-3 py-1.5 text-sm text-tinta transition hover:border-acento disabled:opacity-40"
+              >
+                {pidiendoMensajes ? "Redactando…" : "Ver el mensaje"}
+              </button>
+            </div>
+
+            {/* 🔴 Reescrito el 17/8. Decía «los textos los escribe un modelo
+                de lenguaje… pasa por un control automático». Edgardo lo
+                frenó con una pregunta sin vuelta: *"¿qué puede saber el
+                usuario/padres de qué es «modelo» y de controles
+                automáticos?"*. Nada — y ésta es la garantía central del
+                producto, así que no puede estar escrita en un idioma que
+                el que la necesita no habla. */}
+            {!mensajes && !pidiendoMensajes && (
+              <div className="mt-3 flex gap-3 rounded-lg border border-borde/70 bg-degradado-sutil px-4 py-3.5">
+                <ShieldCheck size={18} className="mt-0.5 shrink-0 text-acento" aria-hidden />
+                <p className="text-sm leading-relaxed text-tenue">
+                  Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
+                  artificial sólo lo pone en palabras, y antes de que ese texto salga se revisa
+                  que no diga nada que el sistema no pueda sostener. Si no pasa esa revisión, sale
+                  un texto escrito de antemano.
+                </p>
+              </div>
+            )}
+
+            {/* 🔴 Si no salió, se dice. Un guion en el lugar del texto se lee
+                como «el sistema no tenía nada que decir», que es una
+                respuesta legítima del producto — y taparía con ella una
+                función caída. */}
+            {mensajes?.fallo && (
+              <p className="mt-4 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
+                {mensajes.fallo}
+              </p>
+            )}
+
+            {mensajes && !mensajes.fallo && (
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <Mensaje
+                  titulo="A los adultos responsables"
+                  cuerpo={mensajes.paraLosAdultos}
+                  acento="border-t-acento"
+                />
+                <Mensaje
+                  titulo={`Al propio chico (${edad} años)`}
+                  cuerpo={mensajes.paraElChico}
+                  acento="border-t-acentoDos"
+                />
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+
+      {/* ── QUE LLEGUE DE VERDAD ────────────────────────────────────────── */}
+      <Entrega escenario={escenario} dia={dia} edad={edad} genero={genero} estado={estado} />
+
+      {/* ── 🔴 La nota que blinda, no la que debilita ───────────────────── */}
       <p className="px-1 text-xs leading-relaxed text-apagado">
         <strong className="text-tenue">Datos de ejemplo.</strong> El análisis es el del sistema
         real: el simulador sólo emite señales — quién decide es el motor, con la misma regla de
@@ -668,9 +687,11 @@ function Entrega({
 
 /* ── Piezas ──────────────────────────────────────────────────────────── */
 
-function Panel({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+/** Cada control es su propia tarjeta — antes las tres compartían una fila
+ *  con bordes divisorios, que dejaba de tener sentido apiladas en columna. */
+function PanelControl({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
-    <div className="bg-superficie px-5 py-4">
+    <div className="rounded-xl border border-borde bg-superficie px-4 py-4">
       <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-tenue">{titulo}</h3>
       {children}
     </div>

@@ -94,7 +94,7 @@ export default async function Home({
   const puerta = await laPuerta(searchParams?.i?.trim() ?? "");
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
+    <main className="mx-auto max-w-6xl px-6 py-12">
       {/* 🔴 La puerta de la familia va ACÁ ARRIBA, a la vista desde el primer
           segundo. Una pantalla de logueo que no está enlazada en ningún lado
           obliga a saberse una dirección de memoria, y eso no es una molestia
@@ -126,20 +126,28 @@ export default async function Home({
         </Link>
       </div>
 
-      <header className="pb-8">
+      {/* 🔑 Cabecera corta a propósito: lo que hay que decir antes de la
+          consola es el nombre, qué hace, y que se puede probar sin cuenta —
+          no más. El resto (cómo se usa en tu casa) ya tiene su lugar en el
+          botón de arriba y en la franja de confianza de acá abajo. */}
+      <header className="pb-6">
         <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-apagado">
           CoderCup AI · entrega 23 de agosto de 2026
         </p>
         <h1 className="mt-3 text-4xl font-bold tracking-tight texto-degradado">{PRODUCTO}</h1>
-        <p className="mt-3 max-w-2xl text-balance text-lg leading-relaxed text-tenue">
-          {BAJADA}
-        </p>
-        <p className="mt-4 max-w-2xl text-sm leading-relaxed text-apagado">
-          Movés los controles y el motor vuelve a leer. No hace falta registrarse.{" "}
-          <Link href={puerta.destino} className="text-acento underline">
-            Para ponerlo en marcha en tu casa, empezá acá.
-          </Link>
-        </p>
+        <p className="mt-3 max-w-2xl text-balance text-lg leading-relaxed text-tenue">{BAJADA}</p>
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-apagado">
+          <span>Sin registro</span>
+          <span aria-hidden className="text-borde">·</span>
+          <span>Sin leer chats</span>
+          <span aria-hidden className="text-borde">·</span>
+          <span>
+            Movés los controles y el motor vuelve a leer —{" "}
+            <Link href={puerta.destino} className="text-acento underline">
+              o ponelo en tu casa
+            </Link>
+          </span>
+        </div>
       </header>
 
       <Consola />
