@@ -19,6 +19,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { EyeOff, ShieldCheck } from "lucide-react";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 
 const DIAS = 21;
@@ -301,7 +302,14 @@ export default function Consola() {
         </header>
 
         <div className="space-y-5 px-5 py-5">
-          <Grafico dias={lectura?.dias ?? []} hasta={dia} />
+          <Grafico
+            dias={lectura?.dias ?? []}
+            hasta={dia}
+            onElegirDia={(i) => {
+              setCorriendo(false);
+              setDia(i);
+            }}
+          />
 
           {/* 🔑 El despliegue, visible: la protección no espera, se despliega. */}
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -322,8 +330,13 @@ export default function Consola() {
             </span>
           </div>
 
-          <Lista titulo="Por qué" items={lectura?.porQue ?? []} />
-          <Lista titulo="Lo que no se ve" items={lectura?.loQueNoSeVe ?? []} apagada />
+          <Lista
+            titulo="Por qué"
+            items={lectura?.porQue ?? []}
+            variante="evidencia"
+            colorTexto={color.texto}
+          />
+          <Lista titulo="Lo que no se ve" items={lectura?.loQueNoSeVe ?? []} variante="limite" />
         </div>
       </section>
 
@@ -349,12 +362,15 @@ export default function Consola() {
             central del producto, así que no puede estar escrita en un idioma
             que el que la necesita no habla. */}
         {!mensajes && !pidiendoMensajes && (
-          <p className="mt-3 text-sm leading-relaxed text-apagado">
-            Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia artificial
-            sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que
-            el sistema no pueda sostener. Si no pasa esa revisión, sale un texto escrito de
-            antemano.
-          </p>
+          <div className="mt-3 flex gap-3 rounded-lg border border-borde/70 bg-degradado-sutil px-4 py-3.5">
+            <ShieldCheck size={18} className="mt-0.5 shrink-0 text-acento" aria-hidden />
+            <p className="text-sm leading-relaxed text-tenue">
+              Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
+              artificial sólo lo pone en palabras, y antes de que ese texto salga se revisa que no
+              diga nada que el sistema no pueda sostener. Si no pasa esa revisión, sale un texto
+              escrito de antemano.
+            </p>
+          </div>
         )}
 
         {/* 🔴 Si no salió, se dice. Un guion en el lugar del texto se lee como
@@ -368,8 +384,16 @@ export default function Consola() {
 
         {mensajes && !mensajes.fallo && (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <Mensaje titulo="A los adultos responsables" cuerpo={mensajes.paraLosAdultos} />
-            <Mensaje titulo={`Al propio chico (${edad} años)`} cuerpo={mensajes.paraElChico} />
+            <Mensaje
+              titulo="A los adultos responsables"
+              cuerpo={mensajes.paraLosAdultos}
+              acento="border-t-acento"
+            />
+            <Mensaje
+              titulo={`Al propio chico (${edad} años)`}
+              cuerpo={mensajes.paraElChico}
+              acento="border-t-acentoDos"
+            />
           </div>
         )}
       </section>
@@ -680,27 +704,52 @@ function Opcion({
   );
 }
 
-/** Una barra por día. La altura es cuánto se apartó de lo habitual para ese chico. */
-function Grafico({ dias, hasta }: { dias: { dia: string; carga: number }[]; hasta: number }) {
+/**
+ * Una barra por día. La altura es cuánto se apartó de lo habitual para ese
+ * chico. 🔑 Cada barra YA VISTA es un botón: tocarla lleva el reloj a ese
+ * día, para poder ir directo al que llamó la atención sin arrastrar el
+ * control de más arriba paso a paso.
+ */
+function Grafico({
+  dias,
+  hasta,
+  onElegirDia,
+}: {
+  dias: { dia: string; carga: number }[];
+  hasta: number;
+  onElegirDia: (dia: number) => void;
+}) {
   return (
     <div>
-      <div className="flex h-24 items-end gap-1" role="img" aria-label="Carga diaria de las últimas tres semanas">
+      <div className="flex h-24 items-end gap-1" role="group" aria-label="Carga diaria de las últimas tres semanas">
         {Array.from({ length: DIAS }, (_, i) => {
           const d = dias[i];
           const visible = i <= hasta;
           const carga = visible && d ? d.carga : 0;
           const alto = Math.max(2, carga * 100);
+          const esHoy = i === hasta;
           const tono =
             carga >= 0.45 ? "bg-riesgo" : carga >= 0.25 ? "bg-atencion" : "bg-borde";
           return (
-            <span
+            <button
               key={i}
-              className={`flex-1 rounded-sm transition-all duration-300 ${
-                visible ? tono : "bg-borde/30"
-              }`}
-              style={{ height: `${alto}%` }}
+              type="button"
+              disabled={!visible}
+              onClick={() => onElegirDia(i)}
+              aria-pressed={esHoy}
+              aria-label={`Día ${i + 1}${visible ? `, carga ${Math.round(carga * 100)}%` : ", todavía no llegó"}`}
               title={`Día ${i + 1}`}
-            />
+              className={`group flex flex-1 items-end ${visible ? "cursor-pointer" : "cursor-default"}`}
+            >
+              <span
+                className={`block w-full rounded-sm transition-all duration-300 ${
+                  visible ? tono : "bg-borde/30"
+                } ${visible ? "group-hover:brightness-125" : ""} ${
+                  esHoy ? "ring-2 ring-tinta/70 ring-offset-1 ring-offset-superficie" : ""
+                }`}
+                style={{ height: `${alto}%` }}
+              />
+            </button>
           );
         })}
       </div>
@@ -714,26 +763,43 @@ function Grafico({ dias, hasta }: { dias: { dia: string; carga: number }[]; hast
   );
 }
 
+/**
+ * 🔑 «evidencia» son observaciones del motor — llevan el color del estado
+ * actual, para que se lea junto con el encabezado de arriba. «limite» es lo
+ * que el sistema NO ve — es una garantía, no un hallazgo, y por eso se
+ * distingue con el ícono del ojo tachado en vez de un color de alerta.
+ */
 function Lista({
   titulo,
   items,
-  apagada,
+  variante,
+  colorTexto,
 }: {
   titulo: string;
   items: string[];
-  apagada?: boolean;
+  variante: "evidencia" | "limite";
+  colorTexto?: string;
 }) {
   if (items.length === 0) return null;
+  const esLimite = variante === "limite";
+  const puntoColor = esLimite ? "bg-apagado" : (colorTexto ?? "text-acento").replace("text-", "bg-");
   return (
     <div>
-      <h3 className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-tenue">{titulo}</h3>
-      <ul className="space-y-1.5">
+      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-tenue">
+        {esLimite && <EyeOff size={13} className="text-apagado" aria-hidden />}
+        {titulo}
+      </h3>
+      <ul className="space-y-2">
         {items.map((t, i) => (
           <li
             key={i}
-            className={`flex gap-2 text-sm leading-relaxed ${apagada ? "text-apagado" : "text-tinta"}`}
+            className={`flex gap-2.5 rounded-lg border px-3.5 py-2.5 text-sm leading-relaxed transition-colors ${
+              esLimite
+                ? "border-borde/60 bg-fondo/40 text-apagado hover:border-borde"
+                : "border-borde bg-fondo text-tinta hover:border-tenue/60"
+            }`}
           >
-            <span aria-hidden className="select-none text-borde">·</span>
+            <span aria-hidden className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${puntoColor}`} />
             <span>{t}</span>
           </li>
         ))}
@@ -742,16 +808,50 @@ function Lista({
   );
 }
 
-function Mensaje({ titulo, cuerpo }: { titulo: string; cuerpo?: Redactado }) {
+function Mensaje({
+  titulo,
+  cuerpo,
+  acento,
+}: {
+  titulo: string;
+  cuerpo?: Redactado;
+  /** Franja de color arriba de la tarjeta, para distinguir de un vistazo a
+   *  quién le habla cada mensaje — violeta a los adultos, cian al chico. */
+  acento: string;
+}) {
+  const [copiado, setCopiado] = useState(false);
+
+  const copiar = useCallback(async () => {
+    if (!cuerpo?.texto) return;
+    try {
+      await navigator.clipboard.writeText(cuerpo.texto);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 1500);
+    } catch {
+      /* Sin permiso de portapapeles o navegador viejo: no rompe nada más. */
+    }
+  }, [cuerpo?.texto]);
+
   return (
-    <div className="rounded-lg border border-borde bg-fondo px-4 py-3">
+    <div className={`rounded-lg border border-t-2 border-borde bg-fondo px-4 py-3 ${acento}`}>
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-tenue">{titulo}</h3>
-        {cuerpo?.origen && (
-          <span className="shrink-0 text-[11px] text-apagado">
-            {cuerpo.origen === "ia" ? "redactado por el modelo" : "texto de respaldo"}
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-3">
+          {cuerpo?.origen && (
+            <span className="text-[11px] text-apagado">
+              {cuerpo.origen === "ia" ? "redactado por el modelo" : "texto de respaldo"}
+            </span>
+          )}
+          {cuerpo?.texto && (
+            <button
+              type="button"
+              onClick={copiar}
+              className="text-[11px] text-apagado underline-offset-2 transition hover:text-tinta hover:underline"
+            >
+              {copiado ? "copiado" : "copiar"}
+            </button>
+          )}
+        </div>
       </div>
       <p className="whitespace-pre-line text-sm leading-relaxed text-tinta">
         {cuerpo?.texto ?? "—"}
