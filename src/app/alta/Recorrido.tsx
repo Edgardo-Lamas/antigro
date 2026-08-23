@@ -704,7 +704,7 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
             type="button"
             onClick={() => setPaso((p) => p + 1)}
             disabled={paso === 1 && faltaElChico}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
           >
             {paso === 1 && faltaElChico ? "Falta el nombre" : "Seguir"}
             <ArrowRight size={14} />
@@ -716,7 +716,7 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
             type="button"
             onClick={guardar}
             disabled={guardando}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
           >
             {guardando ? (
               <>
@@ -734,7 +734,7 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
           <button
             type="button"
             onClick={() => router.push("/mi-familia")}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90"
           >
             Ir a mi panel <ArrowRight size={14} />
           </button>

@@ -252,6 +252,10 @@ export default async function Home({
           </p>
         </div>
       </footer>
+
+      <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-wider text-apagado">
+        Desarrollado por Edgardo Lamas y Sandra Ortellado · para CoderCup AI
+      </p>
     </main>
   );
 }

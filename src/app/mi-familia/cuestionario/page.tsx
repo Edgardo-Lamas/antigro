@@ -419,7 +419,7 @@ export default function Cuestionario() {
             type="button"
             onClick={() => setPaso(1)}
             disabled={!firmante}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
           >
             {firmante ? "Empezar" : "Elegí quién contesta"} <ArrowRight size={14} />
           </button>
@@ -429,7 +429,7 @@ export default function Cuestionario() {
           <button
             type="button"
             onClick={() => setPaso((p) => p + 1)}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90"
           >
             {/* 📌 Nunca dice «Falta contestar»: saltear es una opción legítima y
                 el botón no puede sugerir lo contrario. */}
@@ -442,7 +442,7 @@ export default function Cuestionario() {
             type="button"
             onClick={guardar}
             disabled={guardando || contestadas === 0}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
           >
             {guardando ? (
               <>
@@ -460,7 +460,7 @@ export default function Cuestionario() {
           <button
             type="button"
             onClick={() => router.push("/mi-familia")}
-            className="flex items-center gap-2 rounded-md bg-acento px-5 py-2.5 text-sm font-semibold text-fondo transition"
+            className="flex items-center gap-2 rounded-md bg-degradado px-5 py-2.5 text-sm font-semibold text-fondo transition hover:opacity-90"
           >
             Volver al panel <ArrowRight size={14} />
           </button>

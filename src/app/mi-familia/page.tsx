@@ -161,7 +161,7 @@ interface Respuesta {
 const COLOR_SENAL: Record<TipoDeSenal, string> = {
   volumen: "bg-acento",
   madrugada: "bg-atencion",
-  plataforma_nueva: "bg-acento",
+  plataforma_nueva: "bg-acentoDos",
   evasion: "bg-riesgo",
 };
 
