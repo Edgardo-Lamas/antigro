@@ -43,9 +43,15 @@ const config: Config = {
         calma: "#5E9C76",
       },
       backgroundImage: {
-        /** El degradado de marca — violeta a cian, 90°. Botones y títulos. */
+        /** El degradado de marca — violeta a cian, 90°. Botones (texto oscuro) y títulos. */
         degradado: "linear-gradient(90deg, #7C6CF0 0%, #35C6D6 100%)",
         "degradado-sutil": "linear-gradient(135deg, rgba(124,108,240,0.10) 0%, rgba(53,198,214,0.04) 100%)",
+        /** Mismo degradado, oscurecido en los dos extremos. Sólo para los
+         *  botones con texto BLANCO encima (home, /entrar, /panel/login):
+         *  el cian claro de `degradado` da ~2:1 de contraste con blanco,
+         *  por debajo del mínimo de accesibilidad (WCAG AA). Con estos dos
+         *  tonos el contraste sube a ~5:1 en los dos extremos. */
+        "degradado-fuerte": "linear-gradient(90deg, #6952E0 0%, #0F7A88 100%)",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],

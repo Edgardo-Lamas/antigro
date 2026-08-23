@@ -315,7 +315,7 @@ function Puerta() {
             <button
               type="submit"
               disabled={cargando || (creando && !acepta)}
-              className="mt-1 flex items-center justify-center gap-2 rounded-md bg-degradado px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
+              className="mt-1 flex items-center justify-center gap-2 rounded-md bg-degradado-fuerte px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
             >
               {cargando ? (
                 <>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BookOpen, LogIn } from "lucide-react";
+import { BookOpen, LogIn, ScrollText, ShieldCheck } from "lucide-react";
 import { auth } from "@/auth";
 import { BAJADA, PRODUCTO } from "@/lib/config";
 import { hayBase } from "@/lib/supabase";
@@ -119,7 +119,7 @@ export default async function Home({
         </Link>
         <Link
           href={puerta.destino}
-          className="flex items-center gap-2 rounded-md bg-degradado px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_28px_-8px_rgba(124,108,240,0.55)] transition hover:opacity-90"
+          className="flex items-center gap-2 rounded-md bg-degradado-fuerte px-4 py-2.5 text-sm font-semibold text-white shadow-[0_0_28px_-8px_rgba(124,108,240,0.55)] transition hover:opacity-90"
         >
           <LogIn size={15} />
           {puerta.texto}
@@ -221,41 +221,48 @@ export default async function Home({
         </p>
       </section>
 
-      <footer className="mt-12 flex flex-wrap items-baseline justify-between gap-3 border-t border-borde pt-6">
+      <footer className="mt-12 border-t border-borde pt-6">
         {/* 🔴 Reescrito el 17/8, misma corrección que en la consola y en la
             guía: «el motor», «un control» y «la IA» son palabras nuestras, no
-            del padre que las lee. */}
-        <p className="max-w-3xl text-xs leading-relaxed text-apagado">
-          Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia artificial
-          sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que
-          el sistema no pueda sostener. Si no pasa esa revisión, sale un texto escrito de antemano.
-        </p>
+            del padre que las lee. En tarjeta, no en un párrafo suelto: es la
+            garantía central del producto y se lee como tal en toda la app. */}
+        <div className="flex gap-3 rounded-lg border border-borde/70 bg-degradado-sutil px-4 py-3.5">
+          <ShieldCheck size={16} className="mt-0.5 shrink-0 text-acento" aria-hidden />
+          <p className="max-w-3xl text-xs leading-relaxed text-tenue">
+            Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia artificial
+            sólo lo pone en palabras, y antes de que ese texto salga se revisa que no diga nada que
+            el sistema no pueda sostener. Si no pasa esa revisión, sale un texto escrito de
+            antemano.
+          </p>
+        </div>
 
-        {/* 🔑 El sello de versión, y no es un adorno de programador.
-            El 16/8 se perdió media hora discutiendo si una pantalla estaba
-            publicada o no: Vercel deja viva la dirección de CADA deploy, así
-            que es facilísimo estar mirando una foto de hace horas y jurar que
-            "sigue igual". Con esto se sabe de un vistazo qué se está mirando,
-            sin abrir una terminal ni preguntarle a nadie. */}
-        <div className="flex shrink-0 items-baseline gap-4">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
           {/* 🔑 Al pie y no arriba, a diferencia de la guía: nadie llega a
               AntiGro buscando los términos. Pero tienen que estar enlazados
               desde algún lugar estable, y el pie es donde se los busca. */}
           <Link
             href="/terminos"
-            className="font-mono text-[10px] uppercase tracking-wider text-apagado transition hover:text-acento"
+            className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-apagado transition hover:text-acento"
           >
+            <ScrollText size={13} aria-hidden />
             Términos de uso
           </Link>
-          <p className="font-mono text-[10px] uppercase tracking-wider text-apagado">
-            versión {version()}
+
+          {/* 🔑 El sello de versión, y no es un adorno de programador.
+              El 16/8 se perdió media hora discutiendo si una pantalla estaba
+              publicada o no: Vercel deja viva la dirección de CADA deploy, así
+              que es facilísimo estar mirando una foto de hace horas y jurar que
+              "sigue igual". Con esto se sabe de un vistazo qué se está mirando,
+              sin abrir una terminal ni preguntarle a nadie. */}
+          <p className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-wider text-apagado">
+            <span>versión {version()}</span>
+            <span aria-hidden className="text-borde">
+              ·
+            </span>
+            <span>Edgardo Lamas y Sandra Ortellado, para CoderCup AI</span>
           </p>
         </div>
       </footer>
-
-      <p className="mt-4 text-center font-mono text-[10px] uppercase tracking-wider text-apagado">
-        Desarrollado por Edgardo Lamas y Sandra Ortellado · para CoderCup AI
-      </p>
     </main>
   );
 }
