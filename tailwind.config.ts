@@ -1,12 +1,16 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Paleta AntiGro.
+ * Paleta AntiGro — v2 (22/8).
  *
- * El producto habla de algo grave sin gritar. Un sistema que alarma todo el
- * tiempo se apaga a la semana. Por eso el color de alerta es ámbar y no rojo
- * de pánico, y el fondo es sobrio: cuando el sistema se calla, la pantalla
- * también tiene que estar callada.
+ * El producto sigue hablando de algo grave sin gritar: eso NO cambió, y por
+ * eso `atencion`, `riesgo` y `calma` —los tres colores que hacen un trabajo
+ * semántico real, avisando algo— se mantienen intactos.
+ *
+ * Lo que sí cambió es la identidad: `fondo` pasa a un navy más profundo y
+ * `acento` se separa en dos tonos (`acento` violeta + `acentoDos` cian) para
+ * poder armar el degradado que es la firma visual de esta versión, sin
+ * perder el tono sereno del original.
  */
 const config: Config = {
   content: [
@@ -17,23 +21,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        fondo: "#0D1117",
-        superficie: "#151B23",
-        borde: "#232B36",
-        tinta: "#E6EAEF",
+        fondo: "#0A0E14",
+        superficie: "#10151F",
+        borde: "#1E2530",
+        tinta: "#E9ECF3",
         tenue: "#8B95A1",
         apagado: "#5A6572",
-        /** Identidad. Sereno a propósito. */
-        acento: "#4E9BB9",
-        acentoSuave: "#16303B",
-        /** El sistema está hablando. */
+        /** Identidad. El violeta ancla el degradado. */
+        acento: "#7C6CF0",
+        acentoSuave: "#221C3D",
+        /** El segundo extremo del degradado — cian. */
+        acentoDos: "#35C6D6",
+        acentoDosSuave: "#122A2E",
+        /** El sistema está hablando. Intacto: sigue siendo ámbar, no pánico. */
         atencion: "#D08A3E",
         atencionSuave: "#33270F",
-        /** Riesgo sostenido. Terracota, no rojo de emergencia. */
+        /** Riesgo sostenido. Terracota, no rojo de emergencia. Intacto. */
         riesgo: "#C4553D",
         riesgoSuave: "#331813",
-        /** Todo en orden. */
+        /** Todo en orden. Intacto. */
         calma: "#5E9C76",
+      },
+      backgroundImage: {
+        /** El degradado de marca — violeta a cian, 90°. Botones y títulos. */
+        degradado: "linear-gradient(90deg, #7C6CF0 0%, #35C6D6 100%)",
+        "degradado-sutil": "linear-gradient(135deg, rgba(124,108,240,0.10) 0%, rgba(53,198,214,0.04) 100%)",
       },
       fontFamily: {
         sans: ["var(--font-geist-sans)", "Inter", "sans-serif"],

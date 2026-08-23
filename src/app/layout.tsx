@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="es-AR">
       <head>
-        <meta name="theme-color" content="#0d1117" />
+        <meta name="theme-color" content="#0a0e14" />
       </head>
       <body className={`${GeistSans.variable} antialiased`}>
         <a

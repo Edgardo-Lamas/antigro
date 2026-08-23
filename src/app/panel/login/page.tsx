@@ -88,7 +88,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={cargando}
-            className="mt-1 flex items-center justify-center gap-2 rounded-md bg-acento px-4 py-2.5 text-sm font-semibold text-fondo transition disabled:cursor-not-allowed disabled:bg-borde disabled:text-apagado"
+            className="mt-1 flex items-center justify-center gap-2 rounded-md bg-degradado px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:bg-none disabled:bg-borde disabled:text-apagado disabled:opacity-100"
           >
             {cargando ? (
               <>
