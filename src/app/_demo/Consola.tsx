@@ -719,6 +719,14 @@ function Grafico({
   hasta: number;
   onElegirDia: (dia: number) => void;
 }) {
+  /* 🔴 Altura en PÍXELES, calculada acá, y no un `height: X%` en el span
+   *  anidado dentro del botón: eso dependía de que cada nivel de flex
+   *  (contenedor → botón → span) tuviera una altura "definida" para que el
+   *  porcentaje del hijo pudiera resolverse, y en un caso así de anidado no
+   *  se sostuvo — las barras quedaban aplastadas. Con píxeles calculados acá
+   *  mismo no hay nada que resolver: el navegador no tiene que adivinar. */
+  const ALTO_CONTENEDOR_PX = 96; // el mismo número que h-24
+
   return (
     <div>
       <div className="flex h-24 items-end gap-1" role="group" aria-label="Carga diaria de las últimas tres semanas">
@@ -726,7 +734,7 @@ function Grafico({
           const d = dias[i];
           const visible = i <= hasta;
           const carga = visible && d ? d.carga : 0;
-          const alto = Math.max(2, carga * 100);
+          const altoPct = Math.max(2, carga * 100);
           const esHoy = i === hasta;
           const tono =
             carga >= 0.45 ? "bg-riesgo" : carga >= 0.25 ? "bg-atencion" : "bg-borde";
@@ -739,17 +747,11 @@ function Grafico({
               aria-pressed={esHoy}
               aria-label={`Día ${i + 1}${visible ? `, carga ${Math.round(carga * 100)}%` : ", todavía no llegó"}`}
               title={`Día ${i + 1}`}
-              className={`group flex h-full flex-1 items-end ${visible ? "cursor-pointer" : "cursor-default"}`}
-            >
-              <span
-                className={`block w-full rounded-sm transition-all duration-300 ${
-                  visible ? tono : "bg-borde/30"
-                } ${visible ? "group-hover:brightness-125" : ""} ${
-                  esHoy ? "ring-2 ring-tinta/70 ring-offset-1 ring-offset-superficie" : ""
-                }`}
-                style={{ height: `${alto}%` }}
-              />
-            </button>
+              style={{ height: `${(altoPct / 100) * ALTO_CONTENEDOR_PX}px` }}
+              className={`flex-1 rounded-sm transition-all duration-300 ${
+                visible ? `${tono} hover:brightness-125 cursor-pointer` : "bg-borde/30 cursor-default"
+              } ${esHoy ? "ring-2 ring-tinta/70 ring-offset-1 ring-offset-superficie" : ""}`}
+            />
           );
         })}
       </div>
