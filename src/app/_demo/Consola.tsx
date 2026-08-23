@@ -739,7 +739,7 @@ function Grafico({
               aria-pressed={esHoy}
               aria-label={`Día ${i + 1}${visible ? `, carga ${Math.round(carga * 100)}%` : ", todavía no llegó"}`}
               title={`Día ${i + 1}`}
-              className={`group flex flex-1 items-end ${visible ? "cursor-pointer" : "cursor-default"}`}
+              className={`group flex h-full flex-1 items-end ${visible ? "cursor-pointer" : "cursor-default"}`}
             >
               <span
                 className={`block w-full rounded-sm transition-all duration-300 ${
