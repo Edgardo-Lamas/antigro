@@ -19,7 +19,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { EyeOff, ShieldCheck } from "lucide-react";
+import { EyeOff } from "lucide-react";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 
 const DIAS = 21;
@@ -48,10 +48,18 @@ function destinatarios(estado: Estado): number {
   return estado === "patron_sostenido" ? 3 : 0;
 }
 
-const COLOR_ESTADO: Record<Estado, { texto: string; fondo: string; borde: string }> = {
-  en_calma: { texto: "text-calma", fondo: "bg-calma/10", borde: "border-calma/30" },
-  atencion: { texto: "text-atencion", fondo: "bg-atencionSuave", borde: "border-atencion/40" },
-  patron_sostenido: { texto: "text-riesgo", fondo: "bg-riesgoSuave", borde: "border-riesgo/40" },
+const COLOR_ESTADO: Record<Estado, { texto: string; fondo: string; borde: string; punto: string }> = {
+  en_calma: { texto: "text-calma", fondo: "bg-calma/10", borde: "border-calma/30", punto: "bg-calma" },
+  atencion: { texto: "text-atencion", fondo: "bg-atencionSuave", borde: "border-atencion/40", punto: "bg-atencion" },
+  patron_sostenido: { texto: "text-riesgo", fondo: "bg-riesgoSuave", borde: "border-riesgo/40", punto: "bg-riesgo" },
+};
+
+/** Una línea corta por estado, al lado del nombre. No inventa nada nuevo:
+ *  es la misma idea de `NOMBRE_DE_ESTADO`, un paso más despacio. */
+const DESCRIPCION_ESTADO: Record<Estado, string> = {
+  en_calma: "Nada que se sostenga en el tiempo. El sistema mira y calla.",
+  atencion: "Un cambio que todavía puede ser cualquier cosa. Se cuenta, no se alarma.",
+  patron_sostenido: "El patrón se repite en días distintos y conviene mirarlo.",
 };
 
 interface Redactado {
@@ -265,161 +273,195 @@ export default function Consola() {
           </PanelControl>
         </section>
 
-        {/* ── LA LECTURA, con el reloj adentro ─────────────────────────── */}
-        <div className="space-y-6">
+        {/* ── LA LECTURA: nivel + confianza arriba, reloj y gráfico abajo ── */}
+        <div className="space-y-5">
           <section
             id="tour-lectura"
-            className={`rounded-xl border ${color.borde} ${color.fondo} transition-colors ${
+            className={`rounded-xl border ${color.borde} bg-superficie transition-colors ${
               cargando ? "opacity-70" : ""
             }`}
           >
-            <header className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-b border-borde/60 px-5 py-4">
-              <h2 className={`text-xl font-semibold tracking-tight ${color.texto}`}>
-                {NOMBRE_DE_ESTADO[estado]}
-              </h2>
-              <p className="text-sm">
-                {aCuantos === 0 ? (
-                  <span className="text-tenue">
-                    No le escribió <strong className="text-tinta">a nadie</strong>
-                  </span>
-                ) : (
-                  <span className="text-tenue">
-                    Le escribió a <strong className={color.texto}>{aCuantos}</strong>: los dos
-                    adultos responsables y el propio chico
-                  </span>
-                )}
-              </p>
-            </header>
-
-            <div className="space-y-5 px-5 py-5">
-              {/* ── EL RELOJ, ahora controla el gráfico que tiene debajo ── */}
-              <div
-                id="tour-reloj"
-                className="flex flex-wrap items-center gap-4 rounded-lg border border-borde/70 bg-fondo/40 px-4 py-3"
-              >
-                <button
-                  onClick={reproducir}
-                  disabled={corriendo}
-                  className="rounded-lg bg-acento px-4 py-2 text-sm font-semibold text-fondo transition hover:brightness-110 disabled:opacity-40"
-                >
-                  {corriendo ? "Corriendo…" : "▶ Reproducir tres semanas"}
-                </button>
-                <input
-                  type="range"
-                  min={0}
-                  max={DIAS - 1}
-                  value={dia}
-                  onChange={(e) => {
-                    setCorriendo(false);
-                    setDia(Number(e.target.value));
-                  }}
-                  className="h-1 min-w-[160px] flex-1 cursor-pointer appearance-none rounded-full bg-borde accent-acento"
-                  aria-label="Día de la historia"
-                />
-                <span className="tabular-nums text-sm text-tenue">
-                  día <strong className="text-tinta">{dia + 1}</strong> de {DIAS}
-                </span>
-              </div>
-
-              <Grafico
-                dias={lectura?.dias ?? []}
-                hasta={dia}
-                onElegirDia={(i) => {
-                  setCorriendo(false);
-                  setDia(i);
-                }}
-              />
-
-              {/* 🔑 El despliegue, visible: la protección no espera, se despliega. */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                <span className="text-tenue">
-                  Conoce a este chico hace{" "}
-                  <strong className="tabular-nums text-tinta">{diasDePerfil}</strong>{" "}
-                  {diasDePerfil === 1 ? "día" : "días"}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="text-apagado">alcance</span>
-                  <span className="h-1.5 w-28 overflow-hidden rounded-full bg-borde">
-                    <span
-                      className="block h-full rounded-full bg-acento transition-all duration-300"
-                      style={{ width: `${Math.round(alcance * 100)}%` }}
-                    />
-                  </span>
-                  <span className="tabular-nums text-tinta">{alcance.toFixed(2)}</span>
-                </span>
-              </div>
-
-              <div className="grid gap-5 md:grid-cols-2">
-                <Lista
-                  titulo="Por qué"
-                  items={lectura?.porQue ?? []}
-                  variante="evidencia"
-                  colorTexto={color.texto}
-                />
-                <Lista titulo="Lo que no se ve" items={lectura?.loQueNoSeVe ?? []} variante="limite" />
-              </div>
-            </div>
-          </section>
-
-          {/* ── LO QUE SALDRÍA ──────────────────────────────────────────── */}
-          <section id="tour-mensajes" className="rounded-xl border border-borde bg-superficie px-5 py-5">
-            <div className="flex flex-wrap items-baseline justify-between gap-3">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-tenue">
-                Lo que saldría
-              </h2>
-              <button
-                onClick={pedirMensajes}
-                disabled={pidiendoMensajes}
-                className="rounded-lg border border-borde px-3 py-1.5 text-sm text-tinta transition hover:border-acento disabled:opacity-40"
-              >
-                {pidiendoMensajes ? "Redactando…" : "Ver el mensaje"}
-              </button>
-            </div>
-
-            {/* 🔴 Reescrito el 17/8. Decía «los textos los escribe un modelo
-                de lenguaje… pasa por un control automático». Edgardo lo
-                frenó con una pregunta sin vuelta: *"¿qué puede saber el
-                usuario/padres de qué es «modelo» y de controles
-                automáticos?"*. Nada — y ésta es la garantía central del
-                producto, así que no puede estar escrita en un idioma que
-                el que la necesita no habla. */}
-            {!mensajes && !pidiendoMensajes && (
-              <div className="mt-3 flex gap-3 rounded-lg border border-borde/70 bg-degradado-sutil px-4 py-3.5">
-                <ShieldCheck size={18} className="mt-0.5 shrink-0 text-acento" aria-hidden />
-                <p className="text-sm leading-relaxed text-tenue">
-                  Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
-                  artificial sólo lo pone en palabras, y antes de que ese texto salga se revisa
-                  que no diga nada que el sistema no pueda sostener. Si no pasa esa revisión, sale
-                  un texto escrito de antemano.
+            <div className="flex flex-wrap items-start justify-between gap-6 px-5 pt-5">
+              <div>
+                <p className="text-xs uppercase tracking-[0.08em] text-apagado">Lectura del motor</p>
+                <div className="mt-2 flex items-center gap-3">
+                  <span
+                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${color.punto} shadow-[0_0_0_5px_rgba(255,255,255,0.06)]`}
+                    aria-hidden
+                  />
+                  <h2 className="text-2xl font-semibold tracking-tight text-tinta">
+                    {NOMBRE_DE_ESTADO[estado]}
+                  </h2>
+                </div>
+                <p className="mt-2 max-w-md text-sm leading-relaxed text-tenue">
+                  {DESCRIPCION_ESTADO[estado]}
+                </p>
+                <p className="mt-2 text-xs text-apagado">
+                  {aCuantos === 0 ? (
+                    <>No le escribió a nadie</>
+                  ) : (
+                    <>
+                      Le escribió a <strong className={color.texto}>{aCuantos}</strong>: los dos
+                      adultos responsables y el propio chico
+                    </>
+                  )}
                 </p>
               </div>
-            )}
 
-            {/* 🔴 Si no salió, se dice. Un guion en el lugar del texto se lee
-                como «el sistema no tenía nada que decir», que es una
-                respuesta legítima del producto — y taparía con ella una
-                función caída. */}
-            {mensajes?.fallo && (
-              <p className="mt-4 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
-                {mensajes.fallo}
-              </p>
-            )}
+              {/* 🔑 «Alcance» es el dato real del motor — cuánto se desplegó
+                  la lectura de ese chico, de 0 a 1. Es el mismo número que
+                  el mockup llamaba «confianza del cálculo»: no es otra
+                  medida inventada, es el `alcance` con otro nombre visual. */}
+              <div className="min-w-[150px] text-right">
+                <p className="text-xs text-apagado">Alcance de la lectura</p>
+                <p className="mt-1.5 text-2xl font-semibold text-acento tabular-nums">
+                  {Math.round(alcance * 100)}%
+                </p>
+                <span className="mt-2 block h-1 overflow-hidden rounded-full bg-borde">
+                  <span
+                    className="block h-full rounded-full bg-acento transition-all duration-300"
+                    style={{ width: `${Math.round(alcance * 100)}%` }}
+                  />
+                </span>
+                <p className="mt-1.5 text-[11px] text-apagado">
+                  {diasDePerfil} {diasDePerfil === 1 ? "día" : "días"} conociéndolo
+                </p>
+              </div>
+            </div>
 
-            {mensajes && !mensajes.fallo && (
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <Mensaje
-                  titulo="A los adultos responsables"
-                  cuerpo={mensajes.paraLosAdultos}
-                  acento="border-t-acento"
-                />
-                <Mensaje
-                  titulo={`Al propio chico (${edad} años)`}
-                  cuerpo={mensajes.paraElChico}
-                  acento="border-t-acentoDos"
+            <div className="mt-5 px-5 pb-5">
+              {/* ── EL RELOJ, arriba del gráfico que controla ── */}
+              <div
+                id="tour-reloj"
+                className="flex flex-wrap items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={reproducir}
+                    disabled={corriendo}
+                    className="rounded-lg border border-acento px-3.5 py-1.5 text-[13px] font-medium text-acento transition hover:bg-acentoSuave disabled:opacity-40"
+                  >
+                    {corriendo ? "Corriendo…" : "▶ Reproducir tres semanas"}
+                  </button>
+                  <span className="text-xs text-apagado">
+                    día <strong className="tabular-nums text-tinta">{dia + 1}</strong> de {DIAS}
+                  </span>
+                </div>
+                <span className="text-xs text-apagado">riesgo por día</span>
+              </div>
+
+              <div className="mt-2.5">
+                <Grafico
+                  dias={lectura?.dias ?? []}
+                  hasta={dia}
+                  onElegirDia={(i) => {
+                    setCorriendo(false);
+                    setDia(i);
+                  }}
                 />
               </div>
-            )}
+
+              <input
+                type="range"
+                min={0}
+                max={DIAS - 1}
+                value={dia}
+                onChange={(e) => {
+                  setCorriendo(false);
+                  setDia(Number(e.target.value));
+                }}
+                className="mt-3 h-1 w-full cursor-pointer appearance-none rounded-full bg-borde accent-acento"
+                aria-label="Día de la historia"
+              />
+
+              {lectura && lectura.loQueNoSeVe.length > 0 && (
+                <p className="mt-4 flex items-start gap-2 text-[11px] leading-relaxed text-apagado">
+                  <EyeOff size={13} className="mt-0.5 shrink-0" aria-hidden />
+                  <span>{lectura.loQueNoSeVe.join(" ")}</span>
+                </p>
+              )}
+            </div>
           </section>
+
+          {/* ── SEÑALES ACUMULADAS + EL MENSAJE, lado a lado ────────────── */}
+          <div className="grid gap-5 md:grid-cols-2">
+            <section className="rounded-xl border border-borde bg-superficie px-5 py-5">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-apagado">
+                Señales acumuladas
+              </h2>
+              {lectura && lectura.porQue.length > 0 ? (
+                <ul className="mt-3.5 space-y-3">
+                  {lectura.porQue.map((t, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed">
+                      <span
+                        aria-hidden
+                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${color.punto}`}
+                      />
+                      <span className="text-tinta">{t}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3.5 text-sm leading-relaxed text-apagado">
+                  Nada que reportar todavía. La enorme mayoría de las semanas se ven así.
+                </p>
+              )}
+            </section>
+
+            <section id="tour-mensajes" className="flex flex-col rounded-xl border border-borde bg-superficie px-5 py-5">
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-apagado">
+                  El mensaje que te llegaría
+                </h2>
+                <button
+                  onClick={pedirMensajes}
+                  disabled={pidiendoMensajes}
+                  className="shrink-0 rounded-lg border border-borde px-3 py-1.5 text-xs text-tinta transition hover:border-acento disabled:opacity-40"
+                >
+                  {pidiendoMensajes ? "Redactando…" : "Ver el mensaje"}
+                </button>
+              </div>
+
+              {/* 🔴 El diseño mostraba el mensaje siempre puesto, calculado
+                  gratis en el navegador. Acá NO: cada mensaje real son dos
+                  llamadas al modelo (adultos + chico), y mostrarlo solo con
+                  un botón es la regla documentada arriba del archivo — sale
+                  a demanda porque redactarlo en cada movimiento del reloj
+                  sería lento y caro. */}
+              {!mensajes && !pidiendoMensajes && (
+                <div className="mt-3.5 flex-1 rounded-lg border border-dashed border-borde px-4 py-3.5 text-sm leading-relaxed text-apagado">
+                  Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
+                  artificial sólo lo pone en palabras, y se revisa antes de salir.
+                </div>
+              )}
+
+              {mensajes?.fallo && (
+                <p className="mt-3.5 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
+                  {mensajes.fallo}
+                </p>
+              )}
+
+              {mensajes && !mensajes.fallo && (
+                <div className="mt-3.5 space-y-3">
+                  <Mensaje
+                    titulo="A los adultos responsables"
+                    cuerpo={mensajes.paraLosAdultos}
+                    acento="border-t-acento"
+                  />
+                  <Mensaje
+                    titulo={`Al propio chico (${edad} años)`}
+                    cuerpo={mensajes.paraElChico}
+                    acento="border-t-acentoDos"
+                  />
+                </div>
+              )}
+
+              <div className="mt-3.5 flex items-center gap-2 text-[11px] text-apagado">
+                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${color.punto}`} aria-hidden />
+                Decide el motor. La IA sólo lo pone en palabras, y se revisa antes de salir.
+              </div>
+            </section>
+          </div>
         </div>
       </div>
 
@@ -782,51 +824,6 @@ function Grafico({
         <span>día 14</span>
         <span>día 21</span>
       </div>
-    </div>
-  );
-}
-
-/**
- * 🔑 «evidencia» son observaciones del motor — llevan el color del estado
- * actual, para que se lea junto con el encabezado de arriba. «limite» es lo
- * que el sistema NO ve — es una garantía, no un hallazgo, y por eso se
- * distingue con el ícono del ojo tachado en vez de un color de alerta.
- */
-function Lista({
-  titulo,
-  items,
-  variante,
-  colorTexto,
-}: {
-  titulo: string;
-  items: string[];
-  variante: "evidencia" | "limite";
-  colorTexto?: string;
-}) {
-  if (items.length === 0) return null;
-  const esLimite = variante === "limite";
-  const puntoColor = esLimite ? "bg-apagado" : (colorTexto ?? "text-acento").replace("text-", "bg-");
-  return (
-    <div>
-      <h3 className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-tenue">
-        {esLimite && <EyeOff size={13} className="text-apagado" aria-hidden />}
-        {titulo}
-      </h3>
-      <ul className="space-y-2">
-        {items.map((t, i) => (
-          <li
-            key={i}
-            className={`flex gap-2.5 rounded-lg border px-3.5 py-2.5 text-sm leading-relaxed transition-colors ${
-              esLimite
-                ? "border-borde/60 bg-fondo/40 text-apagado hover:border-borde"
-                : "border-borde bg-fondo text-tinta hover:border-tenue/60"
-            }`}
-          >
-            <span aria-hidden className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${puntoColor}`} />
-            <span>{t}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
