@@ -274,7 +274,11 @@ export default function MiFamilia() {
   const deBaja = datos.adultos.filter((a) => a.activo === false);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-2xl px-6 pb-28 pt-12">
+      {/* 🔑 `pb-28` abajo en vez de `py-12`: el botón del asistente es
+          `fixed` y vive en la esquina de abajo a la derecha para siempre.
+          Sin ese colchón, lo último de la página le queda debajo y no hay
+          scroll que lo destape. */}
       {/* ── Encabezado ─────────────────────────────────────────────────── */}
       <header className="flex items-start justify-between gap-4 border-b border-borde pb-7">
         <div>
@@ -1223,7 +1227,7 @@ function Asistente({ chico }: { chico?: string }) {
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- *  EL BOTÓN FLOTANTE DEL ASISTENTE — 21/8
+ *  EL BOTÓN FLOTANTE DEL ASISTENTE — 21/8, corregido el 24/8
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  🔴 **Lo levantó Edgardo antes de mandarle el enlace a las psicólogas:** *"no
@@ -1236,74 +1240,56 @@ function Asistente({ chico }: { chico?: string }) {
  *  producto sea la más difícil de encontrar es un defecto de producto, no de
  *  estilo: si no la encuentran, el feedback no llega nunca.
  *
- *  🔑 **Se esconde cuando la sección ya está en pantalla.** Un botón fijo que
- *  sigue tapando la esquina cuando ya estás escribiendo la pregunta es ruido —
- *  y encima taparía el propio campo en el que estás escribiendo.
+ *  ─────────────────────────────────────────────────────────────────────────
+ *  🔴 **LO QUE ESTABA MAL HASTA EL 24/8 — y las dos cosas eran la misma**
+ *  ─────────────────────────────────────────────────────────────────────────
+ *
+ *  Edgardo, probándolo con una charla ya empezada: *"no te deja justo ahí sino
+ *  arriba de todo donde sólo se ve texto, se debe scrolear para encontrar esa
+ *  caja"* y *"aparece y desaparece cuando scroleás hacia arriba o hacia abajo,
+ *  DEBERÍA estar fijo"*.
+ *
+ *  🔑 **Las dos salían de apuntarle a la SECCIÓN en vez de al CAMPO.** La
+ *  sección arranca con el título, sigue con la charla entera —que crece con
+ *  cada respuesta— y recién al final tiene la caja de escribir. O sea que
+ *  `#asistente` marca un lugar que puede quedar a varias pantallas de lo único
+ *  que el que apretó el botón vino a hacer.
+ *
+ *  - **El salto** iba al borde de arriba de la sección y dejaba al lector
+ *    mirando texto, con la caja abajo de todo.
+ *  - **El apagado** se disparaba cuando ese mismo borde llegaba a media
+ *    pantalla, con la caja todavía dos pantallas más abajo: el botón se iba
+ *    justo cuando más falta hacía y volvía recién al pasar la sección de
+ *    largo. Eso era el aparecer y desaparecer.
+ *
+ *  ✅ **Ahora no se esconde nunca** —decisión suya, y es la correcta: un atajo
+ *  que hay que buscar deja de ser un atajo— y el salto va derecho a
+ *  `#pregunta-al-asistente`, que es la caja, no al título de la sección.
+ *
+ *  📌 Se cayeron el `useState` y los dos `IntersectionObserver` que sostenían
+ *  el vaivén. Si alguna vez vuelve a hacer falta esconderlo, lo que hay que
+ *  observar es el CAMPO, no la sección: ése fue el error de origen.
  *
  *  📌 Sólo vive en `/mi-familia`. En la home no va: ahí no hay familia, no hay
  *  informe y no hay de qué hablar. En el recorrido tampoco — el que está dando
  *  de alta todavía no tiene nada que preguntar.
  */
 function BotonDelAsistente() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const seccion = document.getElementById("asistente");
-    if (!seccion) return;
-
-    /* 🔴 **DOS OBSERVADORES, Y LA RAZÓN ES EL TELÉFONO — 21/8.**
-       Lo levantó Edgardo el mismo día que se puso el botón: *"aparece y
-       desaparece muy rápido"*. Medido en pantalla de teléfono: **doce cambios
-       de estado con seis movimientos de la barra de direcciones**, sin tocar
-       el scroll.
-
-       Pasaba porque apagar y encender eran la MISMA raya —el borde de abajo de
-       la pantalla—. En el teléfono esa raya no se queda quieta: la barra del
-       navegador se esconde al bajar y vuelve al subir, y la pantalla crece y
-       se achica entre 60 y 100 px sola. Parado en esa franja, cada movimiento
-       del dedo cruzaba la raya de ida y de vuelta.
-
-       🔑 Ahora son dos rayas separadas por media pantalla, y entre las dos el
-       botón se queda como está:
-       - **Se apaga** cuando la sección llegó a la mitad de la pantalla — o sea
-         cuando de verdad la estás mirando, no cuando asoma un borde.
-       - **Vuelve** recién cuando la sección se fue del todo.
-       Ninguna barra de navegador mide media pantalla, así que el vaivén ya no
-       puede cruzar las dos. 📌 Sigue sin haber un `scroll` a mano: el navegador
-       avisa en las dos rayas y nada más. */
-    const ojoApagar = new IntersectionObserver(
-      ([e]) => {
-        if (e?.isIntersecting) setVisible(false);
-      },
-      { threshold: 0, rootMargin: "0px 0px -50% 0px" },
-    );
-    const ojoEncender = new IntersectionObserver(
-      ([e]) => {
-        if (!e?.isIntersecting) setVisible(true);
-      },
-      { threshold: 0 },
-    );
-    ojoApagar.observe(seccion);
-    ojoEncender.observe(seccion);
-    return () => {
-      ojoApagar.disconnect();
-      ojoEncender.disconnect();
-    };
-  }, []);
-
   function ir() {
-    const seccion = document.getElementById("asistente");
-    if (!seccion) return;
+    const campo = document.getElementById("pregunta-al-asistente");
+    if (!campo) return;
     /* ⚠ `prefers-reduced-motion` se respeta: un salto animado de dos pantallas
        le cae mal a quien pidió que no se mueva nada. */
     const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    seccion.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "start" });
-    /* El foco va al campo, no a la sección: el que tocó el botón viene a
-       escribir. En el teléfono eso además abre el teclado solo. */
-    window.setTimeout(
-      () => document.getElementById("pregunta-al-asistente")?.focus({ preventScroll: true }),
-      quieto ? 0 : 600,
-    );
+    /* 🔑 `center` y no `start`: deja la caja en el medio de la pantalla, con el
+       final de la charla arriba y el botón «Preguntar» abajo, los dos a la
+       vista de una. Pegada al borde de arriba, en el teléfono el teclado se
+       come el botón y hay que volver a scrolear para mandar la pregunta. */
+    campo.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "center" });
+    /* El foco va al campo: el que tocó el botón viene a escribir, y en el
+       teléfono eso además abre el teclado solo. `preventScroll` porque el salto
+       de arriba ya lo dejó donde va. */
+    window.setTimeout(() => campo.focus({ preventScroll: true }), quieto ? 0 : 600);
   }
 
   return (
@@ -1311,9 +1297,7 @@ function BotonDelAsistente() {
       type="button"
       onClick={ir}
       aria-label="Ir al asistente y escribir una pregunta"
-      className={`fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-acento/60 bg-acento px-4 py-3 text-sm font-semibold text-fondo shadow-lg transition-all duration-200 hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acento motion-reduce:transition-none ${
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"
-      }`}
+      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-acento/60 bg-acento px-4 py-3 text-sm font-semibold text-fondo shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acento motion-reduce:transition-none"
     >
       <MessageCircle size={16} />
       Preguntar
