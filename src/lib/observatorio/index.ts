@@ -264,7 +264,13 @@ export function analizar(filas: FilaDelObservatorio[], universo: Universo): Hall
             `de tocar a varios a la vez`,
         );
       }
-      if (raro) motivos.push("no está catalogado en ningún lado");
+      /* ⚠ Decía «no está catalogado en ningún lado», y era más de lo que el
+         sistema puede afirmar: el catálogo es NUESTRO, tiene un puñado de
+         entradas, y afuera quedan lugares perfectamente conocidos. Corregido el
+         28/8 para que diga lo que de verdad se sabe. El motivo sigue valiendo
+         igual —un lugar que no reconocemos, con lift alto, es un hallazgo— pero
+         ahora se lee sin prometer una autoridad que no hay detrás. */
+      if (raro) motivos.push("no lo reconoce el catálogo de lugares del sistema");
 
       return {
         dominio: f.dominio,

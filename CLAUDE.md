@@ -12,11 +12,212 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
+## 🔴 FACEBOOK Y MESSENGER NO ESTABAN EN EL CATÁLOGO — arreglado el 28/8
+
+**Salió de una pregunta de Edgardo:** si se le podía hacer llegar al sistema alguna base de datos
+externa que le sume al análisis. Al ir a mirar dónde entraría una, apareció que el agujero no era
+la falta de una base: era el catálogo propio.
+
+🔴 **`CATALOGO` en `src/lib/senales/plataformas.ts` tenía DOCE entradas escritas a mano, y
+Facebook no era una de ellas.** El Estudio nacional —la fuente que este proyecto usa para calibrar
+los pesos— lo mide como el **primer** medio de contacto en Argentina (**52,8%**, por encima de
+Instagram 33,1% y WhatsApp 30,7%), y el encabezado de ese mismo archivo lo cita desde que se
+escribió. **La fuente estaba, la entrada no.**
+
+➡ **Qué se rompía, y no era cosmético:** Facebook caía en `desconocida`, así que la secuencia
+*Facebook → WhatsApp* —el traslado más frecuente que describe nuestra propia fuente— **no
+disparaba `esCruce`**. La señal más filosa del motor era ciega justo en la plataforma número uno.
+
+✅ **Agregados los dos, en `contacto_abierto`** y no con la mensajería: la propiedad que gobierna
+ese archivo es *si un desconocido puede escribirle sin que el chico le entregue nada*, y en
+Facebook/Messenger el mensaje de un desconocido cae en «solicitudes de mensajes» y el chico lo lee
+igual. Es el mismo motivo por el que Snapchat está arriba y no abajo.
+📌 **`fbcdn.net` queda afuera a propósito:** es infraestructura de contenido y también se resuelve
+al abrir Instagram — meterlo llamaría «Facebook» a tráfico que no lo es.
+📌 **Messenger comparte dominios con Facebook en el DNS.** Ponerlos en la misma puerta hace que esa
+ambigüedad no cambie la lectura; separarlos habría hecho depender el resultado de una distinción
+que el filtro no siempre puede hacer.
+
+### ✅ `npm run probar-plataformas` — la tanda 12, hoy con **42 comprobaciones**
+
+🔑 **La comprobación que importa no es «Facebook está»: es que ninguna plataforma nombrada por
+nuestras propias fuentes quede sin clasificar.** Una entrada suelta se vuelve a olvidar; una lista
+anclada a la fuente se pone roja sola. Cubre además el cruce en las dos direcciones, los
+subdominios, y que `fbcdn.net` siga afuera.
+⚠ **Nada de esto lo veía el typecheck ni ninguna tanda anterior:** no había código roto, había un
+catálogo incompleto. **El catálogo era la única pieza del motor sin pruebas.**
+
+### ⚠ La frase del observatorio decía de más — corregida
+
+`observatorio/index.ts` rotulaba un dominio sin clasificar como *«no está catalogado en ningún
+lado»*, y es más de lo que el sistema puede afirmar: el catálogo es **nuestro** y tiene un puñado
+de entradas. Con doce, esa frase la disparaba `spotify.com`. Ahora dice **«no lo reconoce el
+catálogo de lugares del sistema»**, que es la verdad. El motivo sigue valiendo igual —un lugar que
+no reconocemos, con lift alto, es un hallazgo— pero se lee sin prometer una autoridad que no hay.
+
+### 📌 Los números de la demo NO se movieron
+
+El simulador emite `roblox.com`, `freefire.garena.com`, `minecraft.net`, `snapchat.com`,
+`whatsapp.net`, `discord.com` y `telegram.org` (`simulador.ts:116`). **Facebook no está entre
+ellos**, así que los días en que el sistema habla siguen siendo los mismos —17 / 12 / 14 / 20— y
+el PDF de presentación y el gráfico siguen válidos sin regenerarlos.
+
+### ✅ EL CATÁLOGO IMPORTADO — 43 servicios, 400 dominios (28/8, misma sesión)
+
+**Él lo cerró en una línea:** *"¿cuál es el problema de colocar todas? OBVIO que es información
+para análisis, siempre"*. Tenía razón y mi pregunta estaba mal planteada: **no había que elegir
+cuáles entran, había que decidir en qué puerta cae cada una.**
+
+📦 **Fuente: `github.com/nextdns/services`, licencia MIT**, bajado el 28/8. Vive en
+`src/lib/senales/servicios.ts`; `plataformas.ts` lo consulta.
+
+⚠ **No se importó a ciegas, y menos mal:** de los 404 dominios, **tres son basura de la fuente** —
+`xboxlive.xom` (typo de `.com`), `youtube` sin dominio y `_spotify-connect._tcp.local`, que es
+mDNS— y `ttvnw.net` viene repetido. Quedan **400 únicos**.
+
+🔴 **La decisión que sostiene todo: dominios de USO vs. INFRAESTRUCTURA.** 127 de los 400 son CDN y
+analítica (`rbxcdn.com`, `ttvnw.net`, `scdn.co`, `nflxvideo.net`). **Entran igual** —si no, el
+observatorio los levantaría como lugares sin catalogar y llenaría los hallazgos con las texturas de
+Roblox— pero van en `infraestructura` y se leen como **`sin_contacto`**. El motivo es el cruce:
+`rbxcdn.com` no es un lugar donde alguien te escribe, y si contara como Roblox **la señal más
+filosa del motor se dispararía porque el chico cargó una imagen**.
+
+🔴 **El catálogo PROPIO se consulta primero, y el orden no es indiferente.** Ahí viven decisiones
+tomadas —WhatsApp es destino (15/8), Snapchat va con los abiertos, Facebook y Messenger son
+contacto abierto (28/8)—. Si la lista importada resolviera antes, un cambio de NextDNS podría
+voltear una decisión nuestra en silencio. Hay cinco comprobaciones que lo verifican.
+
+| Puerta | Servicios |
+|---|---|
+| `contacto_abierto` | **24** — Facebook, Messenger, Instagram, TikTok, Snapchat, Roblox, Minecraft, Fortnite, Twitch, Reddit, X, VK, Tumblr, Tinder, Xbox Live, PSN, Blizzard, LoL, + las 5 dudosas |
+| `requiere_entrega` | **7** — WhatsApp, Telegram, Discord, Signal, Google Chat, Zoom, BeReal |
+| `sin_contacto` | **12** — YouTube, Netflix, Spotify, Amazon, eBay, Disney+, HBO Max, Hulu, Prime Video, Vimeo, Dailymotion, ChatGPT |
+
+⬜ **Siete marcadas `⬜ a revisar` en el archivo, y son decisión de Edgardo, no del código:** 9GAG,
+BeReal, Imgur, Mastodon, Pinterest, Skype y Steam. **No es duda sobre si entran: es sobre en qué
+puerta caen.** Están del lado que más señal produce, que es el conservador para un sistema que
+cuida a un chico — pero una de más en `contacto_abierto` dispara el cruce sin motivo.
+
+📌 **Lo que la fuente NO trae y por eso las regex propias no se borraron:** Free Fire —la #2 de la
+región según el Informe LATAM— y los chats con extraños tipo Omegle.
+
+### ✅ LA EVASIÓN YA TIENE DOMINIOS — `claseDeEvasion()` (28/8)
+
+**Hasta hoy la señal de peso 1 sólo la emitía el simulador, ya etiquetada: el sistema no sabía
+reconocer un solo dominio de VPN.**
+
+🔴 **Dos clases, y mezclarlas saldría caro:** `vpn_o_proxy` es un **acto deliberado** —nadie termina
+en NordVPN sin querer—; `dns_alternativo` **puede no ser del chico**, porque Firefox usa el DoH de
+Cloudflare por su cuenta en varios países. Quien escriba la traducción de NextDNS decide el peso de
+cada una; lo que este archivo no puede hacer es borrar la diferencia.
+📌 **`dns.nextdns.io` no está y no puede estar:** es el nuestro. Hay una comprobación que lo mira.
+
+⚖ **La lista es NUESTRA y corta, a propósito.** La buena del rubro es
+`hagezi/dns-blocklists` (`doh-vpn-proxy-bypass`, **16.704 entradas, diaria**) y **NextDNS ya la
+aplica** en *Block Bypass Methods* — pero es **GPL-3.0**, y esto se cobra: redistribuirla adentro no
+se hace sin mirar la licencia con alguien que sepa. Con cuenta, la aportan ellos sin que nosotros
+redistribuyamos nada.
+📌 Los 35 dominios se verificaron por resolución DNS: **ninguno inventado.** Entre ellos
+`1clickvpn.net`, que no salió de una lista sino de una sesión real — es la extensión que rompió el
+login del curso el 27/8.
+
+⚠ **Y hay que decirlo sin vueltas: nada de esto enciende el sistema.** Sin NextDNS,
+`FuenteNextDNS.leer()` sigue devolviendo vacío y ningún dominio real llega hasta acá. Lo de hoy
+mejora el simulador y el observatorio, y deja las piezas puestas.
+
+### 🔴 EL ORDEN QUE QUEDÓ, decidido por él el 28/8
+
+*"resumiendo hueco 1 y 2 van ahora, luego que veas el PDF hueco 3 y luego NextDNS"*.
+
+1. ✅ **El catálogo** (hecho hoy) · ✅ **los dominios de evasión** (hecho hoy).
+2. ⬜ **Leer el PDF de Kids Online Argentina 2025** (UNICEF/UNESCO, 291 escuelas, 20 jurisdicciones,
+   9 a 17, representativo por edad, género y NSE) y ver si desagrega uso por edad. Si lo hace, entra
+   como referencia poblacional y la vía absoluta deja de tener sólo dos señales.
+   🔑 Trae además un dato que toca lo que ya usamos: **47% tuvo contacto con desconocidos**, contra
+   el 60% del LATAM y el 40% de CHS. Es el único con muestra representativa argentina.
+3. ⬜ **NextDNS.** 🔴 **Y la nota vieja decía mal que era una decisión permanente: era «no se
+   conecta PARA EL CODERCUP» (19/8), y el CoderCup ya pasó.** Lo levantó él: *"PARA QUE el sistema
+   funcione hay que tener NextDNS ¿o me equivoco?"* — **no se equivoca.** Sin cuenta, la fuente cae
+   al simulador, el reloj no escala nunca y **el panel de una familia real no alerta jamás**.
+   NextDNS no es un accesorio: es el único ojo del sistema. US$ 1,99/mes por familia.
+
+⚠ **Lo que NO entra, y ya está investigado dos veces:** listas de material de abuso (IWF, Arachnid,
+Safe Browsing) —el grooming pasa en las plataformas más populares— y los corpus de chats de
+predadores, que rompen la regla 2.
+
+### 🔴🔴 EL INFORME DE PERPLEXITY REPITIÓ EL MISMO ERROR QUE EN AGOSTO
+
+Él lo trajo el 28/8. **Vuelve a afirmar que PhishTank, URLhaus y OISD *"contienen dominios
+conocidos por alojar CSAM o sitios de grooming"*. Es FALSO, y ya estaba verificado acá desde el
+18/8.** Re-verificado ese día contra `oisd.nl`: bloquea **ads, phishing, malware, spyware,
+ransomware, cryptojacking y telemetría**, más una lista aparte de porno/gore. Ni una mención de
+CSAM ni de grooming. Encima inventa que OISD significa *"Open Internet Safety Data"*: el sitio no
+define la sigla en ningún lado.
+📌 **Sirve para abrir puertas, no para cerrar decisiones** — la pista de la API de NextDNS fue la
+que llevó a `nextdns/services`, que es de donde salió todo lo de arriba.
+
+---
+
+## 🤝 SANDRA ORTELLADO TRABAJA ACÁ DESDE EL 22/8 — Y LA UX/UI ES SUYA
+
+**`SanOrtellado` en GitHub.** Psicóloga y desarrolladora; se ofreció sola y no cobró. Tiene
+**permiso `write`**. 🔴 **Edgardo pidió expresamente que la UX/UI la haga ella y que nosotros no
+toquemos nada de eso** — la apuesta es la relación profesional, no la velocidad del producto.
+
+🔴 **`main` AHORA ESTÁ PROTEGIDA, y cambia cómo se publica:**
+
+| | |
+|---|---|
+| PR obligatorio | **sí**, con **cero aprobaciones** (ella mergea sola, sin esperar a nadie) |
+| `enforce_admins` | **false** — Edgardo (admin) **sigue pusheando directo a `main`** |
+| Bloqueado | push forzado y borrado de `main` |
+
+⚠ **`maintain` y `triage` no existen en repos personales.** Sólo hay `pull · push · admin`. La API
+acepta el PATCH y lo guarda como `write` igual.
+✅ **Para levantar el proyecto no hace falta ninguna clave:** sin Supabase cae al repositorio en
+memoria y sin NextDNS al simulador. `npm run dev -- -p 3007`.
+
+### 🔑 Lo que encontró, y es un diagnóstico y no una lista
+
+No encontró **el «por qué» de la alerta, los estados ni qué señales mira el sistema** — **las tres
+están construidas**. Lo que pidió como *"el cambio más importante"* es textual lo que ya genera el
+sistema y esconde detrás de «Ver el mensaje». Miró a las 19:34; el arreglo de esa ruta se publicó a
+las 17:26. **Lo tenía andando y no lo encontró igual.**
+🔴 **Tercera vez en una semana con el mismo patrón:** el asistente a 1.865 px · «Ver el mensaje»
+muerto cuatro días · el «por qué» invisible. **AntiGro tiene más de lo que muestra, y ese es el
+problema de fondo.**
+📌 Da en el clavo con nuestra propia norma en `Falta NEXTDNS_API_KEY`, `Falta CORREO_REMITENTE` y
+`alcance 0.00`: es **jerga sin traducir**. ⚠ Pero ese bloque **no se borra** —es la honestidad del
+sistema y sostiene el modo demo—: **se traduce**.
+
+---
+
+## 🎬 EL GUION DEL VIDEO — escrito el 22/8, falta grabarlo
+
+📌 `docs/guion-video-codercup.md` (fuente) · `docs/guion-video/guion-impreso.html` (maqueta A4) ·
+PDF en el Escritorio. **Sin commitear.**
+🔴 **1:56 de 2:00.** La voz son **256 palabras contadas** (114 s a 135 p/m) + 2 s de negro. La
+primera versión daba **2:19 y no entraba**. **Grabar la voz primero y cronometrarla.**
+🔴 **El bloque del producto va con captura de pantalla REAL, no con clips generados** — es lo único
+que prueba Ejecución. Y su punto 4 —«Ver el mensaje» abierto, con el «por qué» a la vista— **es el
+corazón del video**, justo lo que Sandra no encontró sola.
+⚠ La cifra de detenidos de la causa de Córdoba se mueve: la placa dice «al 22 de agosto de 2026».
+
+---
+
 ## 🔴 LO PRIMERO, HOY: LA CUENTA DE ANTHROPIC NO TIENE CRÉDITO
 
 **Toda la IA del sistema está caída por eso, y sólo por eso** — el asistente contesta el respaldo y
 la escalada manda texto de respaldo. La clave está bien; lo que falta es plata en la cuenta.
 **Hasta que se cargue, no tiene sentido mandarle el enlace a nadie a probar el asistente.**
+
+🔴 **Al 22/8 sigue igual, y ya no parece el banco:** *"hice otros pagos sin problema pero la consola
+de Anthropic no me recibe ahora mi cuenta"*. Verificado ese día contra producción —
+`POST /api/demo/mensajes` devuelve **`origen: "respaldo"`** en los dos textos. **Es la forma más
+rápida de comprobar si la IA volvió: si dice `respaldo`, sigue caída.**
+📌 **Camino alternativo si no se destraba:** la **API de Gemini es gratuita y no pide tarjeta**.
+Tocaría `redactar.ts`, `asistente.ts` y el control anti-invención. **No evaluado a fondo — Edgardo
+no lo pidió todavía.**
 📌 El detalle y por qué costó una sesión encontrarlo, en «EL ASISTENTE CAÍA AL RESPALDO».
 
 ---
@@ -38,6 +239,26 @@ sostienen el motor → Fuente 1», más abajo. **Ahí está todo, no reconstruir
 
 Edgardo lo autorizó en dos pasos: primero decidió qué hacer con el 43% (*«las dos cosas»*), y
 cuando apareció que el 74,3% tenía el mismo defecto: *«corregí lo que se tenga que corregir»*.
+
+> 🔴🔴 **CORRECCIÓN DEL 23/8/2026 — LA TABLA DE ABAJO ESTÁ MAL EN UN PUNTO CLAVE.**
+> Se verificó contra la fuente primaria (prensa del informe, 4/11/2021): **el informe del CIPDH,
+> en el marco de UNESCO, NO mide sólo bullying virtual.** Abarca ciberacoso, bullying virtual,
+> **grooming y pornografía infantil**, y **el 86,7% de sus casos corresponde a grooming y
+> pornografía infantil**. WhatsApp aparece en el **74,3% de esos casos** (el 25,7% restante se lo
+> reparten Instagram, Facebook, Twitter, Zoom y Telegram).
+> ➡ **El 74,3%, el 80%, el 90% y el 60% SE PUEDEN CITAR diciendo «de los casos»**, con la fuente al
+> pie: *CIPDH-UNESCO, 2021*. Lo que corresponde es nombrar de quién son, no re-rotularlos.
+> ⚠ **Salvedad honesta:** son cifras de **denuncias y causas judiciales** (6.000 denuncias en 2021,
+> 25 causas por día, ~30.000 desde 2012) más una encuesta telefónica de 2.654 casos en familias con
+> hijos de 5 a 15. «Más casos» mide en parte cuánto se denuncia, no sólo cuánto pasa.
+> 🔴 **El 63% sigue estando mal** y esa fila es correcta: es de El Litoral (2018) y además choca con
+> el «7 de cada 10» del informe LATAM. Ésa es la única que hay que cambiar.
+> 📌 **PENDIENTE, no se tocó:** la nota falsa está copiada en `src/lib/ia/reglas.ts` (donde 74,3 /
+> 80 / 90 quedaron EXCLUIDOS de `CIFRAS_CITABLES`, así que el asistente los trata como inventados y
+> cae al respaldo), `src/app/guia/page.tsx:418`, `src/lib/motor/evaluar.ts:11`,
+> `src/lib/motor/pesos.ts:232` y `:371`, `src/lib/datos/tipos.ts:132` y
+> `src/lib/senales/plataformas.ts:39`.
+
 
 | Decía el producto | Verdad | Qué se hizo |
 |---|---|---|
@@ -145,16 +366,21 @@ las pantallas"*. **Medido, y no era una impresión.**
 producto fuera la más difícil de encontrar es un defecto de producto, no de estilo: **si no la
 encuentran, el feedback no llega nunca.** Puede explicar por sí solo que hubiera cero charlas.
 
-✅ **`BotonDelAsistente`** en `mi-familia/page.tsx`: fijo abajo a la derecha, baja hasta la sección
-y **deja el cursor en el campo** —el que lo toca viene a escribir, y en el teléfono eso abre el
-teclado solo—. 🔑 **Se apaga cuando la sección ya está en pantalla**: un botón fijo que sigue ahí
-mientras escribís taparía el propio campo. Con `IntersectionObserver`, no con un `scroll` a mano.
+✅ **`BotonDelAsistente`** en `mi-familia/page.tsx`: **fijo abajo a la derecha y siempre visible**
+(ver el cambio del 24/8 más abajo), baja hasta **el campo** —no hasta el título de la sección— y
+**deja el cursor ahí**: el que lo toca viene a escribir, y en el teléfono eso abre el teclado solo.
+Salta con `scrollIntoView` sobre `#pregunta-al-asistente` y `block: "center"`, que deja la caja en
+el medio con el final de la charla arriba y el botón «Preguntar» abajo, los dos a la vista.
 📌 Respeta `prefers-reduced-motion`. 📌 Sólo vive en `/mi-familia`: en la home no hay familia ni
-informe, y en el recorrido todavía no hay nada que preguntar.
+informe, y en el recorrido todavía no hay nada que preguntar. 📌 **El `pb-28` del `<main>` es parte
+de esto:** sin ese colchón, un botón fijo tapa para siempre la esquina de abajo del final de la
+página.
 
-⚠ **Cómo se comprueba, porque el typecheck no lo ve:** con `viewport` de teléfono, logueado, que el
-botón se vea desde arriba de todo, que al tocarlo el foco quede en `#pregunta-al-asistente`, que la
-opacidad pase a 0 con la sección a la vista, y que desde ahí el asistente conteste de verdad.
+⚠ **Cómo se comprueba, porque el typecheck no lo ve:** con `viewport` de teléfono, logueado y **con
+una charla ya empezada** —que es donde se rompía—, que el botón se vea desde arriba de todo y no
+desaparezca en ningún punto del scroll, que al tocarlo la caja quede a la vista con el botón
+«Preguntar» incluido, que el foco quede en `#pregunta-al-asistente`, y que desde ahí el asistente
+conteste de verdad.
 
 ### 🔴 Y ESE MISMO DÍA TITILABA EN EL TELÉFONO — arreglado
 
@@ -184,6 +410,29 @@ vista, vuelve cuando quedó atrás, y sigue dejando el cursor en `#pregunta-al-a
 ⚠ **La lección, que sirve para cualquier cosa fija en el teléfono:** un umbral apoyado en el borde
 de la pantalla es un umbral que se mueve solo. Si algo prende y apaga por posición, las dos rayas
 tienen que estar separadas — y separadas por más de lo que mide la barra del navegador.
+
+### 🔴 Y EL 24/8 SE CAYÓ TODO EL PRENDER Y APAGAR — decisión de Edgardo
+
+**Volvió a levantarlo probándolo con una charla ya empezada:** *"no te deja justo ahí sino arriba de
+todo donde sólo se ve texto, se debe scrolear para encontrar esa caja"* y *"aparece y desaparece
+cuando scroleás hacia arriba o hacia abajo, DEBERÍA estar fijo"*.
+
+🔑 **Las dos quejas eran el MISMO bug, y el arreglo del 21/8 no lo había tocado: el código miraba la
+SECCIÓN cuando lo que importa es el CAMPO.** `#asistente` arranca con el título, sigue con la charla
+entera —que crece con cada respuesta— y recién al final tiene la caja de escribir. Con conversación
+cargada, ese `id` marca un punto que puede quedar a varias pantallas de lo único que el que apretó
+el botón vino a hacer. De ahí salían las dos cosas: **el salto** dejaba al lector mirando texto, y
+**el apagado** se disparaba cuando el borde de arriba de la sección llegaba a media pantalla, con la
+caja todavía dos pantallas más abajo. El botón se iba justo cuando más falta hacía y volvía recién
+al pasar la sección de largo.
+
+✅ **El botón ya no se esconde nunca.** Se cayeron el `useState` y los dos `IntersectionObserver`.
+El salto va a `#pregunta-al-asistente`, no a `#asistente`.
+
+⚠ **La lección del 21/8 sigue en pie y no se borra, pero servía para el problema equivocado:** no
+había que afinar el umbral, había que preguntarse **qué elemento hay que observar**. Un umbral bien
+calibrado sobre el elemento incorrecto sigue estando mal. Si algún día vuelve a hacer falta
+esconderlo, lo que se observa es el campo.
 
 ---
 
@@ -448,7 +697,7 @@ enlace del alta el 19/8 para que probaran **el asistente**. Lo que traigan entra
 | **Rama** | `fase-4-consola-y-observatorio`, y **`main` está sincronizada**. 🔴 Desde el 19/8 `main` ES producción: **un push ahí sale EN VIVO** |
 | **En producción** | `8ec4bd9`, **promovido y verificado EN VIVO el 20/8** (`main` fast-forward → deploy automático). Las 33 comprobaciones del navegador corrieron **contra `antigro.vercel.app`**, no contra localhost |
 | **La base** | ✅ 14 · 15 · 16 · 17 · 18 · **19** (el registro de accesos, aplicada y verificada el 20/8) |
-| **Verificación** | `npm run probar` — **383 comprobaciones** en 11 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte + **34 hogares**. **En verde** |
+| **Verificación** | `npm run probar` — **425 comprobaciones** en 12 tandas: 12 reglas + 11 sugerencias + 27 instalación + 23 turno + 15 tour + 91 términos + 73 cuestionario + 29 acuse + 33 escalada + 35 parte + 34 hogares + **42 plataformas**. **En verde** |
 | **En el navegador** | **`node prueba-entrar.mjs`** (la puerta: el logueo que fallaba en silencio y el ojo, 13 · **no escribe en la base**) · `node prueba-navegador.mjs` (el cuestionario) · `node prueba-puertas.mjs` (las dos entradas y la clave, 33) · `node prueba-acuse-circuito.mjs` (el acuse contra el webhook real) · `npx tsx preguntas-dia-uno.mjs` (lee respuestas reales del asistente). 🔑 Las tres primeras aceptan `SITIO=https://antigro.vercel.app` |
 | **Comprobado en vivo (19/8)** | `/` `/guia` `/terminos` `/entrar` dan 200 · **`/entrar` sin código NO dibuja «es mi primera vez» y con el enlace SÍ** (verificado en navegador) · el reloj da 401 sin secreto · el webhook 401 sin el suyo |
 | **En la base de producción** | **Una sola familia** (la sembrada), un chico (Ana) y dos usuarios: `demo@antigro.app` y `mariana@ejemplo.ar`. **Cero accesos, cero observaciones.** Verificado el 20/8 después de probar en vivo |
@@ -3288,7 +3537,7 @@ atribuidas por exactamente este motivo.
 
 | Cifra | De quién es de verdad |
 |---|---|
-| Argentina 2º de América Latina en ciberacoso infantil · **74,3% por WhatsApp** · **80%** nenas · **90%** acoso cotidiano durante meses · **60%** no se denuncia | **UNESCO/CIPDH, 2021 — y miden *bullying virtual*, no grooming** |
+| Argentina 2º de América Latina en ciberacoso infantil · **74,3% por WhatsApp** · **80%** nenas · **90%** acoso cotidiano durante meses · **60%** no se denuncia | **CIPDH-UNESCO, 2021.** 🔴 **Acá decía «miden bullying virtual, no grooming» y es FALSO** — verificado el 23/8 contra la fuente: el informe cubre grooming y **el 86,7% de sus casos SON grooming y pornografía infantil**. Se citan «de los casos», con la fuente al pie. Ver la corrección arriba |
 | **56,4%** habla con desconocidos · **35,4%** pedido de fotos | **Grooming Argentina**, n=4.276, 2019-2020 |
 | **63%** no sabe qué es el grooming | **El Litoral**, nota del 6/4/2018 |
 | **43%** dijo no hablar sobre los riesgos en Internet con sus padres | **Encuesta en 11 escuelas** de una ciudad |

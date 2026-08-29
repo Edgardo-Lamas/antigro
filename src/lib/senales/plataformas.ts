@@ -47,6 +47,8 @@
  *  no sirve el ranking. Por eso el sistema tiene que producir su propio dato.
  */
 
+import { SERVICIOS } from "./servicios.ts";
+
 export type Puerta =
   /**
    * 🔴 Un desconocido puede iniciar conversación sin que el chico le dé nada:
@@ -94,6 +96,37 @@ const CATALOGO: { patron: RegExp; puerta: Puerta; nombre: string }[] = [
   { patron: /(^|\.)instagram\.com$/i, puerta: "contacto_abierto", nombre: "Instagram" },
   { patron: /(^|\.)omegle|chatroulette/i, puerta: "contacto_abierto", nombre: "Chat con extraños" },
 
+  /* 🔴 **Facebook y Messenger — agregados el 28/8/2026, y eran la ausencia más
+     cara de este catálogo.** El Estudio nacional (Ministerio de Justicia, 2023)
+     los mide como el PRIMER medio de contacto en Argentina —**Facebook 52,8%**,
+     por encima de Instagram (33,1%) y de WhatsApp (30,7%)— y el Informe Grooming
+     LATAM los tiene entre las apps más usadas por los chicos de la región. Están
+     citados en el encabezado de este mismo archivo desde que se escribió: la
+     fuente estaba, la entrada no.
+
+     ➡ **Qué se rompía sin ellos, y no era un detalle cosmético.** Facebook caía
+     en `desconocida`, así que la secuencia *Facebook → WhatsApp* —el traslado
+     más frecuente que describe nuestra propia fuente— **no disparaba `esCruce`**.
+     La señal más filosa del motor era ciega justo en la plataforma número uno.
+
+     📌 **Los dos van en contacto abierto, no con la mensajería**, por la única
+     propiedad que gobierna este archivo: un desconocido puede escribirle sin que
+     el chico le entregue nada — el mensaje cae en «solicitudes de mensajes» y el
+     chico lo lee igual. Es el mismo motivo por el que Snapchat está acá arriba y
+     no abajo.
+
+     ⚠ **Y resuelve de paso un problema que es de red, no de criterio:** en el DNS,
+     Messenger comparte dominios con Facebook. Separarlos en dos puertas habría
+     hecho depender la lectura de una distinción que el filtro no siempre puede
+     hacer; en la misma puerta, esa ambigüedad no cambia el resultado.
+
+     📌 **`fbcdn.net` queda afuera a propósito.** Es infraestructura de contenido
+     y también se resuelve al abrir Instagram: meterlo llamaría «Facebook» a
+     tráfico que no lo es, y ensuciaría `plataforma_nueva` con un lugar que el
+     chico nunca eligió. */
+  { patron: /(^|\.)(facebook|fb)\.com$/i, puerta: "contacto_abierto", nombre: "Facebook" },
+  { patron: /(^|\.)messenger\.com$/i, puerta: "contacto_abierto", nombre: "Messenger" },
+
   /* ── Requieren entrega: el chico tiene que dar algo primero ── */
   { patron: /(^|\.)whatsapp\.(com|net)$/i, puerta: "requiere_entrega", nombre: "WhatsApp" },
   { patron: /(^|\.)telegram\.(org|me)$/i, puerta: "requiere_entrega", nombre: "Telegram" },
@@ -103,14 +136,68 @@ const CATALOGO: { patron: RegExp; puerta: Puerta; nombre: string }[] = [
   { patron: /(^|\.)youtube\.com$/i, puerta: "sin_contacto", nombre: "YouTube" },
 ];
 
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LOS DOMINIOS IMPORTADOS — 28/8/2026
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  Las entradas de arriba son NUESTRAS y siguen mandando; `servicios.ts` agrega
+ *  los 400 dominios (únicos, de 404 publicados) de las 43 plataformas que publica NextDNS (MIT). El detalle
+ *  de qué se importó, qué se descartó y por qué está en el encabezado de ese
+ *  archivo.
+ *
+ *  🔴 **El orden de búsqueda no es indiferente, y por eso el catálogo propio va
+ *  PRIMERO:** ahí viven decisiones tomadas y discutidas —WhatsApp es destino y
+ *  no lugar peligroso (15/8), Snapchat va con los abiertos y no con la
+ *  mensajería, Facebook y Messenger son contacto abierto (28/8)—. Si la lista
+ *  importada resolviera primero, un cambio de ellos podría voltear una decisión
+ *  nuestra **sin que nadie se entere**. Al revés no pasa: lo importado sólo
+ *  contesta donde nosotros no dijimos nada.
+ */
+
+/** Dominio exacto → qué es. Se arma una vez, al cargar el módulo. */
+const POR_DOMINIO = new Map<string, { nombre: string; puerta: Puerta }>();
+for (const servicio of SERVICIOS) {
+  for (const dominio of servicio.dominios) {
+    POR_DOMINIO.set(dominio, { nombre: servicio.nombre, puerta: servicio.puerta });
+  }
+  /* 🔑 La infraestructura se reconoce —así el observatorio no la levanta como un
+     lugar que nadie tiene catalogado— pero NUNCA hereda la puerta del servicio:
+     un CDN no es un lugar donde alguien te escribe. Ver `servicios.ts`. */
+  for (const dominio of servicio.infraestructura ?? []) {
+    POR_DOMINIO.set(dominio, { nombre: servicio.nombre, puerta: "sin_contacto" });
+  }
+}
+
+/**
+ * Busca el dominio y, si no está, va subiendo por el árbol: `www.roblox.com` →
+ * `roblox.com` → `com`. Así gana **la coincidencia más específica**, que es la
+ * que sabe más.
+ */
+function buscarImportado(dominio: string): { nombre: string; puerta: Puerta } | undefined {
+  let resto = dominio;
+  while (resto.length > 0) {
+    const encontrado = POR_DOMINIO.get(resto);
+    if (encontrado) return encontrado;
+    const punto = resto.indexOf(".");
+    if (punto < 0) return undefined;
+    resto = resto.slice(punto + 1);
+  }
+  return undefined;
+}
+
 export function puertaDe(dominio: string): Puerta {
   const limpio = dominio.trim().toLowerCase();
-  return CATALOGO.find((c) => c.patron.test(limpio))?.puerta ?? "desconocida";
+  const propio = CATALOGO.find((c) => c.patron.test(limpio));
+  if (propio) return propio.puerta;
+  return buscarImportado(limpio)?.puerta ?? "desconocida";
 }
 
 export function nombreDeLugar(dominio: string): string {
   const limpio = dominio.trim().toLowerCase();
-  return CATALOGO.find((c) => c.patron.test(limpio))?.nombre ?? limpio;
+  const propio = CATALOGO.find((c) => c.patron.test(limpio));
+  if (propio) return propio.nombre;
+  return buscarImportado(limpio)?.nombre ?? limpio;
 }
 
 /** ¿Es un lugar que nadie tiene catalogado? Lo que el observatorio prioriza. */
