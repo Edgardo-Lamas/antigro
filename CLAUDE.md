@@ -1521,6 +1521,23 @@ siempre tuvieron el 20 bien, **así que el PDF que circuló está bien.**
 🔑 **Las dos interfaces únicas —señales y datos— son lo que sostiene el modo demo.** Sin NextDNS y
 sin Supabase el sistema anda igual y **lo dice en pantalla**. No romperlas.
 
+### 🔴🔴 UN DEPLOY DESDE LA MÁQUINA DEJA PRODUCCIÓN ADELANTE DE GIT — 28/8
+
+**Pasó, y se revirtió solo un arreglo que funcionaba.** El botón del asistente (24/8) se desplegó
+desde el working tree de Edgardo **sin commitear**. O sea: producción lo tenía, el repositorio no.
+El push del 28/8 subió `main` —que seguía con el `IntersectionObserver` viejo— y **lo pisó en
+silencio**. Estuvo ~7 minutos con el comportamiento viejo hasta que él lo levantó: *"el botón
+flotante ya está en producción desde el lunes"*.
+
+🔴 **Y mi diagnóstico estaba mal por mirar el lugar equivocado:** dije «producción no lo tiene»
+leyendo `git`, que es una inferencia, no una verificación. **Lo que está en producción se pregunta
+en producción** — `npx vercel ls` muestra la edad y el origen de cada deploy, y ahí se veía el del
+lunes.
+
+✅ **La regla: lo que se despliega, se commitea.** Un deploy desde el working tree deja a git
+atrasado, y el siguiente push de cualquiera —nuestro o de Sandra— revierte ese trabajo sin que
+nada se ponga rojo. No hay typecheck ni tanda que lo pueda ver.
+
 ### 🔴 Cómo se publica, porque NO es automático
 
 ```
