@@ -268,7 +268,7 @@ function Puerta() {
                 🔑 **Las declaraciones van a la VISTA, no detrás del enlace.**
                 Son la única parte del documento que compromete al que lo
                 acepta, y esconderlas atrás de un «leí y acepto» las
-                convertiría en la letra chica que estos términos no son.
+                convertiría en la letra pequeña que estos términos no son.
                 El documento entero sigue a un clic, en otra pestaña para no
                 perder lo escrito.
 

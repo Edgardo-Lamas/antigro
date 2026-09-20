@@ -1,3 +1,4 @@
+import { ayudaDeSiempre, PAIS_POR_DEFECTO } from "@/lib/paises";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -164,8 +165,8 @@ export async function POST(req: Request) {
         texto:
           "Estuvimos hablando bastante seguido y necesito un rato. " +
           `Volvé en ${Math.ceil(turno.esperaSeg / 60)} minutos y seguimos.\n\n` +
-          "Si es algo que no puede esperar, el teléfono ANAR de la Familia, 600 50 51 52, " +
-          "atiende las 24 horas.",
+          `Si es algo que no puede esperar, ${ayudaDeSiempre("adulto", PAIS_POR_DEFECTO).nombre} ` +
+          `(${ayudaDeSiempre("adulto", PAIS_POR_DEFECTO).telefono}) atiende las 24 horas.`,
         origen: "respaldo",
         causa: "limite",
         motivos: ["Demasiadas preguntas seguidas."],

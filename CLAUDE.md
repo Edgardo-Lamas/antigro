@@ -21,6 +21,38 @@ que vosea y deriva a la Línea 137 se lee como algo que no fue hecho para él.
 se trata de disimular de dónde es él —eso va en la inscripción, y no hay nada que esconder—: se
 trata de que el usuario español lea su idioma.
 
+### 🌍 LA CAPA DE PAÍS — `src/lib/paises.ts`. La idea es de Edgardo, del 19/9
+
+**Yo venía a borrar el material argentino y reemplazarlo por el español. Él lo frenó:** *"¿por qué
+en lugar de eliminar las citas del Ministerio de Justicia de Argentina, dejamos las dos opciones y
+el agente debería usar según sea el país?"*. **Tenía razón: ese material está verificado y no está
+mal, está en otro país.**
+
+🔑 **Lo que gana el producto no es ahorro de trabajo.** El motor no cambia ni una línea entre un
+país y otro: lo único que cambia es **a quién se llama y qué artículo se cita**. AntiGro deja de
+ser un producto argentino traducido y pasa a ser un motor con una capa de país que son datos.
+
+🔴🔴 **LA REGLA QUE HACE QUE ESTO NO SEA UN PELIGRO: el país lo elige el CÓDIGO, antes de armar el
+prompt, y el modelo recibe UNA sola lista.** Pasarle las dos con un «usá la que corresponda» es
+cuestión de tiempo hasta que le dé a un padre de Madrid la Línea 137. Un teléfono que no atiende,
+dado en el peor momento, no falla ruidosamente como un error de código: falla en silencio, y del
+otro lado hay alguien esperando que alguien atienda.
+
+**Qué quedó por país:** los recursos (`RECURSOS_POR_PAIS`), el marco legal, **las normas**
+(`NORMAS_POR_PAIS`), las recomendaciones de organismos (`FUENTES_POR_PAIS`) **y el idioma de los
+dos prompts** — el asistente tutea en España y vosea en Argentina, y lo dice el prompt.
+
+🔑 **En `legal.ts` el `id` dejó de ser la norma y pasó a ser el CONCEPTO.** Antes `ley-26061-10`,
+ahora `intimidad-del-menor`, y cada país trae su artículo. Por eso los términos de uso se escriben
+una sola vez. 🔴 `terminos.prueba.ts` verifica que **todos los conceptos que citan los términos
+existan en TODOS los países**: un país al que le falte uno no se habilita, porque el documento
+quedaría citando el aire.
+
+📌 **`PAIS_POR_DEFECTO = "ES"`** y por ahora el país no se elige en el alta: el hogar todavía no
+guarda de qué país es. Cuando se agregue ese campo, esto pasa a ser sólo su valor por defecto.
+⚠ **La costura conocida:** la capa cubre los DATOS. El texto fijo de la interfaz está en peninsular
+para todos — sacarlo a un archivo de traducciones no entraba antes del 24/9.
+
 ### ✅ Los entes y las normas, hechos y verificados en fuente oficial
 
 🔴 **Cada teléfono y cada artículo se abrió en su fuente el 19/9** —`incibe.es`, `anar.org`,
@@ -70,9 +102,10 @@ alguno vuelve a aprobar, el control se aflojó: no son pruebas de estilo. **17 d
 
 ### ⬜ Lo que falta de España (en este orden)
 
-1. **`src/lib/ia/recomendaciones.ts`** — los consejos siguen siendo del Ministerio de Justicia
-   argentino y de Con Vos en la Web. Hay que traer los de **INCIBE/IS4K, ANAR y Save the Children
-   España**, 🔴 textuales y con enlace, como está hecho hoy.
+1. **Los consejos de organismos españoles.** `FUENTES_POR_PAIS.ES` está **vacío a propósito**, y
+   el prompt lo dice en voz alta: le prohíbe al agente presentar un consejo como respaldado y le
+   prohíbe citar organismos de otro país. Faltan traer, 🔴 textuales y con enlace: **INCIBE/IS4K**,
+   **ANAR** y **Save the Children España**. Los argentinos quedaron intactos en `FUENTES_POR_PAIS.AR`.
 2. **El barrido de voseo de la interfaz** — quedan unas 30 apariciones en pantallas y textos del
    panel, el alta, la consola y el tour. Los mensajes al chico y el prompt del asistente ya están.
 3. **Las cifras** — el corpus es argentino (Estudio nacional, Grooming Argentina). El material

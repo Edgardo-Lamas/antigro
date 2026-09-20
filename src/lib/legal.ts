@@ -37,6 +37,8 @@
  * cuenta. Una ruta de API que importa de una pantalla es la clase de enredo que
  * después nadie se anima a tocar.
  */
+import type { Pais } from "@/lib/paises";
+
 export const VERSION_DE_LOS_TERMINOS = "2026-09-19";
 
 export interface NormaCitada {
@@ -60,7 +62,24 @@ export interface NormaCitada {
  * cómo se reparte entre los padres, y al final lo que le toca al que ofrece el
  * servicio. Es el mismo orden en que lo lee una familia.
  */
-export const NORMAS: NormaCitada[] = [
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LAS NORMAS, PAÍS POR PAÍS — así desde el 19/9
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔑 **El `id` dejó de ser la norma y pasó a ser el CONCEPTO.** Antes se
+ * llamaba `ley-26061-10`; ahora se llama `intimidad-del-menor`, y cada país
+ * trae la suya para ese mismo concepto. Es lo que permite que los términos de
+ * uso se escriban una sola vez: el documento cita «acá va lo de la intimidad
+ * del menor» y el país pone el artículo.
+ *
+ * 🔴 **Los conceptos que citan los términos tienen que existir en TODOS los
+ * países.** Lo verifica `terminos.prueba.ts`: un país al que le falte uno no
+ * puede habilitarse, porque el documento quedaría citando el aire.
+ */
+export const NORMAS_POR_PAIS: Record<Pais, NormaCitada[]> = {
+  /* ── España — verificado en el BOE y en EUR-Lex el 19/9 ─────────────────── */
+  ES: [
   {
     /**
      * 🔑 **Es la que mejor sostiene el producto entero, y es más fuerte que su
@@ -70,7 +89,7 @@ export const NORMAS: NormaCitada[] = [
      * ninguna ley de datos. AntiGro no lee ninguno — y acá está por qué eso no
      * es una limitación técnica, es la forma correcta de hacerlo.
      */
-    id: "lo-1-1996-4",
+    id: "intimidad-del-menor",
     norma: "Ley Orgánica 1/1996 de Protección Jurídica del Menor",
     articulo: "Art. 4.1",
     titulo: "Derecho al honor, a la intimidad y a la propia imagen",
@@ -87,7 +106,7 @@ export const NORMAS: NormaCitada[] = [
      * ese párrafo con «las orientación sexuales», una errata del DOUE que no
      * vamos a reproducir en pantalla ni a corregir por nuestra cuenta.
      */
-    id: "rgpd-9-1",
+    id: "datos-sensibles",
     norma: "Reglamento (UE) 2016/679 — RGPD",
     articulo: "Art. 9.1",
     titulo: "Categorías especiales de datos",
@@ -110,7 +129,7 @@ export const NORMAS: NormaCitada[] = [
      * y no habría permiso de los padres que lo arreglara. Por eso el sistema no
      * lo afirma en ningún lado: no es prudencia, es que no se puede.
      */
-    id: "lopdgdd-9",
+    id: "prohibido-archivar-sensibles",
     norma: "Ley Orgánica 3/2018 — LOPDGDD",
     articulo: "Art. 9.1",
     titulo: "El consentimiento no basta para los datos más sensibles",
@@ -133,7 +152,7 @@ export const NORMAS: NormaCitada[] = [
      * preguntarle. 📌 La banda 14-17 del sistema ya cae justo en ese corte, por
      * casualidad: el producto estaba bien preparado sin saberlo.
      */
-    id: "lopdgdd-7",
+    id: "consentimiento-del-menor",
     norma: "Ley Orgánica 3/2018 — LOPDGDD",
     articulo: "Art. 7",
     titulo: "Consentimiento de los menores de edad",
@@ -152,7 +171,7 @@ export const NORMAS: NormaCitada[] = [
      * potestad se ejerce conjuntamente, y dar de alta a un hijo en un sistema
      * que va a avisar sobre él es un acto de esa potestad.
      */
-    id: "cc-156",
+    id: "responsabilidad-parental",
     norma: "Código Civil",
     articulo: "Art. 156, párrafo primero",
     titulo: "La patria potestad se ejerce conjuntamente",
@@ -170,7 +189,7 @@ export const NORMAS: NormaCitada[] = [
      * 📌 Se cita en los términos, no en el panel: a un padre asustado no se le
      * recuerda su obligación legal, se le da un teléfono.
      */
-    id: "lopivi-15",
+    id: "deber-de-comunicar",
     norma: "Ley Orgánica 8/2021 de protección integral a la infancia y la adolescencia frente a la violencia",
     articulo: "Art. 15",
     titulo: "Deber de comunicación de la ciudadanía",
@@ -191,7 +210,7 @@ export const NORMAS: NormaCitada[] = [
      * protege, y encima deja al proveedor explicando por qué la escribió. Lo que
      * protege es describir con precisión qué hace el sistema.
      */
-    id: "trlgdcu-86",
+    id: "clausulas-abusivas",
     norma: "Texto refundido de la Ley General para la Defensa de los Consumidores y Usuarios (RDL 1/2007)",
     articulo: "Art. 86",
     titulo: "Cláusulas abusivas por limitar los derechos básicos",
@@ -203,7 +222,139 @@ export const NORMAS: NormaCitada[] = [
     url: "https://www.boe.es/buscar/act.php?id=BOE-A-2007-20555",
     verificado: "2026-09-19",
   },
-];
+  {
+    /**
+     * 🔑 **El que cubre lo que en Argentina dice el art. 654.** Allá hay un
+     * «deber de informar» al otro progenitor escrito con todas las letras; acá
+     * no existe ese artículo, y lo que lo sostiene es que la patria potestad es
+     * una función que se ejerce **en interés del hijo** y comprende velar por
+     * él. 📌 No es lo mismo y no se cita como si lo fuera: por eso el texto va
+     * entero y la conclusión la saca quien lea.
+     */
+    id: "deberes-de-los-padres",
+    norma: "Código Civil",
+    articulo: "Art. 154",
+    titulo: "Qué comprende la patria potestad",
+    texto:
+      "La patria potestad, como responsabilidad parental, se ejercerá siempre en interés de los " +
+      "hijos e hijas, de acuerdo con su personalidad, y con respeto a sus derechos, su integridad " +
+      "física y mental. Esta función comprende los siguientes deberes y facultades: 1.º Velar por " +
+      "ellos, tenerlos en su compañía, alimentarlos, educarlos y procurarles una formación integral.",
+    url: "https://www.boe.es/buscar/act.php?id=BOE-A-1889-4763",
+    verificado: "2026-09-19",
+  },
+  ],
+
+  /* ── Argentina — lo que el producto ya tenía, verificado el 18/8 ─────────── */
+  AR: [
+  {
+    id: "intimidad-del-menor",
+    norma: "Ley 26.061 — Protección Integral de los Derechos de Niñas, Niños y Adolescentes",
+    articulo: "Art. 10",
+    titulo: "Derecho a la vida privada e intimidad familiar",
+    texto:
+      "Las niñas, niños y adolescentes tienen derecho a la vida privada e intimidad de y en la " +
+      "vida familiar. Estos derechos no pueden ser objeto de injerencias arbitrarias o ilegales.",
+    url: "https://servicios.infoleg.gob.ar/infolegInternet/anexos/110000-114999/110778/norma.htm",
+    verificado: "2026-08-18",
+  },
+  {
+    id: "datos-sensibles",
+    norma: "Ley 25.326 — Protección de los Datos Personales",
+    articulo: "Art. 2",
+    titulo: "Qué son datos sensibles",
+    texto:
+      "Datos sensibles: Datos personales que revelan origen racial y étnico, opiniones políticas, " +
+      "convicciones religiosas, filosóficas o morales, afiliación sindical e información " +
+      "referente a la salud o a la vida sexual.",
+    url: "https://servicios.infoleg.gob.ar/infolegInternet/anexos/60000-64999/64790/texact.htm",
+    verificado: "2026-08-18",
+  },
+  {
+    /**
+     * 🔴 **Esta es la que más obliga al diseño, y hay que leerla despacio.**
+     * Dice «directa o indirectamente». Un registro que afirmara que un chico
+     * está siendo víctima de un delito sexual revelaría, indirectamente, un
+     * dato sensible sobre un menor. Por eso el sistema no lo afirma en ningún
+     * lado: no es sólo prudencia, es que **formar ese archivo está prohibido**.
+     */
+    id: "prohibido-archivar-sensibles",
+    norma: "Ley 25.326 — Protección de los Datos Personales",
+    articulo: "Art. 7, incs. 1 y 3",
+    titulo: "Datos sensibles: nadie está obligado, y no se pueden archivar",
+    texto:
+      "1. Ninguna persona puede ser obligada a proporcionar datos sensibles. […] " +
+      "3. Queda prohibida la formación de archivos, bancos o registros que almacenen información " +
+      "que directa o indirectamente revele datos sensibles.",
+    url: "https://servicios.infoleg.gob.ar/infolegInternet/anexos/60000-64999/64790/texact.htm",
+    verificado: "2026-08-18",
+  },
+  {
+    id: "responsabilidad-parental",
+    norma: "Código Civil y Comercial de la Nación",
+    articulo: "Art. 641, inc. b",
+    titulo: "Ejercicio de la responsabilidad parental cuando los padres no conviven",
+    texto:
+      "En caso de cese de la convivencia, divorcio o nulidad de matrimonio, a ambos progenitores. " +
+      "Se presume que los actos realizados por uno cuentan con la conformidad del otro, con las " +
+      "excepciones del artículo siguiente. Por voluntad de los progenitores o por decisión " +
+      "judicial, en interés del hijo, el ejercicio se puede atribuir a sólo uno de ellos, o " +
+      "establecerse distintas modalidades.",
+    url: "https://leyes-ar.com/codigo_civil_y_comercial/641.htm",
+    verificado: "2026-08-18",
+  },
+  {
+    /**
+     * 🔑 **El artículo que sostiene la segunda puerta.** Que el otro progenitor
+     * pueda entrar no es una gentileza del que se dio de alta primero: cómo
+     * está el hijo es «cuestión relativa a la persona del hijo», y sobre eso
+     * hay un deber de informar que no depende de cómo se lleven entre ellos.
+     */
+    id: "deberes-de-los-padres",
+    norma: "Código Civil y Comercial de la Nación",
+    articulo: "Art. 654",
+    titulo: "Deber de informar",
+    texto:
+      "Cada progenitor debe informar al otro sobre cuestiones de educación, salud y otras " +
+      "relativas a la persona y bienes del hijo.",
+    url: "https://leyes-ar.com/codigo_civil_y_comercial/654.htm",
+    verificado: "2026-08-18",
+  },
+  {
+    /**
+     * 🔴 **Está acá para que nadie escriba nunca una cláusula que nos exima.**
+     * La tentación de un producto que avisa sobre chicos es cubrirse con letra
+     * chica; el art. 37 dice que esa letra chica **se tiene por no convenida**.
+     * O sea: no protege, y de paso deja al proveedor explicando por qué la
+     * escribió. Lo que protege es describir con precisión qué hace el sistema.
+     *
+     * ⚠ Verificado además que sigue vigente: la Disposición 753/2025 derogó la
+     * Resolución 9/2004, que listaba cláusulas abusivas para medicina prepaga,
+     * telefonía móvil y servicios financieros. No alcanza a este artículo.
+     */
+    id: "clausulas-abusivas",
+    norma: "Ley 24.240 — Defensa del Consumidor",
+    articulo: "Art. 37",
+    titulo: "Cláusulas que se tienen por no convenidas",
+    texto:
+      "Sin perjuicio de la validez del contrato, se tendrán por no convenidas: a) Las cláusulas " +
+      "que desnaturalicen las obligaciones o limiten la responsabilidad por daños; b) Las " +
+      "cláusulas que importen renuncia o restricción de los derechos del consumidor o amplíen " +
+      "los derechos de la otra parte; c) Las cláusulas que contengan cualquier precepto que " +
+      "imponga la inversión de la carga de la prueba en perjuicio del consumidor.",
+    url: "https://proconsumer.org.ar/art-37/",
+    verificado: "2026-08-18",
+  },  ],
+};
+
+/**
+ * 🔴 **El país va siempre explícito, sin valor por defecto.** No es purismo:
+ * una norma que se resuelve sola es una norma que alguien va a citar sin saber
+ * de qué país la sacó, y estas citas van en un documento que la gente firma.
+ */
+export function normasDe(pais: Pais): NormaCitada[] {
+  return NORMAS_POR_PAIS[pais];
+}
 
 /**
  * Busca una norma por `id`.
@@ -213,8 +364,10 @@ export const NORMAS: NormaCitada[] = [
  * y el respaldo desaparecido. Que falle en el build es la forma barata de que
  * no llegue así a producción.
  */
-export function norma(id: string): NormaCitada {
-  const encontrada = NORMAS.find((n) => n.id === id);
-  if (!encontrada) throw new Error(`No existe la norma citada «${id}»`);
+export function norma(id: string, pais: Pais): NormaCitada {
+  const encontrada = normasDe(pais).find((n) => n.id === id);
+  if (!encontrada) {
+    throw new Error(`«${pais}» no tiene ninguna norma para el concepto «${id}»`);
+  }
   return encontrada;
 }

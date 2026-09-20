@@ -18,6 +18,7 @@
  * del arte del estudio, no medido por el estudio.
  */
 
+import { ayudaDeSiempre, PAIS_POR_DEFECTO } from "../paises.ts";
 import type { BandaDeEdad } from "@/lib/config";
 import type { Estado } from "@/lib/motor";
 
@@ -33,6 +34,22 @@ export interface TextoParaElChico {
  * Se deriva directo al adulto de confianza — a esta edad el teléfono de ayuda
  * lo llama un adulto, no el chico.
  */
+/**
+ * 🔴🔴 **El teléfono NO se escribe a mano en estos textos.** Son los mensajes
+ * que salen cuando la IA no contesta, o sea justo los que nadie vuelve a leer
+ * hasta que algo falla. Un número viejo, o el de otro país, sobrevive años en
+ * un texto de respaldo sin que nadie lo note. Sale de `paises.ts` o no sale.
+ */
+const TELEFONO_DEL_CHICO = [
+  ayudaDeSiempre("chico", PAIS_POR_DEFECTO).nombre,
+  ayudaDeSiempre("chico", PAIS_POR_DEFECTO).telefono,
+].join(": ") + ". Gratis, las 24 horas, y te atiende un psicólogo.";
+
+function telefonoDelAdulto(): string {
+  const r = ayudaDeSiempre("adulto", PAIS_POR_DEFECTO);
+  return `${r.nombre}${r.telefono ? ` (${r.telefono})` : ""}`;
+}
+
 const BANDA_7_10: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
   atencion: {
     texto:
@@ -60,7 +77,7 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "Si te está pasando algo, no has hecho nada malo.",
     derivacion: [
       "Cuéntaselo a un adulto de confianza.",
-      "Teléfono ANAR: 900 20 20 10. Gratis, las 24 horas, y te atiende un psicólogo.",
+      TELEFONO_DEL_CHICO,
     ],
   },
   patron_sostenido: {
@@ -71,7 +88,7 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "Cuéntaselo hoy a alguien mayor.",
     derivacion: [
       "Cuéntaselo a un adulto de confianza.",
-      "Teléfono ANAR: 900 20 20 10. Gratis, las 24 horas, y te atiende un psicólogo.",
+      TELEFONO_DEL_CHICO,
     ],
   },
 };
@@ -90,7 +107,7 @@ const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "y es un delito. Tú no has hecho nada mal. Tienes a quién acudir, y eliges tú a quién.",
     derivacion: [
       "El adulto que elegiste tú cuando se dio de alta el sistema.",
-      "Teléfono ANAR: 900 20 20 10. Gratis, las 24 horas, y te atiende un psicólogo.",
+      TELEFONO_DEL_CHICO,
       "Se puede denunciar, y no hace falta tener pruebas para preguntar.",
     ],
   },
@@ -102,7 +119,7 @@ const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "más de lo que parece y casi nadie lo cuenta. Eliges tú a quién acudir.",
     derivacion: [
       "El adulto que elegiste tú cuando se dio de alta el sistema.",
-      "Teléfono ANAR: 900 20 20 10. Gratis, las 24 horas, y te atiende un psicólogo.",
+      TELEFONO_DEL_CHICO,
       "Se puede denunciar, y no hace falta tener pruebas para preguntar.",
     ],
   },
@@ -147,7 +164,7 @@ export function respaldoParaLosAdultos(datos: {
     "",
     datos.estado === "patron_sostenido"
       ? "Qué hacer ahora: hablar con él o ella, sin acusar y sin mostrarle esto como una prueba. " +
-        "Si hace falta orientación, el teléfono ANAR de la Familia (600 50 51 52) atiende gratis las 24 horas."
+        `Si hace falta orientación, ${telefonoDelAdulto()} atiende gratis.`
       : "Qué hacer ahora: nada urgente. Vale la pena estar atento estos días.",
   ].join("\n");
 }

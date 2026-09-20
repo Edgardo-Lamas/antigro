@@ -109,7 +109,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Los datos que sí se guardan son los que cargó la familia —el nombre y la edad del chico, " +
         "quiénes son los adultos— y lo que el sistema fue observando y respondiendo.",
     ],
-    normas: ["lo-1-1996-4", "rgpd-9-1", "lopdgdd-9"],
+    normas: ["intimidad-del-menor", "datos-sensibles", "prohibido-archivar-sensibles"],
   },
   {
     id: "quien-da-de-alta",
@@ -154,7 +154,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Que si hay una medida judicial sobre el cuidado del chico, la voy a respetar al decidir " +
         "quién entra.",
     ],
-    normas: ["cc-156", "lopdgdd-7"],
+    normas: ["responsabilidad-parental", "deberes-de-los-padres"],
   },
   {
     id: "registro",
@@ -189,7 +189,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
     declaraciones: [
       "Que el chico va a saber que AntiGro está funcionando, en los términos que su edad permita.",
     ],
-    normas: ["lo-1-1996-4"],
+    normas: ["intimidad-del-menor"],
   },
   {
     id: "baja",
@@ -204,7 +204,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Cualquiera puede pedir ver, corregir o borrar sus datos. Es un derecho que da la ley de " +
         "protección de datos personales, no una concesión nuestra.",
     ],
-    normas: ["rgpd-9-1"],
+    normas: ["datos-sensibles"],
   },
   {
     id: "limites",
@@ -223,7 +223,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Este texto no es asesoramiento legal. Las normas que se citan están enlazadas a su fuente " +
         "para que cualquiera las lea completas.",
     ],
-    normas: ["trlgdcu-86"],
+    normas: ["clausulas-abusivas"],
   },
 ];
 

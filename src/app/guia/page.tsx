@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
-import { COMO_FUNCIONA, MARCO_LEGAL, PRODUCTO, RECURSOS } from "@/lib/config";
+import { COMO_FUNCIONA, PRODUCTO } from "@/lib/config";
+import { marcoLegalDe, NOMBRE_DEL_PAIS, PAIS_POR_DEFECTO, recursosDe } from "@/lib/paises";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -544,11 +545,13 @@ export default function Guia() {
           </div>
 
           <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
-            <p className="text-sm font-semibold text-tinta">Marco legal</p>
+            <p className="text-sm font-semibold text-tinta">
+              Marco legal — {NOMBRE_DEL_PAIS[PAIS_POR_DEFECTO]}
+            </p>
             <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
-              <li>· {MARCO_LEGAL.cp183}</li>
-              <li>· {MARCO_LEGAL.lopivi}</li>
-              <li>· {MARCO_LEGAL.consentimiento}</li>
+              <li>· {marcoLegalDe().grooming}</li>
+              <li>· {marcoLegalDe().proteccion}</li>
+              <li>· {marcoLegalDe().datos}</li>
             </ul>
           </div>
 
@@ -572,32 +575,32 @@ export default function Guia() {
       {/* ── A dónde recurrir ─────────────────────────────────────────────── */}
       <Seccion
         titulo="Cuando la respuesta correcta no es un sistema"
-        bajada="Está escrito en el producto y no en la letra chica: cuando lo que hace falta es un adulto o un organismo, el sistema lo dice."
+        bajada="Está escrito en el producto y no en la letra pequeña: cuando lo que hace falta es un adulto o un organismo, el sistema lo dice."
       >
         <div className="flex flex-col gap-3">
-          {/* 🔑 El orden no es alfabético: es el de la hora y la situación. Primero
-              el que más sabe del problema, después el que atiende de madrugada,
-              después el que retira el contenido, y la denuncia al final. */}
-          <Ficha
-            que={`${RECURSOS.incibe.nombre} — ${RECURSOS.incibe.queEs}`}
-            detalle={`${RECURSOS.incibe.detalle}. ${RECURSOS.incibe.horario}. WhatsApp ${RECURSOS.incibe.whatsapp} · Telegram ${RECURSOS.incibe.telegram}.`}
-          />
-          <Ficha
-            que={`${RECURSOS.anarFamilia.nombre} — ${RECURSOS.anarFamilia.telefono}`}
-            detalle={`${RECURSOS.anarFamilia.queEs}. ${RECURSOS.anarFamilia.detalle}. ${RECURSOS.anarFamilia.horario}.`}
-          />
-          <Ficha
-            que={`${RECURSOS.anarMenor.nombre} — ${RECURSOS.anarMenor.telefono}`}
-            detalle={`Este es para tu hijo, no para ti: puede llamar él mismo, gratis y en confianza. Desde algunas comunidades también funciona el ${RECURSOS.anarMenor.telefonoEuropeo}, el número europeo de ayuda a la infancia.`}
-          />
-          <Ficha
-            que={RECURSOS.aepd.nombre}
-            detalle={`${RECURSOS.aepd.detalle}. Un adolescente de 14 a 17 años puede acudir por sí mismo — ${RECURSOS.aepd.url}`}
-          />
-          <Ficha
-            que={`${RECURSOS.policia.nombre} — ${RECURSOS.policia.telefono}`}
-            detalle={`${RECURSOS.policia.detalle}: ${RECURSOS.policia.correo}. En una emergencia, ${RECURSOS.policia.emergencias}.`}
-          />
+          {/* 🔑 El orden no es alfabético: es el de la hora y la situación, y sale
+              tal cual del país que esté puesto. Escribir las fichas a mano era
+              lo que hacía que agregar un país fuera tocar esta pantalla. */}
+          {recursosDe().map((r) => (
+            <Ficha
+              key={r.id}
+              que={[r.nombre, r.telefono].filter(Boolean).join(" — ")}
+              detalle={[
+                r.queEs,
+                r.detalle + ".",
+                r.horario ? r.horario + "." : null,
+                r.whatsapp ? `WhatsApp ${r.whatsapp}` + (r.telegram ? ` · Telegram ${r.telegram}.` : ".") : null,
+                r.telefonoAlterno ? `También ${r.telefonoAlterno}.` : null,
+                r.correo ? `${r.correo}.` : null,
+                r.para.includes("chico") && !r.para.includes("adulto")
+                  ? "🔴 Este es para tu hijo, no para ti: puede acudir él mismo."
+                  : null,
+                r.url ?? null,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            />
+          ))}
         </div>
       </Seccion>
 

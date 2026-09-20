@@ -47,6 +47,7 @@
 
 import type { Lectura } from "@/lib/motor";
 import type { QuienLoVio } from "./acuse";
+import { ayudaConHorario, ayudaDeSiempre, PAIS_POR_DEFECTO, type Pais } from "../paises.ts";
 
 /**
  * Cuánto se espera antes de insistir.
@@ -178,6 +179,23 @@ export function decidirEscalada({
  * 🔑 **Y no afirma nada nuevo** (regla 1): dice que se avisó, que nadie lo
  * abrió, y que lo que se veía se sigue viendo. Ni un diagnóstico ni un reproche.
  */
+/**
+ * 🔴 A quién llamar, sacado del país. El aviso de escalada es el mensaje que
+ * llega cuando el primero no lo abrió nadie: el teléfono que lleva tiene que
+ * ser el del país de esa familia, no el que estaba escrito cuando se programó.
+ */
+function aQuienLlamar(pais: Pais = PAIS_POR_DEFECTO): string {
+  const siempre = ayudaDeSiempre("adulto", pais);
+  const conHorario = ayudaConHorario("adulto", pais);
+  const partes = [
+    conHorario
+      ? `${conHorario.nombre}${conHorario.telefono ? ` (${conHorario.telefono})` : ""}, ${(conHorario.horario ?? "").toLowerCase()}`
+      : null,
+    `${siempre.nombre}${siempre.telefono ? `, ${siempre.telefono}` : ""}, ${(siempre.horario ?? "las 24 horas").toLowerCase()}`,
+  ].filter(Boolean);
+  return partes.join(", o ");
+}
+
 export function textoDeLaEscalada(
   chico: string,
   horasDesdeElAviso: number,
@@ -196,7 +214,6 @@ export function textoDeLaEscalada(
       : "") +
     "No hace falta que hagas nada por acá: con abrir el panel alcanza. " +
     "Si el momento es malo, el aviso te va a estar esperando ahí.\n\n" +
-    "Si algo te da mala espina y quieres hablarlo con alguien: el 017 del INCIBE, de 8:00 " +
-    "a 23:00, o el teléfono ANAR de la Familia, 600 50 51 52, las 24 horas."
+    `Si algo te da mala espina y quieres hablarlo con alguien: ${aQuienLlamar()}.`
   );
 }

@@ -24,6 +24,8 @@
  *  especialistas de nuestro material. Cuando llegue esa revisión, entra acá.
  */
 
+import { NOMBRE_DEL_PAIS, PAIS_POR_DEFECTO, type Pais } from "@/lib/paises";
+
 export type Momento =
   /** Antes de que pase nada. Es donde vive la regla 4. */
   | "prevencion"
@@ -47,7 +49,28 @@ export interface Fuente {
   recomendaciones: Recomendacion[];
 }
 
-export const FUENTES: Fuente[] = [
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  POR PAÍS desde el 19/9 — y acá está el motivo entero de la capa
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔑 **Esto es lo que salvó Edgardo.** Yo venía a reemplazar estas fuentes
+ * argentinas por las españolas, o sea a borrarlas. Él preguntó por qué no
+ * quedaban las dos y elegía el agente según el país. El material está
+ * verificado y no está mal: está en otro país.
+ *
+ * 🔴 **Un consejo respaldado por un organismo del Estado vale distinto que una
+ * opinión bien escrita — pero sólo si es el Estado de quien lo lee.** Citarle
+ * el Ministerio de Justicia argentino a un padre de Sevilla no es un problema
+ * de localización: es citar una autoridad que ahí no lo es.
+ *
+ * ⬜ **España está vacío todavía**, y el prompt lo dice en voz alta en vez de
+ * disimularlo (ver `recomendacionesParaElPrompt`). Faltan traer, textuales y
+ * con enlace: **INCIBE / IS4K**, **ANAR** y **Save the Children España**.
+ */
+export const FUENTES_POR_PAIS: Record<Pais, Fuente[]> = {
+  ES: [],
+  AR: [
   {
     organismo:
       "Ministerio de Justicia de la Nación — «Guía para padres, familias y docentes» (Con Vos en la Web)",
@@ -220,7 +243,12 @@ export const FUENTES: Fuente[] = [
       },
     ],
   },
-];
+  ],
+};
+
+export function fuentesDe(pais: Pais): Fuente[] {
+  return FUENTES_POR_PAIS[pais];
+}
 
 const NOMBRE_DEL_MOMENTO: Record<Momento, string> = {
   prevencion: "ANTES DE QUE PASE NADA",
@@ -235,13 +263,30 @@ const NOMBRE_DEL_MOMENTO: Record<Momento, string> = {
  * recomendación la hace aparecer sola, y nadie puede meter un consejo en el
  * prompt sin decir de dónde salió — que es todo el punto de este archivo.
  */
-export function recomendacionesParaElPrompt(): string {
+export function recomendacionesParaElPrompt(pais: Pais = PAIS_POR_DEFECTO): string {
+  const fuentes = fuentesDe(pais);
+
+  /* 🔴 **Si el país no tiene organismos cargados, se dice, no se disimula.**
+     Dejar que el modelo dé consejos como si tuvieran respaldo es exactamente el
+     desbalance que este archivo vino a corregir. Y pasarle los de otro país
+     sería peor todavía. */
+  if (fuentes.length === 0) {
+    return (
+      `⚠ Para ${NOMBRE_DEL_PAIS[pais]} todavía no hay recomendaciones de organismos oficiales ` +
+      `cargadas en el sistema.\n` +
+      `🔴 Podés ordenar opciones y proponer una forma de empezar —es parte de tu trabajo—, pero ` +
+      `NO presentes ningún consejo como respaldado por un organismo, y NO cites organismos de ` +
+      `otro país: para quien te lee no son autoridad. Si te preguntan de dónde sale lo que decís, ` +
+      `decí que es criterio del sistema y no una recomendación oficial.`
+    );
+  }
+
   const bloques: string[] = [];
 
   for (const momento of ["prevencion", "si_el_chico_cuenta", "si_ya_paso"] as Momento[]) {
     const lineas: string[] = [`── ${NOMBRE_DEL_MOMENTO[momento]} ──`];
 
-    for (const fuente of FUENTES) {
+    for (const fuente of fuentes) {
       for (const r of fuente.recomendaciones.filter((x) => x.momento === momento)) {
         lineas.push(`- "${r.texto}" (${fuente.organismo})`);
       }
@@ -253,8 +298,10 @@ export function recomendacionesParaElPrompt(): string {
 }
 
 /** Para mostrarlas en pantalla con su enlace, sin repetir la lista. */
-export function organismosCitados(): { organismo: string; enlace: string; verificado: string }[] {
-  return FUENTES.map((f) => ({
+export function organismosCitados(
+  pais: Pais = PAIS_POR_DEFECTO,
+): { organismo: string; enlace: string; verificado: string }[] {
+  return fuentesDe(pais).map((f) => ({
     organismo: f.organismo,
     enlace: f.enlace,
     verificado: f.verificado,
