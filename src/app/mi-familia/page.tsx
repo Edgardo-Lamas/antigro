@@ -24,8 +24,10 @@ import {
   Check,
   TriangleAlert,
   Smartphone,
+  FileText,
 } from "lucide-react";
 import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senales/tipos";
+import { LOCALE_DEL_PAIS, PAIS_POR_DEFECTO } from "@/lib/paises";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
 import { COMO_FUNCIONA } from "@/lib/config";
@@ -191,6 +193,15 @@ const VINCULO: Record<string, string> = {
  * 🔑 Y «hoy» / «ayer» no son un adorno: quien acaba de contestar tiene que
  * reconocer su propia firma sin hacer la cuenta.
  */
+/** La hora de una señal. Es la mitad del dato: una consulta a las 3 AM y una a
+ *  las 3 de la tarde no significan lo mismo, y el panel sólo mostraba el día. */
+function horaDe(iso: string): string {
+  return new Date(iso).toLocaleTimeString(LOCALE_DEL_PAIS[PAIS_POR_DEFECTO], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 function fechaEnCriollo(iso: string): string {
   const cuando = new Date(iso);
   const dia = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
@@ -269,6 +280,11 @@ export default function MiFamilia() {
     porDia.set(dia, [...(porDia.get(dia) ?? []), s]);
   }
   const dias = Array.from(porDia.entries()).sort(([a], [b]) => a.localeCompare(b));
+
+  /* 🔴 Los ids de las señales que sostienen la lectura. El motor ya los
+     guardaba —el comentario de `evaluar.ts` es literal: «Sin esto, no se
+     afirma»—, pero no llegaban a ninguna pantalla. */
+  const sostienen = new Set(datos.lectura?.senalesQueLaSostienen ?? []);
 
   const activos = datos.adultos.filter((a) => a.activo !== false);
   const deBaja = datos.adultos.filter((a) => a.activo === false);
@@ -481,6 +497,21 @@ export default function MiFamilia() {
           {datos.chico?.nombre ?? "el chico"} escribió.
         </p>
 
+        {/* 🔑 **De acá sale todo lo que el sistema afirma, y hasta hoy no se
+            podía comprobar.** El informe decía «un patrón que se sostuvo doce
+            días» y el padre tenía que creerle: la lista de abajo estaba, pero
+            no decía CUÁLES de esas señales sostenían la lectura, ni a qué hora,
+            ni de dónde habían salido. Sin eso, la línea de tiempo era una
+            ilustración; con eso, es el registro. */}
+        {sostienen.size > 0 && (
+          <p className="mt-2.5 rounded-lg border border-borde bg-superficie px-4 py-2.5 text-xs leading-relaxed text-tinta">
+            De las {datos.senales.length} señales de estos {datos.ventana.dias} días,{" "}
+            <strong className="text-acento">{sostienen.size}</strong>{" "}
+            {sostienen.size === 1 ? "es la que sostiene" : "son las que sostienen"} lo que dice el
+            informe de arriba. Están marcadas con un punto.
+          </p>
+        )}
+
         {dias.length === 0 ? (
           <p className="mt-3 text-sm text-tenue">
             Sin señales en estas tres semanas. Cuando no pasa nada, el sistema no dice nada.
@@ -488,28 +519,49 @@ export default function MiFamilia() {
         ) : (
           <ul className="mt-3 divide-y divide-borde">
             {dias.map(([dia, senales]) => (
-              <li key={dia} className="flex items-center gap-4 py-3">
-                <span className="w-20 shrink-0 font-mono text-xs text-apagado">
-                  {new Date(`${dia}T12:00:00`).toLocaleDateString("es-AR", {
+              <li key={dia} className="flex items-start gap-4 py-3">
+                <span className="w-20 shrink-0 pt-0.5 font-mono text-xs text-apagado">
+                  {new Date(`${dia}T12:00:00`).toLocaleDateString(LOCALE_DEL_PAIS[PAIS_POR_DEFECTO], {
                     day: "2-digit",
                     month: "short",
                   })}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {senales.map((s) => (
-                    <span
-                      key={s.id}
-                      title={`${NOMBRE_DE_SENAL[s.tipo]} · intensidad ${s.intensidad.toFixed(2)}`}
-                      className={`rounded px-2 py-0.5 text-[11px] text-fondo ${COLOR_SENAL[s.tipo]}`}
-                    >
-                      {NOMBRE_DE_SENAL[s.tipo]}
-                    </span>
-                  ))}
+                  {senales.map((s) => {
+                    const sostiene = sostienen.has(s.id);
+                    return (
+                      <span
+                        key={s.id}
+                        title={`${NOMBRE_DE_SENAL[s.tipo]} · intensidad ${s.intensidad.toFixed(2)} · la vio ${s.fuente === "nextdns" ? "NextDNS" : "el simulador"}${sostiene ? " · sostiene la lectura" : ""}`}
+                        className={`rounded px-2 py-0.5 text-[11px] text-fondo ${COLOR_SENAL[s.tipo]} ${
+                          sostiene ? "ring-2 ring-tinta/60" : "opacity-70"
+                        }`}
+                      >
+                        {sostiene && "● "}
+                        {NOMBRE_DE_SENAL[s.tipo]}{" "}
+                        <span className="font-mono opacity-80">{horaDe(s.fecha)}</span>
+                      </span>
+                    );
+                  })}
                 </div>
               </li>
             ))}
           </ul>
         )}
+
+        {datos.senales.length > 0 && (
+          <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+            Cada señal queda guardada con su día, su hora, su intensidad y de dónde salió
+            {datos.fuente.simulada ? " — ahora mismo, de un simulador" : " — del filtro de la red"}.
+            🔴 Lo que nunca se guarda, ni se puede guardar, es una sola palabra de lo que se
+            escribió: el sistema rechaza cualquier dato que traiga contenido.
+          </p>
+        )}
+
+        {/* El parte, cuando el padre lo pide. Va acá abajo porque es el resumen
+            de esto mismo: la pregunta «¿esto está funcionando?» se contesta con
+            el registro de arriba, no con una frase tranquilizadora. */}
+        <ElParte />
       </section>
     </main>
   );
@@ -954,7 +1006,7 @@ function Asistente({ chico }: { chico?: string }) {
       const d = await res.json();
       /* 🔑 Si el servidor mandó un texto, se muestra ése aunque el código no sea
          200. El límite de frecuencia contesta 429 con una explicación escrita
-         —cuánto falta, y la Línea 137 mientras tanto—, y taparla con el cartel
+         —cuánto falta, y el teléfono de ayuda mientras tanto—, y taparla con el cartel
          genérico dejaría al adulto sin saber si el sistema se rompió. El
          genérico queda para cuando de verdad no vino nada. */
       setTurnos((t) => [
@@ -2038,6 +2090,81 @@ function LaClave({
    lecturas deja de ser un registro y pasa a ser vigilancia de uno sobre el
    otro — y AntiGro no puede hacerles a los padres lo que promete no hacerle al
    chico. */
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL PARTE, PEDIDO A MANO — lo pidió Edgardo el 19/9
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * **El parte existe desde el 19/8, pero sólo lo mandaba el reloj cada 30 días
+ * por Telegram.** El padre que entra al panel el día 12 preguntándose si esto
+ * anda no tenía forma de averiguarlo — que es justo el agujero que el parte vino
+ * a tapar. Ahora lo pide y lo lee.
+ *
+ * 🔑 **Se puede apretar todas las veces que haga falta porque no cuesta nada:**
+ * el parte son cuentas sobre el registro, no lo escribe el modelo.
+ *
+ * ⚠ **No es una alerta chiquita, y el texto del parte ya está escrito para eso:**
+ * dice siempre por qué lo que vio no ameritó escribirle. Si un padre ansioso lee
+ * «hubo tres noches tarde» y actúa sobre eso, rompimos con nuestro propio
+ * mensaje la regla que evita que alguien se alarme por un pico suelto.
+ */
+function ElParte() {
+  const [texto, setTexto] = useState<string | null>(null);
+  const [pidiendo, setPidiendo] = useState(false);
+  const [error, setError] = useState(false);
+
+  async function pedir() {
+    setPidiendo(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/mi-familia/parte");
+      const d = await res.json();
+      if (!res.ok || typeof d.texto !== "string") throw new Error("no salió");
+      setTexto(d.texto);
+    } catch {
+      setError(true);
+    } finally {
+      setPidiendo(false);
+    }
+  }
+
+  return (
+    <div className="mt-6 border-t border-borde pt-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-tinta">¿Está funcionando?</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-apagado">
+            El parte sale solo cada 30 días. Si lo querés ver ahora, pedilo.
+          </p>
+        </div>
+        <button
+          onClick={pedir}
+          disabled={pidiendo}
+          className="flex shrink-0 items-center gap-2 rounded-lg border border-borde px-4 py-2 text-sm text-tinta transition hover:border-acento hover:text-acento disabled:opacity-50"
+        >
+          {pidiendo ? <LoaderCircle size={14} className="animate-spin" /> : <FileText size={14} />}
+          {texto ? "Pedirlo otra vez" : "Pedir el parte ahora"}
+        </button>
+      </div>
+
+      {error && (
+        <p className="mt-3 text-sm text-atencion">
+          No se pudo armar el parte en este momento. Probá de nuevo en un rato.
+        </p>
+      )}
+
+      {texto && (
+        /* 🔴 Sin color de atención y sin botón adentro: es una señal de vida, no
+           una novedad sobre el chico. Un recuadro naranja acá haría que un
+           resumen tranquilo se lea como una alerta. */
+        <pre className="mt-4 whitespace-pre-wrap rounded-lg border border-borde bg-superficie px-5 py-4 font-sans text-sm leading-relaxed text-tinta">
+          {texto}
+        </pre>
+      )}
+    </div>
+  );
+}
 
 function ElRegistro({
   accesos,

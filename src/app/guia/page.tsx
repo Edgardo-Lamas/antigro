@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
-import { COMO_FUNCIONA, MARCO_LEGAL, PRODUCTO, RECURSOS } from "@/lib/config";
+import { COMO_FUNCIONA, PRODUCTO } from "@/lib/config";
+import { marcoLegalDe, NOMBRE_DEL_PAIS, PAIS_POR_DEFECTO, recursosDe } from "@/lib/paises";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -544,10 +545,13 @@ export default function Guia() {
           </div>
 
           <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
-            <p className="text-sm font-semibold text-tinta">Marco legal argentino</p>
+            <p className="text-sm font-semibold text-tinta">
+              Marco legal — {NOMBRE_DEL_PAIS[PAIS_POR_DEFECTO]}
+            </p>
             <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
-              <li>· {MARCO_LEGAL.ley26904}</li>
-              <li>· {MARCO_LEGAL.ley27590}</li>
+              <li>· {marcoLegalDe().grooming}</li>
+              <li>· {marcoLegalDe().proteccion}</li>
+              <li>· {marcoLegalDe().datos}</li>
             </ul>
           </div>
 
@@ -571,17 +575,32 @@ export default function Guia() {
       {/* ── A dónde recurrir ─────────────────────────────────────────────── */}
       <Seccion
         titulo="Cuando la respuesta correcta no es un sistema"
-        bajada="Está escrito en el producto y no en la letra chica: cuando lo que hace falta es un adulto o un organismo, el sistema lo dice."
+        bajada="Está escrito en el producto y no en la letra pequeña: cuando lo que hace falta es un adulto o un organismo, el sistema lo dice."
       >
         <div className="flex flex-col gap-3">
-          <Ficha
-            que={`${RECURSOS.linea137.nombre} — ${RECURSOS.linea137.telefono}`}
-            detalle={`${RECURSOS.linea137.detalle}. WhatsApp ${RECURSOS.linea137.whatsapp}.`}
-          />
-          <Ficha
-            que={RECURSOS.gapp.nombre}
-            detalle={`${RECURSOS.gapp.detalle} — ${RECURSOS.gapp.url}`}
-          />
+          {/* 🔑 El orden no es alfabético: es el de la hora y la situación, y sale
+              tal cual del país que esté puesto. Escribir las fichas a mano era
+              lo que hacía que agregar un país fuera tocar esta pantalla. */}
+          {recursosDe().map((r) => (
+            <Ficha
+              key={r.id}
+              que={[r.nombre, r.telefono].filter(Boolean).join(" — ")}
+              detalle={[
+                r.queEs,
+                r.detalle + ".",
+                r.horario ? r.horario + "." : null,
+                r.whatsapp ? `WhatsApp ${r.whatsapp}` + (r.telegram ? ` · Telegram ${r.telegram}.` : ".") : null,
+                r.telefonoAlterno ? `También ${r.telefonoAlterno}.` : null,
+                r.correo ? `${r.correo}.` : null,
+                r.para.includes("chico") && !r.para.includes("adulto")
+                  ? "🔴 Este es para tu hijo, no para ti: puede acudir él mismo."
+                  : null,
+                r.url ?? null,
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            />
+          ))}
         </div>
       </Seccion>
 

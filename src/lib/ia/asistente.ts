@@ -34,7 +34,15 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { recomendacionesParaElPrompt } from "./recomendaciones";
-import { MARCO_LEGAL, RECURSOS } from "@/lib/config";
+import {
+  ayudaConHorario,
+  ayudaDeSiempre,
+  marcoLegalDe,
+  NOMBRE_DEL_PAIS,
+  PAIS_POR_DEFECTO,
+  recursosDe,
+  type Pais,
+} from "@/lib/paises";
 import type { Lectura } from "@/lib/motor";
 import { NOMBRE_DE_ESTADO } from "@/lib/motor";
 import { revisarRespuestaDelAsistente } from "./reglas";
@@ -72,7 +80,70 @@ export interface TurnoDelAsistente {
  * el mensaje del usuario, nunca acá: meterlos acá anularía la caché en cada
  * llamada y se pagaría el corpus entero a precio completo todas las veces.
  */
-const SISTEMA = `Sos el asistente de AntiGro. Hablás con un adulto responsable de una familia que
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  A DÓNDE SE DERIVA — se arma con los recursos de UN país, nunca de dos
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴🔴 **Ésta es la función que hace que la capa de país no sea un peligro.**
+ * El modelo recibe la lista del país del hogar y no ve la otra. Si algún día
+ * alguien tiene la tentación de pasarle las dos con un «usá la que
+ * corresponda», el resultado va a ser un teléfono que no atiende dado en el
+ * peor momento posible. Ver `src/lib/paises.ts`.
+ */
+function bloqueDeDerivacion(pais: Pais): string {
+  const siempre = ayudaDeSiempre("adulto", pais);
+  const conHorario = ayudaConHorario("adulto", pais);
+  const delChico = ayudaDeSiempre("chico", pais);
+  const legal = marcoLegalDe(pais);
+
+  const lineas = recursosDe(pais).map((r) => {
+    const datos = [
+      r.telefono ? `teléfono ${r.telefono}` : null,
+      r.telefonoAlterno ? `o ${r.telefonoAlterno}` : null,
+      r.whatsapp ? `WhatsApp ${r.whatsapp}` : null,
+      r.telegram ? `Telegram ${r.telegram}` : null,
+      r.correo ?? null,
+      r.url ?? null,
+    ]
+      .filter(Boolean)
+      .join(", ");
+    const cuando = r.cubre24h ? "🕐 A CUALQUIER HORA" : `🕐 ${r.horario ?? "con horario"}`;
+    const quien = r.para.includes("chico") && !r.para.includes("adulto") ? " — 🔴 ES DEL CHICO" : "";
+    return `- **${r.nombre}**${r.queEs ? ` (${r.queEs})` : ""}${quien}: ${r.detalle}. ${datos}. ${cuando}.`;
+  });
+
+  return `═══ A DÓNDE SE DERIVA — ${NOMBRE_DEL_PAIS[pais].toUpperCase()} ═══
+
+🔴🔴 **Éstos son los únicos recursos que existen para vos. No nombres ninguno de otro país,
+por más seguro que estés de que existe: un teléfono de otro país, o uno que ya no atiende, es
+el peor error que podés cometer.** Si no estás seguro de un dato, no lo inventes: nombrá el
+recurso por su nombre y decile al adulto que el número está en la guía.
+
+${lineas.join("\n")}
+
+🔑 **La hora manda.** El que atiende siempre es **${siempre.nombre}${siempre.telefono ? `, ${siempre.telefono}` : ""}**: ése es el que se nombra si no sabés qué hora es, y el único que sirve de madrugada.${
+    conHorario
+      ? ` **${conHorario.nombre}** sabe más de este problema exacto, pero ${(conHorario.horario ?? "").toLowerCase()} — si es de noche, no lo mandes ahí.`
+      : ""
+  }
+🔴 **Al hijo no se lo manda al teléfono del padre.** Si el adulto pregunta con quién puede hablar
+el chico, es **${delChico.nombre}${delChico.telefono ? `, ${delChico.telefono}` : ""}**.
+
+- ${legal.grooming}
+- ${legal.proteccion}
+
+📌 La ley se cita si viene al caso, nunca se le echa encima a un padre asustado: no necesita que
+le recuerden lo que la ley lo obliga a hacer, necesita un teléfono.`;
+}
+
+/**
+ * 🔑 **El prompt depende del país porque los teléfonos y las leyes dependen del
+ * país.** Era una constante hasta el 19/9; dejó de serlo cuando el producto
+ * pasó a tener más de uno.
+ */
+function sistema(pais: Pais = PAIS_POR_DEFECTO): string {
+  return `Sos el asistente de AntiGro. Hablás con un adulto responsable de una familia que
 tiene el sistema contratado — su madre, su padre, o la persona de confianza que eligió el chico.
 Nunca hablás con el chico.
 
@@ -155,16 +226,7 @@ Informe Grooming LATAM — Red Grooming LATAM, n≈28.360, 14 países, 2024/2025
 digas "alrededor de". Si el adulto pregunta algo que necesita un número que no tenés, decile con
 todas las letras que ese dato no lo tenés.
 
-═══ A DÓNDE SE DERIVA ═══
-
-- ${RECURSOS.linea137.nombre}: ${RECURSOS.linea137.detalle}. Teléfono ${RECURSOS.linea137.telefono},
-  WhatsApp ${RECURSOS.linea137.whatsapp}. Atiende las 24 horas.
-- ${RECURSOS.gapp.nombre}: ${RECURSOS.gapp.detalle} — ${RECURSOS.gapp.url}
-- ${MARCO_LEGAL.ley26904}
-- ${MARCO_LEGAL.ley27590}
-
-La Procuración General de la Suprema Corte de la provincia de Buenos Aires recomienda a los
-adultos observar los cambios de humor y los horarios de conexión. No publica estadística propia.
+${bloqueDeDerivacion(pais)}
 
 ═══ LO QUE RECOMIENDAN LOS ORGANISMOS OFICIALES ═══
 
@@ -175,7 +237,7 @@ escrita. Si lo que vas a decir está acá, decilo y nombrá la fuente. Si no est
 igual —ordenar opciones y proponer una forma de empezar es parte de tu trabajo— pero **no lo
 presentes como si tuviera respaldo oficial**.
 
-${recomendacionesParaElPrompt()}
+${recomendacionesParaElPrompt(pais)}
 
 ⚠ Tres de esas son contraintuitivas y son las que más se hacen mal, así que si vienen al caso no
 las dejes pasar: **no borrar nada** del teléfono (es la prueba), **no amenazar al acosador** (se
@@ -187,7 +249,8 @@ asusta, borra todo y desaparece), y **no interrogar al chico** cuando cuenta alg
 - Ordenás las opciones que tiene adelante, de la más simple a la más difícil.
 - Decís CÓMO abrir la conversación con el chico: con qué frase empezar, en qué momento, qué
   conviene no decir.
-- Decís cuándo la respuesta ya no es seguir hablando con vos, sino llamar al 137.
+- Decís cuándo la respuesta ya no es seguir hablando con vos, sino llamar por teléfono — y
+  decís a cuál de los de arriba, según la hora que sea.
 - Razonás sobre los números que el informe ya trae. Eso no es inventar: es trabajar con lo que hay,
   y es probablemente lo más útil que podés hacer.
 
@@ -229,7 +292,21 @@ Del largo: contestá lo que se preguntó. Dos o tres párrafos cortos suele alca
 pasos, poné una lista corta. No repitas el informe entero si te preguntaron una sola cosa.
 
 Nunca empieces con "Entiendo tu preocupación", "Es comprensible que" ni ninguna otra fórmula de
-manual: se nota, y lo que se nota no acompaña. Entrá por la respuesta.`;
+manual: se nota, y lo que se nota no acompaña. Entrá por la respuesta.
+
+═══ CÓMO ESCRIBÍS ═══
+
+${
+  pais === "ES"
+    ? `🔴🔴 **Escribís en ESPAÑOL DE ESPAÑA y le hablás de TÚ.** Del otro lado hay un padre o una
+madre de España, no de América. Nada de "vos", "acá", "recién", "pibe", "chico" como vocativo,
+"celular" ni "plata": es "tú", "aquí", "hace un momento", "tu hijo", "tu hija", "móvil", "dinero".
+Un voseo en la primera línea le dice a esa persona que esto no fue hecho para ella, y deja de leer
+antes de llegar a lo que el sistema vio.`
+    : `🔴 **Escribís en castellano rioplatense, con voseo.** Del otro lado hay un padre o una madre
+de Argentina: "podés", "tenés", "mirá". Registro cordial, cero jerga técnica.`
+}`;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    EL CLIENTE
@@ -286,6 +363,23 @@ const FALLO = "[asistente] \u2717 se cay\u00f3 la llamada al modelo \u00b7";
  * puede afirmar con eso. Inventar la causa acá sería exactamente el error que
  * el producto entero existe para no cometer.
  */
+/**
+ * A quién llamar, dicho en una frase y sacado del país. 📌 Existe para que el
+ * teléfono no quede escrito a mano acá adentro: el respaldo es justo el texto
+ * que nadie vuelve a leer hasta que falla algo.
+ */
+function aQuienLlamar(pais: Pais): string {
+  const siempre = ayudaDeSiempre("adulto", pais);
+  const conHorario = ayudaConHorario("adulto", pais);
+  const base = `${siempre.nombre} atiende ${(siempre.horario ?? "siempre").toLowerCase()}${
+    siempre.telefono ? ` en el ${siempre.telefono}` : ""
+  }`;
+  if (!conHorario) return base;
+  return `${base}, y ${(conHorario.horario ?? "").toLowerCase()} también está ${conHorario.nombre}${
+    conHorario.telefono && conHorario.telefono !== conHorario.nombre ? ` (${conHorario.telefono})` : ""
+  }, que es el que más sabe de esto`;
+}
+
 function respaldo(nombreDelChico: string, lectura: Lectura | null): string {
   const dias = lectura?.perfil.diasObservados ?? 0;
 
@@ -308,8 +402,7 @@ function respaldo(nombreDelChico: string, lectura: Lectura | null): string {
     cuantoSabe +
     `Lo que sí te sirve ahora mismo: mirá el informe de ${nombreDelChico} —el "por qué" dice ` +
     `exactamente qué se vio y en qué días—, y si lo que estás sintiendo es que algo no está ` +
-    `bien, no esperes a tener certeza. La ${RECURSOS.linea137.nombre} atiende las 24 horas al ` +
-    `${RECURSOS.linea137.telefono} y por WhatsApp al ${RECURSOS.linea137.whatsapp}: son ellos ` +
+    `bien, no esperes a tener certeza. ${aQuienLlamar(PAIS_POR_DEFECTO)}: son ellos ` +
     `los que saben qué preguntar.\n\n` +
     `Probá de nuevo en un rato.`
   );
@@ -379,7 +472,9 @@ export async function responderAlAdulto(entrada: {
       max_tokens: MAX_TOKENS,
       /* 🔑 El corpus entero se cachea acá. Es lo que hace barato no tener RAG:
          el material viaja en cada pedido pero se paga una sola vez. */
-      system: [{ type: "text", text: SISTEMA, cache_control: { type: "ephemeral" } }],
+      system: [
+        { type: "text", text: sistema(PAIS_POR_DEFECTO), cache_control: { type: "ephemeral" } },
+      ],
       messages: [
         ...previos,
         {

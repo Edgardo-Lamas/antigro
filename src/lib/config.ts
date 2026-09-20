@@ -75,32 +75,15 @@ export const LO_QUE_CRUZA =
   "oficiales sobre qué pesa cuánto.";
 
 /**
- * Recursos oficiales a los que el sistema deriva.
- * 🔴 Cuando la respuesta correcta es un adulto o la Línea 137, el sistema lo dice.
+ * 🔴 **Los recursos oficiales y el marco legal se mudaron a `src/lib/paises.ts`
+ * el 19/9**, cuando el producto pasó a tener más de un país. No son una
+ * constante del producto: son una constante DEL PAÍS, y elegir mal el país es
+ * darle a un padre un teléfono que no atiende.
+ *
+ * Se piden por función —`recursosDe(pais)`, `marcoLegalDe(pais)`— y nunca
+ * quedan las dos listas juntas en un mismo texto. El porqué está escrito
+ * entero allá.
  */
-export const RECURSOS = {
-  linea137: {
-    nombre: "Línea 137",
-    detalle: "Programa Las Víctimas Contra Las Violencias — atención las 24 horas",
-    telefono: "137",
-    whatsapp: "+54 9 11 3133-1000",
-  },
-  gapp: {
-    nombre: "GAPP",
-    detalle: "App de denuncia de Grooming Argentina",
-    url: "https://www.grooming.org.ar/",
-  },
-} as const;
-
-/**
- * Marco legal argentino. Se cita, no se interpreta.
- * Fuente: Estudio nacional sobre acoso sexual a NNyA mediante TIC,
- * Ministerio de Justicia y Derechos Humanos de la Nación, 2023.
- */
-export const MARCO_LEGAL = {
-  ley26904: "Ley 26.904 (2013) — art. 131 del Código Penal: 6 meses a 4 años.",
-  ley27590: "Ley 27.590 «Mica Ortega» (2020) — Programa Nacional de Prevención.",
-} as const;
 
 /** Bandas de edad del mensaje al chico. Salen de los datos, no de una corazonada. */
 export const BANDAS_DE_EDAD = [

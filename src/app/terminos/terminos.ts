@@ -86,7 +86,8 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "No es un detector de grooming. No dice, ni puede decir, que un chico esté siendo acosado " +
         "ni que alguien sea un acosador. Lo que entrega es una lectura del sistema con el motivo " +
         "a la vista, para que un adulto mire y decida.",
-      "No reemplaza a la Línea 137, ni a una denuncia, ni a un profesional. Si algo hace ruido, " +
+      "No reemplaza al 017 del INCIBE, al teléfono ANAR, a una denuncia ni a un profesional. " +
+        "Si algo hace ruido, " +
         "el camino es ése y el sistema lo dice cada vez que corresponde.",
       "Lo que muestra AntiGro no es prueba judicial y no está preparado para serlo.",
     ],
@@ -108,7 +109,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Los datos que sí se guardan son los que cargó la familia —el nombre y la edad del chico, " +
         "quiénes son los adultos— y lo que el sistema fue observando y respondiendo.",
     ],
-    normas: ["ley-26061-10", "ley-25326-2", "ley-25326-7"],
+    normas: ["intimidad-del-menor", "datos-sensibles", "prohibido-archivar-sensibles"],
   },
   {
     id: "quien-da-de-alta",
@@ -127,7 +128,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
     declaraciones: [
       "Que ejerzo la responsabilidad parental o la tutela sobre el chico que voy a dar de alta.",
       "Que los datos que cargo son verdaderos, y que si dejo de estar a cargo lo voy a dar de baja.",
-      "Que entiendo que AntiGro no detecta delitos ni reemplaza a la Línea 137.",
+      "Que entiendo que AntiGro no detecta delitos ni reemplaza a un teléfono de ayuda oficial.",
     ],
   },
   {
@@ -153,7 +154,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Que si hay una medida judicial sobre el cuidado del chico, la voy a respetar al decidir " +
         "quién entra.",
     ],
-    normas: ["ccyc-641", "ccyc-654"],
+    normas: ["responsabilidad-parental", "deberes-de-los-padres"],
   },
   {
     id: "registro",
@@ -188,7 +189,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
     declaraciones: [
       "Que el chico va a saber que AntiGro está funcionando, en los términos que su edad permita.",
     ],
-    normas: ["ley-26061-10"],
+    normas: ["intimidad-del-menor"],
   },
   {
     id: "baja",
@@ -203,7 +204,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Cualquiera puede pedir ver, corregir o borrar sus datos. Es un derecho que da la ley de " +
         "protección de datos personales, no una concesión nuestra.",
     ],
-    normas: ["ley-25326-2"],
+    normas: ["datos-sensibles"],
   },
   {
     id: "limites",
@@ -222,7 +223,7 @@ export const SECCIONES: SeccionDeTerminos[] = [
       "Este texto no es asesoramiento legal. Las normas que se citan están enlazadas a su fuente " +
         "para que cualquiera las lea completas.",
     ],
-    normas: ["ley-24240-37"],
+    normas: ["clausulas-abusivas"],
   },
 ];
 

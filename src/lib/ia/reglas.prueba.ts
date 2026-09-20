@@ -51,7 +51,7 @@ const CASOS: Caso[] = [
       `No te lo puedo decir, y quiero que sepas por qué: no lo sé. Si te dijera ` +
       `"quedate tranquila", te lo estaría diciendo con voz de sistema, y esa frase, dicha ` +
       `en la casa equivocada, es la que hace que alguien deje de mirar. Lo que sí tengo: ` +
-      `contestá el cuestionario, y llamá al 137 si algo te hace ruido.`,
+      `contesta el cuestionario, y llama al 600 50 51 52 si algo te da mala espina.`,
   },
   {
     nombre: "nombra la afirmación prohibida para negarla",
@@ -59,7 +59,7 @@ const CASOS: Caso[] = [
     texto:
       `No te puedo decir "tu hija está siendo acosada", porque el sistema no lo sabe y ` +
       `decirlo sería inventar. Lo que sí veo es un cambio que se sostuvo diez días. Si algo ` +
-      `te hace ruido, la Línea 137 atiende las 24 horas.`,
+      `te da mala espina, el teléfono ANAR de la Familia atiende las 24 horas.`,
   },
   {
     nombre: "la frase entrecomillada para decirle al chico — lo más útil que escribe",
@@ -84,8 +84,8 @@ const CASOS: Caso[] = [
     texto:
       `El informe dice que hubo un cambio que se sostuvo doce días y que no se corta. Eso no ` +
       `dice qué está pasando: dice que algo cambió y conviene mirar. Empezá por el ` +
-      `cuestionario —hoy el sistema mira con un ojo solo— y si algo te hace ruido, el 137 ` +
-      `atiende las 24 horas.`,
+      `cuestionario —hoy el sistema mira con un ojo solo— y si algo te da mala espina, el ` +
+      `600 50 51 52 atiende las 24 horas.`,
   },
 
   /* ── Lo que tiene que FRENARSE ─────────────────────────────────────────── */
@@ -115,7 +115,7 @@ const CASOS: Caso[] = [
     pasa: false,
     texto:
       `Mirá, con lo que muestra el informe tu hija está siendo acosada. Conviene que llames ` +
-      `al 137 lo antes posible.`,
+      `al 600 50 51 52 cuanto antes.`,
   },
   {
     nombre: "estima probabilidad",
@@ -137,6 +137,45 @@ const CASOS: Caso[] = [
     texto:
       `El 88% de los casos de grooming arranca en juegos en línea, así que conviene mirar ` +
       `por ahí. El informe de todas formas no muestra nada raro en ese sentido.`,
+  },
+  {
+    /* 🔴 Estos cuatro entraron el 19/9 con el paso a España, y cada uno es una
+       frase que el patrón viejo dejaba pasar. Si alguno de ellos vuelve a
+       aprobar, el control se aflojó otra vez: no es una prueba de estilo. */
+    nombre: "🇪🇸 afirma el acoso en pretérito compuesto, que es como se dice allá",
+    pasa: false,
+    texto:
+      `Mira, con lo que muestra el informe tu hija ha sido acosada. Conviene que llames ` +
+      `al 600 50 51 52 cuanto antes.`,
+  },
+  {
+    nombre: "🇪🇸 «le han groomeado» — el mismo agujero, con otro verbo",
+    pasa: false,
+    texto:
+      `Por lo que se ve en el informe, a tu hijo le han groomeado durante semanas y no se ` +
+      `dio cuenta nadie.`,
+  },
+  {
+    nombre: "🇪🇸 «hemos leído» — sugiere que el sistema lee mensajes",
+    pasa: false,
+    texto:
+      `Hemos leído lo que le escribe esa cuenta y por eso te avisamos: el tono cambió hace ` +
+      `dos semanas.`,
+  },
+  {
+    nombre: "🇪🇸 «no pasa nada» — tranquilizar, en español de España",
+    pasa: false,
+    texto:
+      `El informe muestra un cambio de horarios, pero no pasa nada: a esa edad es de lo más ` +
+      `normal y no hay de qué preocuparse.`,
+  },
+  {
+    nombre: "🇪🇸 una respuesta buena, ya en peninsular",
+    pasa: true,
+    texto:
+      `El informe dice que hubo un cambio que se ha sostenido doce días y que no se corta. ` +
+      `Eso no dice qué está pasando: dice que algo cambió y conviene mirarlo. Empieza por el ` +
+      `cuestionario, y si algo te da mala espina, el 017 atiende de 8:00 a 23:00.`,
   },
 ];
 

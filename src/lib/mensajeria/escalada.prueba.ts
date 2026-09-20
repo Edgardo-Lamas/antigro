@@ -181,7 +181,7 @@ const texto = textoDeLaEscalada("Ana", 9, false);
 comprobar("nombra al chico", texto.includes("Ana"));
 comprobar("dice que el primero no lo abrió nadie", /no lo abrió/i.test(texto));
 comprobar("dice que el patrón sigue", /se sigue viendo/i.test(texto));
-comprobar("deriva a la Línea 137", texto.includes("137"));
+comprobar("deriva a un teléfono de ayuda español", /017|600 50 51 52/.test(texto));
 
 /* 🔴 Regla 1: no afirma nada. Ni diagnostica ni tranquiliza ni reprocha. */
 for (const prohibida of [

@@ -19,7 +19,8 @@
  *  el respaldo desaparecido, que es peor que no citar nada.
  */
 
-import { NORMAS, VERSION_DE_LOS_TERMINOS } from "../../lib/legal.ts";
+import { NORMAS_POR_PAIS, VERSION_DE_LOS_TERMINOS } from "../../lib/legal.ts";
+import { NOMBRE_DEL_PAIS, type Pais } from "../../lib/paises.ts";
 import { DECLARACIONES, LARGO_MAXIMO_PARRAFO, SECCIONES } from "./terminos.ts";
 
 let fallaron = 0;
@@ -77,20 +78,37 @@ for (const frase of CLAUSULAS_QUE_NO_VAN) {
 
 /* ── 2. Las citas legales existen ────────────────────────────────────────── */
 
-const IDS_DE_NORMAS = new Set(NORMAS.map((n) => n.id));
+/* 🔴🔴 **Contra TODOS los países, y es el guardarraíl de la capa de país.** El
+   documento de términos se escribe una sola vez y cita conceptos; si un país no
+   tiene norma para uno de ellos, la pantalla queda afirmando algo con el
+   respaldo desaparecido. Un país al que le falte un concepto no se habilita. */
+const PAISES = Object.keys(NORMAS_POR_PAIS) as Pais[];
 
-for (const seccion of SECCIONES) {
-  for (const id of seccion.normas ?? []) {
-    comprobar(`la cita «${id}» de «${seccion.titulo}» existe en legal.ts`, IDS_DE_NORMAS.has(id));
+for (const pais of PAISES) {
+  const normas = NORMAS_POR_PAIS[pais];
+  const conceptos = new Set(normas.map((n) => n.id));
+
+  for (const seccion of SECCIONES) {
+    for (const id of seccion.normas ?? []) {
+      comprobar(
+        `${NOMBRE_DEL_PAIS[pais]} tiene norma para «${id}» (${seccion.titulo})`,
+        conceptos.has(id),
+      );
+    }
   }
-}
 
-for (const n of NORMAS) {
   comprobar(
-    `la norma «${n.id}» trae texto, enlace y fecha de verificación`,
-    Boolean(n.texto.trim() && n.url.startsWith("http") && /^\d{4}-\d{2}-\d{2}$/.test(n.verificado)),
-    `texto ${n.texto.length} · url ${n.url} · verificado ${n.verificado}`,
+    `${NOMBRE_DEL_PAIS[pais]}: ningún concepto repetido`,
+    conceptos.size === normas.length,
   );
+
+  for (const n of normas) {
+    comprobar(
+      `${NOMBRE_DEL_PAIS[pais]} · «${n.id}» trae texto, enlace y fecha de verificación`,
+      Boolean(n.texto.trim() && n.url.startsWith("http") && /^\d{4}-\d{2}-\d{2}$/.test(n.verificado)),
+      `texto ${n.texto.length} · url ${n.url} · verificado ${n.verificado}`,
+    );
+  }
 }
 
 /* ── 3. Las secciones que no pueden faltar ───────────────────────────────── */
@@ -125,7 +143,10 @@ comprobar(
   TODO_EL_TEXTO.includes("no ve, no guarda y no puede leer el contenido de los mensajes"),
 );
 
-comprobar("nombra la Línea 137", TODO_EL_TEXTO.includes("línea 137"));
+comprobar(
+  "nombra un teléfono de ayuda oficial",
+  /017|ANAR/i.test(TODO_EL_TEXTO),
+);
 
 comprobar(
   "dice que no es un detector de grooming",
@@ -214,7 +235,7 @@ comprobar(
 
 console.log(
   fallaron === 0
-    ? `\n✅ ${SECCIONES.length} secciones y ${NORMAS.length} normas, todo en orden.`
+    ? `\n✅ ${SECCIONES.length} secciones y ${NORMAS_POR_PAIS.ES.length} normas por país, todo en orden.`
     : `\n❌ ${fallaron} comprobaciones fallaron.`,
 );
 

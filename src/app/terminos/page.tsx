@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowLeft, ScrollText } from "lucide-react";
 import { PRODUCTO } from "@/lib/config";
 import { norma, VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
+import { PAIS_POR_DEFECTO } from "@/lib/paises";
 import { SECCIONES } from "./terminos";
 
 /**
@@ -31,7 +32,7 @@ export const metadata = {
 
 /** Una norma citada, con su texto y el enlace a la fuente. */
 function Norma({ id }: { id: string }) {
-  const n = norma(id);
+  const n = norma(id, PAIS_POR_DEFECTO);
   return (
     <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
       <p className="text-xs font-semibold uppercase tracking-[0.1em] text-acento">
@@ -85,7 +86,7 @@ export default function Terminos() {
             saque de encima el daño. Ver la sección «límites». */}
         <div className="mt-6 rounded-lg border border-acento/40 bg-superficie px-5 py-4">
           <p className="text-sm leading-relaxed text-tinta">
-            Acá no vas a encontrar letra chica que nos exima de responsabilidad. No la escribimos
+            Aquí no vas a encontrar letra pequeña que nos exima de responsabilidad. No la escribimos
             porque no serviría: la ley de defensa del consumidor tiene por no convenidas esas
             cláusulas. Lo que hay en su lugar es la descripción precisa de qué hace el sistema y
             qué no puede hacer.
@@ -115,7 +116,7 @@ export default function Terminos() {
 
           {/* 🔑 Lo que declara quien acepta va aparte y se ve distinto. Es la
               única parte del documento que compromete al que lo lee, y
-              mezclarla con el resto sería convertirla en letra chica —
+              mezclarla con el resto sería convertirla en letra pequeña —
               exactamente lo que este documento no quiere ser. */}
           {seccion.declaraciones && (
             <div className="mt-5 rounded-lg border border-atencion/40 bg-atencionSuave px-5 py-4">

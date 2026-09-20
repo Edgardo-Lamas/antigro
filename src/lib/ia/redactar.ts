@@ -18,6 +18,7 @@ import type { Estado, Lectura } from "@/lib/motor";
 import { NOMBRE_DE_ESTADO } from "@/lib/motor";
 import { revisarLecturaParaAdultos, revisarMensajeAlChico } from "./reglas";
 import { respaldoParaElChico, respaldoParaLosAdultos } from "./respaldo";
+import { ayudaDeSiempre, comoSeLoNombra, PAIS_POR_DEFECTO, type Pais } from "../paises.ts";
 
 const MODELO = "claude-opus-5";
 
@@ -102,7 +103,13 @@ function anthropic(): Anthropic | null {
  * chico y de la lectura van en el mensaje del usuario, nunca acá — meterlos
  * acá anularía la caché en cada llamada.
  */
-const SISTEMA = `Sos el redactor de AntiGro, un sistema que percibe señales de que un chico
+/**
+ * 🔑 **Depende del país porque el idioma y el teléfono dependen del país.** Era
+ * una constante hasta el 19/9. 📌 Sigue yendo en el `system` y sigue cacheándose:
+ * lo que cambia es el país, que no cambia entre pedidos de una misma familia.
+ */
+function sistema(pais: Pais = PAIS_POR_DEFECTO): string {
+  return `Sos el redactor de AntiGro, un sistema que percibe señales de que un chico
 puede estar siendo acosado por internet SIN LEER NUNCA sus conversaciones.
 
 Tu única tarea es poner en palabras una conclusión que YA está tomada. No evalúes el riesgo,
@@ -124,19 +131,26 @@ REGLAS QUE NO SE NEGOCIAN
    cifra en los datos, no pongas ninguna.
 5. Nunca culpes al chico, ni siquiera de forma indirecta. Nada de "tendrías que haber",
    "por qué no contaste", "es peligroso que hables con desconocidos".
-6. Escribí en castellano rioplatense, con voseo. Registro cordial, cero jerga técnica.
+6. ${
+  pais === "ES"
+    ? `Escribí en ESPAÑOL DE ESPAÑA, tuteando de tú. 🔴 Del otro lado hay un chico o una chica de
+   España. Nada de voseo ni de americanismos: ni "vos", ni "acá", ni "pibe", ni "celular". Es
+   "tú", "aquí", "móvil". Un voseo le dice que esto no fue escrito para él, y a esa edad eso
+   alcanza para cerrar el mensaje.`
+    : `Escribí en castellano rioplatense, con voseo: "podés", "tenés", "contale".`
+} Registro cordial, cero jerga técnica.
 
 CÓMO SE LE HABLA A CADA EDAD
 
 - 7 a 10 años: corto y muy concreto. Una sola idea. Sin abstracciones y sin la palabra
-  "grooming". Se lo deriva a un adulto de la casa. NO le nombres la Línea 137: a esa edad
-  el que llama es un adulto.
+  "grooming". Se lo deriva a un adulto de la casa. NO le nombres ningún teléfono de ayuda: a
+  esa edad el que llama es un adulto.
 - 11 a 13 años: se le explica el mecanismo, no sólo la regla. Se nombra el grooming como lo
   que es, un delito, y se aclara que le pasa a mucha gente. Se lo deriva a un adulto de
-  confianza y se le nombra la Línea 137.
+  confianza y se le nombra ${comoSeLoNombra(ayudaDeSiempre("chico", PAIS_POR_DEFECTO))}.
 - 14 a 17 años: de igual a igual. Nada que suene a reto, a control ni a sermón. No des por
   sentado que el adulto es la salida. Se le nombra el adulto que él mismo eligió, la
-  Línea 137 y la posibilidad de denunciar.
+  ${comoSeLoNombra(ayudaDeSiempre("chico", PAIS_POR_DEFECTO))} y la posibilidad de denunciar.
 
 GUARDARRAÍL DE GÉNERO
 Lo único que cambia según el género es qué tipo de riesgo se enfatiza, y sólo donde hay dato
@@ -151,6 +165,7 @@ que no es culpa suya y a quién puede recurrir.
 FORMA DE LA RESPUESTA
 Devolvé únicamente el texto que se va a mandar. Sin encabezados, sin comillas, sin explicar
 lo que hiciste y sin ofrecer alternativas. Lo que escribas se manda tal cual.`;
+}
 
 /* ── La llamada ──────────────────────────────────────────────────────────── */
 
@@ -178,7 +193,9 @@ async function pedirTexto(datos: string): Promise<{ texto: string } | { error: s
       model: MODELO,
       max_tokens: MAX_TOKENS,
       output_config: { effort: "medium" },
-      system: [{ type: "text", text: SISTEMA, cache_control: { type: "ephemeral" } }],
+      system: [
+        { type: "text", text: sistema(PAIS_POR_DEFECTO), cache_control: { type: "ephemeral" } },
+      ],
       messages: [{ role: "user", content: datos }],
     });
 
@@ -274,7 +291,8 @@ export async function redactarLecturaParaAdultos(entrada: {
     "",
     "Tope: 1500 caracteres. No lo pases.",
     "Cerrá con qué mirar ahora. Si el patrón se sostuvo, la conversación con el chico va sin",
-    "acusar y sin mostrarle esto como una prueba; y la Línea 137 orienta gratis las 24 horas.",
+    `acusar y sin mostrarle esto como una prueba; y ${comoSeLoNombra(ayudaDeSiempre("adulto", PAIS_POR_DEFECTO))}`,
+    "orienta gratis las 24 horas.",
   ].join("\n");
 
   const resultado = await pedirTexto(datos);

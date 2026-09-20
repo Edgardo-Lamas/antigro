@@ -18,6 +18,7 @@
  * del arte del estudio, no medido por el estudio.
  */
 
+import { ayudaDeSiempre, PAIS_POR_DEFECTO } from "../paises.ts";
 import type { BandaDeEdad } from "@/lib/config";
 import type { Estado } from "@/lib/motor";
 
@@ -30,37 +31,53 @@ export interface TextoParaElChico {
 
 /**
  * 7–10 · Corto y concreto. Una idea por mensaje, sin abstracciones.
- * Se deriva directo al adulto de confianza — a esta edad la Línea 137 la
- * llama un adulto, no el chico.
+ * Se deriva directo al adulto de confianza — a esta edad el teléfono de ayuda
+ * lo llama un adulto, no el chico.
  */
+/**
+ * 🔴🔴 **El teléfono NO se escribe a mano en estos textos.** Son los mensajes
+ * que salen cuando la IA no contesta, o sea justo los que nadie vuelve a leer
+ * hasta que algo falla. Un número viejo, o el de otro país, sobrevive años en
+ * un texto de respaldo sin que nadie lo note. Sale de `paises.ts` o no sale.
+ */
+const TELEFONO_DEL_CHICO = [
+  ayudaDeSiempre("chico", PAIS_POR_DEFECTO).nombre,
+  ayudaDeSiempre("chico", PAIS_POR_DEFECTO).telefono,
+].join(": ") + ". Gratis, las 24 horas, y te atiende un psicólogo.";
+
+function telefonoDelAdulto(): string {
+  const r = ayudaDeSiempre("adulto", PAIS_POR_DEFECTO);
+  return `${r.nombre}${r.telefono ? ` (${r.telefono})` : ""}`;
+}
+
 const BANDA_7_10: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
   atencion: {
     texto:
-      "Hola. Si alguien que no conocés te escribe y te hace sentir raro, no es tu culpa. " +
-      "Podés contarle a un grande de tu casa. No te va a pasar nada malo por contarlo.",
-    derivacion: ["Contáselo a un adulto de tu casa."],
+      "Hola. Si alguien que no conoces te escribe y te hace sentir raro, no es culpa tuya. " +
+      "Puedes contárselo a un mayor de tu casa. No te va a pasar nada malo por contarlo.",
+    derivacion: ["Cuéntaselo a un adulto de tu casa."],
   },
   patron_sostenido: {
     texto:
-      "Hola. Si alguien que no conocés te pide una foto, no tenés que contestarle. " +
-      "No es tu culpa y no estás en problemas. Contáselo hoy a un grande de tu casa.",
-    derivacion: ["Contáselo hoy a un adulto de tu casa."],
+      "Hola. Si alguien que no conoces te pide una foto, no tienes que contestarle. " +
+      "No es culpa tuya y no estás en un lío. Cuéntaselo hoy a un mayor de tu casa.",
+    derivacion: ["Cuéntaselo hoy a un adulto de tu casa."],
   },
 };
 
 /**
  * 11–13 · Se explica el mecanismo, no sólo la regla. Se nombra el grooming
- * como lo que es: un delito. Se le nombra la Línea 137.
+ * como lo que es: un delito. Se le nombra el teléfono ANAR, que es el suyo.
  */
 const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
   atencion: {
     texto:
-      "Hola. Te escribimos por algo que quizás no sepas: hay adultos que se hacen pasar por " +
+      "Hola. Te escribimos por algo que quizá no sepas: hay adultos que se hacen pasar por " +
       "chicos para ganarse la confianza de alguien de tu edad. Se llama grooming y es un delito. " +
-      "Si algo te está pasando, no hiciste nada malo.",
+      "Si te está pasando algo, no has hecho nada malo.",
     derivacion: [
-      "Contáselo a un adulto de confianza.",
-      "Línea 137: gratis, las 24 horas, desde cualquier teléfono.",
+      "Cuéntaselo a un adulto de confianza.",
+      TELEFONO_DEL_CHICO,
     ],
   },
   patron_sostenido: {
@@ -68,10 +85,10 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "Hola. Hay adultos que se hacen pasar por chicos para ganarse la confianza de alguien de " +
       "tu edad, y después piden fotos o piden que no lo cuentes. Se llama grooming, es un delito " +
       "y le pasa a muchísima gente. Nada de esto es culpa tuya, ni siquiera si contestaste. " +
-      "Contáselo hoy a alguien grande.",
+      "Cuéntaselo hoy a alguien mayor.",
     derivacion: [
-      "Contáselo a un adulto de confianza.",
-      "Línea 137: gratis, las 24 horas, desde cualquier teléfono.",
+      "Cuéntaselo a un adulto de confianza.",
+      TELEFONO_DEL_CHICO,
     ],
   },
 };
@@ -85,25 +102,25 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
 const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
   atencion: {
     texto:
-      "Hola. Esto no es un reto ni un control. Si alguien que conociste por internet te está " +
-      "pidiendo cosas que no querés dar, o te dice que no lo cuentes, eso tiene nombre: grooming, " +
-      "y es un delito. Vos no hiciste nada mal. Tenés a quién recurrir, y podés elegir a quién.",
+      "Hola. Esto no es una bronca ni un control. Si alguien que conociste por internet te está " +
+      "pidiendo cosas que no quieres dar, o te dice que no lo cuentes, eso tiene nombre: grooming, " +
+      "y es un delito. Tú no has hecho nada mal. Tienes a quién acudir, y eliges tú a quién.",
     derivacion: [
-      "El adulto que vos elegiste cuando se dio de alta el sistema.",
-      "Línea 137: gratis, las 24 horas, y no hace falta dar tu nombre.",
-      "Se puede denunciar, y no necesitás tener pruebas para consultar.",
+      "El adulto que elegiste tú cuando se dio de alta el sistema.",
+      TELEFONO_DEL_CHICO,
+      "Se puede denunciar, y no hace falta tener pruebas para preguntar.",
     ],
   },
   patron_sostenido: {
     texto:
-      "Hola. Esto no es un reto ni un control, y no leímos nada de lo que escribiste. " +
+      "Hola. Esto no es una bronca ni un control, y no hemos leído nada de lo que escribes. " +
       "Si alguien te está presionando para mandar fotos, para hablar a escondidas o para que no " +
       "lo cuentes, eso es grooming y es un delito — de la otra persona, nunca tuyo. Pasa mucho " +
-      "más de lo que parece y casi nadie lo cuenta. Vos elegís a quién recurrir.",
+      "más de lo que parece y casi nadie lo cuenta. Eliges tú a quién acudir.",
     derivacion: [
-      "El adulto que vos elegiste cuando se dio de alta el sistema.",
-      "Línea 137: gratis, las 24 horas, y no hace falta dar tu nombre.",
-      "Se puede denunciar, y no necesitás tener pruebas para consultar.",
+      "El adulto que elegiste tú cuando se dio de alta el sistema.",
+      TELEFONO_DEL_CHICO,
+      "Se puede denunciar, y no hace falta tener pruebas para preguntar.",
     ],
   },
 };
@@ -147,7 +164,7 @@ export function respaldoParaLosAdultos(datos: {
     "",
     datos.estado === "patron_sostenido"
       ? "Qué hacer ahora: hablar con él o ella, sin acusar y sin mostrarle esto como una prueba. " +
-        "Si hace falta orientación, la Línea 137 atiende gratis las 24 horas."
+        `Si hace falta orientación, ${telefonoDelAdulto()} atiende gratis.`
       : "Qué hacer ahora: nada urgente. Vale la pena estar atento estos días.",
   ].join("\n");
 }
