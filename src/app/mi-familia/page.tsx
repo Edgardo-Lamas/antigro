@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import {
@@ -228,6 +228,11 @@ export default function MiFamilia() {
   const [estadoCarga, setEstadoCarga] = useState<"cargando" | "ok" | "error" | "inactivo">(
     "cargando",
   );
+  /* La capa del asistente. Vive acá y no adentro de `Asistente` porque la abren
+     tres lugares distintos: el botón flotante, la tarjeta del informe y cada
+     uno de los arranques sugeridos. */
+  const [asistenteAbierto, setAsistenteAbierto] = useState(false);
+  const [arranqueElegido, setArranqueElegido] = useState("");
 
   const cargar = useCallback(async () => {
     try {
@@ -415,11 +420,17 @@ export default function MiFamilia() {
         deUnTotalDe={datos.cuestionario.deUnTotalDe}
       />
 
-      {/* ── El asistente ───────────────────────────────────────────────── */}
-      <Asistente chico={datos.chico?.nombre} />
-      {/* 🔴 Y el atajo, porque la sección de arriba queda a dos pantallas de
-          scroll y nadie la encontraba. Ver `BotonDelAsistente`. */}
-      <BotonDelAsistente />
+      {/* ── El asistente ─────────────────────────────────────────────────
+          🔑 Acá queda sólo la PUERTA. La charla vive en una capa que se monta
+          al final de la página y es `fixed`, así que no suma un solo píxel al
+          alto del panel. Ver el encabezado de `Asistente`. */}
+      <EntradaAlAsistente
+        chico={datos.chico?.nombre}
+        alAbrir={(p) => {
+          setArranqueElegido(p ?? "");
+          setAsistenteAbierto(true);
+        }}
+      />
 
       {/* ── La instalación ─────────────────────────────────────────────── */}
       <Instalacion chico={datos.chico?.nombre} />
@@ -563,6 +574,22 @@ export default function MiFamilia() {
             el registro de arriba, no con una frase tranquilizadora. */}
         <ElParte />
       </section>
+
+      {/* ── El asistente y su atajo ──────────────────────────────────────
+          🔑 Los dos son `fixed`, así que viven fuera del flujo y da igual
+          dónde estén escritos. Van al final porque es lo último que se dibuja
+          y así quedan por encima de todo sin pelear por el `z-index`. */}
+      <Asistente
+        chico={datos.chico?.nombre}
+        abierto={asistenteAbierto}
+        alCerrar={() => setAsistenteAbierto(false)}
+        preguntaInicial={arranqueElegido}
+        alConsumirPregunta={() => setArranqueElegido("")}
+      />
+      <BotonDelAsistente
+        oculto={asistenteAbierto}
+        alTocar={() => setAsistenteAbierto(true)}
+      />
     </main>
   );
 }
@@ -948,7 +975,56 @@ function ElCuestionario({
   );
 }
 
-function Asistente({ chico }: { chico?: string }) {
+/* 📌 Arranques sugeridos. No son decoración: un padre preocupado muchas veces
+   no sabe qué preguntar, y una caja de texto vacía es una pared.
+   🔑 Viven ACÁ y no adentro de `Asistente` desde el 20/9: la tarjeta del informe
+   los muestra para invitar, y la capa los muestra cuando todavía no se habló.
+   Escritos dos veces se desincronizan — ya pasó con `juntarObservaciones`. */
+const ARRANQUES = [
+  "¿Qué significa este informe?",
+  "¿Cómo le hablo del tema sin que se cierre?",
+  "¿Qué mirar además de lo que ve el sistema?",
+];
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL ASISTENTE — UNA CAPA, NO UNA SECCIÓN. Rediseñado el 20/9
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  🔴 **Medido el 20/9 con una charla cargada, en un teléfono de 390×844:** la
+ *  sección arrancaba en 1.563 px y medía **8.803 px — el 66% del panel entero**,
+ *  que daba 13.354 px (15,8 pantallas). La charla se dibujaba adentro del flujo
+ *  y crecía sin techo con cada respuesta.
+ *
+ *  ➡ **Lo que eso rompía no era el asistente: era todo lo demás.** «Qué vio la
+ *  red» —la trazabilidad, lo que contesta *¿por qué me decís esto?*— terminaba
+ *  en el píxel 12.493, la pantalla 15 de 16. Lo que sostiene al producto entero
+ *  quedaba donde no llega nadie.
+ *
+ *  🔑 **Y explica el botón flotante de otra manera que la del 21/8.** No hizo
+ *  falta porque el asistente estuviera escondido: hizo falta porque era tan
+ *  grande que sepultó al resto, y hubo que poner un atajo para volver.
+ *
+ *  ✅ **Ahora vive en una capa `fixed`**, así que no aporta una sola línea al
+ *  alto de la página: teléfono a pantalla completa, monitor en una columna a la
+ *  derecha. En el informe queda `EntradaAlAsistente`, que es la puerta.
+ *  📌 **Se mantiene montada aunque esté cerrada** —oculta, no desmontada—: así
+ *  la charla no se vuelve a pedir al servidor cada vez que se abre, y lo que el
+ *  padre dejó escrito sin mandar sigue ahí cuando vuelve.
+ */
+function Asistente({
+  chico,
+  abierto,
+  alCerrar,
+  preguntaInicial,
+  alConsumirPregunta,
+}: {
+  chico?: string;
+  abierto: boolean;
+  alCerrar: () => void;
+  preguntaInicial?: string;
+  alConsumirPregunta: () => void;
+}) {
   const [turnos, setTurnos] = useState<TurnoEnPantalla[]>([]);
   const [pregunta, setPregunta] = useState("");
   const [pensando, setPensando] = useState(false);
@@ -974,13 +1050,55 @@ function Asistente({ chico }: { chico?: string }) {
     };
   }, []);
 
-  /* 📌 Arranques sugeridos. No son decoración: un padre preocupado muchas veces
-     no sabe qué preguntar, y una caja de texto vacía es una pared. */
-  const ARRANQUES = [
-    "¿Qué significa este informe?",
-    "¿Cómo le hablo del tema sin que se cierre?",
-    "¿Qué mirar además de lo que ve el sistema?",
-  ];
+  /* ── Lo que hace que una capa se sienta una capa ──────────────────────────
+
+     🔑 Las cuatro son de accesibilidad y ninguna es adorno: una capa que no se
+     cierra con Escape, que no lleva el foco adentro y que deja el fondo
+     moviéndose por detrás es un cartel grande, no un diálogo. */
+  const cuerpo = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!abierto) return;
+
+    /* El foco va al campo: el que abrió el asistente viene a escribir, y en el
+       teléfono eso además abre el teclado solo. Es la misma decisión del 24/8,
+       que ya había elegido el CAMPO y no la sección. */
+    const campo = document.getElementById("pregunta-al-asistente");
+    window.setTimeout(() => campo?.focus({ preventScroll: true }), 80);
+
+    function conEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") alCerrar();
+    }
+    window.addEventListener("keydown", conEscape);
+
+    /* ⚠ El fondo se traba mientras la capa está abierta. Sin esto, en el
+       teléfono el dedo scrollea el panel de atrás en vez de la charla. */
+    const overflowPrevio = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", conEscape);
+      document.body.style.overflow = overflowPrevio;
+    };
+  }, [abierto, alCerrar]);
+
+  /* La charla se muestra siempre por su final: lo último que se dijo es lo que
+     importa, y con historia cargada abrirla por arriba obliga a scrollear para
+     llegar a lo de hoy. */
+  useEffect(() => {
+    if (!abierto || !cuerpo.current) return;
+    cuerpo.current.scrollTop = cuerpo.current.scrollHeight;
+  }, [abierto, turnos.length, pensando]);
+
+  /* Un arranque tocado desde la tarjeta del informe abre la capa Y manda la
+     pregunta. 📌 Se avisa que se consumió para que no se vuelva a disparar en
+     el próximo render. */
+  useEffect(() => {
+    if (!abierto || !preguntaInicial || cargando) return;
+    preguntar(preguntaInicial);
+    alConsumirPregunta();
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [abierto, preguntaInicial, cargando]);
 
   async function preguntar(texto: string) {
     const limpio = texto.trim();
@@ -1085,25 +1203,77 @@ function Asistente({ chico }: { chico?: string }) {
   const deOtroDia = ultima ? diaLocal(ultima) !== diaLocal(new Date().toISOString()) : false;
 
   return (
-    <section
-      id="asistente"
-      className="mt-8 scroll-mt-4 rounded-lg border border-borde bg-superficie px-5 py-5"
+    <div
+      aria-hidden={!abierto}
+      /* 🔑 `inert` saca del orden de tabulación TODO lo de adentro mientras la
+         capa está cerrada. Sin esto, la capa sigue montada —que es lo que
+         preserva la charla— y alguien que navega con el teclado se mete a
+         escribir en un diálogo que no está viendo. `pointer-events-none` frena
+         el mouse y no frena el tabulador. */
+      {...(abierto ? {} : ({ inert: "" } as Record<string, string>))}
+      className={`fixed inset-0 z-50 ${abierto ? "" : "pointer-events-none"}`}
     >
-      <div className="flex items-center gap-2">
-        <MessageCircle size={15} className="text-acento" />
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
-          Preguntale al asistente
-        </h2>
-        {turnos.length > 0 && !confirmandoBorrado && (
-          <button
-            onClick={() => setConfirmandoBorrado(true)}
-            className="ml-auto flex items-center gap-1.5 text-[11px] text-apagado transition hover:text-riesgo"
-          >
-            <Trash2 size={11} /> Borrar la charla
-          </button>
-        )}
-      </div>
+      {/* El fondo. Tocarlo cierra, que es lo que todo el mundo intenta primero.
+          🔴 En monitor apaga mucho menos y no desenfoca: ahí la capa es una
+          columna al costado, y la mitad del valor de preguntarle algo al
+          asistente es tener el informe a la vista mientras se le pregunta. En
+          el teléfono no aplica — la capa tapa la pantalla entera. */}
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="Cerrar el asistente"
+        onClick={alCerrar}
+        className={`absolute inset-0 bg-fondo/70 backdrop-blur-[2px] transition-opacity motion-reduce:transition-none sm:bg-fondo/30 sm:backdrop-blur-none ${
+          abierto ? "opacity-100" : "opacity-0"
+        }`}
+      />
 
+      {/* 🔑 Teléfono: pantalla completa. Monitor: una columna a la derecha, con
+          el informe a la vista al costado — que es la mitad del valor de
+          preguntarle algo al asistente. */}
+      <section
+        id="asistente"
+        role="dialog"
+        aria-modal={abierto}
+        aria-label="Asistente de AntiGro"
+        className={`absolute inset-0 flex flex-col border-borde bg-superficie transition-transform duration-200 motion-reduce:transition-none sm:left-auto sm:w-[26rem] sm:border-l ${
+          abierto ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        {/* ⚠ En 390 px acá entran cuatro cosas y no cinco. El título completo
+            más «Borrar la charla» en palabras parten los dos en dos renglones y
+            el encabezado se come 80 px de la charla. Por eso borrar es sólo el
+            tacho, con su nombre accesible puesto. */}
+        <div className="flex shrink-0 items-center gap-2 border-b border-borde px-5 py-4">
+          <MessageCircle size={15} className="shrink-0 text-acento" />
+          <h2 className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+            Preguntale al asistente
+          </h2>
+          <div className="ml-auto flex shrink-0 items-center gap-1">
+            {turnos.length > 0 && !confirmandoBorrado && (
+              <button
+                onClick={() => setConfirmandoBorrado(true)}
+                aria-label="Borrar la charla"
+                title="Borrar la charla"
+                className="flex items-center justify-center rounded-md p-1.5 text-apagado transition hover:bg-fondo hover:text-riesgo"
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={alCerrar}
+              aria-label="Cerrar el asistente"
+              className="flex items-center justify-center rounded-md p-1.5 text-tenue transition hover:bg-fondo hover:text-tinta"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Lo único que scrollea. El alto lo pone la capa, no el contenido: por
+            eso la charla ya no puede empujar nada. */}
+        <div ref={cuerpo} className="flex-1 overflow-y-auto px-5 py-4">
       {cargando ? (
         <div className="mt-4 flex items-center gap-2 text-xs text-apagado">
           <LoaderCircle size={12} className="animate-spin" /> Buscando lo que ya hablaron…
@@ -1218,6 +1388,8 @@ function Asistente({ chico }: { chico?: string }) {
         </>
       )}
 
+        </div>
+
       {/* 🔴 **EN EL TELÉFONO VA APILADO, Y NO ES ESTÉTICA — 21/8.**
           Lo levantó Edgardo: *"el espacio para la pregunta es muy chico en
           mobile, ocupa la mitad de la pantalla"*. Medido: **196 px de 390, el
@@ -1244,7 +1416,7 @@ function Asistente({ chico }: { chico?: string }) {
           e.preventDefault();
           preguntar(pregunta);
         }}
-        className="mt-4 flex flex-col gap-2 sm:flex-row"
+        className="flex shrink-0 flex-col gap-2 border-t border-borde px-5 py-4 sm:flex-row"
       >
         <textarea
           id="pregunta-al-asistente"
@@ -1273,6 +1445,68 @@ function Asistente({ chico }: { chico?: string }) {
           Preguntar
         </button>
       </form>
+      </section>
+    </div>
+  );
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LA PUERTA AL ASISTENTE, adentro del informe — 20/9
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  🔑 **Esto es lo que queda en el flujo del panel cuando la charla se va a su
+ *  capa**, y no es un botón pelado a propósito: la charla se llevaba 8.803 px,
+ *  pero también se llevaba la explicación de para qué sirve el asistente y los
+ *  tres arranques sugeridos. Sacar la charla y dejar sólo un botón habría
+ *  resuelto el alto tirando lo único que invita a usarlo.
+ *
+ *  📌 Mide ~200 px. Los arranques abren la capa **con la pregunta ya mandada**:
+ *  el que tocó «¿Qué significa este informe?» no vino a escribir, vino a leer.
+ */
+function EntradaAlAsistente({
+  chico,
+  alAbrir,
+}: {
+  chico?: string;
+  alAbrir: (pregunta?: string) => void;
+}) {
+  return (
+    <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+      <div className="flex items-center gap-2">
+        <MessageCircle size={15} className="text-acento" />
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+          Preguntale al asistente
+        </h2>
+      </div>
+
+      <p className="mt-2.5 text-sm leading-relaxed text-tenue">
+        Te explica el informe, te ordena las opciones y te dice cómo abrir la conversación con{" "}
+        {chico ?? "el chico"}.{" "}
+        <span className="text-apagado">
+          No te va a decir que no es nada, ni que sí: eso no lo puede saber, y decírtelo sería
+          mentirte con cara de sistema.
+        </span>
+      </p>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {ARRANQUES.map((a) => (
+          <button
+            key={a}
+            onClick={() => alAbrir(a)}
+            className="rounded-full border border-borde px-3 py-1.5 text-xs text-tenue transition hover:border-acento hover:text-acento"
+          >
+            {a}
+          </button>
+        ))}
+      </div>
+
+      <button
+        onClick={() => alAbrir()}
+        className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-acento transition hover:brightness-110"
+      >
+        Escribir mi pregunta <ArrowRight size={13} />
+      </button>
     </section>
   );
 }
@@ -1326,30 +1560,24 @@ function Asistente({ chico }: { chico?: string }) {
  *  informe y no hay de qué hablar. En el recorrido tampoco — el que está dando
  *  de alta todavía no tiene nada que preguntar.
  */
-function BotonDelAsistente() {
-  function ir() {
-    const campo = document.getElementById("pregunta-al-asistente");
-    if (!campo) return;
-    /* ⚠ `prefers-reduced-motion` se respeta: un salto animado de dos pantallas
-       le cae mal a quien pidió que no se mueva nada. */
-    const quieto = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    /* 🔑 `center` y no `start`: deja la caja en el medio de la pantalla, con el
-       final de la charla arriba y el botón «Preguntar» abajo, los dos a la
-       vista de una. Pegada al borde de arriba, en el teléfono el teclado se
-       come el botón y hay que volver a scrolear para mandar la pregunta. */
-    campo.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "center" });
-    /* El foco va al campo: el que tocó el botón viene a escribir, y en el
-       teléfono eso además abre el teclado solo. `preventScroll` porque el salto
-       de arriba ya lo dejó donde va. */
-    window.setTimeout(() => campo.focus({ preventScroll: true }), quieto ? 0 : 600);
-  }
+function BotonDelAsistente({ oculto, alTocar }: { oculto: boolean; alTocar: () => void }) {
+  /* 🔑 **Desde el 20/9 ABRE LA CAPA en vez de saltar a una sección.** Todo el
+     problema del 21/8 y del 24/8 —a qué elemento apuntar, dónde frenar el
+     salto, si esconderlo o no— existía porque el destino estaba adentro de la
+     página y se movía. Una capa no tiene a dónde saltar: aparece.
 
+     📌 **Y ahora sí desaparece, pero por un motivo distinto del de agosto:** se
+     va cuando la capa está abierta, porque ahí sobra. No es el vaivén por
+     scroll que se cayó el 24/8 — eso no vuelve. */
   return (
     <button
       type="button"
-      onClick={ir}
-      aria-label="Ir al asistente y escribir una pregunta"
-      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-acento/60 bg-acento px-4 py-3 text-sm font-semibold text-fondo shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acento motion-reduce:transition-none"
+      onClick={alTocar}
+      aria-expanded={!oculto ? undefined : true}
+      aria-label="Abrir el asistente y escribir una pregunta"
+      className={`fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-acento/60 bg-acento px-4 py-3 text-sm font-semibold text-fondo shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acento motion-reduce:transition-none ${
+        oculto ? "pointer-events-none opacity-0" : "opacity-100"
+      }`}
     >
       <MessageCircle size={16} />
       Preguntar

@@ -17,10 +17,13 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 📄 **El fundamento entero vive en el dossier:** https://claude.ai/artifact/Jue1oRUWcPFjSXrSCGoryW
 (documento vivo — se actualiza sobre ese mismo enlace, no se crea uno nuevo).
 
-1. 🔴 **LA INTERFAZ, y separar el simulador del producto.** No estaba en la lista de mejoras y va
+1. 🟡 **LA INTERFAZ, y separar el simulador del producto.** No estaba en la lista de mejoras y va
    primero: **varios psicólogos le dijeron que no la entendían**, y quien ve la consola de la home
    y después abre el panel cree que sigue en la demo. Mientras no se resuelva, cualquier mejora se
-   le agrega a algo que no se entiende. 📌 El panel mide 9 pantallas de scroll y tiene 14 secciones.
+   le agrega a algo que no se entiende.
+   ✅ **Primer movimiento hecho el 20/9: la charla salió del informe** — el panel bajó de 15,8
+   pantallas a 5,9. Ver el bloque de abajo. ⬜ Faltan el orden de las secciones y el marco del
+   simulador.
 2. **Terminar el idioma** — va pegado al 1: si hay que tocar cada pantalla, el texto se escribe una
    sola vez. Falta la interfaz; el asistente, los mensajes al chico y los controles ya están.
 3. **El ensayo de la conversación con el hijo** — el asistente hace de hijo adolescente. El
@@ -37,6 +40,57 @@ la Universidad de Toulouse (CC BY-SA, 66 categorías, conversión a NextDNS ya h
 🔴 **No existen listas públicas de dominios de grooming.** Verificado tres veces. No volver a buscar.
 
 ⛔ **Fuera del alcance y del discurso: bullying.** Decisión suya del 19/9.
+
+---
+
+## 🪟 LA CHARLA SALIÓ DEL INFORME — 20/9, primer movimiento de la interfaz
+
+**Rama `interfaz/asistente-en-capa`.** Se midió el panel abriéndolo de verdad, logueado como
+`mariana@ejemplo.ar` en un teléfono de 390×844, y el número no se parecía a lo anotado:
+
+| | Antes | Después |
+|---|---|---|
+| El panel entero | **13.354 px · 15,8 pantallas** | **4.949 px · 5,9 pantallas** |
+| «Preguntale al asistente» | **8.803 px — el 66% del panel** | 336 px (la puerta) |
+| «Qué vio la red» empezaba en | **12.493 px** (pantalla 15 de 16) | 4.088 px (pantalla 5) |
+
+🔴 **La causa: la charla se dibujaba adentro del flujo y crecía sin techo.** 12.682 caracteres de
+conversación vieja empujaban todo lo demás diez pantallas hacia abajo. **La trazabilidad que se
+construyó el 19/9 —lo que contesta *¿por qué me decís esto?*— terminaba donde no llega nadie.**
+
+🔑 **Y explica el botón flotante de otra manera que la del 21/8.** No hizo falta porque el
+asistente estuviera escondido: hizo falta porque **era tan grande que sepultó al resto**, y hubo
+que poner un atajo para volver. La nota vieja diagnosticó el síntoma.
+
+### Cómo quedó
+
+- **`Asistente` es una capa `fixed`**, así que no aporta un solo píxel al alto de la página.
+  Teléfono a pantalla completa; monitor en una columna de 26 rem a la derecha.
+  🔴 **Se mantiene MONTADA cuando está cerrada** —oculta, no desmontada—: así la charla no se
+  vuelve a pedir al servidor en cada apertura y lo escrito sin mandar sigue ahí. Por eso lleva
+  **`inert`** mientras está cerrada: `pointer-events-none` frena el mouse y **no** frena el
+  tabulador, y sin `inert` alguien que navega con el teclado escribe en un diálogo que no ve.
+- **`EntradaAlAsistente`** queda en el informe: la explicación de para qué sirve y los tres
+  arranques. 🔑 **No es un botón pelado a propósito** — sacar la charla y dejar sólo un botón
+  habría arreglado el alto tirando lo único que invita a usarlo. Un arranque **abre la capa con la
+  pregunta ya mandada**: el que tocó «¿Qué significa este informe?» no vino a escribir, vino a leer.
+- **`BotonDelAsistente` ABRE la capa** en vez de saltar a una sección, y se apaga mientras está
+  abierta. 📌 **Eso NO es el vaivén por scroll que se cayó el 24/8** — aquello no vuelve. 🔑 Todo
+  el problema de agosto (a qué elemento apuntar, dónde frenar el salto) existía porque el destino
+  vivía adentro de la página y se movía. **Una capa no tiene a dónde saltar: aparece.**
+- **`ARRANQUES` pasó a ser constante de módulo.** La tarjeta y la capa los muestran los dos, y
+  escritos en dos lugares se desincronizan — ya pasó con `juntarObservaciones` (19/8).
+- Escape cierra · el fondo se traba mientras está abierta · el foco va al campo · la charla se
+  abre por su final. 📌 **En monitor el fondo apaga poco y no desenfoca**: la mitad del valor de
+  preguntarle algo al asistente es tener el informe a la vista mientras se le pregunta.
+
+✅ **Verificado en pantalla, no sólo en el typecheck:** se abrió con el botón y con un arranque, el
+modelo **contestó de verdad** (no respaldo) y en peninsular, Escape cerró, y **después de dos
+turnos nuevos el panel seguía midiendo lo mismo** — que es la prueba de que la charla ya no empuja
+nada. `npm run probar` en verde.
+
+⚠ **Lo que apareció y NO se tocó:** el encabezado de la capa no entra en 390 px con «Borrar la
+charla» en palabras; quedó como ícono con su nombre accesible.
 
 ---
 
