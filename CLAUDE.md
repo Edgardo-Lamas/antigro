@@ -92,6 +92,46 @@ nada. `npm run probar` en verde.
 ⚠ **Lo que apareció y NO se tocó:** el encabezado de la capa no entra en 390 px con «Borrar la
 charla» en palabras; quedó como ícono con su nombre accesible.
 
+### 🧍 Y LA PRESENCIA YA TIENE SU LUGAR — mismo día, lo marcó él
+
+**Mirando la capa recién hecha:** *"tené en cuenta que la pregunta se la va a estar haciendo al
+asistente virtual que habíamos definido. Te lo digo porque ahora veo una caja de diálogo"*.
+**Tenía razón: la capa es el contenedor, y adentro no va un cuadro de texto — va él.**
+
+🔑 **Y su recordatorio destapa que son DOS lugares, no uno.** El punto 2 del plan dice que la
+presencia está *siempre*, no sólo cuando se abre la charla: si el avatar vive únicamente adentro
+de la capa, vuelve a ser un botón con otra ropa.
+
+| Dónde | Qué hay |
+|---|---|
+| **Monitor (`lg`+)** | Franja fija a la **izquierda**, de cuerpo entero, siempre a la vista. El panel mide 672 px centrado: a los lados sobra espacio y **no le quita nada al informe** |
+| **Teléfono** | La esquina de abajo, de cintura para arriba, dentro de un círculo de 64 px. Ahí no hay lugar para presencia continua sin robarle pantalla al informe |
+| **La capa, en las dos** | En el encabezado, al lado del título — el padre le está escribiendo a alguien y ese alguien tiene que estar en pantalla |
+
+📌 **El rótulo «Preguntar» se conserva en el teléfono**: sin él, una figura en una esquina es un
+adorno y nadie sabe que se toca.
+
+🔴 **`src/components/Presencia.tsx` — y LOS CLIPS NO EXISTEN TODAVÍA (son el punto 4).** Mientras
+tanto dibuja una **silueta translúcida en SVG** con el degradado de la casa, que ocupa exactamente
+el lugar y la medida del clip: el día que los cuatro archivos estén en `public/avatar/`, se cambia
+`HAY_CLIPS` a `true` y **no hay que tocar una línea del layout**.
+🔑 La paleta ya era de holograma sin habérselo propuesto: `acento` violeta → `acentoDos` cian.
+
+🔴🔴 **LA FIGURA NO REACCIONA AL RIESGO — serena y estable siempre.** `estado` describe qué hace el
+asistente (reposo · escuchando · pensando · hablando), **nunca cómo viene el chico**. `reglas.ts`
+controla lo que el asistente *afirma*, y **un gesto preocupado es una afirmación que ningún control
+mira**. Está escrito en el encabezado del componente para que nadie le pase la lectura.
+
+⚠ Dos cosas que sólo se vieron mirando la pantalla: las rayas del holograma se dibujaban como una
+**caja rayada** alrededor del cuerpo (faltaba el `clipPath`), y en el teléfono el rótulo centrado
+empujaba la figura y dejaba la última letra contra el borde (`items-end`).
+
+### ✅ Y de paso, lo que tocaba del punto 2 (el idioma)
+
+**Las pantallas del asistente quedaron en peninsular**, porque el orden aprobado dice que el texto
+se escribe una sola vez: «Pregúntale al asistente» · «Escribe tu pregunta» · «Queda guardada para
+ti… la borras cuando quieras» · «Retomas la charla». ⬜ **El resto del barrido sigue pendiente.**
+
 ---
 
 ## 🔍 LA TRAZABILIDAD SE VE, Y EL PARTE SE PUEDE PEDIR — 19/9

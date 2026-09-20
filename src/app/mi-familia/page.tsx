@@ -32,6 +32,7 @@ import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
 import { COMO_FUNCIONA } from "@/lib/config";
 import CampoDeClave from "@/components/CampoDeClave";
+import Presencia from "@/components/Presencia";
 import {
   CLAVE_MINIMA,
   COMO_SE_LEE,
@@ -586,7 +587,7 @@ export default function MiFamilia() {
         preguntaInicial={arranqueElegido}
         alConsumirPregunta={() => setArranqueElegido("")}
       />
-      <BotonDelAsistente
+      <PresenciaDelAsistente
         oculto={asistenteAbierto}
         alTocar={() => setAsistenteAbierto(true)}
       />
@@ -1244,10 +1245,16 @@ function Asistente({
             más «Borrar la charla» en palabras parten los dos en dos renglones y
             el encabezado se come 80 px de la charla. Por eso borrar es sólo el
             tacho, con su nombre accesible puesto. */}
-        <div className="flex shrink-0 items-center gap-2 border-b border-borde px-5 py-4">
-          <MessageCircle size={15} className="shrink-0 text-acento" />
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-borde px-5 py-3">
+          {/* 🔑 Acá es donde de verdad hace falta: el padre está escribiéndole a
+              alguien, y ese alguien tiene que estar en pantalla mientras le
+              escribe. 📌 `pensando` convierte la espera de ~15 s en «me está
+              pensando la respuesta», que es la mitad de para qué existe. */}
+          <span className="flex h-11 w-11 shrink-0 items-end justify-center overflow-hidden rounded-full border border-acento/40 bg-acentoSuave/70">
+            <Presencia estado={pensando ? "pensando" : "reposo"} forma="busto" />
+          </span>
           <h2 className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-acento">
-            Preguntale al asistente
+            Pregúntale al asistente
           </h2>
           <div className="ml-auto flex shrink-0 items-center gap-1">
             {turnos.length > 0 && !confirmandoBorrado && (
@@ -1310,8 +1317,8 @@ function Asistente({
               que la escribe tiene derecho a saber dónde queda. */}
           {turnos.length > 0 && !confirmandoBorrado && (
             <p className="mt-2.5 text-[11px] leading-relaxed text-apagado">
-              {deOtroDia ? "Retomás la charla donde la dejaste. " : ""}
-              Queda guardada para vos: el otro adulto responsable no la ve, y la borrás cuando
+              {deOtroDia ? "Retomas la charla donde la dejaste. " : ""}
+              Queda guardada para ti: el otro adulto responsable no la ve, y la borras cuando
               quieras.
             </p>
           )}
@@ -1433,7 +1440,7 @@ function Asistente({
             }
           }}
           rows={2}
-          placeholder="Escribí tu pregunta"
+          placeholder="Escribe tu pregunta"
           className="w-full resize-none rounded-md border border-borde bg-fondo px-3 py-3 text-base leading-relaxed text-tinta outline-none focus:border-acento sm:w-auto sm:flex-1 sm:py-2 sm:text-sm"
         />
         <button
@@ -1476,7 +1483,7 @@ function EntradaAlAsistente({
       <div className="flex items-center gap-2">
         <MessageCircle size={15} className="text-acento" />
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
-          Preguntale al asistente
+          Pregúntale al asistente
         </h2>
       </div>
 
@@ -1560,28 +1567,78 @@ function EntradaAlAsistente({
  *  informe y no hay de qué hablar. En el recorrido tampoco — el que está dando
  *  de alta todavía no tiene nada que preguntar.
  */
-function BotonDelAsistente({ oculto, alTocar }: { oculto: boolean; alTocar: () => void }) {
-  /* 🔑 **Desde el 20/9 ABRE LA CAPA en vez de saltar a una sección.** Todo el
-     problema del 21/8 y del 24/8 —a qué elemento apuntar, dónde frenar el
-     salto, si esconderlo o no— existía porque el destino estaba adentro de la
-     página y se movía. Una capa no tiene a dónde saltar: aparece.
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  DONDE ESTÁ EL ASISTENTE CUANDO NO SE LE ESTÁ HABLANDO — 20/9
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ *  🔑 **Desde hoy ABRE LA CAPA en vez de saltar a una sección.** Todo el
+ *  problema del 21/8 y del 24/8 —a qué elemento apuntar, dónde frenar el salto,
+ *  si esconderlo o no— existía porque el destino estaba adentro de la página y
+ *  se movía con cada respuesta. **Una capa no tiene a dónde saltar: aparece.**
+ *
+ *  🔴 **Y deja de ser un botón: es la presencia.** Lo pidió Edgardo el 31/8
+ *  —*"que esté presente siempre que abra el sistema, atento al requerimiento
+ *  del padre"*— y lo recordó el 20/9 mirando esta pantalla: *"la pregunta se la
+ *  va a estar haciendo al asistente virtual"*. Un botón que dice «Preguntar» no
+ *  es nadie. ⬜ Los clips son el punto 4; el lugar y la medida ya son éstos.
+ *
+ *  **Dos lugares, porque son dos problemas distintos:**
+ *  - **Monitor (`lg` para arriba): la franja de la izquierda, siempre a la
+ *    vista.** El panel mide 672 px centrado, así que a los lados sobra espacio
+ *    y la presencia **no le quita nada al informe**. De pie, al costado del que
+ *    decide — nunca delante.
+ *  - **Teléfono: la esquina.** Ahí no hay lugar para presencia continua sin
+ *    robarle pantalla al informe, así que va de cintura para arriba, chiquito y
+ *    fijo. 📌 Conserva el rótulo «Preguntar»: sin él, una figura en una esquina
+ *    es un adorno y nadie sabe que se toca.
+ *
+ *  📌 **Los dos se apagan con la capa abierta**, porque ahí el asistente ya está
+ *  en pantalla. ⚠ Eso NO es el vaivén por scroll que se cayó el 24/8: aquello
+ *  dependía de dónde estabas mirando y esto depende de si la capa está abierta.
+ */
+function PresenciaDelAsistente({ oculto, alTocar }: { oculto: boolean; alTocar: () => void }) {
+  /* 📌 Acá siempre está en reposo, y no hace falta pasarle el estado de la
+     charla: cuando el asistente piensa, la capa está abierta — y con la capa
+     abierta esto está apagado. El que piensa es el del encabezado de la capa. */
+  const estado = "reposo" as const;
+  const apagada = oculto ? "pointer-events-none opacity-0" : "opacity-100";
 
-     📌 **Y ahora sí desaparece, pero por un motivo distinto del de agosto:** se
-     va cuando la capa está abierta, porque ahí sobra. No es el vaivén por
-     scroll que se cayó el 24/8 — eso no vuelve. */
   return (
-    <button
-      type="button"
-      onClick={alTocar}
-      aria-expanded={!oculto ? undefined : true}
-      aria-label="Abrir el asistente y escribir una pregunta"
-      className={`fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border border-acento/60 bg-acento px-4 py-3 text-sm font-semibold text-fondo shadow-lg transition hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-acento motion-reduce:transition-none ${
-        oculto ? "pointer-events-none opacity-0" : "opacity-100"
-      }`}
-    >
-      <MessageCircle size={16} />
-      Preguntar
-    </button>
+    <>
+      {/* ── Monitor: la franja ──────────────────────────────────────────── */}
+      <button
+        type="button"
+        onClick={alTocar}
+        aria-label="Abrir el asistente y escribir una pregunta"
+        className={`fixed bottom-0 left-0 top-0 z-30 hidden w-40 flex-col items-center justify-end pb-10 transition-opacity duration-300 motion-reduce:transition-none lg:flex xl:w-56 ${apagada}`}
+      >
+        <div className="h-[22rem] w-full px-3 xl:h-[26rem]">
+          <Presencia estado={estado} forma="cuerpo" />
+        </div>
+        <span className="mt-3 text-[11px] uppercase tracking-[0.14em] text-apagado transition group-hover:text-acento">
+          Pregúntale
+        </span>
+      </button>
+
+      {/* ── Teléfono: la esquina ────────────────────────────────────────── */}
+      <button
+        type="button"
+        onClick={alTocar}
+        aria-label="Abrir el asistente y escribir una pregunta"
+        /* ⚠ `items-end` y no `items-center`: el rótulo es más ancho que el
+           círculo, y centrado empujaba la figura hacia adentro y dejaba la
+           última letra contra el borde de la pantalla. */
+        className={`fixed bottom-5 right-4 z-40 flex flex-col items-end gap-1 transition-opacity motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acento lg:hidden ${apagada}`}
+      >
+        <span className="flex h-16 w-16 items-end justify-center overflow-hidden rounded-full border border-acento/50 bg-acentoSuave/80 shadow-lg backdrop-blur-sm">
+          <Presencia estado={estado} forma="busto" />
+        </span>
+        <span className="whitespace-nowrap rounded-full bg-fondo/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-tinta">
+          Preguntar
+        </span>
+      </button>
+    </>
   );
 }
 
