@@ -194,16 +194,32 @@ export default function Consola() {
   return (
     <div className="space-y-6">
       {/*
-       * ── DOS COLUMNAS ──────────────────────────────────────────────────
-       * 🔑 Izquierda angosta = lo que uno elige. Derecha ancha = lo que el
-       * motor devuelve. En una sola columna esos dos roles se mezclaban en
-       * una fila de controles arriba, después el reloj aparte, después la
-       * lectura — tres bloques para una sola idea. El reloj ahora vive
-       * DENTRO de la tarjeta de lectura, arriba de su propio gráfico, que es
-       * lo que controla: no tiene sentido en otro lado.
+       * ── LA VITRINA ────────────────────────────────────────────────────
+       *
+       * 🔴 **El simulador es una RÉPLICA del panel con datos inventados, y
+       * eso no se arregla haciéndolo distinto.** Lo intentamos al revés —que
+       * mostrara otra cosa— y Edgardo lo frenó con la pregunta correcta:
+       * *"si el simulador es diferente del panel real ¿no obligaría a un
+       * segundo entendimiento de un nuevo panel?"*. Duplicar la pantalla
+       * duplica la carga, que es justo lo que veníamos a bajar.
+       *
+       * ✅ **Lo acordado el 20/9: el mismo panel, ENMARCADO.** Como la
+       * maqueta de un edificio en una vitrina: se parece, tiene que
+       * parecerse, y nadie la confunde porque está en una vitrina y tiene
+       * cartel.
+       *
+       * 🔑 Y la diferencia no hubo que inventarla, ya existía: **el
+       * simulador tiene perillas y el panel no**, porque la realidad no se
+       * elige. Por eso las perillas viven AFUERA del marco y adentro queda
+       * sólo lo que el motor devuelve, con los rótulos del panel de verdad
+       * —«Cómo viene», «Qué vio la red»—, en el mismo orden.
+       *
+       * ➡ Da vuelta el problema: hasta hoy el simulador competía con el
+       * panel; así lo ENSEÑA. El que movió las perillas acá ya sabe leer el
+       * suyo cuando entra.
        */}
       <div className="grid gap-6 lg:grid-cols-[300px_1fr] lg:items-start">
-        {/* ── LOS CONTROLES ────────────────────────────────────────────── */}
+        {/* ── LAS PERILLAS — FUERA DE LA VITRINA ───────────────────────── */}
         <section id="tour-controles" className="space-y-4">
           <PanelControl titulo="El chico">
             <div className="flex items-baseline justify-between">
@@ -271,96 +287,22 @@ export default function Consola() {
               Nueve preguntas sobre hechos que ellos ven y la red no puede ver.
             </p>
           </PanelControl>
-        </section>
 
-        {/* ── LA LECTURA: nivel + confianza arriba, reloj y gráfico abajo ── */}
-        <div className="space-y-5">
-          <section
-            id="tour-lectura"
-            className={`rounded-xl border ${color.borde} bg-superficie transition-colors ${
-              cargando ? "opacity-70" : ""
-            }`}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-6 px-5 pt-5">
-              <div>
-                <p className="text-xs uppercase tracking-[0.08em] text-apagado">Lectura del motor</p>
-                <div className="mt-2 flex items-center gap-3">
-                  <span
-                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${color.punto} shadow-[0_0_0_5px_rgba(255,255,255,0.06)]`}
-                    aria-hidden
-                  />
-                  <h2 className="text-2xl font-semibold tracking-tight text-tinta">
-                    {NOMBRE_DE_ESTADO[estado]}
-                  </h2>
-                </div>
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-tenue">
-                  {DESCRIPCION_ESTADO[estado]}
-                </p>
-                <p className="mt-2 text-xs text-apagado">
-                  {aCuantos === 0 ? (
-                    <>No le escribió a nadie</>
-                  ) : (
-                    <>
-                      Le escribió a <strong className={color.texto}>{aCuantos}</strong>: los dos
-                      adultos responsables y el propio chico
-                    </>
-                  )}
-                </p>
-              </div>
-
-              {/* 🔑 «Alcance» es el dato real del motor — cuánto se desplegó
-                  la lectura de ese chico, de 0 a 1. Es el mismo número que
-                  el mockup llamaba «confianza del cálculo»: no es otra
-                  medida inventada, es el `alcance` con otro nombre visual. */}
-              <div className="min-w-[150px] text-right">
-                <p className="text-xs text-apagado">Alcance de la lectura</p>
-                <p className="mt-1.5 text-2xl font-semibold text-acento tabular-nums">
-                  {Math.round(alcance * 100)}%
-                </p>
-                <span className="mt-2 block h-1 overflow-hidden rounded-full bg-borde">
-                  <span
-                    className="block h-full rounded-full bg-acento transition-all duration-300"
-                    style={{ width: `${Math.round(alcance * 100)}%` }}
-                  />
-                </span>
-                <p className="mt-1.5 text-[11px] text-apagado">
-                  {diasDePerfil} {diasDePerfil === 1 ? "día" : "días"} conociéndolo
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-5 px-5 pb-5">
-              {/* ── EL RELOJ, arriba del gráfico que controla ── */}
-              <div
-                id="tour-reloj"
-                className="flex flex-wrap items-center justify-between gap-3"
+          {/* 🔴 **El reloj es una perilla y por eso se mudó acá afuera.** El
+              20/9 lo habíamos metido adentro de la tarjeta de lectura, pegado
+              al gráfico que controla, y para una pantalla suelta estaba bien.
+              Con el marco deja de estarlo: adentro va lo que el motor
+              devuelve, y elegir qué día se mira es de las cosas que un padre
+              en su panel no puede hacer. */}
+          <PanelControl titulo="El día">
+            <div id="tour-reloj">
+              <button
+                onClick={reproducir}
+                disabled={corriendo}
+                className="w-full rounded-lg border border-acento px-3.5 py-2 text-[13px] font-medium text-acento transition hover:bg-acentoSuave disabled:opacity-40"
               >
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={reproducir}
-                    disabled={corriendo}
-                    className="rounded-lg border border-acento px-3.5 py-1.5 text-[13px] font-medium text-acento transition hover:bg-acentoSuave disabled:opacity-40"
-                  >
-                    {corriendo ? "Corriendo…" : "▶ Reproducir tres semanas"}
-                  </button>
-                  <span className="text-xs text-apagado">
-                    día <strong className="tabular-nums text-tinta">{dia + 1}</strong> de {DIAS}
-                  </span>
-                </div>
-                <span className="text-xs text-apagado">riesgo por día</span>
-              </div>
-
-              <div className="mt-2.5">
-                <Grafico
-                  dias={lectura?.dias ?? []}
-                  hasta={dia}
-                  onElegirDia={(i) => {
-                    setCorriendo(false);
-                    setDia(i);
-                  }}
-                />
-              </div>
-
+                {corriendo ? "Corriendo…" : "▶ Reproducir tres semanas"}
+              </button>
               <input
                 type="range"
                 min={0}
@@ -373,44 +315,184 @@ export default function Consola() {
                 className="mt-3 h-1 w-full cursor-pointer appearance-none rounded-full bg-borde accent-acento"
                 aria-label="Día de la historia"
               />
-
-              {lectura && lectura.loQueNoSeVe.length > 0 && (
-                <p className="mt-4 flex items-start gap-2 text-[11px] leading-relaxed text-apagado">
-                  <EyeOff size={13} className="mt-0.5 shrink-0" aria-hidden />
-                  <span>{lectura.loQueNoSeVe.join(" ")}</span>
-                </p>
-              )}
+              <p className="mt-2 text-xs text-apagado">
+                día <strong className="tabular-nums text-tinta">{dia + 1}</strong> de {DIAS}
+              </p>
             </div>
-          </section>
+          </PanelControl>
+        </section>
 
-          {/* ── SEÑALES ACUMULADAS + EL MENSAJE, lado a lado ────────────── */}
-          <div className="grid gap-5 md:grid-cols-2">
-            <section className="rounded-xl border border-borde bg-superficie px-5 py-5">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-apagado">
-                Señales acumuladas
+        {/* ── EL MARCO, Y EL PANEL ADENTRO ─────────────────────────────── */}
+        <div className="rounded-2xl border border-acento/30 bg-[#06090D] p-3 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.04),0_24px_60px_-24px_rgba(0,0,0,0.85)] sm:p-4">
+          {/* 🔴 **El rótulo VIAJA con el contenido, y ése era el problema
+              entero.** El de antes existía —«Probalo con datos de ejemplo»—
+              pero se perdía con el scroll: a 950 px de ahí, o sea una pantalla
+              de teléfono más abajo, ya estabas mirando «El patrón se sostiene»
+              en rojo, con un gráfico subiendo y un 80%, y nada en pantalla
+              decía que era inventado. Eso es exactamente lo que les pasó a los
+              psicólogos.
+
+              📌 `sticky` y no `fixed`: se despega solo cuando el marco termina.
+              Un cartel que dice «ejemplo» sobre el resto de la página mentiría
+              al revés. */}
+          <div className="sticky top-0 z-20 -mx-3 -mt-3 mb-4 flex items-center gap-2.5 rounded-t-2xl border-b border-acento/20 bg-[#06090D]/95 px-4 py-2.5 backdrop-blur sm:-mx-4 sm:-mt-4 sm:px-5">
+            {/* 📌 Una sola línea, y el texto corto es parte del diseño: esta
+                barra vive pegada arriba de la pantalla todo lo que dura el
+                simulador, así que cada renglón que ocupa se lo saca al informe
+                durante tres pantallas seguidas. Lo que hay que sostener ahí es
+                «esto es de ejemplo»; el matiz completo va al pie del marco. */}
+            <span className="shrink-0 rounded bg-atencionSuave px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-atencion">
+              datos de ejemplo
+            </span>
+            <span className="text-[11px] leading-snug text-tenue">
+              así se vería tu panel
+            </span>
+          </div>
+
+          {/* 🔑 `max-w-2xl` no es un número de diseño: es **el ancho exacto del
+              panel real** (`/mi-familia`). Si la maqueta no tiene la medida del
+              edificio, deja de enseñarlo. */}
+          <div className="mx-auto max-w-2xl px-1 pb-1">
+            {/* ── CÓMO VIENE ───────────────────────────────────────────── */}
+            <section id="tour-lectura">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+                Cómo viene
               </h2>
-              {lectura && lectura.porQue.length > 0 ? (
-                <ul className="mt-3.5 space-y-3">
-                  {lectura.porQue.map((t, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed">
-                      <span
-                        aria-hidden
-                        className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${color.punto}`}
-                      />
-                      <span className="text-tinta">{t}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-3.5 text-sm leading-relaxed text-apagado">
-                  Nada que reportar todavía. La enorme mayoría de las semanas se ven así.
+
+              <div
+                className={`mt-3 rounded-lg border px-5 py-5 transition-colors ${color.borde} ${
+                  color.fondo
+                } ${cargando ? "opacity-70" : ""}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`h-2.5 w-2.5 shrink-0 rounded-full ${color.punto} shadow-[0_0_0_5px_rgba(255,255,255,0.06)]`}
+                    aria-hidden
+                  />
+                  <p className={`text-lg font-semibold ${color.texto}`}>
+                    {NOMBRE_DE_ESTADO[estado]}
+                  </p>
+                </div>
+                <p className="mt-1.5 text-sm leading-relaxed text-tenue">
+                  {DESCRIPCION_ESTADO[estado]}
                 </p>
-              )}
+                <p className="mt-1.5 text-xs text-apagado">
+                  Últimos {DIAS} días. El sistema lo viene mirando hace {diasDePerfil}{" "}
+                  {diasDePerfil === 1 ? "día" : "días"}.
+                </p>
+
+                {/* 🔑 «Alcance» es el dato real del motor —cuánto se desplegó la
+                    lectura de ese chico, de 0 a 1—, y acá va en una línea y no
+                    en un número de 2xl con columna propia: en el panel real ese
+                    lugar lo ocupa el estado, y dos titulares compitiendo era
+                    parte de por qué esto se leía como otra pantalla. */}
+                <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                  <span className="text-[11px] uppercase tracking-[0.1em] text-apagado">
+                    Alcance de la lectura
+                  </span>
+                  <span className="h-1 w-24 overflow-hidden rounded-full bg-borde">
+                    <span
+                      className="block h-full rounded-full bg-acento transition-all duration-300"
+                      style={{ width: `${Math.round(alcance * 100)}%` }}
+                    />
+                  </span>
+                  <span className="text-xs font-semibold tabular-nums text-acento">
+                    {Math.round(alcance * 100)}%
+                  </span>
+                </div>
+
+                {/* 🔴 «Señales acumuladas» dejó de ser una sección aparte: en el
+                    panel real esto es el «Por qué», adentro de la misma caja y
+                    debajo del estado. Afuera era una tarjeta más que el padre
+                    tenía que relacionar por su cuenta con la lectura. */}
+                {lectura && lectura.porQue.length > 0 ? (
+                  <>
+                    <p className="mt-4 text-[11px] uppercase tracking-[0.1em] text-apagado">
+                      Por qué
+                    </p>
+                    <ul className="mt-1.5 flex flex-col gap-1">
+                      {lectura.porQue.map((t, i) => (
+                        <li key={i} className="text-sm leading-relaxed text-tinta">
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p className="mt-4 text-sm leading-relaxed text-apagado">
+                    Nada que reportar todavía. La enorme mayoría de las semanas se ven así.
+                  </p>
+                )}
+
+                {/* 🔴 Va siempre, y sobre todo cuando alerta: un sistema que
+                    dice lo que ve tiene que decir lo que no ve. Es el mismo
+                    bloque del panel real, en el mismo lugar. */}
+                {lectura && lectura.loQueNoSeVe.length > 0 && (
+                  <>
+                    <p className="mt-4 flex items-center gap-1.5 text-[11px] uppercase tracking-[0.1em] text-apagado">
+                      <EyeOff size={12} aria-hidden /> Lo que no se ve desde acá
+                    </p>
+                    {/* 📌 Corrido y en cuerpo chico, no en lista como el panel
+                        real: son seis frases largas y en lista medían 608 px
+                        —tres cuartos de pantalla de teléfono— para decir algo
+                        que se lee de un tirón. El rótulo es el mismo; lo que
+                        cambia es el tamaño del párrafo. */}
+                    <p className="mt-1.5 text-[11px] leading-relaxed text-apagado">
+                      {lectura.loQueNoSeVe.join(" ")}
+                    </p>
+                  </>
+                )}
+
+                <p className="mt-4 border-t border-borde/60 pt-3 text-xs text-apagado">
+                  {aCuantos === 0 ? (
+                    <>No le escribió a nadie</>
+                  ) : (
+                    <>
+                      Le escribió a <strong className={color.texto}>{aCuantos}</strong>: los dos
+                      adultos responsables y el propio chico
+                    </>
+                  )}
+                </p>
+              </div>
             </section>
 
-            <section id="tour-mensajes" className="flex flex-col rounded-xl border border-borde bg-superficie px-5 py-5">
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-xs font-semibold uppercase tracking-[0.08em] text-apagado">
+            {/* ── QUÉ VIO LA RED ───────────────────────────────────────── */}
+            <section className="mt-8">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+                Qué vio la red
+              </h2>
+              <p className="mt-2 text-xs leading-relaxed text-apagado">
+                Se ve qué día pasó algo y cuánto pesó. No se ve —ni se guarda— nada de lo que el
+                chico escribió.
+              </p>
+
+              <div className="mt-3 rounded-lg border border-borde bg-superficie px-5 py-5">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-[11px] uppercase tracking-[0.1em] text-apagado">
+                    Riesgo por día
+                  </span>
+                  <span className="text-xs text-apagado">
+                    hasta el día <strong className="tabular-nums text-tinta">{dia + 1}</strong>
+                  </span>
+                </div>
+
+                <div className="mt-3">
+                  <Grafico
+                    dias={lectura?.dias ?? []}
+                    hasta={dia}
+                    onElegirDia={(i) => {
+                      setCorriendo(false);
+                      setDia(i);
+                    }}
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* ── EL MENSAJE ───────────────────────────────────────────── */}
+            <section id="tour-mensajes" className="mt-8">
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
                   El mensaje que te llegaría
                 </h2>
                 <button
@@ -422,58 +504,69 @@ export default function Consola() {
                 </button>
               </div>
 
-              {/* 🔴 El diseño mostraba el mensaje siempre puesto, calculado
-                  gratis en el navegador. Acá NO: cada mensaje real son dos
-                  llamadas al modelo (adultos + chico), y mostrarlo solo con
-                  un botón es la regla documentada arriba del archivo — sale
-                  a demanda porque redactarlo en cada movimiento del reloj
-                  sería lento y caro. */}
-              {!mensajes && !pidiendoMensajes && (
-                <div className="mt-3.5 flex-1 rounded-lg border border-dashed border-borde px-4 py-3.5 text-sm leading-relaxed text-apagado">
-                  Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
-                  artificial sólo lo pone en palabras, y se revisa antes de salir.
-                </div>
-              )}
+              <div className="mt-3 rounded-lg border border-borde bg-superficie px-5 py-5">
+                {/* 🔴 El diseño mostraba el mensaje siempre puesto, calculado
+                    gratis en el navegador. Acá NO: cada mensaje real son dos
+                    llamadas al modelo (adultos + chico), y mostrarlo sólo con
+                    un botón es la regla documentada arriba del archivo — sale
+                    a demanda porque redactarlo en cada movimiento del reloj
+                    sería lento y caro. */}
+                {!mensajes && !pidiendoMensajes && (
+                  <p className="text-sm leading-relaxed text-apagado">
+                    Quién decide es el sistema, mirando qué pasó y en qué días. La inteligencia
+                    artificial sólo lo pone en palabras, y se revisa antes de salir.
+                  </p>
+                )}
 
-              {mensajes?.fallo && (
-                <p className="mt-3.5 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
-                  {mensajes.fallo}
-                </p>
-              )}
+                {mensajes?.fallo && (
+                  <p className="rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3 text-sm leading-relaxed text-atencion">
+                    {mensajes.fallo}
+                  </p>
+                )}
 
-              {mensajes && !mensajes.fallo && (
-                <div className="mt-3.5 space-y-3">
-                  <Mensaje
-                    titulo="A los adultos responsables"
-                    cuerpo={mensajes.paraLosAdultos}
-                    acento="border-t-acento"
+                {mensajes && !mensajes.fallo && (
+                  <div className="space-y-3">
+                    <Mensaje
+                      titulo="A los adultos responsables"
+                      cuerpo={mensajes.paraLosAdultos}
+                      acento="border-t-acento"
+                    />
+                    <Mensaje
+                      titulo={`Al propio chico (${edad} años)`}
+                      cuerpo={mensajes.paraElChico}
+                      acento="border-t-acentoDos"
+                    />
+                  </div>
+                )}
+
+                <div className="mt-3.5 flex items-center gap-2 text-[11px] text-apagado">
+                  <span
+                    className={`h-1.5 w-1.5 shrink-0 rounded-full ${color.punto}`}
+                    aria-hidden
                   />
-                  <Mensaje
-                    titulo={`Al propio chico (${edad} años)`}
-                    cuerpo={mensajes.paraElChico}
-                    acento="border-t-acentoDos"
-                  />
+                  Decide el motor. La IA sólo lo pone en palabras, y se revisa antes de salir.
                 </div>
-              )}
-
-              <div className="mt-3.5 flex items-center gap-2 text-[11px] text-apagado">
-                <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${color.punto}`} aria-hidden />
-                Decide el motor. La IA sólo lo pone en palabras, y se revisa antes de salir.
               </div>
             </section>
+
+            {/* ── 🔴 La nota que blinda, no la que debilita ─────────────
+                Se mudó ACÁ ADENTRO, al pie del marco. Suelta al final de la
+                página quedaba a cuatro pantallas del dato que matizaba, que
+                es lo mismo que no estar. */}
+            <p className="mt-8 border-t border-borde pt-4 text-xs leading-relaxed text-apagado">
+              <strong className="text-tenue">Datos de ejemplo.</strong> El análisis es el del
+              sistema real: el simulador sólo emite señales — quién decide es el motor, con la
+              misma regla de persistencia que correría contra un filtro de red conectado.
+            </p>
           </div>
         </div>
       </div>
 
-      {/* ── QUE LLEGUE DE VERDAD ────────────────────────────────────────── */}
+      {/* ── QUE LLEGUE DE VERDAD ──────────────────────────────────────────
+          🔑 FUERA del marco, y no es un descuido de layout: acá no hay nada
+          simulado — el mensaje sale por Telegram al teléfono del que lo pide.
+          Ponerlo adentro de la vitrina diría que también es de mentira. */}
       <Entrega escenario={escenario} dia={dia} edad={edad} genero={genero} estado={estado} />
-
-      {/* ── 🔴 La nota que blinda, no la que debilita ───────────────────── */}
-      <p className="px-1 text-xs leading-relaxed text-apagado">
-        <strong className="text-tenue">Datos de ejemplo.</strong> El análisis es el del sistema
-        real: el simulador sólo emite señales — quién decide es el motor, con la misma regla de
-        persistencia que correría contra un filtro de red conectado.
-      </p>
     </div>
   );
 }

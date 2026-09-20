@@ -23,7 +23,7 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
    le agrega a algo que no se entiende.
    ✅ **Hecho el 20/9: la charla salió del informe, la presencia tiene su lugar y las secciones
    están ordenadas** — el panel bajó de **15,8 pantallas a 3,2**. Ver los bloques de abajo.
-   ⬜ **Falta el marco del simulador**, que es la otra mitad del punto 1.
+   ✅ **Y el marco del simulador, la otra mitad, también** — ver «LA VITRINA» más abajo.
 2. **Terminar el idioma** — va pegado al 1: si hay que tocar cada pantalla, el texto se escribe una
    sola vez. Falta la interfaz; el asistente, los mensajes al chico y los controles ya están.
 3. **El ensayo de la conversación con el hijo** — el asistente hace de hijo adolescente. El
@@ -40,6 +40,50 @@ la Universidad de Toulouse (CC BY-SA, 66 categorías, conversión a NextDNS ya h
 🔴 **No existen listas públicas de dominios de grooming.** Verificado tres veces. No volver a buscar.
 
 ⛔ **Fuera del alcance y del discurso: bullying.** Decisión suya del 19/9.
+
+---
+
+## 🔍 LA VITRINA — el marco del simulador, 20/9
+
+**Cierra el punto 1.** El diagnóstico exacto: **el simulador era una RÉPLICA del panel con datos
+inventados** —misma columna vertebral, mismo orden, misma paleta—, y por eso el que veía la consola
+y después abría su panel creía que seguía en la demo.
+
+🔴 **Yo propuse que el simulador mostrara OTRA cosa (el motor, los pesos, el cruce) y Edgardo lo
+frenó con la pregunta correcta:** *"si el simulador es diferente del panel real ¿no obligaría a un
+segundo entendimiento de un nuevo panel?"*. Tenía razón: eso duplica la carga en vez de bajarla.
+
+✅ **Lo acordado y hecho: el MISMO panel, enmarcado.** Como una maqueta en una vitrina — se parece
+al edificio, tiene que parecerse, y nadie la confunde porque está en una vitrina y tiene cartel.
+🔑 **La diferencia no hubo que inventarla, ya existía: el simulador tiene PERILLAS y el panel no**,
+porque la realidad no se elige.
+
+| | Antes | Ahora |
+|---|---|---|
+| El rótulo | «Probalo con datos de ejemplo», **se perdía a 950 px** | Barra `sticky` que **viaja con el marco** |
+| Las perillas | Mezcladas con la salida, en el mismo grid | **Afuera del marco** — incluido el reloj |
+| Los rótulos de adentro | «Lectura del motor» · «Señales acumuladas» | **«Cómo viene» · «Qué vio la red»**, los del panel real |
+| El «por qué» | Tarjeta aparte, a un lado | **Adentro de la caja de estado**, como en `/mi-familia` |
+| La nota que blinda | Al final de la página, a 4 pantallas | **Al pie del marco** |
+| «Que te llegue a vos» | Adentro del bloque | **Afuera**: ahí no hay nada simulado, el Telegram sale de verdad |
+
+🔴 **Lo que se medía y no se veía en el código:** en un teléfono de 390×844, entre el rótulo
+(px 1.107) y «El patrón se sostiene» en rojo con un 80% y un gráfico subiendo (px 2.057) había
+**950 px — una pantalla entera**. Nada en pantalla decía que era inventado. **Eso es exactamente lo
+que les pasó a los psicólogos.**
+
+📌 **`max-w-2xl` adentro del marco no es un número de diseño: es el ancho exacto de `/mi-familia`.**
+Si la maqueta no tiene la medida del edificio, deja de enseñarlo.
+📌 **El reloj se mudó a las perillas.** El 20/9 lo habíamos puesto adentro de la tarjeta de lectura,
+pegado al gráfico que controla; con el marco deja de corresponder, porque elegir qué día se mira es
+justo de lo que un padre en su panel no puede hacer.
+📌 «Lo que no se ve desde acá» va **corrido y en cuerpo chico**, no en lista como el panel real: son
+seis frases largas y en lista medían 608 px.
+⬜ **Queda pendiente el desplegable «Ver cómo lo pensó»** (datos externos y motor) dentro del mismo
+marco — estaba marcado como opcional en el acuerdo.
+
+➡ **Da vuelta el problema: hasta ahora el simulador competía con el panel; así lo ENSEÑA.** El que
+movió las perillas en la home ya sabe leer el suyo cuando entra, porque es el mismo dibujo.
 
 ---
 
