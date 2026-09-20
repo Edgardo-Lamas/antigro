@@ -21,9 +21,9 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
    primero: **varios psicólogos le dijeron que no la entendían**, y quien ve la consola de la home
    y después abre el panel cree que sigue en la demo. Mientras no se resuelva, cualquier mejora se
    le agrega a algo que no se entiende.
-   ✅ **Primer movimiento hecho el 20/9: la charla salió del informe** — el panel bajó de 15,8
-   pantallas a 5,9. Ver el bloque de abajo. ⬜ Faltan el orden de las secciones y el marco del
-   simulador.
+   ✅ **Hecho el 20/9: la charla salió del informe, la presencia tiene su lugar y las secciones
+   están ordenadas** — el panel bajó de **15,8 pantallas a 3,2**. Ver los bloques de abajo.
+   ⬜ **Falta el marco del simulador**, que es la otra mitad del punto 1.
 2. **Terminar el idioma** — va pegado al 1: si hay que tocar cada pantalla, el texto se escribe una
    sola vez. Falta la interfaz; el asistente, los mensajes al chico y los controles ya están.
 3. **El ensayo de la conversación con el hijo** — el asistente hace de hijo adolescente. El
@@ -131,6 +131,37 @@ empujaba la figura y dejaba la última letra contra el borde (`items-end`).
 **Las pantallas del asistente quedaron en peninsular**, porque el orden aprobado dice que el texto
 se escribe una sola vez: «Pregúntale al asistente» · «Escribe tu pregunta» · «Queda guardada para
 ti… la borras cuando quieras» · «Retomas la charla». ⬜ **El resto del barrido sigue pendiente.**
+
+### 📐 Y EL ORDEN DE LAS SECCIONES — mismo día, cierra el punto 1
+
+**El panel bajó de 15,8 pantallas a 3,2** (13.354 px → 2.714 px). El orden ahora cuenta una
+historia en vez de listar catorce cosas:
+
+| | Sección | Por qué ahí |
+|---|---|---|
+| 1 | **Cómo viene** | La respuesta. Es lo único que el padre vino a buscar |
+| 2 | **Qué vio la red** | En qué se apoya esa respuesta. Contesta «¿por qué me dices esto?» |
+| 3 | **Lo que ven ustedes** | La otra mitad de la lectura: el cuestionario |
+| 4 | **Quién vio el aviso** | El estado del aviso, y sólo significa algo cuando hubo uno |
+| 5 | **Pregúntale al asistente** | La puerta. Va después del informe porque las preguntas vienen de haberlo leído |
+| 6 | **La casa** (plegado) | Todo lo que se mira una vez y no se vuelve a mirar |
+
+🔴 **«Falta algo» dejó de ser la primera sección y se mudó ADENTRO del informe**, arriba del
+estado. **Era el cambio de fondo, no de lugar:** un padre abría el panel de su hija y lo primero
+que leía era una tarea pendiente, arriba de «Sin novedad». 🔑 Si el filtro no está instalado, eso
+no es una tarea al costado: **es la respuesta a «cómo viene»** — el sistema no está viendo nada.
+
+🔑 **«La casa» agrupa lo que era el 70% del panel**: la instalación, quiénes están, las entradas,
+la clave, el registro y las sugerencias. **No se borra nada: se pliega.** Un panel que arranca con
+seis secciones de configuración le dice al que entra que esto es un sistema para administrar, y es
+un sistema para mirar a un chico. 📌 Las sugerencias se cuentan en el rótulo («1 sugerencia»), así
+que plegarlas no las esconde.
+
+📌 **Es `<details>` del navegador y no un estado propio:** abre sin JavaScript, Ctrl+F encuentra lo
+de adentro igual y el teclado lo maneja solo. Un plegable hecho a mano pierde las tres cosas.
+
+**El recorrido completo del día:** 15,8 pantallas → 5,9 (la charla salió del informe) → **3,2** (el
+orden). Y «Qué vio la red» pasó de la pantalla 15 a la **2**.
 
 ---
 

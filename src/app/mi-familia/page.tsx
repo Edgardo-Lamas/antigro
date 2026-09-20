@@ -16,6 +16,8 @@ import {
   DoorOpen,
   KeyRound,
   History,
+  Home,
+  ChevronDown,
   X,
   UserMinus,
   MessageCircle,
@@ -324,45 +326,6 @@ export default function MiFamilia() {
         </p>
       )}
 
-      {/* ── Lo que de verdad impide trabajar ────────────────────────────── */}
-      {datos.familia.impedimentos.length > 0 && (
-        <section className="mt-6 rounded-lg border border-atencion/40 bg-atencionSuave px-5 py-4">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-atencion">
-            Falta algo
-          </h2>
-          <ul className="mt-2.5 flex flex-col gap-1">
-            {datos.familia.impedimentos.map((f) => (
-              <li key={f} className="text-sm text-atencion">
-                {f}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* ── Lo que conviene, que NO es lo mismo ──────────────────────────
-          🔴 Hasta el 17/8 esto y lo de arriba eran la misma lista, en el mismo
-          cartel naranja de alerta. A un hogar con un solo progenitor le decía
-          «hacen falta al menos 2 adultos responsables», que es falso: esa
-          familia no está incompleta. Ahora se ve distinto porque ES distinto —
-          gris, no naranja— y cada consejo viene con su porqué. Un consejo sin
-          motivo se lee como una exigencia disfrazada. */}
-      {datos.familia.sugerencias.length > 0 && (
-        <section className="mt-6 rounded-lg border border-borde bg-superficie px-5 py-4">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-apagado">
-            Esto lo haría más completo
-          </h2>
-          <ul className="mt-2.5 flex flex-col gap-3">
-            {datos.familia.sugerencias.map((s) => (
-              <li key={s.que}>
-                <p className="text-sm text-tinta">{s.que}</p>
-                <p className="mt-0.5 text-xs leading-relaxed text-tenue">{s.porQue}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
       {/* ── El informe ─────────────────────────────────────────────────── */}
       <section className="mt-8">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
@@ -370,6 +333,29 @@ export default function MiFamilia() {
         </h2>
 
         <div className={`mt-3 rounded-lg border px-5 py-5 ${color.borde} ${color.fondo}`}>
+          {/* 🔴 LO QUE IMPIDE TRABAJAR VA ACÁ ADENTRO — 20/9, y es un cambio de
+              fondo, no de lugar. Hasta hoy era la PRIMERA sección del panel:
+              un padre abría el informe de su hija y lo primero que leía era una
+              tarea pendiente. Peor todavía, lo leía ARRIBA de «Sin novedad».
+
+              🔑 Si el filtro no está instalado, eso NO es una tarea al costado:
+              **es la respuesta a «cómo viene»** — el sistema no está viendo
+              nada. Puesto acá adentro y antes del estado, el que lee entiende
+              en qué condiciones está hecha la lectura que viene abajo. */}
+          {datos.familia.impedimentos.length > 0 && (
+            <div className="mb-4 rounded-md border border-atencion/40 bg-atencionSuave px-3.5 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-atencion">
+                Falta algo, y esto lo condiciona
+              </p>
+              <ul className="mt-1.5 flex flex-col gap-1">
+                {datos.familia.impedimentos.map((f) => (
+                  <li key={f} className="text-sm leading-relaxed text-atencion">
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <p className={`text-lg font-semibold ${color.texto}`}>{NOMBRE_DE_ESTADO[estado]}</p>
           {datos.chico && (
             <p className="mt-1.5 text-xs text-tenue">
@@ -410,94 +396,6 @@ export default function MiFamilia() {
           )}
         </div>
       </section>
-
-      {/* ── Quién vio el aviso ─────────────────────────────────────────── */}
-      <ElAcuse acuse={datos.acuse} />
-
-      {/* ── Lo que ven los adultos ─────────────────────────────────────── */}
-      <ElCuestionario
-        chico={datos.chico?.nombre}
-        firmas={datos.cuestionario.firmas}
-        deUnTotalDe={datos.cuestionario.deUnTotalDe}
-      />
-
-      {/* ── El asistente ─────────────────────────────────────────────────
-          🔑 Acá queda sólo la PUERTA. La charla vive en una capa que se monta
-          al final de la página y es `fixed`, así que no suma un solo píxel al
-          alto del panel. Ver el encabezado de `Asistente`. */}
-      <EntradaAlAsistente
-        chico={datos.chico?.nombre}
-        alAbrir={(p) => {
-          setArranqueElegido(p ?? "");
-          setAsistenteAbierto(true);
-        }}
-      />
-
-      {/* ── La instalación ─────────────────────────────────────────────── */}
-      <Instalacion chico={datos.chico?.nombre} />
-
-      {/* ── Quiénes están ──────────────────────────────────────────────── */}
-      <section className="mt-8">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
-          Quiénes están
-        </h2>
-
-        {datos.chico && (
-          <p className="mt-3 text-sm text-tinta">
-            {datos.chico.nombre}, {datos.chico.edad} años.{" "}
-            <span className="text-apagado">
-              {datos.chico.quienEligeAlReferente === "el_chico"
-                ? "A esta edad, la persona de confianza de afuera la elige ella o él."
-                : "A esta edad, la persona de confianza de afuera la eligen ustedes."}
-            </span>
-          </p>
-        )}
-
-        <ul className="mt-4 flex flex-col gap-4">
-          {activos.map((a) => (
-            <Referente key={a.id} adulto={a} chico={datos.chico?.nombre} alCambiar={cargar} />
-          ))}
-
-          {datos.chico && (
-            <li className="flex flex-col gap-1.5 border-t border-borde pt-4">
-              <div className="flex flex-wrap items-baseline gap-2 text-sm">
-                <span className="text-tinta">{datos.chico.nombre}</span>
-                <span className="text-apagado">— es a quien cuida el sistema</span>
-                <span className="font-mono text-[10px] uppercase tracking-wider text-apagado">
-                  {datos.chico.canal}
-                </span>
-              </div>
-              <Conexion persona={datos.chico} />
-            </li>
-          )}
-        </ul>
-
-        {deBaja.length > 0 && (
-          <div className="mt-6 border-t border-borde pt-4">
-            <p className="text-[11px] uppercase tracking-[0.1em] text-apagado">Ya no están</p>
-            <ul className="mt-2 flex flex-col gap-1">
-              {deBaja.map((a) => (
-                <li key={a.id} className="text-xs text-apagado">
-                  {a.nombre} — {VINCULO[a.vinculo] ?? a.vinculo}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </section>
-
-      {/* ── Las entradas de la casa ────────────────────────────────────── */}
-      {datos.puertas.length > 0 && (
-        <LasPuertas puertas={datos.puertas} alCambiar={cargar} />
-      )}
-
-      {/* ── La clave ───────────────────────────────────────────────────── */}
-      {datos.puertas.length > 0 && (
-        <LaClave hayMasDeUnaCasa={datos.puertas.length > 1} alCambiar={cargar} />
-      )}
-
-      {/* ── El registro ────────────────────────────────────────────────── */}
-      <ElRegistro accesos={datos.accesos ?? []} />
 
       {/* ── La línea de tiempo ─────────────────────────────────────────── */}
       <section className="mt-8">
@@ -575,6 +473,152 @@ export default function MiFamilia() {
             el registro de arriba, no con una frase tranquilizadora. */}
         <ElParte />
       </section>
+
+
+      {/* ── Lo que ven los adultos ─────────────────────────────────────── */}
+      <ElCuestionario
+        chico={datos.chico?.nombre}
+        firmas={datos.cuestionario.firmas}
+        deUnTotalDe={datos.cuestionario.deUnTotalDe}
+      />
+
+      {/* ── Quién vio el aviso ─────────────────────────────────────────── */}
+      <ElAcuse acuse={datos.acuse} />
+      {/* ── El asistente ─────────────────────────────────────────────────
+          🔑 Acá queda sólo la PUERTA. La charla vive en una capa que se monta
+          al final de la página y es `fixed`, así que no suma un solo píxel al
+          alto del panel. Ver el encabezado de `Asistente`. */}
+      <EntradaAlAsistente
+        chico={datos.chico?.nombre}
+        alAbrir={(p) => {
+          setArranqueElegido(p ?? "");
+          setAsistenteAbierto(true);
+        }}
+      />
+
+      {/* ── LA CASA ──────────────────────────────────────────────────────
+          🔴 **Las seis secciones de acá adentro eran el 70% del panel y ninguna
+          contesta «¿cómo está mi hija?»**: son cosas que se miran una vez y no
+          se vuelven a mirar —quién vive en la casa, cómo se instaló el filtro,
+          las entradas, la clave, qué se cambió—.
+
+          🔑 **No se borra nada: se pliega.** Un panel que arranca con seis
+          secciones de configuración le dice al que entra que esto es un sistema
+          para administrar, y es un sistema para mirar a un chico.
+
+          📌 **`<details>` del navegador y no un estado propio:** se abre sin
+          JavaScript, el buscador del navegador (Ctrl+F) encuentra lo de adentro
+          igual, y el teclado lo maneja solo. Un plegable hecho a mano pierde las
+          tres cosas y no gana ninguna.
+
+          ⚠ Lo que NO entra acá es lo que impide trabajar: eso subió adentro del
+          informe, porque condiciona la lectura en vez de acompañarla. */}
+      <details className="group mt-8 rounded-lg border border-borde bg-superficie/50">
+        <summary className="flex cursor-pointer list-none items-center gap-2 px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-tenue transition hover:text-tinta">
+          <Home size={13} />
+          La casa
+          {datos.familia.sugerencias.length > 0 && (
+            <span className="rounded-full bg-acentoSuave px-2 py-0.5 text-[10px] font-semibold normal-case tracking-normal text-acento">
+              {datos.familia.sugerencias.length}{" "}
+              {datos.familia.sugerencias.length === 1 ? "sugerencia" : "sugerencias"}
+            </span>
+          )}
+          <ChevronDown
+            size={15}
+            className="ml-auto shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+          />
+        </summary>
+
+        <div className="border-t border-borde px-5 pb-6 pt-1">
+      {/* ── Lo que conviene, que NO es lo mismo ──────────────────────────
+          🔴 Hasta el 17/8 esto y lo de arriba eran la misma lista, en el mismo
+          cartel naranja de alerta. A un hogar con un solo progenitor le decía
+          «hacen falta al menos 2 adultos responsables», que es falso: esa
+          familia no está incompleta. Ahora se ve distinto porque ES distinto —
+          gris, no naranja— y cada consejo viene con su porqué. Un consejo sin
+          motivo se lee como una exigencia disfrazada. */}
+      {datos.familia.sugerencias.length > 0 && (
+        <section className="mt-6 rounded-lg border border-borde bg-superficie px-5 py-4">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-apagado">
+            Esto lo haría más completo
+          </h2>
+          <ul className="mt-2.5 flex flex-col gap-3">
+            {datos.familia.sugerencias.map((s) => (
+              <li key={s.que}>
+                <p className="text-sm text-tinta">{s.que}</p>
+                <p className="mt-0.5 text-xs leading-relaxed text-tenue">{s.porQue}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {/* ── La instalación ─────────────────────────────────────────────── */}
+      <Instalacion chico={datos.chico?.nombre} />
+
+      {/* ── Quiénes están ──────────────────────────────────────────────── */}
+      <section className="mt-8">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+          Quiénes están
+        </h2>
+
+        {datos.chico && (
+          <p className="mt-3 text-sm text-tinta">
+            {datos.chico.nombre}, {datos.chico.edad} años.{" "}
+            <span className="text-apagado">
+              {datos.chico.quienEligeAlReferente === "el_chico"
+                ? "A esta edad, la persona de confianza de afuera la elige ella o él."
+                : "A esta edad, la persona de confianza de afuera la eligen ustedes."}
+            </span>
+          </p>
+        )}
+
+        <ul className="mt-4 flex flex-col gap-4">
+          {activos.map((a) => (
+            <Referente key={a.id} adulto={a} chico={datos.chico?.nombre} alCambiar={cargar} />
+          ))}
+
+          {datos.chico && (
+            <li className="flex flex-col gap-1.5 border-t border-borde pt-4">
+              <div className="flex flex-wrap items-baseline gap-2 text-sm">
+                <span className="text-tinta">{datos.chico.nombre}</span>
+                <span className="text-apagado">— es a quien cuida el sistema</span>
+                <span className="font-mono text-[10px] uppercase tracking-wider text-apagado">
+                  {datos.chico.canal}
+                </span>
+              </div>
+              <Conexion persona={datos.chico} />
+            </li>
+          )}
+        </ul>
+
+        {deBaja.length > 0 && (
+          <div className="mt-6 border-t border-borde pt-4">
+            <p className="text-[11px] uppercase tracking-[0.1em] text-apagado">Ya no están</p>
+            <ul className="mt-2 flex flex-col gap-1">
+              {deBaja.map((a) => (
+                <li key={a.id} className="text-xs text-apagado">
+                  {a.nombre} — {VINCULO[a.vinculo] ?? a.vinculo}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+
+      {/* ── Las entradas de la casa ────────────────────────────────────── */}
+      {datos.puertas.length > 0 && (
+        <LasPuertas puertas={datos.puertas} alCambiar={cargar} />
+      )}
+
+      {/* ── La clave ───────────────────────────────────────────────────── */}
+      {datos.puertas.length > 0 && (
+        <LaClave hayMasDeUnaCasa={datos.puertas.length > 1} alCambiar={cargar} />
+      )}
+
+      {/* ── El registro ────────────────────────────────────────────────── */}
+      <ElRegistro accesos={datos.accesos ?? []} />
+        </div>
+      </details>
 
       {/* ── El asistente y su atajo ──────────────────────────────────────
           🔑 Los dos son `fixed`, así que viven fuera del flujo y da igual
