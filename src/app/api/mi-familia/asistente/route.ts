@@ -164,7 +164,8 @@ export async function POST(req: Request) {
         texto:
           "Estuvimos hablando bastante seguido y necesito un rato. " +
           `Volvé en ${Math.ceil(turno.esperaSeg / 60)} minutos y seguimos.\n\n` +
-          "Si es algo que no puede esperar, la Línea 137 atiende las 24 horas.",
+          "Si es algo que no puede esperar, el teléfono ANAR de la Familia, 600 50 51 52, " +
+          "atiende las 24 horas.",
         origen: "respaldo",
         causa: "limite",
         motivos: ["Demasiadas preguntas seguidas."],

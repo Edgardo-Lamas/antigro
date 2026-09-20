@@ -12,6 +12,75 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
+## 🇪🇸 EL PRODUCTO HABLA PARA ESPAÑA — primera tanda hecha el 19/9
+
+**Por qué:** AntiGro se presenta al concurso de emprendedores de **IEBS**, que es española.
+Hubo prórroga: **la entrega es el 24/9**. Quien lo va a abrir es un jurado español, y un producto
+que vosea y deriva a la Línea 137 se lee como algo que no fue hecho para él.
+🔴 **Decisión de Edgardo del 19/9:** el producto habla en español de España, sin doble idioma. No
+se trata de disimular de dónde es él —eso va en la inscripción, y no hay nada que esconder—: se
+trata de que el usuario español lea su idioma.
+
+### ✅ Los entes y las normas, hechos y verificados en fuente oficial
+
+🔴 **Cada teléfono y cada artículo se abrió en su fuente el 19/9** —`incibe.es`, `anar.org`,
+`aepd.es`, `policia.es` y el BOE—, uno por uno. Ninguno salió de memoria.
+
+**`RECURSOS` (`src/lib/config.ts`) — ahora son CINCO y se deriva por HORA:**
+
+| Recurso | Para quién | Cuándo |
+|---|---|---|
+| **017** (INCIBE) · WhatsApp 900 116 117 · Telegram @INCIBE017 | el adulto | 8:00–23:00, todos los días |
+| **600 50 51 52** — ANAR de la Familia | el adulto | **24 h, 365 días** |
+| **900 20 20 10** / 116 111 — ANAR de Niños y Adolescentes | 🔴 el CHICO, no el padre | 24 h |
+| **Canal prioritario de la AEPD** | retirada urgente de fotos o vídeos | — |
+| **091 / 112** y `denuncias.pornografia.infantil@policia.es` | la denuncia, al final del camino | — |
+
+🔑 **El reparto no es burocracia: el 017 sabe de grooming pero cierra a las 23:00, y la señal de
+madrugada —que es la que este sistema ve— cae fuera.** Por eso el que sostiene la madrugada es el
+de ANAR. Derivar mal es dejar a un padre hablando con un contestador.
+
+**`NORMAS` (`src/lib/legal.ts`) — siete, todas del BOE o de EUR-Lex:**
+
+🔴🔴 **El grooming está en el art. 183 del Código Penal, NO en el 183 ter.** La LO 10/2022
+renumeró el capítulo con efectos del 7/10/2022 y casi todo lo publicado sigue citando el 183 ter,
+que hoy dice otra cosa (el consentimiento del próximo en edad). Si alguien «corrige» esto, mandarlo
+al BOE antes.
+
+Las otras seis: **LO 1/1996 art. 4.1** (honor, intimidad y **secreto de las comunicaciones** del
+menor — es la que mejor sostiene que no se lean los mensajes, más fuerte que la argentina) ·
+**RGPD art. 9.1** · **LOPDGDD art. 9.1** (ni el consentimiento levanta la prohibición) ·
+**LOPDGDD art. 7** (🔑 a los **14 años** el menor consiente sus propios datos; la banda 14-17 del
+sistema cae justo en ese corte) · **Código Civil art. 156** (patria potestad conjunta: sostiene la
+segunda puerta) · **LOPIVI art. 15** (deber de comunicar indicios) · **TRLGDCU art. 86**.
+📌 `VERSION_DE_LOS_TERMINOS` subió a `2026-09-19`: cambió el texto, no el código.
+
+### 🔴🔴 EL CAMBIO DE IDIOMA AFLOJABA EL GUARDARRAÍL, Y NO AVISABA
+
+**Lo más importante de la sesión, y no estaba pedido.** `src/lib/ia/reglas.ts` estaba escrito para
+como se habla acá. En España el tiempo normal para lo recién pasado es el compuesto, y contra los
+patrones viejos **pasaban limpio**:
+
+- *«tu hija **ha sido** acosada»* · *«le **han** groomeado»* → el control de la regla 1 no los veía.
+- *«**hemos leído** lo que le escribe»* → el patrón buscaba `leímos|leemos|leyó`.
+- *«**no pasa nada**»*, *«no hay de qué **preocuparse**»* → tranquilizar, en español de España.
+
+✅ Los cuatro patrones ampliados y **cinco casos nuevos en `reglas.prueba.ts`, marcados 🇪🇸**. Si
+alguno vuelve a aprobar, el control se aflojó: no son pruebas de estilo. **17 de 17 en verde.**
+
+### ⬜ Lo que falta de España (en este orden)
+
+1. **`src/lib/ia/recomendaciones.ts`** — los consejos siguen siendo del Ministerio de Justicia
+   argentino y de Con Vos en la Web. Hay que traer los de **INCIBE/IS4K, ANAR y Save the Children
+   España**, 🔴 textuales y con enlace, como está hecho hoy.
+2. **El barrido de voseo de la interfaz** — quedan unas 30 apariciones en pantallas y textos del
+   panel, el alta, la consola y el tour. Los mensajes al chico y el prompt del asistente ya están.
+3. **Las cifras** — el corpus es argentino (Estudio nacional, Grooming Argentina). El material
+   español ya está bajado en `docs/fuentes/` desde el 31/8: Ministerio del Interior (investigaciones
+   policiales reales), Save the Children, EU Kids Online España y Europol.
+
+---
+
 ## 🔴 FACEBOOK Y MESSENGER NO ESTABAN EN EL CATÁLOGO — arreglado el 28/8
 
 **Salió de una pregunta de Edgardo:** si se le podía hacer llegar al sistema alguna base de datos
@@ -205,20 +274,44 @@ corazón del video**, justo lo que Sandra no encontró sola.
 
 ---
 
-## 🔴 LO PRIMERO, HOY: LA CUENTA DE ANTHROPIC NO TIENE CRÉDITO
+## ✅ LA CLAVE DE ANTHROPIC — resuelta, y este bloque decía lo contrario hasta el 31/8
 
-**Toda la IA del sistema está caída por eso, y sólo por eso** — el asistente contesta el respaldo y
-la escalada manda texto de respaldo. La clave está bien; lo que falta es plata en la cuenta.
-**Hasta que se cargue, no tiene sentido mandarle el enlace a nadie a probar el asistente.**
+**AntiGro corre con la clave de Sandra**, cargada el 24/8 en `production` y `preview` y verificada
+con `HTTP 200` contra Anthropic ANTES de tocar Vercel. La lee `ANTIGRO_ANTHROPIC_KEY`
+(`src/lib/ia/asistente.ts:247`, con `ANTHROPIC_API_KEY` sólo de reserva).
 
-🔴 **Al 22/8 sigue igual, y ya no parece el banco:** *"hice otros pagos sin problema pero la consola
-de Anthropic no me recibe ahora mi cuenta"*. Verificado ese día contra producción —
-`POST /api/demo/mensajes` devuelve **`origen: "respaldo"`** en los dos textos. **Es la forma más
-rápida de comprobar si la IA volvió: si dice `respaldo`, sigue caída.**
-📌 **Camino alternativo si no se destraba:** la **API de Gemini es gratuita y no pide tarjeta**.
-Tocaría `redactar.ts`, `asistente.ts` y el control anti-invención. **No evaluado a fondo — Edgardo
-no lo pidió todavía.**
-📌 El detalle y por qué costó una sesión encontrarlo, en «EL ASISTENTE CAÍA AL RESPALDO».
+🔴 **Este archivo siguió diciendo «no tiene crédito» una semana después de que se resolviera**, y
+eso hizo que se diagnosticara la cuenta en vez del proyecto más de una vez. **AntiGro no comparte
+la cuenta de los otros proyectos de Edgardo:** tiene la suya. Si el asistente falla, se mira el
+registro del servidor (`[asistente] ✗ …`), no la facturación.
+
+📌 **Cómo se comprueba en un minuto, y sigue valiendo:** `POST /api/demo/mensajes` contra
+producción. Si devuelve `origen: "respaldo"`, no contestó el modelo.
+
+---
+
+## 📚 `docs/fuentes/` — la base documental española y europea (31/8)
+
+**Cuatro informes bajados con su texto ya extraído** (`.txt` al lado de cada PDF, `pdftotext
+-layout`), más un `README.md` que explica qué aporta cada uno:
+
+| Archivo | Qué es |
+|---|---|
+| `interior-grooming-policial.pdf` | **La más útil para el motor.** Ministerio del Interior de España, 48 pág. Estudio cuantitativo sobre investigaciones policiales reales, **con las variables codificadas**: duración del delito en meses (*iter criminis*) y **duración de la conversación en días** entre el primer y el último mensaje. La única fuente que le pone número a cuánto dura una captación. 🔴 Cloudflare: **no se baja con `curl`**, hay que usar el navegador |
+| `savethechildren-tras-la-pantalla-2026.pdf` | 23 sentencias / 28 casos en España 2023-2024. 🔑 **Agresores del entorno familiar: 3,3 % (2021-22) → 25 % (2023-24)** — valida con fuente judicial española que el sistema no lea los mensajes y que **el referente lo elija el chico** |
+| `eu-kids-online-v-espana-2026.pdf` | UPV/EHU, encuesta 2025 a menores de 10 a 16. **Línea base de uso normal por edad.** Red académica: **a ésta se le puede pedir el dataset** |
+| `europol-iocta-2026.pdf` | Europol, 28/4/2026, con capítulo de explotación sexual infantil online |
+
+⚠ **Son marco de referencia, NO el mecanismo.** El punto de comparación sigue siendo el propio
+chico y su línea base; estos datos explican **por qué un desvío importa**. Es la misma corrección
+que Edgardo hizo el 24/8 sobre el correo a Faro Digital.
+📌 Faltan ir a buscar: **INCIBE / IS4K** (el Safer Internet Centre oficial de España, redes INSAFE
+e INHOPE, línea 017 con 138.003 consultas en 2025), **WeProtect** (87 % de las tecnológicas detecta
+material de abuso por hash-matching, **sólo el 37 % puede detectar grooming**), ANAR, INHOPE y BIK+.
+
+📄 **`docs/informes/AntiGro-humanizacion-y-trazabilidad.pdf`** — las nueve ideas para humanizar el
+sistema con su impacto técnico, escrito para que lo evalúe Sandra. Fuente en `.html`, se regenera
+con Chrome headless (`--print-to-pdf`).
 
 ---
 

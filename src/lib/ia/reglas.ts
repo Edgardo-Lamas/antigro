@@ -42,12 +42,21 @@ interface ReglaDeTexto {
 
 const AFIRMACIONES_PROHIBIDAS: ReglaDeTexto[] = [
   {
-    patron: /\b(est[áa]s?|fuiste|fue|son|es)\s+(siendo\s+)?(v[íi]ctima|acosad[oa]|groomead[oa])/i,
+    /* 🔴🔴 **«ha sido» entró el 19/9, con el paso a España, y no es un agregado
+       cosmético.** Estos patrones estaban escritos para como se habla acá: «fue
+       acosada», «la están acosando». En España el tiempo normal para lo que
+       acaba de pasar es el compuesto —«tu hija **ha sido** acosada», «**le han**
+       groomeado»—, y contra el patrón viejo eso pasaba limpio. El control más
+       importante del producto se habría aflojado justo al cambiar de mercado,
+       sin que nada fallara ni avisara. */
+    patron:
+      /\b(est[áa]s?|est[áa]n|fuiste|fue|son|es|ha\s+sido|han\s+sido|hab[ée]is\s+sido)\s+(siendo\s+)?(v[íi]ctima|acosad[oa]|groomead[oa])/i,
     motivo: "Afirma que hay acoso. El sistema señala, no diagnostica.",
     negarLoHaceCorrecto: false,
   },
   {
-    patron: /\bte\s+est[áa]n?\s+(acosando|groomeando|manipulando)\b/i,
+    patron:
+      /\b(te|le|la|lo|les)\s+(est[áa]n?|han|ha)\s+(acosando|acosado|groomeando|groomeado|manipulando|manipulado)\b/i,
     motivo: "Afirma que hay acoso en curso.",
     negarLoHaceCorrecto: false,
   },
@@ -67,7 +76,8 @@ const AFIRMACIONES_PROHIBIDAS: ReglaDeTexto[] = [
     negarLoHaceCorrecto: true,
   },
   {
-    patron: /\b(le[íi]mos|leemos|ley[óo]|seg[úu]n\s+(tus|sus)\s+(mensajes|conversaciones|chats))\b/i,
+    patron:
+      /\b(le[íi]mos|leemos|ley[óo]|(hemos|han|he|hab[ée]is)\s+le[íi]do|seg[úu]n\s+(tus|sus)\s+(mensajes|conversaciones|chats))\b/i,
     motivo: "🔴 Sugiere que se leyó contenido. El sistema no lee conversaciones.",
     negarLoHaceCorrecto: true,
   },
@@ -237,13 +247,22 @@ function cifrasInventadas(texto: string): string[] {
 /* ── 3. Derivación obligatoria por banda ─────────────────────────────────── */
 
 /**
- * 📌 A los de 7 a 10 NO se les nombra la Línea 137: a esa edad la llama un
- * adulto. Nombrársela a un chico de 8 es darle una salida que no puede usar.
+ * 📌 A los de 7 a 10 NO se les nombra ningún teléfono de ayuda: a esa edad lo
+ * llama un adulto. Nombrárselo a un chico de 8 es darle una salida que no puede
+ * usar.
+ *
+ * 🔑 **El teléfono es el de ANAR y no el 017.** El 017 del INCIBE es para el
+ * entorno del menor —padres y educadores— y cierra a las 23:00; el de ANAR lo
+ * atiende un psicólogo, es para el chico y no cierra nunca. Un mensaje que le
+ * da a un chico de 15 un teléfono que a las 2 de la mañana no contesta es peor
+ * que no darle ninguno.
  */
+const TELEFONO_DEL_CHICO = /\bANAR\b|\b900\s?20\s?20\s?10\b|\b116\s?111\b/i;
+
 const DERIVACION_EXIGIDA: Record<BandaDeEdad, RegExp[]> = {
-  "7-10": [/\b(grande|adulto|mam[áa]|pap[áa]|casa)\b/i],
-  "11-13": [/\b(adulto|grande)\b/i, /\b137\b/],
-  "14-17": [/\b137\b/],
+  "7-10": [/\b(grande|mayor|adulto|mam[áa]|pap[áa]|casa)\b/i],
+  "11-13": [/\b(adulto|grande|mayor)\b/i, TELEFONO_DEL_CHICO],
+  "14-17": [TELEFONO_DEL_CHICO],
 };
 
 /* ── 4. Largo ────────────────────────────────────────────────────────────── */
@@ -313,8 +332,21 @@ const TRANQUILIZAR_O_ESTIMAR: ReglaDeTexto[] = [
     negarLoHaceCorrecto: false,
   },
   {
-    patron: /\bno\s+(te\s+)?preocup(es|arte|e)\b/i,
+    patron: /\bno\s+(te\s+|os\s+|se\s+)?preocup(es|arte|arse|aros|e|éis)\b/i,
     motivo: "🔴 Tranquiliza.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    /* 📌 Las dos de abajo entraron con el paso a España: son la forma corriente
+       de quitarle hierro a algo allá, y ninguna de las dos existía en la lista
+       porque acá nadie las dice así. */
+    patron: /\bno\s+pasa\s+nada\b/i,
+    motivo: "🔴 Tranquiliza. Es la frase con la que se cierra un caso sin mirarlo.",
+    negarLoHaceCorrecto: false,
+  },
+  {
+    patron: /\bno\s+hay\s+(nada\s+)?de\s+qu[ée]\s+preocupar(se|te|os)\b/i,
+    motivo: "🔴 Descarta el motivo de preocupación.",
     negarLoHaceCorrecto: false,
   },
   {

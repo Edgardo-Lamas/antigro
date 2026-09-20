@@ -125,7 +125,10 @@ comprobar(
   TODO_EL_TEXTO.includes("no ve, no guarda y no puede leer el contenido de los mensajes"),
 );
 
-comprobar("nombra la Línea 137", TODO_EL_TEXTO.includes("línea 137"));
+comprobar(
+  "nombra un teléfono de ayuda oficial",
+  /017|ANAR/i.test(TODO_EL_TEXTO),
+);
 
 comprobar(
   "dice que no es un detector de grooming",

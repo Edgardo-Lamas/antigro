@@ -196,7 +196,7 @@ export function textoDeLaEscalada(
       : "") +
     "No hace falta que hagas nada por acá: con abrir el panel alcanza. " +
     "Si el momento es malo, el aviso te va a estar esperando ahí.\n\n" +
-    "Si algo te hace ruido y querés hablarlo con alguien, la Línea 137 atiende " +
-    "las 24 horas."
+    "Si algo te da mala espina y quieres hablarlo con alguien: el 017 del INCIBE, de 8:00 " +
+    "a 23:00, o el teléfono ANAR de la Familia, 600 50 51 52, las 24 horas."
   );
 }

@@ -157,14 +157,29 @@ todas las letras que ese dato no lo tenés.
 
 ═══ A DÓNDE SE DERIVA ═══
 
-- ${RECURSOS.linea137.nombre}: ${RECURSOS.linea137.detalle}. Teléfono ${RECURSOS.linea137.telefono},
-  WhatsApp ${RECURSOS.linea137.whatsapp}. Atiende las 24 horas.
-- ${RECURSOS.gapp.nombre}: ${RECURSOS.gapp.detalle} — ${RECURSOS.gapp.url}
-- ${MARCO_LEGAL.ley26904}
-- ${MARCO_LEGAL.ley27590}
+🔴 **NO HAY UN TELÉFONO ÚNICO, Y ELEGIR MAL ES DEJAR A UN PADRE HABLANDO CON UN CONTESTADOR.**
+Se deriva por HORA y por SITUACIÓN:
 
-La Procuración General de la Suprema Corte de la provincia de Buenos Aires recomienda a los
-adultos observar los cambios de humor y los horarios de conexión. No publica estadística propia.
+- **De 8:00 a 23:00, y el problema es de internet** → ${RECURSOS.incibe.nombre}
+  (${RECURSOS.incibe.queEs}). ${RECURSOS.incibe.detalle}. WhatsApp ${RECURSOS.incibe.whatsapp},
+  Telegram ${RECURSOS.incibe.telegram}. Es el que más sabe de este problema exacto.
+- **Fuera de ese horario, o si hace falta un psicólogo YA** → ${RECURSOS.anarFamilia.nombre},
+  ${RECURSOS.anarFamilia.telefono}. ${RECURSOS.anarFamilia.detalle}. ${RECURSOS.anarFamilia.horario}.
+  🔴 El 017 cierra a las 23:00; éste no cierra nunca. A las tres de la mañana, éste.
+- **Para el hijo, si quiere hablar él** → ${RECURSOS.anarMenor.nombre},
+  ${RECURSOS.anarMenor.telefono} (en algunas comunidades, ${RECURSOS.anarMenor.telefonoEuropeo}).
+  Puede llamar sin que nadie de la casa se entere.
+- **Si ya hay una foto o un vídeo circulando** → ${RECURSOS.aepd.nombre}: ${RECURSOS.aepd.url}.
+  No orienta, tramita la retirada. Un adolescente de 14 a 17 puede acudir por sí mismo.
+- **La denuncia** → ${RECURSOS.policia.nombre}, ${RECURSOS.policia.telefono}, o
+  ${RECURSOS.policia.correo}. 📌 Va al final del camino y sólo si el adulto ya lo decidió: no
+  empujes a denunciar, y no digas nunca que hubo un delito.
+
+- ${MARCO_LEGAL.cp183}
+- ${MARCO_LEGAL.lopivi}
+
+🔑 Ese art. 15 de la LOPIVI conviene tenerlo presente, pero **no se lo eches encima como una
+obligación legal**: un padre asustado no necesita que le recuerden que la ley lo obliga.
 
 ═══ LO QUE RECOMIENDAN LOS ORGANISMOS OFICIALES ═══
 
@@ -187,7 +202,8 @@ asusta, borra todo y desaparece), y **no interrogar al chico** cuando cuenta alg
 - Ordenás las opciones que tiene adelante, de la más simple a la más difícil.
 - Decís CÓMO abrir la conversación con el chico: con qué frase empezar, en qué momento, qué
   conviene no decir.
-- Decís cuándo la respuesta ya no es seguir hablando con vos, sino llamar al 137.
+- Decís cuándo la respuesta ya no es seguir hablando con vos, sino llamar por teléfono — y
+  decís a cuál de los de arriba, según la hora que sea.
 - Razonás sobre los números que el informe ya trae. Eso no es inventar: es trabajar con lo que hay,
   y es probablemente lo más útil que podés hacer.
 
@@ -308,8 +324,9 @@ function respaldo(nombreDelChico: string, lectura: Lectura | null): string {
     cuantoSabe +
     `Lo que sí te sirve ahora mismo: mirá el informe de ${nombreDelChico} —el "por qué" dice ` +
     `exactamente qué se vio y en qué días—, y si lo que estás sintiendo es que algo no está ` +
-    `bien, no esperes a tener certeza. La ${RECURSOS.linea137.nombre} atiende las 24 horas al ` +
-    `${RECURSOS.linea137.telefono} y por WhatsApp al ${RECURSOS.linea137.whatsapp}: son ellos ` +
+    `bien, no esperes a tener certeza. El ${RECURSOS.anarFamilia.nombre} atiende ` +
+    `${RECURSOS.anarFamilia.horario} en el ${RECURSOS.anarFamilia.telefono}, y de 8:00 a 23:00 ` +
+    `también está el ${RECURSOS.incibe.nombre}, que es el que más sabe de esto: son ellos ` +
     `los que saben qué preguntar.\n\n` +
     `Probá de nuevo en un rato.`
   );

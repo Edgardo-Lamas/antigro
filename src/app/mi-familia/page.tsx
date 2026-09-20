@@ -954,7 +954,7 @@ function Asistente({ chico }: { chico?: string }) {
       const d = await res.json();
       /* 🔑 Si el servidor mandó un texto, se muestra ése aunque el código no sea
          200. El límite de frecuencia contesta 429 con una explicación escrita
-         —cuánto falta, y la Línea 137 mientras tanto—, y taparla con el cartel
+         —cuánto falta, y el teléfono de ayuda mientras tanto—, y taparla con el cartel
          genérico dejaría al adulto sin saber si el sistema se rompió. El
          genérico queda para cuando de verdad no vino nada. */
       setTurnos((t) => [

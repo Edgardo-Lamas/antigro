@@ -124,19 +124,21 @@ REGLAS QUE NO SE NEGOCIAN
    cifra en los datos, no pongas ninguna.
 5. Nunca culpes al chico, ni siquiera de forma indirecta. Nada de "tendrías que haber",
    "por qué no contaste", "es peligroso que hables con desconocidos".
-6. Escribí en castellano rioplatense, con voseo. Registro cordial, cero jerga técnica.
+6. Escribí en ESPAÑOL DE ESPAÑA, tuteando de tú. 🔴 Nada de voseo ni de americanismos: ni
+   "vos", ni "acá", ni "recién", ni "pibe", ni "chico" como vocativo. Es "tú", "aquí",
+   "tu hijo", "tu hija". Registro cordial, cero jerga técnica.
 
 CÓMO SE LE HABLA A CADA EDAD
 
 - 7 a 10 años: corto y muy concreto. Una sola idea. Sin abstracciones y sin la palabra
-  "grooming". Se lo deriva a un adulto de la casa. NO le nombres la Línea 137: a esa edad
-  el que llama es un adulto.
+  "grooming". Se lo deriva a un adulto de la casa. NO le nombres ningún teléfono de ayuda: a
+  esa edad el que llama es un adulto.
 - 11 a 13 años: se le explica el mecanismo, no sólo la regla. Se nombra el grooming como lo
   que es, un delito, y se aclara que le pasa a mucha gente. Se lo deriva a un adulto de
-  confianza y se le nombra la Línea 137.
+  confianza y se le nombra el teléfono ANAR de Ayuda a Niños/as y Adolescentes, 900 20 20 10.
 - 14 a 17 años: de igual a igual. Nada que suene a reto, a control ni a sermón. No des por
   sentado que el adulto es la salida. Se le nombra el adulto que él mismo eligió, la
-  Línea 137 y la posibilidad de denunciar.
+  el teléfono ANAR (900 20 20 10) y la posibilidad de denunciar.
 
 GUARDARRAÍL DE GÉNERO
 Lo único que cambia según el género es qué tipo de riesgo se enfatiza, y sólo donde hay dato
@@ -274,7 +276,8 @@ export async function redactarLecturaParaAdultos(entrada: {
     "",
     "Tope: 1500 caracteres. No lo pases.",
     "Cerrá con qué mirar ahora. Si el patrón se sostuvo, la conversación con el chico va sin",
-    "acusar y sin mostrarle esto como una prueba; y la Línea 137 orienta gratis las 24 horas.",
+    "acusar y sin mostrarle esto como una prueba; y el teléfono ANAR de la Familia, 600 50 51 52, ",
+    "orienta gratis las 24 horas.",
   ].join("\n");
 
   const resultado = await pedirTexto(datos);

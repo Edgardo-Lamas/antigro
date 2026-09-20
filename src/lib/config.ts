@@ -75,31 +75,125 @@ export const LO_QUE_CRUZA =
   "oficiales sobre qué pesa cuánto.";
 
 /**
- * Recursos oficiales a los que el sistema deriva.
- * 🔴 Cuando la respuesta correcta es un adulto o la Línea 137, el sistema lo dice.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  LOS RECURSOS OFICIALES — ESPAÑA. Reemplazaron a los argentinos el 19/9
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **Cada dato de acá se abrió en la fuente oficial el 19/9**, uno por uno:
+ * `incibe.es`, `anar.org`, `aepd.es` y `policia.es`. Ninguno salió de memoria ni
+ * de un resumen. La regla de la casa vale doble acá: si el sistema le da a un
+ * padre un teléfono equivocado en el peor momento, no hay nada que lo compense.
+ *
+ * 🔑 **Por qué son CUATRO y no uno.** En Argentina la Línea 137 cubría todo: era
+ * estatal, gratuita y de 24 horas. En España ese teléfono único no existe, y el
+ * reparto no es burocracia: es que cada uno atiende algo distinto.
+ *   · El **017** sabe de grooming y de internet, pero **cierra a las 23:00** —
+ *     y la señal de madrugada, que es la que este sistema ve, cae fuera.
+ *   · El de **ANAR** atiende a cualquier hora, con psicólogos, y es el que
+ *     queda cuando el padre mira el panel a las tres de la mañana.
+ *   · La **AEPD** no aconseja: ordena retirar. Es para cuando la foto ya circula.
+ *   · La **Policía** es la denuncia, y va al final, nunca primero.
+ *
+ * 📌 El sistema deriva por HORA y por SITUACIÓN, no por preferencia.
  */
 export const RECURSOS = {
-  linea137: {
-    nombre: "Línea 137",
-    detalle: "Programa Las Víctimas Contra Las Violencias — atención las 24 horas",
-    telefono: "137",
-    whatsapp: "+54 9 11 3133-1000",
+  /**
+   * El que más sabe del problema exacto: INCIBE, el instituto nacional de
+   * ciberseguridad. Asesora al entorno del menor —padres y educadores— en lo
+   * psicosocial, lo técnico y lo legal. 🔴 No atiende de 23:00 a 8:00.
+   */
+  incibe: {
+    nombre: "017",
+    queEs: "Tu Ayuda en Ciberseguridad, del INCIBE",
+    detalle: "Gratuito y confidencial. Asesoramiento psicosocial, técnico y legal",
+    telefono: "017",
+    whatsapp: "900 116 117",
+    telegram: "@INCIBE017",
+    horario: "De 8:00 a 23:00, todos los días del año",
+    url: "https://www.incibe.es/linea-de-ayuda-en-ciberseguridad",
   },
-  gapp: {
-    nombre: "GAPP",
-    detalle: "App de denuncia de Grooming Argentina",
-    url: "https://www.grooming.org.ar/",
+
+  /**
+   * 🔑 **El que sostiene la madrugada.** Es el que se le nombra al adulto cuando
+   * el 017 está cerrado, y el único de los cuatro que atiende siempre.
+   */
+  anarFamilia: {
+    nombre: "Teléfono ANAR de la Familia y los Centros Escolares",
+    queEs: "Fundación ANAR",
+    detalle: "Gratuito, confidencial y atendido por psicólogos",
+    telefono: "600 50 51 52",
+    horario: "24 horas, los 365 días del año",
+    url: "https://www.anar.org/telefono-anar-familia-y-centros-escolares/",
+  },
+
+  /**
+   * 🔴 **Éste es del CHICO, no del padre, y no se los mezcla.** Lo atiende un
+   * psicólogo y el chico puede llamar sin que nadie de la casa se entere.
+   * 📌 El `116 111` es el número europeo de ayuda a la infancia, pero en España
+   * no llega a todas las comunidades: por eso el que se muestra primero es el
+   * 900, que sí funciona en todo el país.
+   */
+  anarMenor: {
+    nombre: "Teléfono ANAR de Ayuda a Niños/as y Adolescentes",
+    queEs: "Fundación ANAR",
+    detalle: "Gratuito y confidencial, atendido por psicólogos",
+    telefono: "900 20 20 10",
+    telefonoEuropeo: "116 111",
+    horario: "24 horas, los 365 días del año",
+    url: "https://www.anar.org/telefono-chat-anar/",
+  },
+
+  /**
+   * Para cuando ya hay una foto o un vídeo circulando. No orienta: tramita la
+   * retirada urgente. 🔑 Un adolescente de 14 a 17 puede acudir por sí mismo.
+   */
+  aepd: {
+    nombre: "Canal prioritario de la AEPD",
+    queEs: "Agencia Española de Protección de Datos",
+    detalle:
+      "Retirada urgente de fotografías, vídeos o audios de contenido sexual o violento " +
+      "difundidos sin permiso de la persona afectada",
+    url: "https://www.aepd.es/canalprioritario",
+  },
+
+  /**
+   * La denuncia. 📌 Va al final del camino y sólo cuando el adulto ya decidió:
+   * el sistema no denuncia, no afirma que hubo delito y no empuja a hacerlo.
+   */
+  policia: {
+    nombre: "Policía Nacional",
+    detalle: "Denuncia de delitos sexuales contra menores cometidos por internet",
+    telefono: "091",
+    emergencias: "112",
+    correo: "denuncias.pornografia.infantil@policia.es",
+    url: "https://www.policia.es/_es/denuncias.php",
   },
 } as const;
 
 /**
- * Marco legal argentino. Se cita, no se interpreta.
- * Fuente: Estudio nacional sobre acoso sexual a NNyA mediante TIC,
- * Ministerio de Justicia y Derechos Humanos de la Nación, 2023.
+ * Marco legal español. Se cita, no se interpreta. Verificado en el BOE el 19/9.
+ *
+ * 🔴🔴 **El grooming está en el artículo 183, NO en el 183 ter.** La Ley Orgánica
+ * 10/2022 renumeró el capítulo con efectos del 7/10/2022, y prácticamente todo lo
+ * que hay escrito por ahí —incluidas guías de divulgación— sigue citando el 183
+ * ter, que hoy ya no dice eso. Un jurado español que vaya a comprobarlo va a
+ * encontrar bien lo nuestro y mal lo de al lado.
+ *
+ * 🔑 **El art. 15 de la LOPIVI es el que le da sentido legal a todo el producto**:
+ * en España, advertir indicios y no comunicarlos no es una opción personal.
  */
 export const MARCO_LEGAL = {
-  ley26904: "Ley 26.904 (2013) — art. 131 del Código Penal: 6 meses a 4 años.",
-  ley27590: "Ley 27.590 «Mica Ortega» (2020) — Programa Nacional de Prevención.",
+  cp183:
+    "Código Penal, art. 183 — contactar por internet con un menor de 16 años y proponerle " +
+    "un encuentro, con actos materiales de acercamiento: 1 a 3 años de prisión. Embaucarle " +
+    "para que facilite material pornográfico: 6 meses a 2 años.",
+  lopivi:
+    "Ley Orgánica 8/2021 de protección integral a la infancia y la adolescencia frente a la " +
+    "violencia, art. 15 — quien advierte indicios de violencia sobre un menor está obligado " +
+    "a comunicarlo de forma inmediata.",
+  consentimiento:
+    "LOPDGDD (Ley Orgánica 3/2018), art. 7 — a partir de los 14 años el menor consiente por " +
+    "sí mismo el tratamiento de sus datos; por debajo, consiente quien tiene la patria potestad.",
 } as const;
 
 /** Bandas de edad del mensaje al chico. Salen de los datos, no de una corazonada. */
