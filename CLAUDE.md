@@ -12,6 +12,34 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
+## 🧭 POR DÓNDE SE SIGUE — orden aprobado por Edgardo el 19/9
+
+📄 **El fundamento entero vive en el dossier:** https://claude.ai/artifact/Jue1oRUWcPFjSXrSCGoryW
+(documento vivo — se actualiza sobre ese mismo enlace, no se crea uno nuevo).
+
+1. 🔴 **LA INTERFAZ, y separar el simulador del producto.** No estaba en la lista de mejoras y va
+   primero: **varios psicólogos le dijeron que no la entendían**, y quien ve la consola de la home
+   y después abre el panel cree que sigue en la demo. Mientras no se resuelva, cualquier mejora se
+   le agrega a algo que no se entiende. 📌 El panel mide 9 pantallas de scroll y tiene 14 secciones.
+2. **Terminar el idioma** — va pegado al 1: si hay que tocar cada pantalla, el texto se escribe una
+   sola vez. Falta la interfaz; el asistente, los mensajes al chico y los controles ya están.
+3. **El ensayo de la conversación con el hijo** — el asistente hace de hijo adolescente. El
+   diferencial que no tiene ningún competidor.
+4. **El avatar** — dónde vive (presente, no un botón) y qué forma tiene (cuerpo entero translúcido).
+   Cuatro clips en bucle, nunca video por respuesta.
+5. **El botón antipánico del chico** — conceptualmente lo más valioso; va quinto porque toca base de
+   datos, alta y mensajería.
+6. **El micrófono.** 7. **La llamada telefónica** (única que necesita contratar telefonía).
+
+🔑 **En paralelo, porque no toca ninguna pantalla: los datos externos.** Lista de categorización de
+la Universidad de Toulouse (CC BY-SA, 66 categorías, conversión a NextDNS ya hecha — `dating` tiene
+8.656 dominios, `stalkerware` 525) y la edad del dominio por RDAP, probada: gratis y sin cuenta.
+🔴 **No existen listas públicas de dominios de grooming.** Verificado tres veces. No volver a buscar.
+
+⛔ **Fuera del alcance y del discurso: bullying.** Decisión suya del 19/9.
+
+---
+
 ## 🔍 LA TRAZABILIDAD SE VE, Y EL PARTE SE PUEDE PEDIR — 19/9
 
 **Las dos salieron de una pregunta suya:** *"¿qué es eso de la trazabilidad?"*, y después
