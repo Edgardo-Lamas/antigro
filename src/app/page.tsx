@@ -325,7 +325,13 @@ export default async function Home({
             <span aria-hidden className="text-borde">
               ·
             </span>
-            <span>Edgardo Lamas y Sandra Ortellado, para CoderCup AI</span>
+            {/* 🔴 Sin coautoría y sin concurso — 20/9, y lo pidió él.
+                Decía «Edgardo Lamas y Sandra Ortellado, para CoderCup AI»: dos
+                datos vencidos al mismo tiempo. El CoderCup fue la entrega de
+                agosto y el que mira ahora es el jurado de IEBS; y Sandra no
+                está confirmada en esta etapa, así que su nombre firmaba algo
+                que no decidió. */}
+            <span>Edgardo Lamas</span>
           </p>
         </footer>
       </main>
