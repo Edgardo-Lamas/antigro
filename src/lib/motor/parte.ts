@@ -188,10 +188,27 @@ export function textoDelParte(chico: string, parte: Parte): string {
     );
   }
 
+  /* 🔴🔴 **EL MES EN QUE SÍ TE ESCRIBIMOS TIENE QUE DECIRLO, y hasta el 19/9
+     no lo decía.** El parte saltaba de «lo que vimos» a «no hace falta que
+     hagas nada», sin nombrar el aviso que había salido ese mismo mes. Para un
+     padre que recibió una alerta y no la abrió, eso se lee como que aquello no
+     era importante — el propio sistema desmintiendo su propio aviso. Apareció
+     el 19/9 al probar el parte a mano con los tres casos. */
+  if (parte.huboAviso) {
+    partes.push(
+      "",
+      "Este mes sí te escribimos: hubo algo que se sostuvo y te mandamos un aviso. " +
+        "El detalle está en el panel, con el día y el motivo.",
+    );
+  }
+
   /* 🔴 **La parte que hace que esto no sea una alerta chiquita.** Sin esto, un
      padre lee «3 noches tarde» y actúa sobre un pico suelto — que es
-     exactamente lo que la regla 5 existe para evitar. */
-  if (!parte.huboAviso) {
+     exactamente lo que la regla 5 existe para evitar.
+     ⚠ **Y no va cuando no llegó ninguna señal**: «nada de eso se sostuvo» sin
+     un «eso» del que hablar era, además de absurdo, una frase tranquilizadora
+     pegada justo debajo de la sospecha de que el filtro se cayó. */
+  if (!parte.huboAviso && parte.senalesQueLlegaron > 0) {
     partes.push(
       "",
       parte.rachaMasLarga > 0
@@ -204,8 +221,12 @@ export function textoDelParte(chico: string, parte: Parte): string {
 
   partes.push(
     "",
-    "Esto no es una alerta y no hace falta que hagas nada. Es para que sepas que el sistema " +
-      "está mirando.",
+    parte.senalesQueLlegaron === 0
+      ? /* 🔴 Acá NO se puede decir «no hace falta que hagas nada»: es el único
+           caso en que sí hace falta, porque puede ser una avería. */
+        "Este parte sale solo cada 30 días, para que sepas que el sistema está mirando."
+      : "Esto no es una alerta y no hace falta que hagas nada. Es para que sepas que el sistema " +
+        "está mirando.",
   );
 
   return partes.join("\n");

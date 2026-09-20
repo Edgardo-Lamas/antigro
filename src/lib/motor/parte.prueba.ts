@@ -147,12 +147,25 @@ comprobar(
 
 /* 📌 Si SÍ hubo aviso, no corresponde decir «por eso no te escribimos» —
    le escribimos. */
-comprobar(
-  "si hubo aviso, no dice que no se escribió",
-  !/por eso no te escribimos/i.test(
-    textoDelParte("Ana", armarParte({ senales: [senal(1)], diasMirados: 30, rachaMasLarga: 6, huboAviso: true })),
-  ),
-);
+{
+  const conAviso = textoDelParte(
+    "Ana",
+    armarParte({ senales: [senal(1)], diasMirados: 30, rachaMasLarga: 6, huboAviso: true }),
+  );
+
+  comprobar("si hubo aviso, no dice que no se escribió", !/por eso no te escribimos/i.test(conAviso));
+
+  /* 🔴🔴 **Encontrado el 19/9 probando el parte a mano, y era un agujero de
+     verdad:** el mes en que SÍ salió un aviso, el parte no lo nombraba. Saltaba
+     de «lo que vimos» a «no hace falta que hagas nada», y un padre que recibió
+     una alerta y no la abrió leía al propio sistema desmintiendo su aviso. */
+  comprobar(
+    "🔴 si hubo aviso, el parte LO DICE",
+    /s[íi] te escribimos/i.test(conAviso),
+    "Un resumen que se calla el aviso del mes desmiente al aviso.",
+  );
+  comprobar("y manda al panel a ver el detalle", /panel/i.test(conAviso));
+}
 
 /* Regla 1: el parte no afirma nada sobre el chico. */
 for (const prohibida of ["está siendo", "es víctima", "grooming", "riesgo", "peligro", "quedate tranquil"]) {
@@ -167,6 +180,20 @@ for (const prohibida of ["está siendo", "es víctima", "grooming", "riesgo", "p
     armarParte({ senales: [], diasMirados: 30, rachaMasLarga: 0, huboAviso: false }),
   );
   comprobar("un parte sin señales igual se emite", vacio.length > 50);
+
+  /* 🔴 También del 19/9: sin una sola señal, el parte decía «nada de eso se
+     sostuvo en el tiempo» — sin ningún «eso» del que hablar, y pegado justo
+     debajo de la sospecha de que el filtro se cayó. Una frase que tranquiliza
+     abajo de una posible avería es lo contrario de lo que hace falta. */
+  comprobar(
+    "🔴 sin señales, no habla de nada que «no se haya sostenido»",
+    !/nada de eso se sostuvo/i.test(vacio),
+    "No hubo ningún «eso»: es una avería posible, no un mes tranquilo.",
+  );
+  comprobar(
+    "🔴 y no dice que no haga falta hacer nada, porque acá sí hace falta",
+    !/no hace falta que hagas nada/i.test(vacio),
+  );
   comprobar(
     "y sugiere revisar el filtro, sin dramatizar",
     /revisar que el filtro siga puesto/i.test(vacio),

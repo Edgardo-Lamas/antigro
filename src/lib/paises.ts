@@ -49,6 +49,17 @@ export const NOMBRE_DEL_PAIS: Record<Pais, string> = {
   AR: "Argentina",
 };
 
+/**
+ * 📌 Cómo se escriben las fechas y las horas de cada país. Parece cosmético y
+ * no lo es: una alerta fechada «19/09» en un país que escribe «09/19» es una
+ * alerta que se lee mal, y estas fechas son justamente lo que sostiene cada
+ * cosa que el sistema afirma.
+ */
+export const LOCALE_DEL_PAIS: Record<Pais, string> = {
+  ES: "es-ES",
+  AR: "es-AR",
+};
+
 /** A quién le sirve cada recurso. Un recurso puede servirle a más de uno. */
 export type Destinatario =
   /** El adulto de la casa. */

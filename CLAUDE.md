@@ -12,6 +12,48 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
 
 ---
 
+## 🔍 LA TRAZABILIDAD SE VE, Y EL PARTE SE PUEDE PEDIR — 19/9
+
+**Las dos salieron de una pregunta suya:** *"¿qué es eso de la trazabilidad?"*, y después
+*"creo que debería haber un botón para que el padre pueda pedirlo al momento"*.
+
+### Lo que YA estaba y no se veía
+
+🔑 **La trazabilidad estaba construida en los datos desde siempre.** Cada lectura guarda
+`senalesQueLaSostienen` —el comentario de `evaluar.ts` es literal: «Sin esto, no se afirma»— y cada
+señal se persiste con fecha, tipo, intensidad, contexto y **fuente**. La cadena aviso → señal →
+evento estaba entera. **Lo que no existía era la pantalla.**
+
+✅ **Ahora la línea de tiempo del panel («Qué vio la red») muestra:** cuáles de las señales
+sostienen la lectura (marcadas con ● y un anillo; las demás atenuadas), **la hora de cada una** —el
+panel sólo mostraba el día, y una consulta a las 3 AM no es lo mismo que una a las 3 de la tarde—,
+de qué fuente salió, y un renglón que dice «de las N señales de estos X días, M sostienen el
+informe de arriba».
+📌 El pie recuerda lo otro: que nunca se guarda una palabra de lo que se escribió, y que el sistema
+**rechaza** cualquier dato que traiga contenido (`CLAVES_PROHIBIDAS` en `senales/tipos.ts`).
+
+### El parte a demanda — `GET /api/mi-familia/parte`
+
+**Existía desde el 19/8 pero sólo lo mandaba el reloj, cada 30 días y por Telegram.** El padre que
+entraba el día 12 preguntándose si esto anda no tenía cómo averiguarlo.
+✅ Botón **«Pedir el parte ahora»** al final de «Qué vio la red», y el texto se muestra ahí mismo.
+🔑 **Se puede apretar todas las veces que haga falta: el parte es determinista, no lo escribe el
+modelo.** 🔴 No se registra en el libro de la casa (mirar no deja rastro) y **no dispara Telegram**:
+si lo mandara, abrir el panel le haría vibrar el teléfono al otro progenitor.
+
+### 🔴🔴 Y al probarlo a mano aparecieron dos defectos del texto, del 19/8
+
+1. **El mes en que SÍ salió un aviso, el parte no lo nombraba.** Saltaba de «lo que vimos» a «no
+   hace falta que hagas nada». Un padre que recibió una alerta y no la abrió leía al propio sistema
+   desmintiendo su aviso. ✅ Ahora lo dice y manda al panel a ver el detalle.
+2. **Sin una sola señal, decía «nada de eso se sostuvo en el tiempo»** —sin ningún «eso»— y
+   cerraba con «no hace falta que hagas nada», **pegado debajo de la sospecha de que el filtro se
+   cayó**, que es el único caso en que sí hace falta hacer algo. ✅ Las dos frases ya no salen ahí.
+
+📌 Cuatro comprobaciones nuevas en `parte.prueba.ts` para que no vuelvan.
+
+---
+
 ## 🇪🇸 EL PRODUCTO HABLA PARA ESPAÑA — primera tanda hecha el 19/9
 
 **Por qué:** AntiGro se presenta al concurso de emprendedores de **IEBS**, que es española.
