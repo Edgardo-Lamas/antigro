@@ -115,6 +115,16 @@ const Cuerpo = z.object({
   /** El que viaja en el enlace que se le pasa al jurado. Ver arriba. */
   invitacion: z.string().max(100).optional(),
   /**
+   * 🔴 **El país de la casa.** Decide los teléfonos y organismos a los que el
+   * sistema deriva, y las leyes que citan los términos que se están aceptando
+   * en este mismo pedido.
+   *
+   * 📌 `enum` y no `string`: un país que no existe no es un dato raro que se
+   * arregla después, es una familia a la que el sistema no sabría a quién
+   * derivar. Si no viene, el de siempre.
+   */
+  pais: z.enum(["AR", "ES"]).optional(),
+  /**
    * ───────────────────────────────────────────────────────────────────────────
    * 🔴 LA ACEPTACIÓN DE LOS TÉRMINOS — 18/8
    * ───────────────────────────────────────────────────────────────────────────
@@ -152,7 +162,8 @@ export async function POST(req: Request) {
     );
   }
 
-  const { email, clave, nombreDeLaFamilia, hogar, familiaId, invitacion, terminos } = parsed.data;
+  const { email, clave, nombreDeLaFamilia, hogar, familiaId, invitacion, pais, terminos } =
+    parsed.data;
 
   /* ── 1.b Los términos ────────────────────────────────────────────────────
      🔴 **Antes que nada de lo demás**, porque es lo único de todo el alta que
@@ -230,6 +241,10 @@ export async function POST(req: Request) {
     hogar,
     familiaId,
     nombreDeLaFamilia,
+    /* 📌 Sólo pesa cuando se crea la familia. En la segunda puerta de padres
+       separados la familia ya existe y su país con ella: el que abre la otra
+       casa no le cambia el país al panel del otro. */
+    pais,
     terminosVersion: terminos,
   });
 

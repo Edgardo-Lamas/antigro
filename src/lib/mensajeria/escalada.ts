@@ -200,6 +200,12 @@ export function textoDeLaEscalada(
   chico: string,
   horasDesdeElAviso: number,
   conEvasion: boolean,
+  /**
+   * 🔴 El país del hogar al que se le escribe. Este mensaje sale SOLO, sin
+   * nadie mirando la pantalla, y termina en un teléfono: es el último lugar
+   * donde puede colarse el número de otro país sin que nadie lo note.
+   */
+  pais: Pais = PAIS_POR_DEFECTO,
 ): string {
   const horas = Math.max(1, Math.round(horasDesdeElAviso));
   const cuando = horas === 1 ? "hace una hora" : `hace ${horas} horas`;
@@ -214,6 +220,6 @@ export function textoDeLaEscalada(
       : "") +
     "No hace falta que hagas nada por acá: con abrir el panel alcanza. " +
     "Si el momento es malo, el aviso te va a estar esperando ahí.\n\n" +
-    `Si algo te da mala espina y quieres hablarlo con alguien: ${aQuienLlamar()}.`
+    `Si algo te da mala espina y quieres hablarlo con alguien: ${aQuienLlamar(pais)}.`
   );
 }

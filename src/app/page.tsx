@@ -7,6 +7,8 @@ import { estadoDeLasFuentes } from "@/lib/senales";
 import { estadoDeLosCanales } from "@/lib/mensajeria";
 import Consola from "./_demo/Consola";
 import Tour, { BotonDelTour } from "./_demo/Tour";
+import SelectorDePais from "@/components/SelectorDePais";
+import { paisElegido } from "@/lib/pais-elegido";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -92,6 +94,7 @@ export default async function Home({
      `/api/alta/hogar`, y tiene que seguir siendo así — una comprobación en la
      pantalla es una comodidad, nunca la cerradura. */
   const puerta = await laPuerta(searchParams?.i?.trim() ?? "");
+  const pais = paisElegido();
 
   return (
     <div className="[background:radial-gradient(1200px_600px_at_78%_-10%,theme(colors.acentoSuave),theme(colors.fondo)_60%)]">
@@ -302,7 +305,19 @@ export default async function Home({
           </div>
         </section>
 
-        <footer className="mt-14 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-borde pt-6">
+        {/* 🔴 El selector de país va acá arriba del pie y no escondido en un
+            menú: lo que cambia son los teléfonos y los organismos que el
+            sistema nombra —el 017 en España, la Línea 137 acá—, y eso aparece
+            en el mensaje de ejemplo de esta misma página. El que no lo
+            encuentra se lleva números de un país que no es el suyo. */}
+        <div className="mt-14 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-borde bg-superficie px-5 py-4">
+          <SelectorDePais actual={pais} />
+          <p className="text-xs leading-relaxed text-apagado">
+            Cambia los teléfonos, los organismos y las leyes que se citan. No cambia el motor.
+          </p>
+        </div>
+
+        <footer className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-borde pt-6">
           {/* 🔑 Al pie y no arriba, a diferencia de la guía: nadie llega a
               AntiGro buscando los términos. Pero tienen que estar enlazados
               desde algún lugar estable, y el pie es donde se los busca. */}

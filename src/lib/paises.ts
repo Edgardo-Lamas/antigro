@@ -37,12 +37,35 @@
 export type Pais = "ES" | "AR";
 
 /**
- * 🔴 **España es el que está puesto, y es una decisión, no un descuido.** El
- * producto se presenta al concurso de IEBS, que es español, y quien lo abre es
- * un jurado español. El día que el país se elija en el alta, esto pasa a ser
- * sólo el valor por defecto de ese campo.
+ * 🔴 **Es sólo lo que se ve ANTES de elegir.** Desde el 20/9 el país lo elige
+ * quien entra (`pais-elegido.ts`) y esta constante dejó de decidir nada por su
+ * cuenta: es el arranque de un selector, no la configuración del producto.
+ *
+ * 🔑 **Y arranca en Argentina por decisión de Edgardo, del 20/9:** *"el producto
+ * es Argentino y lo van a ver así"*. Estuvo en España mientras el único que iba
+ * a abrirlo era el jurado de IEBS; ahora España no se pierde —sigue cargada,
+ * verificada y a un clic— pero deja de ser lo que el sistema supone de alguien
+ * de quien no sabe nada.
  */
-export const PAIS_POR_DEFECTO: Pais = "ES";
+export const PAIS_POR_DEFECTO: Pais = "AR";
+
+/**
+ * 🔴 **Estas tres viven acá y no en `pais-elegido.ts` por una razón concreta:**
+ * ese archivo importa `next/headers` para leer la cookie del servidor, y todo lo
+ * que lo importe queda atado al servidor. La pantalla de alta es de cliente y
+ * necesita el nombre de la cookie para dejarla puesta al elegir país, así que
+ * si estuvieran allá el proyecto directamente no compila.
+ *
+ * 📌 Sin puntos ni dos puntos en el nombre: hay proxies que los maltratan.
+ */
+export const COOKIE_DEL_PAIS = "antigro_pais";
+
+/** Un año. La elección de país de una casa no cambia entre visita y visita. */
+export const DURACION_DE_LA_COOKIE = 60 * 60 * 24 * 365;
+
+export function esPais(v: unknown): v is Pais {
+  return v === "ES" || v === "AR";
+}
 
 export const NOMBRE_DEL_PAIS: Record<Pais, string> = {
   ES: "España",

@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ArrowLeft, ScrollText } from "lucide-react";
 import { PRODUCTO } from "@/lib/config";
 import { norma, VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
-import { PAIS_POR_DEFECTO } from "@/lib/paises";
+import { paisElegido } from "@/lib/pais-elegido";
+import SelectorDePais from "@/components/SelectorDePais";
+import type { Pais } from "@/lib/paises";
 import { SECCIONES } from "./terminos";
 
 /**
@@ -31,8 +33,8 @@ export const metadata = {
 };
 
 /** Una norma citada, con su texto y el enlace a la fuente. */
-function Norma({ id }: { id: string }) {
-  const n = norma(id, PAIS_POR_DEFECTO);
+function Norma({ id, pais }: { id: string; pais: Pais }) {
+  const n = norma(id, pais);
   return (
     <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
       <p className="text-xs font-semibold uppercase tracking-[0.1em] text-acento">
@@ -56,7 +58,12 @@ function Norma({ id }: { id: string }) {
   );
 }
 
+/* 🔑 Dinámica desde el 20/9: las leyes citadas salen del país que eligió quien
+   abre la página, y eso se lee de su cookie. */
+export const dynamic = "force-dynamic";
+
 export default function Terminos() {
+  const pais = paisElegido();
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <Link
@@ -92,6 +99,12 @@ export default function Terminos() {
             qué no puede hacer.
           </p>
         </div>
+
+        {/* 🔴 Acá cambia qué LEY se cita, no una preferencia: los mismos
+            párrafos van respaldados por el Código Civil argentino o por la
+            legislación española según quién esté leyendo. Por eso el selector
+            está arriba de la primera cita y no al pie. */}
+        <SelectorDePais actual={pais} className="mt-6" />
 
         <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.14em] text-apagado">
           Versión {VERSION_DE_LOS_TERMINOS}
@@ -137,7 +150,7 @@ export default function Terminos() {
           {seccion.normas && (
             <div className="mt-5 flex flex-col gap-3">
               {seccion.normas.map((id) => (
-                <Norma key={id} id={id} />
+                <Norma key={id} id={id} pais={pais} />
               ))}
             </div>
           )}

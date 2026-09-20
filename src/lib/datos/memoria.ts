@@ -8,6 +8,7 @@
  * vuelve a armar sola.
  */
 
+import { PAIS_POR_DEFECTO, type Pais } from "@/lib/paises";
 import { generarToken } from "@/lib/supabase";
 import { exigeVinculacion, generarCodigo } from "./tipos";
 import type {
@@ -56,6 +57,7 @@ function sembrar(): {
         nombre: "Familia de demostración",
         token: "demo",
         activo: true,
+        pais: PAIS_POR_DEFECTO,
         creado: ahora,
       },
     ],
@@ -132,6 +134,7 @@ export class RepositorioEnMemoria implements Repositorio {
       nombre: alta.nombre,
       token: generarToken(),
       activo: true,
+      pais: alta.pais ?? PAIS_POR_DEFECTO,
       notas: alta.notas,
       creado: ahora,
     };
@@ -178,6 +181,16 @@ export class RepositorioEnMemoria implements Repositorio {
    */
   async crearHogar(): Promise<ResultadoDeAlta> {
     return { ok: false, motivo: "sin_base" };
+  }
+
+  /**
+   * 📌 Sin base esto se guarda en memoria y se pierde al reiniciar, como todo
+   * lo demás de este repositorio. No devuelve `sin_base` porque nadie depende
+   * de que haya persistido: el modo demo existe para poder mirar el sistema.
+   */
+  async cambiarPaisDeLaFamilia(familiaId: string, pais: Pais): Promise<void> {
+    const familia = this.familias.find((f) => f.id === familiaId);
+    if (familia) familia.pais = pais;
   }
 
   /* ── Las puertas de la casa ─────────────────────────────────────────────

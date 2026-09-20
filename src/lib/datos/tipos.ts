@@ -16,6 +16,7 @@
  */
 
 import type { SenalDeRed } from "@/lib/senales/tipos";
+import type { Pais } from "@/lib/paises";
 
 /* ── Canales ─────────────────────────────────────────────────────────────── */
 
@@ -92,6 +93,17 @@ export interface Familia {
   activo: boolean;
   notas?: string;
   creado: string;
+  /**
+   * 🔴 **A qué país se deriva esta familia.** Decide los teléfonos de ayuda, los
+   * organismos y los artículos que se citan — no el idioma.
+   *
+   * 🔑 **Vive acá y no en el navegador de quien mira, y ése es el punto.** Los
+   * avisos salen SOLOS: cuando el patrón se sostiene y nadie abrió el primero,
+   * el sistema escala a las 3 de la mañana y del otro lado no hay pantalla ni
+   * cookie, hay una familia. Y con padres separados —dos puertas, un panel— el
+   * país del navegador podía dar dos teléfonos distintos para el mismo chico.
+   */
+  pais: Pais;
 }
 
 /**

@@ -4,6 +4,7 @@ import { FuenteSimulador, type Escenario } from "@/lib/senales";
 import { evaluar, VENTANA_DIAS } from "@/lib/motor";
 import { redactarLecturaParaAdultos, redactarMensajeAlChico } from "@/lib/ia";
 import { deQuienViene, tomarTurno } from "@/lib/limite";
+import { paisDeLaPeticion } from "@/lib/pais-elegido";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -108,13 +109,19 @@ export async function POST(req: Request) {
   // Ruta de demo: no hay ficha de chico, así que el reloj hace de alta.
   const lectura = evaluar({ chico: { edad, genero }, senales, hasta, diasObservados: dia + 1 });
 
+  /* 🔴 El país sale de la elección de quien está mirando, no de una constante.
+     Es lo que hace que el mensaje de ejemplo traiga el teléfono que de verdad
+     atiende donde vive esa persona — el 017 en España, la Línea 137 acá. */
+  const pais = paisDeLaPeticion(req);
+
   const [paraLosAdultos, paraElChico] = await Promise.all([
-    redactarLecturaParaAdultos({ nombreDelChico: nombre, edad, lectura }),
-    redactarMensajeAlChico({ nombre, edad, genero, estado: lectura.estado }),
+    redactarLecturaParaAdultos({ nombreDelChico: nombre, edad, lectura, pais }),
+    redactarMensajeAlChico({ nombre, edad, genero, estado: lectura.estado, pais }),
   ]);
 
   return NextResponse.json({
     escenario,
+    pais,
     dia: dia + 1,
     de: VENTANA_DIAS,
     chico: { nombre, edad, genero },

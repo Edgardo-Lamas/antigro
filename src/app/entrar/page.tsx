@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +8,14 @@ import { ShieldCheck, LoaderCircle } from "lucide-react";
 import { VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
 import { DECLARACIONES } from "@/app/terminos/terminos";
 import CampoDeClave from "@/components/CampoDeClave";
+import {
+  COOKIE_DEL_PAIS,
+  DURACION_DE_LA_COOKIE,
+  esPais,
+  NOMBRE_DEL_PAIS,
+  PAIS_POR_DEFECTO,
+  type Pais,
+} from "@/lib/paises";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -80,6 +88,43 @@ function Puerta() {
    */
   const [acepta, setAcepta] = useState(false);
 
+  /**
+   * ───────────────────────────────────────────────────────────────────────
+   * 🔴 EL PAÍS DE LA CASA, Y VA ANTES DE LOS TÉRMINOS
+   * ───────────────────────────────────────────────────────────────────────
+   *
+   * **Lo ordenó Edgardo:** *"lógico debe ir dentro de la configuración de la
+   * Familia"*. Acá es donde la familia nace, así que acá se pregunta.
+   *
+   * 🔑 **Y va arriba del recuadro de términos por una razón concreta, no de
+   * maquetación: el documento que se acepta CITA LEYES**, y son las de un país
+   * o las del otro. Preguntarlo después sería hacerle aceptar a alguien un
+   * texto con la legislación de un lugar donde no vive.
+   */
+  const [pais, setPais] = useState<Pais>(PAIS_POR_DEFECTO);
+
+  /* 📌 Se arranca con lo que el navegador ya tenía —si estuvo mirando la guía
+     en España, llega con España puesta— y no con una suposición nuestra. */
+  useEffect(() => {
+    const guardado = document.cookie
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith(`${COOKIE_DEL_PAIS}=`))
+      ?.slice(COOKIE_DEL_PAIS.length + 1);
+    if (esPais(guardado)) setPais(guardado);
+  }, []);
+
+  /**
+   * 🔑 Elegir acá también deja la cookie puesta, y no es un detalle: el enlace
+   * «términos de uso» de abajo abre OTRA pestaña, que lee la cookie. Sin esto,
+   * alguien podría elegir España y abrir unos términos con leyes argentinas —
+   * exactamente el documento que no está aceptando.
+   */
+  function elegirPais(p: Pais) {
+    setPais(p);
+    document.cookie = `${COOKIE_DEL_PAIS}=${p}; path=/; max-age=${DURACION_DE_LA_COOKIE}; samesite=lax`;
+  }
+
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -91,7 +136,13 @@ function Puerta() {
           headers: { "Content-Type": "application/json" },
           /* 🔑 Viaja la VERSIÓN de los términos, no un `true`. «Aceptó» no
              dice qué aceptó, y el texto va a cambiar. */
-          body: JSON.stringify({ email, clave, invitacion, terminos: VERSION_DE_LOS_TERMINOS }),
+          body: JSON.stringify({
+            email,
+            clave,
+            invitacion,
+            pais,
+            terminos: VERSION_DE_LOS_TERMINOS,
+          }),
         });
         const datos = await res.json();
         if (!res.ok) {
@@ -273,6 +324,38 @@ function Puerta() {
                 perder lo escrito.
 
                 📌 Sólo al crear la cuenta. El que ya la tiene, ya aceptó. */}
+            {creando && (
+              <div className="rounded-lg border border-borde bg-superficie px-4 py-3.5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-tinta">
+                  ¿En qué país vive esta familia?
+                </p>
+                <p className="mt-1.5 text-xs leading-relaxed text-tenue">
+                  Decide a qué teléfonos y organismos deriva el sistema, y qué leyes citan los
+                  términos que aceptás abajo.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  {(["AR", "ES"] as Pais[]).map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => elegirPais(p)}
+                      aria-pressed={pais === p}
+                      className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition ${
+                        pais === p
+                          ? "border-acento bg-acentoSuave text-tinta"
+                          : "border-borde text-tenue hover:border-tenue/60 hover:text-tinta"
+                      }`}
+                    >
+                      {NOMBRE_DEL_PAIS[p]}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-2.5 text-[11px] leading-relaxed text-apagado">
+                  Se puede cambiar después, desde «La casa» en el panel.
+                </p>
+              </div>
+            )}
+
             {creando && (
               <div className="rounded-lg border border-atencion/40 bg-atencionSuave px-4 py-3.5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-tinta">

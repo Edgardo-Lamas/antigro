@@ -380,7 +380,7 @@ function aQuienLlamar(pais: Pais): string {
   }, que es el que más sabe de esto`;
 }
 
-function respaldo(nombreDelChico: string, lectura: Lectura | null): string {
+function respaldo(nombreDelChico: string, lectura: Lectura | null, pais: Pais): string {
   const dias = lectura?.perfil.diasObservados ?? 0;
 
   /* El límite real, con el número adelante. Es cierto con un día y con
@@ -402,7 +402,7 @@ function respaldo(nombreDelChico: string, lectura: Lectura | null): string {
     cuantoSabe +
     `Lo que sí te sirve ahora mismo: mirá el informe de ${nombreDelChico} —el "por qué" dice ` +
     `exactamente qué se vio y en qué días—, y si lo que estás sintiendo es que algo no está ` +
-    `bien, no esperes a tener certeza. ${aQuienLlamar(PAIS_POR_DEFECTO)}: son ellos ` +
+    `bien, no esperes a tener certeza. ${aQuienLlamar(pais)}: son ellos ` +
     `los que saben qué preguntar.\n\n` +
     `Probá de nuevo en un rato.`
   );
@@ -447,12 +447,19 @@ export async function responderAlAdulto(entrada: {
   historia: TurnoDelAsistente[];
   chico: { nombre: string; edad: number };
   lectura: Lectura | null;
+  /**
+   * 🔴 De acá salen los teléfonos que el asistente puede nombrar, y la regla de
+   * `paises.ts` manda que vea UNA sola lista. Sin esto, el asistente contestaba
+   * con el país que estuviera puesto en el código, no con el de quien pregunta.
+   */
+  pais?: Pais;
 }): Promise<Redaccion> {
+  const pais = entrada.pais ?? PAIS_POR_DEFECTO;
   const api = anthropic();
   if (!api) {
     console.error(FALLO, "no hay clave de Anthropic en el entorno");
     return {
-      texto: respaldo(entrada.chico.nombre, entrada.lectura),
+      texto: respaldo(entrada.chico.nombre, entrada.lectura, pais),
       origen: "respaldo",
       causa: "falla",
       motivos: ["Sin clave de Anthropic configurada."],
@@ -473,7 +480,7 @@ export async function responderAlAdulto(entrada: {
       /* 🔑 El corpus entero se cachea acá. Es lo que hace barato no tener RAG:
          el material viaja en cada pedido pero se paga una sola vez. */
       system: [
-        { type: "text", text: sistema(PAIS_POR_DEFECTO), cache_control: { type: "ephemeral" } },
+        { type: "text", text: sistema(pais), cache_control: { type: "ephemeral" } },
       ],
       messages: [
         ...previos,
@@ -510,7 +517,7 @@ export async function responderAlAdulto(entrada: {
       );
 
       return {
-        texto: respaldo(entrada.chico.nombre, entrada.lectura),
+        texto: respaldo(entrada.chico.nombre, entrada.lectura, pais),
         origen: "respaldo",
         causa: "control",
         motivos: veredicto.motivos,
@@ -535,7 +542,7 @@ export async function responderAlAdulto(entrada: {
     console.error(FALLO, motivo);
 
     return {
-      texto: respaldo(entrada.chico.nombre, entrada.lectura),
+      texto: respaldo(entrada.chico.nombre, entrada.lectura, pais),
       origen: "respaldo",
       causa: "falla",
       motivos: [motivo],

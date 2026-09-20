@@ -16,6 +16,7 @@ import {
   DoorOpen,
   KeyRound,
   History,
+  Globe,
   Home,
   ChevronDown,
   X,
@@ -29,7 +30,11 @@ import {
   FileText,
 } from "lucide-react";
 import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senales/tipos";
-import { LOCALE_DEL_PAIS, PAIS_POR_DEFECTO } from "@/lib/paises";
+/* 🔑 El país llega en los DATOS de la familia, no de la cookie: esta pantalla
+   es `"use client"` y la cookie del navegador daría un formato en el HTML
+   servido y otro al hidratar. Y sobre todo, para una familia dada de alta el
+   país es el de la casa. Ver la migración 20. */
+import { LOCALE_DEL_PAIS, NOMBRE_DEL_PAIS, type Pais } from "@/lib/paises";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
 import { COMO_FUNCIONA } from "@/lib/config";
@@ -88,7 +93,7 @@ interface Respuesta {
   /* 🔴 Sin `adultoId`: desde el 17/8 la clave es del HOGAR, así que la pantalla
      NO sabe cuál de los dos padres la está mirando — y no puede inventarlo. */
   yo: { nombre: string | null; hogar: string | null; puertaId: string | null };
-  familia: { nombre: string; impedimentos: string[]; sugerencias: Sugerencia[] };
+  familia: { nombre: string; pais: Pais; impedimentos: string[]; sugerencias: Sugerencia[] };
   chico: {
     id: string;
     nombre: string;
@@ -198,8 +203,8 @@ const VINCULO: Record<string, string> = {
  */
 /** La hora de una señal. Es la mitad del dato: una consulta a las 3 AM y una a
  *  las 3 de la tarde no significan lo mismo, y el panel sólo mostraba el día. */
-function horaDe(iso: string): string {
-  return new Date(iso).toLocaleTimeString(LOCALE_DEL_PAIS[PAIS_POR_DEFECTO], {
+function horaDe(iso: string, pais: Pais): string {
+  return new Date(iso).toLocaleTimeString(LOCALE_DEL_PAIS[pais], {
     hour: "2-digit",
     minute: "2-digit",
   });
@@ -431,7 +436,7 @@ export default function MiFamilia() {
             {dias.map(([dia, senales]) => (
               <li key={dia} className="flex items-start gap-4 py-3">
                 <span className="w-20 shrink-0 pt-0.5 font-mono text-xs text-apagado">
-                  {new Date(`${dia}T12:00:00`).toLocaleDateString(LOCALE_DEL_PAIS[PAIS_POR_DEFECTO], {
+                  {new Date(`${dia}T12:00:00`).toLocaleDateString(LOCALE_DEL_PAIS[datos.familia.pais], {
                     day: "2-digit",
                     month: "short",
                   })}
@@ -449,7 +454,7 @@ export default function MiFamilia() {
                       >
                         {sostiene && "● "}
                         {NOMBRE_DE_SENAL[s.tipo]}{" "}
-                        <span className="font-mono opacity-80">{horaDe(s.fecha)}</span>
+                        <span className="font-mono opacity-80">{horaDe(s.fecha, datos.familia.pais)}</span>
                       </span>
                     );
                   })}
@@ -614,6 +619,9 @@ export default function MiFamilia() {
       {datos.puertas.length > 0 && (
         <LaClave hayMasDeUnaCasa={datos.puertas.length > 1} alCambiar={cargar} />
       )}
+
+      {/* ── El país ────────────────────────────────────────────────────── */}
+      <ElPais actual={datos.familia.pais} alCambiar={cargar} />
 
       {/* ── El registro ────────────────────────────────────────────────── */}
       <ElRegistro accesos={datos.accesos ?? []} />
@@ -2259,6 +2267,86 @@ function LasPuertas({
    🔴 **Y pide la clave de ahora.** La sesión prueba que alguien entró alguna
    vez, no que sea el dueño hoy: un teléfono desbloqueado sobre la mesa
    alcanzaría para quedarse con la casa. */
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  EL PAÍS DE LA FAMILIA
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔴 **Lo que cambia son los TELÉFONOS y las LEYES, no el idioma**, y el texto
+ * de la pantalla tiene que decir eso: alguien que cree que está cambiando el
+ * idioma no entiende que acaba de mover a dónde lo van a derivar a las 3 de la
+ * mañana.
+ *
+ * 📌 Vive adentro de «La casa», con lo demás que se configura una vez. No es
+ * información del informe y no tiene que competir con él.
+ */
+function ElPais({ actual, alCambiar }: { actual: Pais; alCambiar: () => void }) {
+  const [guardando, setGuardando] = useState<Pais | null>(null);
+  const [error, setError] = useState("");
+
+  async function elegir(pais: Pais) {
+    if (pais === actual) return;
+    setError("");
+    setGuardando(pais);
+    try {
+      const res = await fetch("/api/mi-familia/pais", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pais }),
+      });
+      const datos = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(datos.error ?? "No se pudo cambiar. Probá de nuevo.");
+        return;
+      }
+      alCambiar();
+    } catch {
+      setError("No pudimos conectar. Fijate la señal y probá de nuevo.");
+    } finally {
+      setGuardando(null);
+    }
+  }
+
+  return (
+    <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
+      <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-acento">
+        <Globe size={13} /> El país de la familia
+      </h2>
+      <p className="mt-3 text-sm leading-relaxed text-tinta">
+        Decide a qué teléfonos y organismos deriva el sistema cuando algo pasa, y qué leyes cita.
+      </p>
+
+      <div className="mt-3.5 flex gap-2">
+        {(["AR", "ES"] as Pais[]).map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => elegir(p)}
+            disabled={guardando !== null}
+            aria-pressed={actual === p}
+            className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition disabled:opacity-50 ${
+              actual === p
+                ? "border-acento bg-acentoSuave text-tinta"
+                : "border-borde text-tenue hover:border-tenue/60 hover:text-tinta"
+            }`}
+          >
+            {guardando === p ? "Guardando…" : NOMBRE_DEL_PAIS[p]}
+          </button>
+        ))}
+      </div>
+
+      {error && <p className="mt-3 text-xs leading-relaxed text-riesgo">{error}</p>}
+
+      {/* 🔴 Se dice, y no es una formalidad: con padres separados son dos
+          puertas y un solo panel, así que esto se lo cambia también al otro. */}
+      <p className="mt-3 text-[11px] leading-relaxed text-apagado">
+        Vale para toda la familia, no sólo para esta casa. El cambio queda en el registro de
+        abajo.
+      </p>
+    </section>
+  );
+}
 
 function LaClave({
   hayMasDeUnaCasa,

@@ -181,7 +181,17 @@ const texto = textoDeLaEscalada("Ana", 9, false);
 comprobar("nombra al chico", texto.includes("Ana"));
 comprobar("dice que el primero no lo abrió nadie", /no lo abrió/i.test(texto));
 comprobar("dice que el patrón sigue", /se sigue viendo/i.test(texto));
-comprobar("deriva a un teléfono de ayuda español", /017|600 50 51 52/.test(texto));
+/* 🔴 Antes pedía «un teléfono español» y pasó a pedir **el del país que se le
+   pide**. El 20/9 el país de arranque cambió a Argentina y esta comprobación se
+   puso roja: hizo exactamente su trabajo —avisar que el número que sale solo, a
+   las 3 de la mañana, dejó de ser el que se esperaba—. Clavarla a un país era lo
+   que la volvía frágil; lo que no puede fallar nunca es que el teléfono sea el
+   del hogar al que se le escribe. */
+comprobar("deriva al teléfono del país que corresponde", /137/.test(texto));
+comprobar(
+  "y con España elegida, al de allá",
+  /017|600 50 51 52/.test(textoDeLaEscalada("Ana", 9, false, "ES")),
+);
 
 /* 🔴 Regla 1: no afirma nada. Ni diagnostica ni tranquiliza ni reprocha. */
 for (const prohibida of [

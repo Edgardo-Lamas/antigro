@@ -24,8 +24,10 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
    ✅ **Hecho el 20/9: la charla salió del informe, la presencia tiene su lugar y las secciones
    están ordenadas** — el panel bajó de **15,8 pantallas a 3,2**. Ver los bloques de abajo.
    ✅ **Y el marco del simulador, la otra mitad, también** — ver «LA VITRINA» más abajo.
-2. **Terminar el idioma** — va pegado al 1: si hay que tocar cada pantalla, el texto se escribe una
-   sola vez. Falta la interfaz; el asistente, los mensajes al chico y los controles ya están.
+2. 🔴 **El idioma queda para DESPUÉS del 24** — decisión de Edgardo del 20/9: *"el producto es
+   Argentino y lo van a ver así, cargarle todo al español de ellos… no me parece que tenga sentido
+   ahora"*. En su lugar entró **que el país lo elija el usuario** (abajo), que es lo que sí cambia
+   a quién se llama. Relevado: **192 marcas de voseo, ~138 en texto que lee una persona.**
 3. **El ensayo de la conversación con el hijo** — el asistente hace de hijo adolescente. El
    diferencial que no tiene ningún competidor.
 4. **El avatar** — dónde vive (presente, no un botón) y qué forma tiene (cuerpo entero translúcido).
@@ -287,10 +289,82 @@ una sola vez. 🔴 `terminos.prueba.ts` verifica que **todos los conceptos que c
 existan en TODOS los países**: un país al que le falte uno no se habilita, porque el documento
 quedaría citando el aire.
 
-📌 **`PAIS_POR_DEFECTO = "ES"`** y por ahora el país no se elige en el alta: el hogar todavía no
-guarda de qué país es. Cuando se agregue ese campo, esto pasa a ser sólo su valor por defecto.
-⚠ **La costura conocida:** la capa cubre los DATOS. El texto fijo de la interfaz está en peninsular
-para todos — sacarlo a un archivo de traducciones no entraba antes del 24/9.
+### 🏠 20/9 — Y EL PAÍS ES UN DATO DE LA FAMILIA (migración 20)
+
+**Lo ordenó Edgardo:** *"lógico debe ir dentro de la configuración de la Familia"*. La cookie
+resuelve a quien MIRA; esto resuelve a quien ya es cliente.
+
+🔴🔴 **EL CASO QUE LO OBLIGA: los avisos que salen SOLOS.** Cuando el patrón se sostiene y a las
+cuatro horas ningún adulto abrió el primer mensaje, el sistema escala por su cuenta —puede ser a las
+3 de la mañana— y ese texto termina en un teléfono. **Ahí no hay navegador ni cookie que consultar:
+hay una familia.** Sin la columna, el número que sale es el del país que esté puesto en el código.
+🔴 Y el segundo, más silencioso: con **padres separados** —dos puertas, un panel— el país del
+navegador podía dar **dos teléfonos distintos para el mismo chico**.
+
+| Pieza | Dónde |
+|---|---|
+| La columna | `familias.pais`, `not null default 'AR'`, con `check (pais in ('AR','ES'))` |
+| Se elige | En `/entrar`, al crear la cuenta — **ARRIBA del recuadro de términos** |
+| Se cambia | En el panel, dentro de «La casa» → `POST /api/mi-familia/pais` |
+| Queda registrado | Hecho nuevo `cambio_el_pais`, con el país en el detalle |
+| Lo leen | El cron (`escalar` + las dos redacciones) · `/api/alertas` · el asistente · el formato de fecha del panel |
+
+🔴 **El país va ANTES de los términos y no es maquetación:** el documento que se acepta **cita
+leyes**, las de un país o las del otro. Preguntarlo después sería hacerle aceptar a alguien un texto
+con la legislación de un lugar donde no vive. 📌 Y elegirlo ahí deja la cookie puesta, porque el
+enlace «términos de uso» abre otra pestaña que la lee.
+
+📌 **En la segunda puerta de padres separados el país NO se toca:** la familia ya existe y su país
+con ella. El que abre la otra casa no le cambia el país al panel del otro.
+
+⚠ **`COOKIE_DEL_PAIS`, `DURACION_DE_LA_COOKIE` y `esPais()` viven en `paises.ts`, no en
+`pais-elegido.ts`.** Ese último importa `next/headers` y contagia server-only a todo lo que lo
+importe; la pantalla de alta es de cliente y necesita el nombre de la cookie. **Con ellas allá el
+proyecto no compila** — pasó, y así se arregló.
+
+🔴🔴 **PENDIENTE Y BLOQUEANTE: la migración 20 NO está aplicada.** Hasta que corra, el alta rompe al
+insertar una columna que no existe. **El MCP de Supabase NO llega a esta base** —ve un proyecto
+`antigro` (`aqfqfhptwvkpavstjohn`) que no es el que usa el `.env.local` (`xlwgwpojbmakzmlrzgmw`)—,
+así que **la corre Edgardo desde el panel de Supabase**. El SQL está en `supabase/schema.sql` § 20.
+
+### ✅ 20/9 — EL PAÍS LO ELIGE QUIEN MIRA (`src/lib/pais-elegido.ts`)
+
+**Lo ordenó Edgardo:** *"cuando seleccione el usuario el país recibe la información del país
+seleccionado… si selecciona España aparecen los contactos y términos de España"*.
+
+🔴 **Lo que se elige son los CONTACTOS y las NORMAS, no el idioma**, y es su criterio textual:
+*"el voseo no es lo importante ahora, sino que el usuario español encuentre los contactos de su
+país y el usuario argentino los del suyo"*. Por eso el selector dice «Contactos y normas de».
+
+| Pieza | Dónde |
+|---|---|
+| Lee la elección | `paisElegido()` (Server Components) · `paisDeLaPeticion(req)` (Route Handlers) |
+| La guarda | Cookie `antigro_pais`, un año. **No es `?pais=`**: se perdería en el primer enlace que nadie acordó de propagar |
+| El control | `src/components/SelectorDePais.tsx` — un `form` con Server Action, anda sin JavaScript |
+| Está a la vista en | La home (arriba del pie) · la guía (encabezado **y** junto a los contactos) · los términos (arriba de la primera cita legal) |
+
+🔴 **`PAIS_POR_DEFECTO` pasó de `"ES"` a `"AR"`** — *"el producto es Argentino y lo van a ver
+así"*. Ya no configura el producto: es sólo el arranque del selector.
+
+**Qué respeta la elección hoy:** la guía (recursos + marco legal) · los términos (qué ley se cita) ·
+el mensaje de ejemplo de la consola (`/api/demo/mensajes`) · el asistente del panel · los textos de
+respaldo y la escalada.
+
+🔴 **`respaldo.ts` era el riesgo silencioso y se arregló:** los teléfonos se calculaban **una vez al
+cargar el módulo**, con el país que estuviera puesto en el código. Son los textos que salen cuando
+la IA no contesta — justo los que nadie vuelve a leer hasta que algo falla. Ahora son funciones del
+país. 📌 `banda7a10()` no recibe país a propósito: a esa edad no se nombra ningún teléfono.
+
+⚠ **Lo que TODAVÍA no respeta la elección, y por qué:**
+- **`/mi-familia`** (el formato de fecha) es `"use client"`: no puede leer la cookie del servidor, y
+  leerla del navegador daría un HTML servido distinto del hidratado. **Y además corresponde que no
+  la lea**: para una familia dada de alta el país es el del HOGAR, no el del navegador.
+- ⬜ **El país del hogar** — columna en `familias`, pregunta en el alta, y el panel y la escalada lo
+  leen de ahí. Es el paso que falta para cerrar esto.
+
+⚠ **La costura conocida:** la capa cubre los DATOS. El texto fijo de la interfaz sigue voseando y
+los textos de respaldo están en peninsular. **Edgardo lo decidió el 20/9: el barrido del idioma va
+DESPUÉS del 24.**
 
 ### ✅ Los entes y las normas, hechos y verificados en fuente oficial
 

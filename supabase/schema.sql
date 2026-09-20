@@ -759,7 +759,7 @@ create table if not exists accesos (
 alter table accesos drop constraint if exists accesos_que_check;
 alter table accesos add constraint accesos_que_check
   check (que in ('abrio_la_segunda_puerta', 'cerro_una_puerta', 'cambio_la_clave',
-                 'dio_de_baja_un_adulto', 'borro_la_charla'));
+                 'dio_de_baja_un_adulto', 'borro_la_charla', 'cambio_el_pais'));
 
 create index if not exists accesos_familia_fecha_idx on accesos (familia_id, fecha desc);
 
@@ -767,3 +767,37 @@ alter table accesos enable row level security;
 
 comment on table accesos is
   'Lo que una casa APORTA o CAMBIA, fechado. Nunca lo que MIRA: leer el informe o al asistente no deja rastro, a proposito. El cuestionario no esta aca porque ya firma en observaciones.';
+
+
+-- ═════════════════════════════════════════════════════════════════
+--  20. EL PAÍS DE LA FAMILIA — 20/9
+-- ═════════════════════════════════════════════════════════════════
+--
+--  🔑 **Lo ordenó Edgardo, y corrige de raiz donde vivia el dato:** *"logico
+--  debe ir dentro de la configuracion de la Familia"*. Hasta hoy el pais era una
+--  constante del codigo y, desde esta misma manana, una cookie del navegador de
+--  quien mirara. Las dos formas fallan en el mismo lugar.
+--
+--  🔴 **El caso que lo obliga: los avisos que salen SOLOS.** Cuando el patron se
+--  sostiene y a las cuatro horas ningun adulto abrio el primer mensaje, el
+--  sistema escala por su cuenta —puede ser a las 3 de la manana— y ese texto
+--  termina en un telefono. Ahi no hay navegador ni cookie que consultar: hay una
+--  familia. Sin esta columna, el numero que sale es el del pais que estuviera
+--  puesto en el codigo.
+--
+--  🔴 Y hay un segundo caso, mas silencioso: AntiGro soporta **padres separados**
+--  —dos puertas, un solo panel—. Con el pais en el navegador, uno podia estar
+--  viendo el 017 y el otro la Linea 137 PARA EL MISMO CHICO.
+--
+--  📌 `default 'AR'` para que las familias que ya existen queden en un pais real
+--  y no en null: una familia sin pais es una familia a la que el sistema no sabe
+--  a quien derivar, y eso no puede depender de que alguien complete un campo.
+
+alter table familias add column if not exists pais text not null default 'AR';
+
+alter table familias drop constraint if exists familias_pais_check;
+alter table familias add constraint familias_pais_check
+  check (pais in ('AR', 'ES'));
+
+comment on column familias.pais is
+  'A que pais se deriva esta familia: decide los telefonos de ayuda, los organismos y los articulos que se citan. NO decide el idioma. Lo elige quien crea la cuenta y se puede cambiar desde el panel.';

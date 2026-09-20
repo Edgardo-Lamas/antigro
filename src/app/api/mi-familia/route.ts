@@ -196,6 +196,10 @@ export async function GET(req: Request) {
     accesos,
     familia: {
       nombre: datos.familia.nombre,
+      /* 🔴 Va al panel porque manda sobre dos cosas que se ven: cómo se
+         escriben las fechas y a qué organismos deriva el asistente. Y es el de
+         la CASA, no el del navegador desde el que se entre. */
+      pais: datos.familia.pais,
       /* 🔴 Antes acá iban «faltantes» y era una lista de reproches: a un hogar
          con un solo progenitor le decía que estaba incompleto. Ahora son
          sugerencias con su porqué, y lo único que quedó duro es no tener

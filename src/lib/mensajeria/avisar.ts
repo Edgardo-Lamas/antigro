@@ -11,6 +11,7 @@
  * que tenga algo nuevo para decir nadie lo va a leer.
  */
 
+import type { Pais } from "@/lib/paises";
 import {
   diaLocal,
   textoDeLaCeguera,
@@ -226,6 +227,12 @@ export async function escalar(aviso: {
   quienLoVio: QuienLoVio;
   yaSeEscalo: boolean;
   ahora: Date;
+  /**
+   * 🔴 **El país de la FAMILIA, y es el caso que obligó a guardarlo.** Esto sale
+   * solo, sin nadie mirando una pantalla, y termina en un teléfono: acá no hay
+   * navegador del que leer una preferencia. Ver la migración 20.
+   */
+  pais?: Pais;
 }): Promise<{ decision: DecisionDeEscalada; emitidos: AvisoEmitido[] }> {
   const { chico, adultos, lectura, quienLoVio, yaSeEscalo, ahora } = aviso;
 
@@ -237,6 +244,7 @@ export async function escalar(aviso: {
     chico.nombre,
     decision.horasDesdeElAviso ?? 0,
     lectura.evasionesRecientes > 0,
+    aviso.pais,
   );
 
   const emitidos: AvisoEmitido[] = [];

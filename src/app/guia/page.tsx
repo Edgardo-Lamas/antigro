@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { COMO_FUNCIONA, PRODUCTO } from "@/lib/config";
-import { marcoLegalDe, NOMBRE_DEL_PAIS, PAIS_POR_DEFECTO, recursosDe } from "@/lib/paises";
+import { marcoLegalDe, NOMBRE_DEL_PAIS, recursosDe } from "@/lib/paises";
+import { paisElegido } from "@/lib/pais-elegido";
+import SelectorDePais from "@/components/SelectorDePais";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -30,6 +32,11 @@ import { marcoLegalDe, NOMBRE_DEL_PAIS, PAIS_POR_DEFECTO, recursosDe } from "@/l
 export const metadata = {
   title: "Guía de AntiGro — qué hace, qué no, y de dónde sale cada dato",
 };
+
+/* 🔑 Dinámica desde el 20/9: los teléfonos y las normas de esta página salen
+   del país que eligió quien la abre, y eso se lee de su cookie. Una guía
+   servida estática le daría a todos el país del último build. */
+export const dynamic = "force-dynamic";
 
 /* ── Piezas chicas, para que el contenido se lea y no se pierda en clases ──── */
 
@@ -61,6 +68,7 @@ function Ficha({ que, detalle }: { que: string; detalle: string }) {
 }
 
 export default function Guia() {
+  const pais = paisElegido();
   return (
     <main className="mx-auto max-w-3xl px-6 py-12">
       <Link
@@ -85,6 +93,12 @@ export default function Guia() {
           <strong className="text-tinta">sin leer un solo mensaje suyo</strong>. Esta página está
           escrita para quien quiere entenderlo rápido y verificarlo.
         </p>
+
+        {/* 🔴 Arriba de todo y no al pie, porque cambia lo que dice la página
+            más abajo: los teléfonos a los que se llama, los organismos y los
+            artículos que se citan. El que entra tiene que poder ponerlo en su
+            país ANTES de leer un número. */}
+        <SelectorDePais actual={pais} className="mt-6" />
 
         {/* 🔴 Faltaba, y lo marcó Edgardo el 17/8: *"no pusiste el ranking
             LATAM donde Argentina figura segunda"*. Estaba en el PDF desde el
@@ -546,12 +560,12 @@ export default function Guia() {
 
           <div className="rounded-lg border border-borde bg-superficie px-5 py-4">
             <p className="text-sm font-semibold text-tinta">
-              Marco legal — {NOMBRE_DEL_PAIS[PAIS_POR_DEFECTO]}
+              Marco legal — {NOMBRE_DEL_PAIS[pais]}
             </p>
             <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
-              <li>· {marcoLegalDe().grooming}</li>
-              <li>· {marcoLegalDe().proteccion}</li>
-              <li>· {marcoLegalDe().datos}</li>
+              <li>· {marcoLegalDe(pais).grooming}</li>
+              <li>· {marcoLegalDe(pais).proteccion}</li>
+              <li>· {marcoLegalDe(pais).datos}</li>
             </ul>
           </div>
 
@@ -577,11 +591,18 @@ export default function Guia() {
         titulo="Cuando la respuesta correcta no es un sistema"
         bajada="Está escrito en el producto y no en la letra pequeña: cuando lo que hace falta es un adulto o un organismo, el sistema lo dice."
       >
+        {/* 📌 El selector aparece dos veces a propósito. Esta página son seis
+            pantallas largas: el que llega hasta acá abajo buscando un teléfono
+            no va a volver arriba a cambiar de país, y si el que está puesto no
+            es el suyo, lo que se lleva es una lista de números que no le
+            sirven. */}
+        <SelectorDePais actual={pais} className="mb-4" />
+
         <div className="flex flex-col gap-3">
           {/* 🔑 El orden no es alfabético: es el de la hora y la situación, y sale
               tal cual del país que esté puesto. Escribir las fichas a mano era
               lo que hacía que agregar un país fuera tocar esta pantalla. */}
-          {recursosDe().map((r) => (
+          {recursosDe(pais).map((r) => (
             <Ficha
               key={r.id}
               que={[r.nombre, r.telefono].filter(Boolean).join(" — ")}

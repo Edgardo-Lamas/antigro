@@ -6,6 +6,7 @@
  * ningún otro lado.
  */
 
+import { esPais, PAIS_POR_DEFECTO, type Pais } from "@/lib/paises";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
 import { generarToken } from "@/lib/supabase";
@@ -42,6 +43,8 @@ type FilaFamilia = {
   activo: boolean;
   notas: string | null;
   created_at: string;
+  /** Migración 20. `default 'AR'` en la base, así que nunca llega vacío. */
+  pais: string | null;
 };
 
 type FilaChico = {
@@ -111,6 +114,10 @@ const aFamilia = (f: FilaFamilia): Familia => ({
   activo: f.activo,
   notas: f.notas ?? undefined,
   creado: f.created_at,
+  /* 🔴 Si la fila viniera sin país —una base vieja, un `select` que no lo pidió—
+     NO se inventa nada raro: cae en el de siempre. Un país inválido acá se
+     traduce en un teléfono que no atiende. */
+  pais: esPais(f.pais) ? f.pais : PAIS_POR_DEFECTO,
 });
 
 const aChico = (c: FilaChico): Chico => ({
@@ -168,6 +175,7 @@ export class RepositorioSupabase implements Repositorio {
       .insert({
         nombre: alta.nombre,
         token: generarToken(),
+        pais: alta.pais ?? PAIS_POR_DEFECTO,
         notas: alta.notas ?? null,
       })
       .select()
@@ -240,6 +248,10 @@ export class RepositorioSupabase implements Repositorio {
         .insert({
           nombre: alta.nombreDeLaFamilia?.trim() || "Mi familia",
           token: generarToken(),
+          /* 🔴 El país se fija acá, al crear la casa, y con eso quedan atados
+             los teléfonos a los que el sistema va a derivar y las leyes que
+             esta familia acaba de aceptar. */
+          pais: alta.pais ?? PAIS_POR_DEFECTO,
         })
         .select()
         .single<FilaFamilia>();
@@ -466,6 +478,11 @@ export class RepositorioSupabase implements Repositorio {
       chicos: chicos ?? 0,
       chicosConAlerta: new Set((alertas ?? []).map((a) => a.chico_id)).size,
     };
+  }
+
+  async cambiarPaisDeLaFamilia(familiaId: string, pais: Pais): Promise<void> {
+    const { error } = await this.db.from("familias").update({ pais }).eq("id", familiaId);
+    if (error) throw new Error(error.message);
   }
 
   /**

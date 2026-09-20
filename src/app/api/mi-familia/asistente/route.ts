@@ -1,4 +1,5 @@
-import { ayudaDeSiempre, PAIS_POR_DEFECTO } from "@/lib/paises";
+import { ayudaDeSiempre } from "@/lib/paises";
+import { paisDeLaPeticion } from "@/lib/pais-elegido";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { auth } from "@/auth";
@@ -165,8 +166,8 @@ export async function POST(req: Request) {
         texto:
           "Estuvimos hablando bastante seguido y necesito un rato. " +
           `Volvé en ${Math.ceil(turno.esperaSeg / 60)} minutos y seguimos.\n\n` +
-          `Si es algo que no puede esperar, ${ayudaDeSiempre("adulto", PAIS_POR_DEFECTO).nombre} ` +
-          `(${ayudaDeSiempre("adulto", PAIS_POR_DEFECTO).telefono}) atiende las 24 horas.`,
+          `Si es algo que no puede esperar, ${ayudaDeSiempre("adulto", paisDeLaPeticion(req)).nombre} ` +
+          `(${ayudaDeSiempre("adulto", paisDeLaPeticion(req)).telefono}) atiende las 24 horas.`,
         origen: "respaldo",
         causa: "limite",
         motivos: ["Demasiadas preguntas seguidas."],
@@ -233,6 +234,11 @@ export async function POST(req: Request) {
     historia,
     chico: { nombre: chico.nombre, edad: chico.edad },
     lectura,
+    /* 🔴 El país de la FAMILIA, no el de la cookie. Acá ya hay sesión: el país
+       de la casa lo fijó quien la creó, y no puede cambiarlo el navegador desde
+       el que se entre —con padres separados serían dos teléfonos distintos para
+       el mismo chico—. La cookie queda para quien mira sin cuenta. */
+    pais: datos.familia.pais,
   });
 
   /* ── Los dos turnos, juntos ──

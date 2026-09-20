@@ -194,12 +194,18 @@ export async function GET(req: Request) {
 
       if (!yaAviso) {
         const [paraLosAdultos, paraElChico] = await Promise.all([
-          redactarLecturaParaAdultos({ nombreDelChico: chico.nombre, edad: chico.edad, lectura }),
+          redactarLecturaParaAdultos({
+            nombreDelChico: chico.nombre,
+            edad: chico.edad,
+            lectura,
+            pais: familia.pais,
+          }),
           redactarMensajeAlChico({
             nombre: chico.nombre,
             edad: chico.edad,
             genero: chico.genero,
             estado: lectura.estado,
+            pais: familia.pais,
           }),
         ]);
 
@@ -244,6 +250,7 @@ export async function GET(req: Request) {
       quienLoVio: vio,
       yaSeEscalo,
       ahora,
+      pais: familia.pais,
     });
 
     if (decision.escala) {

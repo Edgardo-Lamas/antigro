@@ -92,12 +92,18 @@ export async function POST(req: Request) {
 
   /* ── La IA escribe sólo si el motor decidió que hay algo que decir ── */
   const [paraLosAdultos, paraElChico] = await Promise.all([
-    redactarLecturaParaAdultos({ nombreDelChico: chico.nombre, edad: chico.edad, lectura }),
+    redactarLecturaParaAdultos({
+      nombreDelChico: chico.nombre,
+      edad: chico.edad,
+      lectura,
+      pais: datos.familia.pais,
+    }),
     redactarMensajeAlChico({
       nombre: chico.nombre,
       edad: chico.edad,
       genero: chico.genero,
       estado: lectura.estado,
+      pais: datos.familia.pais,
     }),
   ]);
 

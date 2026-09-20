@@ -18,7 +18,7 @@
  * del arte del estudio, no medido por el estudio.
  */
 
-import { ayudaDeSiempre, PAIS_POR_DEFECTO } from "../paises.ts";
+import { ayudaDeSiempre, PAIS_POR_DEFECTO, type Pais } from "../paises.ts";
 import type { BandaDeEdad } from "@/lib/config";
 import type { Estado } from "@/lib/motor";
 
@@ -40,17 +40,28 @@ export interface TextoParaElChico {
  * hasta que algo falla. Un número viejo, o el de otro país, sobrevive años en
  * un texto de respaldo sin que nadie lo note. Sale de `paises.ts` o no sale.
  */
-const TELEFONO_DEL_CHICO = [
-  ayudaDeSiempre("chico", PAIS_POR_DEFECTO).nombre,
-  ayudaDeSiempre("chico", PAIS_POR_DEFECTO).telefono,
-].join(": ") + ". Gratis, las 24 horas, y te atiende un psicólogo.";
+/**
+ * 🔴 **Era una constante de módulo y pasó a depender del país — 20/9.** Tal como
+ * estaba, el número se calculaba UNA vez al cargar el archivo, con el país que
+ * estuviera puesto en el código: el día que alguien eligiera el otro país, estos
+ * textos —los que salen justo cuando la IA no contestó— habrían seguido dando el
+ * teléfono del país equivocado, en silencio y para siempre.
+ */
+function telefonoDelChico(pais: Pais): string {
+  const r = ayudaDeSiempre("chico", pais);
+  return `${[r.nombre, r.telefono].filter(Boolean).join(": ")}. Gratis, las 24 horas, y te atiende un psicólogo.`;
+}
 
-function telefonoDelAdulto(): string {
-  const r = ayudaDeSiempre("adulto", PAIS_POR_DEFECTO);
+function telefonoDelAdulto(pais: Pais): string {
+  const r = ayudaDeSiempre("adulto", pais);
   return `${r.nombre}${r.telefono ? ` (${r.telefono})` : ""}`;
 }
 
-const BANDA_7_10: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
+/* 🔑 Ésta no recibe país, y es la regla del producto hecha firma: a los 7-10
+   NO se le nombra ningún teléfono de ayuda —el que llama es un adulto—, así que
+   no hay nada acá adentro que dependa de dónde vive. Si algún día aparece un
+   número en estos textos, el tipo va a obligar a decir de qué país es. */
+const banda7a10 = (): Record<Exclude<Estado, "en_calma">, TextoParaElChico> => ({
   atencion: {
     texto:
       "Hola. Si alguien que no conoces te escribe y te hace sentir raro, no es culpa tuya. " +
@@ -63,13 +74,13 @@ const BANDA_7_10: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "No es culpa tuya y no estás en un lío. Cuéntaselo hoy a un mayor de tu casa.",
     derivacion: ["Cuéntaselo hoy a un adulto de tu casa."],
   },
-};
+});
 
 /**
  * 11–13 · Se explica el mecanismo, no sólo la regla. Se nombra el grooming
  * como lo que es: un delito. Se le nombra el teléfono ANAR, que es el suyo.
  */
-const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
+const banda11a13 = (pais: Pais): Record<Exclude<Estado, "en_calma">, TextoParaElChico> => ({
   atencion: {
     texto:
       "Hola. Te escribimos por algo que quizá no sepas: hay adultos que se hacen pasar por " +
@@ -77,7 +88,7 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "Si te está pasando algo, no has hecho nada malo.",
     derivacion: [
       "Cuéntaselo a un adulto de confianza.",
-      TELEFONO_DEL_CHICO,
+      telefonoDelChico(pais),
     ],
   },
   patron_sostenido: {
@@ -88,10 +99,10 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "Cuéntaselo hoy a alguien mayor.",
     derivacion: [
       "Cuéntaselo a un adulto de confianza.",
-      TELEFONO_DEL_CHICO,
+      telefonoDelChico(pais),
     ],
   },
-};
+});
 
 /**
  * 14–17 · De igual a igual. Nada que suene a reto ni a control.
@@ -99,7 +110,7 @@ const BANDA_11_13: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
  * en 11 escuelas, citada en el estudio nacional): el mensaje no puede dar por
  * sentado que el adulto es la salida, por eso van las tres puertas.
  */
-const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
+const banda14a17 = (pais: Pais): Record<Exclude<Estado, "en_calma">, TextoParaElChico> => ({
   atencion: {
     texto:
       "Hola. Esto no es una bronca ni un control. Si alguien que conociste por internet te está " +
@@ -107,7 +118,7 @@ const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "y es un delito. Tú no has hecho nada mal. Tienes a quién acudir, y eliges tú a quién.",
     derivacion: [
       "El adulto que elegiste tú cuando se dio de alta el sistema.",
-      TELEFONO_DEL_CHICO,
+      telefonoDelChico(pais),
       "Se puede denunciar, y no hace falta tener pruebas para preguntar.",
     ],
   },
@@ -119,26 +130,31 @@ const BANDA_14_17: Record<Exclude<Estado, "en_calma">, TextoParaElChico> = {
       "más de lo que parece y casi nadie lo cuenta. Eliges tú a quién acudir.",
     derivacion: [
       "El adulto que elegiste tú cuando se dio de alta el sistema.",
-      TELEFONO_DEL_CHICO,
+      telefonoDelChico(pais),
       "Se puede denunciar, y no hace falta tener pruebas para preguntar.",
     ],
   },
-};
+});
 
-const POR_BANDA: Record<BandaDeEdad, Record<Exclude<Estado, "en_calma">, TextoParaElChico>> = {
-  "7-10": BANDA_7_10,
-  "11-13": BANDA_11_13,
-  "14-17": BANDA_14_17,
-};
+function porBanda(
+  pais: Pais,
+): Record<BandaDeEdad, Record<Exclude<Estado, "en_calma">, TextoParaElChico>> {
+  return {
+    "7-10": banda7a10(),
+    "11-13": banda11a13(pais),
+    "14-17": banda14a17(pais),
+  };
+}
 
 export function respaldoParaElChico(
   banda: BandaDeEdad,
   estado: Estado,
+  pais: Pais = PAIS_POR_DEFECTO,
 ): TextoParaElChico | null {
   // 🔴 En calma el sistema no le escribe. Un sistema que habla porque sí
   // deja de ser creíble justo el día que tiene algo para decir.
   if (estado === "en_calma") return null;
-  return POR_BANDA[banda][estado];
+  return porBanda(pais)[banda][estado];
 }
 
 /** La lectura para los adultos, armada con los datos del motor. */
@@ -147,6 +163,7 @@ export function respaldoParaLosAdultos(datos: {
   estado: Estado;
   porQue: string[];
   loQueNoSeVe: string[];
+  pais?: Pais;
 }): string {
   const encabezado =
     datos.estado === "patron_sostenido"
@@ -164,7 +181,7 @@ export function respaldoParaLosAdultos(datos: {
     "",
     datos.estado === "patron_sostenido"
       ? "Qué hacer ahora: hablar con él o ella, sin acusar y sin mostrarle esto como una prueba. " +
-        `Si hace falta orientación, ${telefonoDelAdulto()} atiende gratis.`
+        `Si hace falta orientación, ${telefonoDelAdulto(datos.pais ?? PAIS_POR_DEFECTO)} atiende gratis.`
       : "Qué hacer ahora: nada urgente. Vale la pena estar atento estos días.",
   ].join("\n");
 }

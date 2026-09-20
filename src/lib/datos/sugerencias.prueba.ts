@@ -60,6 +60,7 @@ function familia(chicos: Chico[], adultos: AdultoResponsable[]): FamiliaCompleta
       id: "f1",
       nombre: "Familia de prueba",
       token: "t",
+      pais: "AR",
       activo: true,
       creado: new Date().toISOString(),
     },

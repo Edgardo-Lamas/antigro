@@ -6,6 +6,7 @@
  * ande sin base y siga andando igual el día que la haya.
  */
 
+import type { Pais } from "@/lib/paises";
 import type {
   AdultoResponsable,
   Chico,
@@ -21,6 +22,8 @@ import type {
 export interface AltaDeFamilia {
   nombre: string;
   notas?: string;
+  /** A qué país se deriva. Si no viene, el de siempre. Ver `Familia.pais`. */
+  pais?: Pais;
   /** 🔑 Va por chico: el perfil vive en su dispositivo. Ver `Chico`. */
   chicos: Omit<Chico, "id" | "familiaId" | "activo" | "creado">[];
   // Un alta nunca crea a alguien ya dado de baja: los campos de la baja no se
@@ -58,6 +61,16 @@ export interface Vinculacion {
  * el recorrido lo dice en pantalla en vez de simular un cobro que no existe.
  */
 export interface AltaDeHogar {
+  /**
+   * 🔴 **El país de la casa, y se elige ANTES de aceptar los términos.** No es
+   * una preferencia de pantalla: los términos que se firman citan las leyes de
+   * ese país, así que preguntarlo después sería hacerle aceptar a alguien un
+   * documento con la legislación de otro lado.
+   *
+   * 📌 Sólo cuenta cuando se crea la familia. En la segunda puerta de padres
+   * separados la familia ya existe, y su país con ella.
+   */
+  pais?: Pais;
   /**
    * 🔴 Con qué entra la casa. **Es del hogar, no de una persona**: los dos
    * progenitores usan la misma. Ver `Hogar` en `tipos.ts`.
@@ -268,6 +281,15 @@ export interface Repositorio {
    * registro con una palabra que nadie sabe leer.
    */
   registrarAcceso(a: Omit<AccesoRegistrado, "id" | "fecha">): Promise<void>;
+
+  /**
+   * Cambia a qué país se deriva esta familia.
+   *
+   * 🔴 No es una preferencia de pantalla: decide los teléfonos y organismos que
+   * el sistema va a nombrar cuando algo pase, incluso en los avisos que salen
+   * solos. Por eso queda registrado como hecho (`cambio_el_pais`).
+   */
+  cambiarPaisDeLaFamilia(familiaId: string, pais: Pais): Promise<void>;
 
   /** Los últimos hechos de esa familia, del más nuevo al más viejo. */
   accesosDe(familiaId: string, limite: number): Promise<AccesoRegistrado[]>;

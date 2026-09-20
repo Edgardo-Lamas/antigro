@@ -147,10 +147,10 @@ CÓMO SE LE HABLA A CADA EDAD
   esa edad el que llama es un adulto.
 - 11 a 13 años: se le explica el mecanismo, no sólo la regla. Se nombra el grooming como lo
   que es, un delito, y se aclara que le pasa a mucha gente. Se lo deriva a un adulto de
-  confianza y se le nombra ${comoSeLoNombra(ayudaDeSiempre("chico", PAIS_POR_DEFECTO))}.
+  confianza y se le nombra ${comoSeLoNombra(ayudaDeSiempre("chico", pais))}.
 - 14 a 17 años: de igual a igual. Nada que suene a reto, a control ni a sermón. No des por
   sentado que el adulto es la salida. Se le nombra el adulto que él mismo eligió, la
-  ${comoSeLoNombra(ayudaDeSiempre("chico", PAIS_POR_DEFECTO))} y la posibilidad de denunciar.
+  ${comoSeLoNombra(ayudaDeSiempre("chico", pais))} y la posibilidad de denunciar.
 
 GUARDARRAÍL DE GÉNERO
 Lo único que cambia según el género es qué tipo de riesgo se enfatiza, y sólo donde hay dato
@@ -184,7 +184,17 @@ function noSalio(motivo: string): { error: string } {
   return { error: motivo };
 }
 
-async function pedirTexto(datos: string): Promise<{ texto: string } | { error: string }> {
+/**
+ * 🔴 **El país viaja hasta acá y no se toma del default — 20/9.** Es el prompt
+ * de sistema el que lleva la lista de recursos, y la regla de `paises.ts` manda
+ * que el modelo vea UNA sola: la del país de quien está del otro lado. Pasarlo
+ * por parámetro es lo que garantiza que el que eligió España no reciba nunca la
+ * Línea 137, ni al revés.
+ */
+async function pedirTexto(
+  datos: string,
+  pais: Pais,
+): Promise<{ texto: string } | { error: string }> {
   const api = anthropic();
   if (!api) return noSalio("Falta ANTHROPIC_API_KEY");
 
@@ -194,7 +204,7 @@ async function pedirTexto(datos: string): Promise<{ texto: string } | { error: s
       max_tokens: MAX_TOKENS,
       output_config: { effort: "medium" },
       system: [
-        { type: "text", text: sistema(PAIS_POR_DEFECTO), cache_control: { type: "ephemeral" } },
+        { type: "text", text: sistema(pais), cache_control: { type: "ephemeral" } },
       ],
       messages: [{ role: "user", content: datos }],
     });
@@ -224,12 +234,14 @@ export async function redactarMensajeAlChico(entrada: {
   edad: number;
   genero: string;
   estado: Estado;
+  pais?: Pais;
 }): Promise<Redaccion | null> {
   // En calma no se le escribe. El silencio también es una decisión del motor.
   if (entrada.estado === "en_calma") return null;
 
+  const pais = entrada.pais ?? PAIS_POR_DEFECTO;
   const banda: BandaDeEdad = bandaDeEdad(entrada.edad);
-  const respaldo = respaldoParaElChico(banda, entrada.estado)!;
+  const respaldo = respaldoParaElChico(banda, entrada.estado, pais)!;
 
   const datos = [
     `Escribile a ${entrada.nombre}, de ${entrada.edad} años (banda ${banda}).`,
@@ -245,7 +257,7 @@ export async function redactarMensajeAlChico(entrada: {
     "· El 43% dice no hablar sobre los riesgos en Internet con sus padres (encuesta en 11 escuelas).",
   ].join("\n");
 
-  const resultado = await pedirTexto(datos);
+  const resultado = await pedirTexto(datos, pais);
   if ("error" in resultado) {
     return { texto: respaldo.texto, origen: "respaldo", motivos: [resultado.error] };
   }
@@ -269,14 +281,17 @@ export async function redactarLecturaParaAdultos(entrada: {
   nombreDelChico: string;
   edad: number;
   lectura: Lectura;
+  pais?: Pais;
 }): Promise<Redaccion | null> {
   if (entrada.lectura.estado === "en_calma") return null;
 
+  const pais = entrada.pais ?? PAIS_POR_DEFECTO;
   const respaldo = respaldoParaLosAdultos({
     nombreDelChico: entrada.nombreDelChico,
     estado: entrada.lectura.estado,
     porQue: entrada.lectura.porQue,
     loQueNoSeVe: entrada.lectura.loQueNoSeVe,
+    pais,
   });
 
   const datos = [
@@ -291,11 +306,11 @@ export async function redactarLecturaParaAdultos(entrada: {
     "",
     "Tope: 1500 caracteres. No lo pases.",
     "Cerrá con qué mirar ahora. Si el patrón se sostuvo, la conversación con el chico va sin",
-    `acusar y sin mostrarle esto como una prueba; y ${comoSeLoNombra(ayudaDeSiempre("adulto", PAIS_POR_DEFECTO))}`,
+    `acusar y sin mostrarle esto como una prueba; y ${comoSeLoNombra(ayudaDeSiempre("adulto", pais))}`,
     "orienta gratis las 24 horas.",
   ].join("\n");
 
-  const resultado = await pedirTexto(datos);
+  const resultado = await pedirTexto(datos, pais);
   if ("error" in resultado) {
     return { texto: respaldo, origen: "respaldo", motivos: [resultado.error] };
   }

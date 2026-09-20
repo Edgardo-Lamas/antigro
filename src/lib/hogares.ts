@@ -184,6 +184,13 @@ export const QUE_SE_REGISTRA = [
   "cambio_la_clave",
   "dio_de_baja_un_adulto",
   "borro_la_charla",
+  /**
+   * 🔴 **Cambiar el país no es una preferencia de pantalla: cambia a qué
+   * teléfono deriva el sistema cuando algo pasa.** Con dos casas, uno de los
+   * dos puede cambiárselo al otro sin avisar, así que tiene que constar — que
+   * es exactamente para lo que existe este registro.
+   */
+  "cambio_el_pais",
 ] as const;
 
 export type QueSeRegistra = (typeof QUE_SE_REGISTRA)[number];
@@ -201,4 +208,5 @@ export const COMO_SE_LEE: Record<QueSeRegistra, string> = {
   cambio_la_clave: "Se cambió la clave de esta casa",
   dio_de_baja_un_adulto: "Se dio de baja a un adulto",
   borro_la_charla: "Se borró la charla con el asistente",
+  cambio_el_pais: "Se cambió el país de la familia",
 };
