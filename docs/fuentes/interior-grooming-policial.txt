@@ -1,0 +1,1872 @@
+INVESTIGACIONES POLICIALES
+POR DELITOS DE ONLINE CHILD
+ SEXUAL GROOMING EN ESPAÑA
+
+
+
+
+                                               Virginia Soldino Garmendia
+                                                 Nerea G. Jusue Moñino
+                                                Enrique J. Carbonell Vayá
+
+
+
+
+Proyecto PID2020-117964RB-I00 financiado por
+     MICIU/AEI/10.13039/501100011033
+AUTORES
+Virginia Soldino Garmendia. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+Nerea G. Jusue Moñino. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+Enrique J. Carbonell Vayá. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+
+COLABORADORES
+Carmen Pérez Sabater. Departamento de Lingüística Aplicada. Universitat Politècnica de València.
+Kathryn C. Seigfried-Spellar. Department of Computer and Information Technology. Purdue University.
+María José Garrido Antón. Dirección General de Coordinación y Estudios. Secretaría de Estado de
+Seguridad.
+Eduardo Casas Herrer. Unidad Central de Ciberdelincuencia - Sección de Protección al Menor. Policía
+Nacional.
+Lourdes Guzmán Márquez. Unidad Técnica de Policía Judicial - Grupo de Inteligencia Criminal y
+Coordinación - Delitos contra las Personas - Sección EMUME Central. Guardia Civil.
+Marian Pérez Tapia. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+Nerea Párraga Albert. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+Ana María García Narro. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+María Teresa Nieto Pérez. Instituto Universitario de Investigación en Criminología y Ciencias Penales.
+Universitat de València.
+
+FINANCIACIÓN
+Esta publicación forma parte del proyecto de I+D+i PID2020-117964RB-I00 Ciberacoso sexual a
+menores: De la elaboración de perfiles lingüísticos al desarrollo de herramientas forenses
+digitales para la prevención, detección y priorización de casos en España (OnSexGroom.es),
+financiado por MICIU/AEI/10.13039/501100011033.
+
+AGRADECIMIENTOS
+Agradecemos el inestimable apoyo del coronel D. José Luis González Álvarez en las fases iniciales de este
+proyecto. Sin el apoyo de los profesionales que trabajan y han trabajado en la Dirección General de
+Coordinación y Estudios, Secretaría de Estado de Seguridad, no hubiera sido posible esta investigación.
+También agradecemos su colaboración a los funcionarios de la Guardia Civil y la Policía Nacional que han
+participado de forma directa o indirecta en este proyecto, y que ocupan sus vidas investigando estos delitos.
+Por su colaboración en la codificación de los datos, nos gustaría agradecer a aquellas personas que han
+formado parte del equipo de trabajo en algún momento: Abilene Vidal Gamito, María Almiñana Tudela,
+Ainhoa Canut Ciscar, Nadia Martínez Sales y Amparo Contreras González.
+
+EDITA
+Ministerio del Interior. Secretaría General Técnica
+
+NIPO: 126- 24- 101- 5
+
+Catálogo de publicaciones de la Administración General del Estado: https://cpage.mpr.gob.es
+
+
+
+
+                                                   1
+ÍNDICE
+1.      RESUMEN EJECUTIVO ......................................................................................................... 3
+2.      INTRODUCCIÓN .................................................................................................................... 4
+     2.1.      Explotación sexual infantil y adolescente y online child sexual grooming. ...................... 4
+     2.2.      Regulación penal del online child sexual grooming en España. ....................................... 5
+     2.3.      Prevalencia del online child sexual grooming en España.................................................. 7
+     2.4.      Características de los perpetradores, modus operandi y tipologías. .................................. 9
+     2.5.      Características de las víctimas. ........................................................................................ 13
+     2.6.      El proyecto OnSexGroom.es............................................................................................ 13
+        2.6.1. Análisis criminológico de los casos de online child sexual grooming investigados en
+        España. ................................................................................................................................... 14
+3.      MÉTODO ............................................................................................................................... 16
+     3.1.      Procedimiento de recogida de datos y muestra. .............................................................. 16
+     3.2.      Variables de interés. ......................................................................................................... 17
+     3.3.      Análisis de los datos. ....................................................................................................... 18
+4.      RESULTADOS ....................................................................................................................... 23
+     4.1.      Características de las investigaciones policiales. ............................................................ 23
+     4.2.      Características de los casos de online child sexual grooming. ........................................ 24
+     4.3.      Características de los groomers. ...................................................................................... 27
+     4.4.      Características de las víctimas. ........................................................................................ 30
+5.      DISCUSIÓN DE LOS RESULTADOS .................................................................................. 33
+     5.1.      Características de los groomers y sus víctimas. .............................................................. 33
+     5.2. Diferencias entre los groomers motivados por el contacto y los groomers limitados al
+     ámbito virtual. ............................................................................................................................ 35
+     5.3. Diferencias entre las víctimas de los groomers motivados por el contacto y las víctimas
+     de los groomers limitados al ámbito virtual. .............................................................................. 38
+     5.4.      Limitaciones y propuestas de futuro. .............................................................................. 39
+     5.5.      Posibles repercusiones del estudio. ................................................................................. 40
+6.      REFERENCIAS...................................................................................................................... 42
+
+
+
+
+                                                                          2
+1. RESUMEN EJECUTIVO
+    Este informe presenta los resultados derivados del análisis criminológico de una muestra de
+98 atestados policiales relacionados con delitos de online child sexual grooming, investigados por
+la Policía Nacional y la Guardia Civil en España. Mediante el uso de análisis estadísticos, se
+examinaron las diferencias criminológicas entre los casos investigados que involucraban a
+groomers motivados por el contacto y aquellos limitados al entorno virtual. Para este propósito, se
+analizaron un total de 257 conversaciones reales que tuvieron lugar entre 120 sospechosos y 234
+víctimas.
+
+    Se exploraron diversas variables, incluyendo las características específicas de los casos
+investigados, los perfiles tanto de las personas investigadas como de las víctimas, las plataformas
+de chat utilizadas, así como los detalles particulares de las conversaciones (p. ej., la cantidad y el
+contenido de los mensajes intercambiados). Además, se analizaron los comportamientos de alto
+riesgo exhibidos por las víctimas, como el envío de imágenes de desnudos, así como las tácticas de
+manipulación y engaño empleadas por los groomers durante el proceso de embaucamiento.
+
+    Estos resultados no solamente proporcionan una comprensión más profunda de la naturaleza
+y las dinámicas de estos delitos, sino que también tienen el potencial de beneficiar a las Fuerzas y
+Cuerpos de Seguridad del Estado. Específicamente, los resultados presentados pueden contribuir a
+mejorar el esclarecimiento de los hechos, así como la identificación y priorización de los casos de
+mayor riesgo, particularmente aquellos que involucran a groomers que buscan encontrarse
+físicamente con sus víctimas. Asimismo, los resultados pueden ser utilizados para desarrollar
+estrategias más efectivas para la protección de las víctimas potenciales.
+
+
+
+
+                                                  3
+2. INTRODUCCIÓN
+
+2.1. Explotación sexual infantil y adolescente y online child sexual grooming.
+
+    La explotación sexual infantil y adolescente (ESIA), entendida como una forma de violencia
+sexual, abarca una amplia gama de delitos de naturaleza sexual perpetrados contra niños, niñas y
+adolescentes (NNA) que ocurren tanto en el mundo físico como en el virtual (Beckett et al., 2017;
+Guardiola Lago, 2023; Seigfried-Spellar & Soldino, 2020). Estos delitos incluyen, entre otros, el
+tráfico de NNA con fines sexuales, el turismo sexual infantil y adolescente, el online child sexual
+grooming (OCSG) o la producción de material de explotación sexual infantil y adolescente
+(MESIA). La ESIA constituye un desafío de carácter internacional (Europol, 2022; International
+Centre for Missing & Exploited Children [ICMEC], 2017; United States Department of Justice
+[DOJ], 2016) cuya prevalencia ha experimentado un aumento a nivel global en los últimos años,
+agravándose aún más durante la pandemia del COVID-19 (European Union Agency for Law
+Enforcement Cooperation [Europol], 2020). Esta problemática ha sido reconocida por Europol
+como una de las amenazas criminales más graves, incluyéndola como una de las prioridades en el
+Ciclo de Actuación de la Unión Europea para el periodo 2022-2025 (Europol, 2022).
+
+    Los avances tecnológicos han facilitado situaciones de ESIA, permitiendo, por ejemplo, que
+los ciberacosadores sexuales (también conocidos como groomers) puedan interactuar en chats
+simultáneos con un número indefinido de víctimas, en cualquier momento y lugar (de Santisteban
+et al., 2018; Malesky, 2007; Quayle et al., 2014; Webster et al., 2012; Winters et al., 2017). Estos
+individuos utilizan una serie de estrategias para manipular a los NNA y ganarse su confianza,
+muchas de las cuales ya existían antes de la era de Internet (por ejemplo, el engaño o el secretismo),
+pero que han evolucionado en términos de alcance y oportunidad (Ringenberg et al., 2022). Las
+tecnologías de la información y la comunicación (TIC) proporcionan a los groomers un medio
+asequible y accesible en el que contactar con NNA, así como cierto anonimato (Cooper, 1998), lo
+cual les genera una sensación de seguridad a la hora de cometer el delito (Seigfried-Spellar, 2013).
+Esto permite que en muchas ocasiones los groomers extiendan su "red de arrastre" (de Santisteban
+et al., 2018; Malesky, 2007; Quayle et al., 2014; Seigfried-Spellar et al., 2019; Webster et al., 2012;
+Winters et al., 2017), enviando mensajes de forma simultánea a múltiples víctimas, incrementando
+así sus probabilidades de identificar a una víctima vulnerable y lograr sus objetivos, como la
+
+
+
+
+                                                  4
+agresión sexual en el mundo físico, la obtención de MESIA, o el intercambio de mensajes con
+contenido sexual (National Center for Missing & Exploited Children [NCMEC], 2017).
+
+
+
+
+2.2. Regulación penal del online child sexual grooming en España.
+
+    En España, el delito de online child grooming, también conocido como ciberacoso sexual a
+menores, fue incorporado al Código Penal (CP) en el año 2010 a través de la Ley Orgánica (LO)
+5/2010, de 22 de junio. Este cambio en el CP tomaba como referencia lo dispuesto en el artículo
+23 del Convenio del Consejo de Europa para la protección de los niños contra la explotación y el
+abuso sexual, de 25 de octubre de 2007 (Convenio de Lanzarote), y en el artículo 6 de la Directiva
+2011/93/UE del Parlamento Europeo y del Consejo, de 13 de diciembre de 2011, relativa a la lucha
+contra los abusos sexuales y la explotación sexual de los menores y la pornografía infantil, por la
+que se sustituye la Decisión marco 2004/68/JAI del Consejo (Cinosi Fernández, 2023; Guisasola
+Lerma, 2022; Lloria García, 2024; Pérez González y De la Mata Barranco, 2023; Villacampa
+Estiarte y Torres Ferrer, 2022). El artículo 183 bis CP castigaba a aquellas personas mayores de
+catorce años (Villacampa Estiarte y Torres Ferrer, 2022) que, utilizando las tecnologías de la
+información y la comunicación (TIC), contactaran con menores de trece años con el propósito de
+concertar un encuentro para cometer delitos sexuales de contacto o facilitar su explotación sexual;
+aunque dicho castigo se limitaba a aquellos supuestos en los que la propuesta del encuentro se
+acompañaba de actos materiales concretos para materializarlo. La inclusión de este nuevo delito se
+fundamentó en la protección de la indemnidad sexual de los menores de trece años, entendida como
+“el derecho a no verse involucrado en un contexto sexual sin un consentimiento válidamente
+prestado”. Además, se procuró proteger el proceso formativo y de desarrollo de la personalidad y
+sexualidad de los menores, libre de injerencias (De la Mata Barranco y Pérez González, 2021;
+Górriz Royo, 2016; Pérez González y De la Mata Barranco, 2023).
+
+    Desde entonces, este tipo delictivo ha experimentado dos modificaciones que siempre han
+mantenido el sentido de la prohibición original (Pérez González y De la Mata Barranco, 2023). En
+primer lugar, la LO 1/2015, de 30 de marzo, reubicó este delito en el artículo 183 ter, elevó la edad
+máxima de las víctimas a los dieciséis años e incorporó un segundo apartado que contemplaba
+aquellos supuestos en los que el contacto a través de las TIC se dirigiera exclusivamente al
+
+
+
+                                                 5
+embaucamiento del menor para la obtención de material pornográfico que involucrara a menores
+de dieciocho años. Posteriormente, la LO 10/2022, de 6 de septiembre, de garantía integral de la
+libertad sexual, reubicó este delito en el artículo 183. Con efectos desde el 7 de octubre de 2022, el
+artículo 183 CP castiga a aquellas personas mayores de catorce años1 que contacten con un menor
+de dieciséis años a través de las TIC y que:
+
+     (1) Propongan concertar un encuentro con el mismo a fin de cometer cualquiera de los delitos
+descritos en los artículos 181 (agresiones sexuales a menores de dieciséis años) y 189 (captación o
+utilización de menores con fines exhibicionistas o pornográficos, o para la elaboración de
+pornografía infantil), siempre que tal propuesta se acompañe de actos materiales encaminados al
+acercamiento. En estos supuestos se prevé una pena de uno a tres años de prisión o una multa de
+doce a veinticuatro meses, sin perjuicio de las penas correspondientes a los delitos en su caso
+cometidos. Además, se prevé un agravamiento de las penas en su mitad superior cuando el
+acercamiento se obtenga mediante coacción, intimidación o engaño.
+
+     (2) Realicen actos dirigidos a embaucar al menor para que les facilite material pornográfico o
+les muestre imágenes pornográficas en las que se represente o aparezca un menor. En estos
+supuestos se prevé una pena de prisión de seis meses a dos años.
+
+     En este contexto, el artículo 183 adelantaría el castigo penal en ambos escenarios a actos
+preparatorios para la comisión de otros delitos sexuales tipificados en diferentes artículos del CP
+(Cinosi Fernández, 2023; Górriz Royo, 2016; Guisasola Lerma, 2022; Pérez González y De la Mata
+Barranco, 2023; Villacampa Estiarte y Torres Ferrer, 2022). De tal manera que, para que el delito
+se considere consumado, no sería necesario ni que el encuentro con el menor se hubiera producido
+(art. 183.1 CP), ni que el material pornográfico llegara a facilitarse o mostrarse por parte del menor
+(art. 183.2 CP).
+
+     Es relevante señalar que, a diferencia de ciertas prácticas comunes en otros países, donde
+agentes policiales (o incluso cualquier ciudadano) pueden actuar bajo la apariencia de NNA, en
+España no es habitual el uso de la figura del agente encubierto informático para la investigación
+criminal de este delito. La consumación del delito requiere por tanto un contacto virtual con una
+víctima real menor de dieciséis años. De acuerdo con lo dispuesto en el artículo 282 bis de la Ley
+
+
+
+1
+  Cuando el autor sea una persona próxima al menor por edad y grado de desarrollo o madurez física y psicológica, y
+siempre y cuando exista el libre consentimiento del menor de dieciséis años (en los supuestos del art. 183.1 CP), se
+excluirá la responsabilidad penal del autor (vid. artículo 183 bis CP; Lloria García, 2024).
+
+
+                                                         6
+de Enjuiciamiento Criminal, el uso del agente encubierto en España se contempla como una
+estrategia de investigación extraordinaria, sujeta a estrictos requisitos legales en virtud de la posible
+afectación de los derechos fundamentales de los investigados, la vulneración de las garantías
+procesales, y a la necesidad de precaución frente a la eventual desviación de estas diligencias de
+investigación hacia acciones de incitación policial al delito por parte de agentes provocadores
+(Bueno de Mata, 2017; Expósito López, 2015).
+
+
+
+
+2.3. Prevalencia del online child sexual grooming en España.
+
+    Según los últimos datos proporcionados por el Portal Estadístico de Criminalidad para el año
+2022 (Ministerio del Interior, 2023), se observa un incremento del 109% en el número de casos de
+OCSG detectados por las Fuerzas y Cuerpos de Seguridad del Estado con respecto al año 2015,
+alcanzando un total de 408 hechos conocidos en el año 2022 (ver Figura 1). Durante el año 2022
+se procedió a la detención o investigación de 99 personas por este delito, siendo el 96% de sexo
+masculino. Respecto a la edad, la mayoría de los implicados se situaba en el rango de 26 a 40 años,
+mientras que un 14% de los detenidos o investigados eran menores de edad (ver Figura 2). Durante
+este mismo periodo, se registraron un total de 404 victimizaciones, siendo el 75% de estas víctimas
+de sexo femenino (ver Figura 3).
+
+
+
+
+                                                                            482
+                                                                      456
+
+
+
+
+                    TOTAL NACIONAL
+                                                                                   421    408
+                                                          378
+                                                   305
+                                            264
+                                     195
+
+
+
+
+                                     2015   2016   2017   2018      2019    2020   2021   2022
+                                                                AÑO
+
+
+           Figura 1. Delito de contacto mediante tecnología con menor de 16 años con fines sexuales.
+              Hechos conocidos por año. Comparativa 2015-2022 (Ministerio del Interior, 2023).
+
+
+
+                                                                7
+                   60
+                                                                                                                                14-17 años
+                   50
+                                                                                                                                18-25 años
+
+
+
+
+  TOTAL NACIONAL
+                   40
+                                                                                                                                26-40 años
+
+                   30                                                                                                           41-50 años
+
+                   20                                                                                                           51-65 años
+
+                                                                                                                                Mayores de
+                   10
+                                                                                                                                65 años
+
+                       0
+                                    2015       2016      2017      2018         2019    2020       2021      2022
+                                                                          AÑO
+
+                         Figura 2. Delito de contacto mediante tecnología con menor de 16 años con fines sexuales.
+                    Detenciones e investigados por grupo de edad. Comparativa 2015-2022 (Ministerio del Interior, 2023).
+
+
+
+
+                                                                               328     328
+                                                                   293                           305        301
+
+
+
+
+                   TOTAL NACIONAL
+                                                        189                                                                 FEMENINO
+                                              177
+                                                                                       159                                  MASCULINO
+                                    127                                        131
+                                               97       100        104                           108        102
+                                     54
+
+
+                                    2015     2016       2017      2018         2019    2020      2021      2022
+                                                                         AÑO
+
+
+                                    Figura 3. Delito de contacto mediante tecnología con menor de 16 años con fines sexuales.
+                                        Victimizaciones por sexo. Comparativa 2015-2022 (Ministerio del Interior, 2023).
+
+
+
+             No obstante, al analizar los datos publicados por el Ministerio Fiscal (2023), resulta llamativo
+el reducido número de procedimientos judiciales iniciados por este delito durante el año 2022 (161
+procedimientos judiciales incoados y 27 sentencias condenatorias; representando tan solo el 0,7%
+del total de procedimientos por delitos informáticos). Cabe resaltar que esta cifra había
+experimentado un aumento constante en años anteriores. La disminución observada podría
+atribuirse a la coincidencia, en muchos casos, entre la conducta tipificada en el artículo 183.2 CP
+
+
+
+                                                                                 8
+(actos dirigidos a embaucar al menor para que le facilite material pornográfico) y la producción de
+material pornográfico infantil contemplada en el artículo 189.1.a) CP2, tras la modificación operada
+por la LO 1/2015. Esta concurrencia podría implicar que el delito de OCSG, bajo la aplicación de
+las reglas sobre concurso de normas, quede absorbido por esta última figura delictiva.
+
+     Por último, si revisamos los resultados de las encuestas de victimización administradas a
+grupos de adolescentes escolarizados en España en los últimos años, se observa una prevalencia de
+victimizaciones por OCSG (en los doce meses previos a la realización de las encuestas) que oscila
+entre el 6% y el 23% (ver Tabla 1). En todos los estudios citados la mayoría de las víctimas eran
+de sexo femenino.
+
+
+     Tabla 1. Resultados observados en las encuestas de victimización administradas a adolescentes en España.
+
+     Estudio                          Tamaño muestral         Rango de edad   Prevalencia OCSG (último año)
+     Pereda et al. (2014)                 1.107                  12-17                     6,3%
+     Montiel et al. (2016)                3.897                  12-17                    17,2%
+     Villacampa & Gómez (2017)             489                   14-18                    10,4%
+     De Santisteban et al. (2018)         2.731                  12-15                    14,9%
+     Machimbarrena et al. (2018)          3.212                  11-21                    16,6%
+     Gámez-Guadix et al. (2021)            395                   12-16                     19%
+     Calvete et al. (2021)                1.260                  12-17                    17,8%
+     Ortega-Barón et al. (2022)           1.029                  12-15                     23%
+
+
+
+
+2.4. Características de los perpetradores, modus operandi y tipologías.
+
+     Estudios previos sobre las características de los delincuentes sexuales online hacen referencia
+a un perfil heterogéneo de individuos con diversas motivaciones delictivas y modus operandi que
+utilizan las TIC en algún momento de la ejecución del delito (Babchishin et al., 2011; Broome et
+al., 2018; Henshaw et al., 2017; Riberas-Gutiérrez, 2023; Seigfried-Spellar & Soldino, 2020;
+Webster et al., 2012). Existen diversos sistemas de clasificación para estos delincuentes, que
+abarcan desde modelos dicotómicos hasta tipologías con múltiples perfiles criminológicos.
+
+     Diversos estudios han mostrado de forma consistente diferencias entre aquellos individuos
+motivados por establecer un encuentro físico con sus víctimas y aquellos cuyos objetivos se
+
+2
+ En el año 2022 se incoaron 674 procedimientos judiciales y se dictaron 282 sentencias condenatorias por delitos de
+pornografía infantil o personas con discapacidad cometidos a través de las TIC (art. 189 CP; Ministerio Fiscal, 2023).
+
+
+                                                          9
+circunscriben al ámbito online. Estos dos grupos son comúnmente conocidos en la literatura
+científica como delincuentes motivados por el contacto (contact-driven offenders) y delincuentes
+motivados por la fantasía (fantasy-driven offenders) o limitados al entorno virtual (Briggs et al.,
+2011; Chiu et al., 2018; Crowell et al., 2022; McCarthy, 2010; McManus et al., 2016; Merdian et
+al., 2018; Quayle et al., 2014; Soldino et al., 2019). Los individuos con una motivación por el
+contacto físico, también conocidos delincuentes mixtos o duales, manifiestan un deseo de cometer
+agresiones sexuales contra menores reales. No obstante, sus motivaciones pueden abarcar también
+la obtención de MESIA o la participación en interacciones sexuales online con menores. En
+contraposición, los delincuentes limitados al ámbito virtual, también denominados delincuentes
+online o sin contacto, se centran exclusivamente en obtener MESIA o participar en interacciones
+sexuales con menores online. Un estudio realizado por NCMEC (2017) identificó que
+aproximadamente un tercio de las personas investigadas por OCSG estaban motivadas por el
+contacto (tenían la intención de perpetrar agresiones sexuales tras concertar citas en persona con
+sus víctimas); el 60% tenía una motivación exclusiva para obtener MESIA, y el 8% buscaban
+únicamente interacciones sexuales virtuales con NNA.
+
+    Los delincuentes motivados por el contacto suelen caracterizarse por ser jóvenes, solteros y
+desempleados (Briggs et al., 2011). También es más probable que presenten antecedentes de
+consumo de drogas (McCarthy, 2010; Soldino et al., 2019). Estos individuos suelen percibir a los
+NNA como objetos de satisfacción sexual (Merdian et al., 2018) y tienden a establecer conexiones
+con otros individuos que comparten sus mismos intereses sexuales (McCarthy, 2010). En cambio,
+los delincuentes limitados al entorno virtual suelen buscar la satisfacción sexual a través de medios
+indirectos, presentan déficits de intimidad y tienden a hacer un mayor uso de MESIA (Merdian et
+al., 2018). Además, estos individuos suelen tener menos antecedentes penales y tasas de
+reincidencia más bajas (Soldino et al., 2019). La prevalencia del diagnóstico de pedofilia varía
+entre ambos grupos en los estudios (McCarthy, 2010; Briggs et al., 2011; Soldino et al., 2019),
+mientras que los delincuentes limitados al entorno virtual suelen presentar en mayor medida un
+trastorno de personalidad narcisista (Briggs et al., 2011). Destaca en España el análisis realizado
+por Riberas-Gutiérrez et al. (2023) de 20 sentencias judiciales dictadas por delitos de OCSG. Los
+20 hombres adultos condenados tenían una edad promedio de 35 años, en su mayoría eran
+españoles, no tenían relación previa con las víctimas y carecían de antecedentes penales. En el 90%
+de los casos, el acusado propuso un encuentro presencial a sus víctimas.
+
+
+
+
+                                                 10
+     Con respecto a su modus operandi, los groomers motivados por el contacto tienden a participar
+en una cantidad limitada de comportamientos sexuales durante sus interacciones virtuales con
+menores (Briggs et al., 2011). Son más propensos a emplear tácticas de embaucamiento basadas en
+autorrevelaciones, como el uso de pronombres de primera persona y palabras con connotaciones
+emocionales, para ganarse la confianza de sus víctimas (Chiu et al., 2018). Asimismo, suelen
+recurrir a tácticas de aislamiento y aproximación, que incluyen el aislamiento mental y físico, así
+como insinuaciones verbales (Crowell et al., 2022). Por otro lado, los groomers sin contacto
+dependen más del embaucamiento y de las técnicas de desensibilización comunicativa (Crowell et
+al., 2022). Además, tienden a hablar con mayor frecuencia sobre relaciones sexuales con otros
+adultos (McManus et al., 2016).
+
+     Si nos centramos en las diversas tipologías propuestas, los resultados del European Online
+Grooming Project (Webster et al., 2012) destacaron tres grupos distintos de groomers: los
+buscadores de intimidad, los de estilo adaptable, y los hipersexualizados (ver Tabla 2). El grupo de
+buscadores de intimidad entabla conversaciones online extensas con los menores, sin ocultar su
+verdadera identidad. Su propósito es crear un vínculo afectivo con NNA y concertar una cita
+presencial para poder consolidar una relación íntima. Por el contrario, el grupo de estilo adaptable
+muestra flexibilidad en su modus operandi, ajustando su identidad y sus técnicas según la reacción
+de la víctima. Finalmente, en el grupo hipersexualizado hallamos individuos con amplias
+colecciones de MESIA que adoptan identidades diversas en sus interacciones online. Sus
+conversaciones se tornan rápidamente sexuales; no obstante, los encuentros cara a cara son menos
+frecuentes en este grupo.
+
+
+              Tabla 2. Tipología propuesta por el European Online Grooming Project (Webster et al., 2012).
+
+                     Antecedentes                                                              Contacto con
+                                       Creencias de        Cambio de           Material                         Desarrollo de la    Medidas de
+      Grupo           por delitos                                                                  otros
+                                      apoyo al delito      identidad         pornográfico                       comunicación        seguridad
+                       sexuales                                                                delincuentes
+  Buscadores de
+                         No         Relación consentida         No                No                No            Lenta y larga         No
+    intimidad
+                                                                                                                 Rápida o lenta,    Sí, carpetas
+                                    Necesidades propias   Sí, dependiendo     Algunos, no      Algunos, no
+                                                                                                                dependiendo de la    ocultas y
+  Estilo adaptable        Sí         y madurez de los      de la reacción       grandes          contacto
+                                                                                                                 respuesta de la    dispositivos
+                                        menores.           de la víctima.     colecciones.     significativo.
+                                                                                                                    víctima.           extra.
+                                                                                Extensas
+                                                           Sí, identidad                         Contacto
+                                                                             colecciones de
+                     Algunos, por    Deshumanización      falsa o imagen                       significativo    Muy sexualizada         No
+ Hipersexualizados                                                              MESIA y
+                      MESIA.          de las víctimas.    de avatar de sus                       con otros        y rápida.         especificado
+                                                                               pornografía
+                                                             genitales.                        delincuentes.
+                                                                             adulta extrema.
+
+
+
+
+                                                                      11
+     Por su parte, DeHart et al. (2017) identificaron cuatro tipos de groomers: cibersexo,
+planificador, cibersexo/planificador y comprador (ver Tabla 3). Los groomers de cibersexo se
+dedican a intercambiar mensajes y contenidos sexuales con la víctima, pero no llegan a concretar
+una cita presencial, aunque la mencionen. Los groomers de cibersexo/planificadores combinan las
+interacciones online con la planificación de un encuentro presencial con la víctima. Los
+planificadores se centran en quedar con la víctima para agredirla sexualmente, sin desarrollar la
+relación con la víctima ni mostrar comportamientos sexuales online. El grupo de compradores
+negocia los términos y el precio para poder agredir sexualmente a sus víctimas. Este grupo responde
+a anuncios de personas que ofrecen a menores, como proxenetas o familiares.
+
+
+                                 Tabla 3. Tipología propuesta por DeHart et al. (2017).
+
+        Grupo                               Objetivo                                                Estrategia
+                           Establecer una relación sexual virtual con       Interacciones online sexualmente explícitas, pedir fotos,
+       Cibersexo
+                           la víctima.                                      exhibicionismo.
+                           Quedar con la víctima para agredirla             Hablar de temas generales, preguntar por experiencias
+      Planificador
+                           sexualmente.                                     sexuales, programar encuentros rápidos.
+                                                                            Interacciones online sexualmente explícitas, pedir fotos,
+                           Combinar una relación sexual virtual y
+ Cibersexo/planificador                                                     exhibicionismo, programar encuentros a largo plazo
+                           física con la víctima.
+                                                                            (alta tasa de cancelación).
+                                                                            Responder a anuncios de encuentros casuales, negociar
+      Comprador            Pagar por agredir sexualmente a la víctima.
+                                                                            condiciones y precios.
+
+
+
+     En un estudio más reciente, van Gijn-Grosvenor y Lamb (2021) realizaron un análisis de los
+chats de Perverted Justice y categorizaron a los groomers en cuatro perfiles distintos (buscadores
+de intimidad, hipersexuales dedicados, sociales y oportunistas-asociales), en base a las diferencias
+en la creación del vínculo, el contenido sexual de las conversaciones y las medidas de seguridad
+adoptadas (ver Tabla 4).
+
+
+                          Tabla 4. Tipología propuesta por van Gijn-Grosvenor y Lamb (2021).
+
+        Grupo                 Creación del vínculo                      Contenido sexual                 Medidas de seguridad
+ Buscador de intimidad           Prioridad alta                          Baja frecuencia                   Baja frecuencia
+ Hipersexual dedicado            Prioridad alta                          Alta frecuencia                   Alta frecuencia
+        Social                   Prioridad alta                          Baja frecuencia                   Baja frecuencia
+  Oportunista-asocial            Prioridad baja                          Baja frecuencia                   Baja frecuencia
+
+
+
+
+                                                               12
+2.5. Características de las víctimas.
+
+    Durante el año 2022, WhatsApp e Instagram destacaron como las plataformas más populares
+en España para diferentes generaciones, incluyendo a los Millennials, la Generación Z y la
+Generación Alpha (IAB Spain, 2022). Paralelamente, se observó un uso considerable de las TIC
+entre NNA en España: el 93,1% utilizaba Internet y el 69,5% disponía de un teléfono móvil
+(Instituto Nacional de Estadística [INE], 2022). Si bien las chicas eran en mayor medida usuarias
+de ordenadores y de teléfonos móviles, los chicos exhibieron un mayor uso de Internet.
+
+    Los adolescentes son particularmente vulnerables ante el delito de OCSG (Whittle et al., 2013).
+Múltiples factores contribuyen a esta vulnerabilidad, entre ellos la participación en
+comportamientos de riesgo online, el amplio acceso a Internet y la escasa supervisión parental en
+su uso (Calvete et al., 2021; Riberas-Gutiérrez et al., 2023; Whittle et al., 2013). Además, se
+constata que, al igual que se registra un incremento en la utilización de las TIC conforme avanza
+la edad (particularmente a partir de los 13 años; INE, 2022), los porcentajes de adolescentes que
+reciben propuestas sexuales también muestran una tendencia al alza con el crecimiento de la edad
+de estos menores (Calvete et al., 2021; Montiel et al., 2016). En este tipo de contextos abusivos y
+con un claro desequilibrio de poder, muchos jóvenes responden a las solicitudes sexuales de los
+groomers involucrándose activamente en interacciones sexuales con ellos (Calvete et al., 2021).
+Asimismo, se ha observado que la mayoría de los casos de ESIA basada en imágenes involucraban
+a jóvenes que generan imágenes sexualmente explícitas de sí mismos (Finkelhor et al., 2023).
+Aunque las chicas suelen recibir más solicitudes sexuales que los chicos (Calvete et al., 2021;
+Gámez-Guadix & Mateos-Pérez, 2019; Montiel et al., 2016), suelen ser menos propensas a
+responder a tales propuestas e interactuar sexualmente con los groomers (Calvete et al., 2021). En
+este sentido, volviendo a los resultados obtenidos del análisis de sentencias de Riberas-Gutiérrez
+et al. (2023), la edad promedio de las víctimas fue de 14 años, con un 53,8% de víctimas varones.
+
+
+
+
+2.6. El proyecto OnSexGroom.es
+
+    Este estudio forma parte del proyecto PID2020-117964RB-I00 “Ciberacoso sexual a menores:
+De la elaboración de perfiles lingüísticos al desarrollo de herramientas forenses digitales para la
+
+
+
+                                                13
+prevención, detección y priorización de casos en España (OnSexGroom.es)”, financiado por el
+Programa Estatal de I+D+i Orientado a los Retos de la Sociedad de la Agencia Estatal de
+Investigación (Ministerio de Ciencia e Innovación). La ejecución de este proyecto ha sido posible
+gracias a la estrecha colaboración entre la academia y las Fuerzas y Cuerpos de Seguridad del
+Estado. En este proyecto participan diversas universidades: Universitat Politècnica de València,
+Universitat de València, Universitat de Lleida, Swansea University y Université de Toulon.
+Además, se suma la contribución de la Dirección General de Coordinación y Estudios de la
+Secretaría de Estado de Seguridad (Ministerio del Interior), la Guardia Civil y la Policía Nacional.
+
+    El objetivo principal del proyecto OnSexGroom.es consiste en prevenir, detectar e interrumpir
+situaciones de acoso sexual de menores en entornos digitales, mediante el desarrollo de una
+herramienta de investigación sólida desde el punto de vista forense. Dicha herramienta permitirá la
+detección, priorización y prevención automáticas de casos de OCSG. En última instancia, el
+propósito central del proyecto radica en el aprovechamiento de las capacidades de esta herramienta
+para apoyar a las Fuerzas y Cuerpos de Seguridad del Estado en la investigación y detección de
+delitos del artículo 183 del Código Penal. El proyecto OnSexGroom.es consta de cinco paquetes de
+trabajo:
+
+   (1) Recopilación y anonimización de atestados policiales instruidos por la Guardia Civil y la
+       Policía Nacional.
+   (2) Análisis criminológico y lingüístico de la información extraída.
+   (3) Desarrollo e implementación de la herramienta de detección/priorización.
+   (4) Actividades de difusión, explotación y comunicación de los resultados.
+   (5) Análisis de los sesgos potenciales del empleo de la inteligencia artificial en la investigación
+       policial.
+
+
+
+2.6.1. Análisis criminológico de los casos de online child sexual grooming investigados
+     en España.
+
+     Los cuerpos policiales de todo el mundo se enfrentan a una avalancha de casos de ESIA que
+requieren investigación, además de la considerable cantidad de datos que deben analizar en cada
+uno de estos casos (Chiu et al., 2018; Harkin et al., 2018; NCMEC, 2022; Seigfried-Spellar et al.,
+2019). Por este motivo, se vuelve imperativo priorizar y categorizar cada caso detectado de OCSG
+
+
+
+                                                 14
+para identificar a aquellos sospechosos de alta prioridad. En concreto, son considerados
+sospechosos de alta prioridad aquellos individuos que buscan mantener un encuentro físico con la
+víctima (groomers motivados por el contacto), y es esencial identificarlos antes de que dicho
+encuentro se materialice (Chiu et al., 2018; Mount et al., 2021; Razi et al., 2021; Seigfried-Spellar
+et al., 2019).
+
+      En este informe se presentan los resultados derivados del análisis criminológico de los
+atestados policiales proporcionados al equipo investigador por parte de la Policía Nacional y la
+Guardia Civil (paquete de trabajo 2). A pesar del impacto global de los delitos de OCSG, todavía
+existe una notable carencia de estudios empíricos que incluyan muestras policiales de países de
+habla no inglesa (Seto, 2019), incluyendo a España (Pascual et al., 2017; Soldino et al., 2019;
+Soldino et al., 2021). El propósito fundamental de este estudio es contribuir a revertir esta situación.
+Para ello, analizamos una muestra de atestados policiales anonimizados que incluían
+conversaciones reales entre sospechosos investigados por delitos de OCSG y menores reales.
+
+      Se llevaron a cabo análisis estadísticos para identificar las diferencias criminológicas entre
+los casos investigados en España que involucraban a groomers motivados por el contacto y los
+casos de groomers limitados al entorno virtual3. Para ello, se examinaron diversas variables como
+las características de los casos investigados, los perfiles de los sospechosos y las víctimas, las
+plataformas de chat utilizadas, los detalles de las conversaciones (como la cantidad de mensajes
+intercambiados), los comportamientos de alto riesgo por parte de la víctima (por ejemplo, el envío
+de imágenes propias de desnudos), el uso de estratagemas de engaño y otras tácticas empleadas en
+el proceso de grooming.
+
+      Para más detalles sobre el estudio realizado, puede consultarse el artículo científico revisado
+por pares publicado por la revista Child Abuse & Neglect, a través de su enlace DOI:
+
+Soldino, V., & Seigfried-Spellar, K. C. (2024). Criminological differences between contact-driven
+and online-focused suspects in online child sexual grooming police reports. Child Abuse & Neglect,
+149, 106696. https://doi.org/10.1016/j.chiabu.2024.106696
+
+
+3
+  Somos conscientes del debate existente en torno a la categorización dicotómica de los groomers con una motivación
+por el contacto físico y aquellos limitados al ámbito online (Broome et al., 2018; Krone et al., 2020). En este estudio,
+optamos por una clasificación fundamentada en la distinción establecida por el legislador español, tal como se refleja
+en los artículos 183.1 y 183.2 CP. Al mismo tiempo, reconocemos la importancia de brindar apoyo a las Fuerzas y
+Cuerpos de Seguridad del Estado mediante investigaciones empíricas que respalden su proceso de priorización de casos
+relacionados con sospechosos que buscan un encuentro físico con sus víctimas para cometer agresiones sexuales fuera
+del ámbito virtual.
+
+
+                                                          15
+3. MÉTODO
+
+3.1. Procedimiento de recogida de datos y muestra.
+
+      El proyecto de investigación fue autorizado por la Secretaría de Estado de Seguridad y superó
+la revisión minuciosa de los comités de ética de la Universitat de València y la Purdue University.
+Los Puntos de Contacto (POC) designados para este proyecto tanto en la Guardia Civil como en la
+Policía Nacional fueron los responsables de buscar la cooperación de diversas unidades policiales
+especializadas desplegadas por todo el territorio nacional para investigar casos de OCSG. Su labor
+consistió en recopilar atestados policiales relacionados con delitos de OCSG. Entre septiembre de
+2020 y enero de 2022 fueron entregados al equipo de investigación, a través de una plataforma
+segura, un total de 98 atestados policiales instruidos entre los años 2008 y 20214.
+
+      Para que un atestado fuera incluido en este estudio, era requisito fundamental que contuviera,
+al menos, el registro de una conversación electrónica entre un sospechoso investigado por un delito
+de ESIA que tuviera 14 años5 o más (la edad mínima de responsabilidad penal en España) y una
+víctima menor de edad, es decir, menor de 18 años6. Antes de llevar a cabo el análisis de los
+atestados se llevó a cabo un riguroso proceso de eliminación de cualquier información personal
+identificable por parte del personal técnico. En total, se extrajeron 295 casos de OCSG de los 98
+atestados disponibles.
+
+      El proceso de anonimización y codificación de los datos comenzó en septiembre de 2020 y
+concluyó en marzo de 2023. La extensión temporal de esta fase de la investigación se debió a
+diversos factores. En primer lugar, la mayoría de los atestados policiales proporcionados por las
+Fuerzas y Cuerpos de Seguridad del Estado (FFCCSE) eran escaneos en formato PDF de
+documentos físicos, lo cual planteó un desafío al extraer, analizar y anonimizar las conversaciones.
+
+4
+  Los criterios de inclusión del estudio se guiaron principalmente por el objetivo de obtener una muestra representativa
+de casos de OCSG en España. Aunque somos conscientes de los avances tecnológicos y los cambios en el
+comportamiento online que han ocurrido en este lapso temporal, decidimos abarcar un periodo extenso para poder
+captar una visión global del fenómeno en el contexto de nuestro estudio.
+5
+  La edad mínima de responsabilidad penal en España. Vid. LO 5/2000, de 12 de enero, reguladora de la responsabilidad
+penal de los menores.
+6
+  Se decidió elevar la edad máxima de las víctimas a los 18 años para este estudio teniendo en cuenta que, tal y como
+establece el art. 189 CP, cualquier tipo de material que represente de manera visual a un menor de 18 años participando
+en conductas sexualmente explícitas, o sus órganos sexuales, es considerado pornografía infantil. Tal y como se ha
+expuesto anteriormente, muchos groomers contactan a través de las TIC con los menores con el propósito de
+embaucarles para obtener MESIA. En aquellos casos en los que la comunicación se produjera con personas mayores
+de 16 años no se cumplirían los requisitos del tipo del art. 183 CP (la víctima debe ser menor de 16 años), pero sí se
+estaría cometiendo un delito del art. 189 CP.
+
+
+                                                          16
+En casi todos los casos, fue necesario realizar una transcripción manual para convertirlos a un
+formato adecuado para el análisis. Además, las conversaciones mostraban una notable variabilidad
+en cuanto a su extensión, alcanzando algunas más de 2.000 líneas de texto. En varios casos, se
+incluían múltiples conversaciones entre el sospechoso y la víctima. Por lo tanto, fue esencial llevar
+a cabo una lectura minuciosa de los atestados policiales, incluyendo las conversaciones, para
+extraer de manera precisa las variables criminológicas de interés.
+
+      En este sentido, de los 295 casos recibidos inicialmente, se excluyeron 38 por diversas
+razones: en 18 de los casos las víctimas eran mayores de edad; en 11 casos los hechos fueron
+calificados como delitos que no entraban dentro de la categoría de ESIA (p.ej., acoso no sexual,
+estafa); 6 casos únicamente incluían conversaciones entre la persona investigada y los progenitores
+de la víctima; y en 3 casos las conversaciones se produjeron entre dos investigados. La muestra
+final para el análisis estadístico incluyó 257 casos de OCSG extraídos de 98 atestados policiales.
+
+
+
+
+3.2. Variables de interés.
+
+      En primer lugar, los casos fueron clasificados en base a la distinción prevista por el art. 183
+CP. Los sospechosos incluidos en cada caso se categorizaron como motivados por el contacto (art.
+183.1 CP)7 o limitados al entorno virtual (art. 183.2 CP)8, dependiendo del contenido de los
+mensajes enviados a las víctimas y de la información incluida en el atestado policial relativo a cada
+caso de OCSG. De esta manera, los sospechosos fueron clasificados como motivados por el
+contacto cuando sus mensajes indicaban de manera explícita una intención de concertar un
+encuentro físico con alguna de las víctimas, incluyendo detalles específicos como la fecha, la hora
+o el lugar de la cita. También se incluyeron en esta categoría aquellos sospechosos que habían
+cometido algún tipo de agresión sexual física contra NNA, según la información contenida en los
+
+
+7
+  Artículo 183.1 CP: El que a través de internet, del teléfono o de cualquier otra tecnología de la información y la
+comunicación contacte con un menor de dieciséis años y proponga concertar un encuentro con el mismo a fin de
+cometer cualquiera de los delitos descritos en los artículos 181 y 189, siempre que tal propuesta se acompañe de actos
+materiales encaminados al acercamiento, será castigado con la pena de uno a tres años de prisión o multa de doce a
+veinticuatro meses, sin perjuicio de las penas correspondientes a los delitos en su caso cometidos. Las penas se
+impondrán en su mitad superior cuando el acercamiento se obtenga mediante coacción, intimidación o engaño.
+8
+  Artículo 183.2 CP: El que, a través de internet, del teléfono o de cualquier otra tecnología de la información y la
+comunicación contacte con un menor de dieciséis años y realice actos dirigidos a embaucarle para que le facilite
+material pornográfico o le muestre imágenes pornográficas en las que se represente o aparezca un menor, será
+castigado con una pena de prisión de seis meses a dos años.
+
+
+                                                         17
+atestados policiales (relativa al hecho investigado o a los antecedentes policiales del sospechoso).
+El resto de los sospechosos fueron categorizados como de no contacto (limitados al ámbito
+virtual)9.
+
+      Para prevenir duplicidades y sesgos (p. ej., incluir a la misma víctima varias veces en el mismo
+análisis), la base de datos fue dividida en tres conjuntos de datos distintos: (1) 257 casos de OCSG;
+(2) 120 investigados; (3) 234 víctimas. Cada conjunto de datos se focalizó en diferentes variables
+para el análisis (ver Tablas 5, 6 y 7).
+
+
+
+
+3.3. Análisis de los datos.
+
+     En primer lugar, se llevó a cabo un análisis descriptivo de todas las variables para la muestra
+completa. Posteriormente, se analizaron las variables de interés para los distintos conjuntos de datos
+(ver Tablas 5, 6 y 7). Se utilizaron pruebas de chi-cuadrado (ꭓ²) para el análisis estadístico de las
+variables categóricas. En el caso de violación de los supuestos de la prueba de chi-cuadrado, se
+utilizó la prueba exacta de Fisher para tablas de contingencia 2 x 2 o la prueba exacta de Fisher-
+Freeman-Halton para tablas de contingencia F x C (Freeman & Halton, 1951). Para el análisis de
+las diferencias entre las medias de las variables continuas se llevaron a cabo pruebas t de Student
+para muestras independientes. El nivel de significación estadística se fijó en el 0,05, aunque se
+registraron también los niveles de significación marginales inferiores a 0,1. También se calcularon
+los tamaños del efecto10 para todos los análisis estadísticos.
+
+
+
+
+9
+  Para asegurar la fiabilidad de esta clasificación, dos codificadores independientes categorizaron a cada sospechoso.
+Se obtuvo un fuerte grado de acuerdo interjueces para esta clasificación (κ = 0,91).
+10
+   Se considera que valores superiores a 0,1 indican un efecto de pequeño tamaño, valores superiores a 0,3 indican un
+efecto moderado y valores mayores a 0,5 indican un efecto de alta magnitud (vid. Field, 2018).
+
+
+                                                         18
+                   Tabla 5. Variables criminológicas de interés. Conjunto de datos: todos los casos de online child sexual grooming (n = 257).
+
+Variable                                                Descripción
+Groomer motivado por el contacto                        El groomer tenía la intención explícita de concertar un encuentro físico con (al menos) una de sus víctimas,
+                                                        proporcionando detalles específicos como fecha/hora/lugar. Alternativamente, hay evidencia de que el
+                                                        groomer ha cometido algún tipo de agresión sexual física contra NNA.
+Diferencia de edad                                      Diferencia de edad entre el groomer y la víctima.
+Múltiples plataformas                                   El groomer se comunicó con la víctima usando múltiples plataformas digitales.
+   Primera plataforma                                   Plataforma digital usada para iniciar la comunicación.
+   Segunda plataforma                                   El groomer y la víctima se movieron de una plataforma digital inicial a otra (p. ej., se conocieron en
+                                                        Instagram, intercambiaron los números de teléfono, y luego continuaron la comunicación en WhatsApp).
+   Otras plataformas                                    Otras plataformas online usadas para comunicarse.
+Envío de imágenes sexuales por parte de la víctima      La víctima envió imágenes sexualmente explícitas de sí misma al groomer.
+   Nivel 1a                                             Desnudos o poses eróticas.
+   Nivel 2ª                                             Actividad sexual entre NNAs / auto-masturbación.
+   Nivel 3ª                                             Actividad sexual entre NNAs y personas adultas, excluyendo la penetración de una persona adulta a NNA.
+   Nivel 4ª                                             Actividad sexual con penetración de una persona adulta a NNA.
+   Nivel 5ª                                             Actividad sexual sádica y bestialismo.
+Envío de imágenes sexuales por parte del groomer        El groomer envió imágenes sexualmente explícitas de sí mismo a la víctima.
+Envío de pornografía por parte del groomer              El groomer envió imágenes pornográficas de otras personas adultas a la víctima.
+Envío de MESIA por parte del groomer                    El groomer envió MESIA a la víctima.
+Identidad falsa                                         El groomer adoptó una identidad falsa, haciéndose pasar por otra persona (p. ej., un NNA, un modelo)
+   Cambio de género                                     El groomer adoptó la identidad de una persona de otro género.
+   Cambio de edad                                       El groomer adoptó la identidad de una persona más joven.
+Propuesta de encuentro físico                           El groomer propuso a la víctima un encuentro en persona.
+   Cita concreta                                        La propuesta del encuentro incluía una fecha, hora y lugar específicos.
+Groomer conocido                                        El groomer y la víctima se conocían previamente, incluso si nunca se habían conocido en persona (p. ej., la
+                                                        víctima puede ser consciente de que el groomer es un amigo de su primo).
+Distancia entre el groomer y la víctima                 Distancia entre la ubicación del groomer y la ubicación de la víctima (municipio), calculada en kilómetros
+                                                        utilizando Google Maps.
+Duración del trayecto en coche                          Tiempo de viaje en coche más corto entre la ubicación del groomer y la ubicación de la víctima (municipio),
+                                                        calculado en minutos utilizando Google Maps.
+Duración del trayecto en otro transporte                Tiempo de viaje más corto entre la ubicación del groomer y la ubicación de la víctima (municipio) utilizando
+                                                        otros medios de transporte como autobús, tren, barco o avión, calculado en minutos utilizando Rome2Rio.
+Número total de mensajes                                Número total de mensajes en el chat.
+  Mensajes enviados por el groomer                      Número total de mensajes enviados por el groomer a la víctima.
+  Mensajes enviados por la víctima                      Número total de mensajes enviados por la víctima al groomer.
+Número total de palabras                                Número total de palabras en el chat.
+
+
+                                                                               19
+    Palabras enviadas por el groomer                      Número total de palabras enviadas por el groomer a la víctima.
+    Palabras enviadas por la víctima                      Número total de palabras enviadas por la víctima al groomer.
+ Número total de imágenes                                 Número total de imágenes en el chat.
+    Imágenes enviadas por el groomer                      Número total de imágenes enviadas por el groomer a la víctima.
+    Imágenes enviadas por la víctima                      Número total de imágenes enviadas por la víctima al groomer.
+ Duración del delito                                      Tiempo transcurrido, en meses, entre el inicio y el final del iter criminis.
+ Duración de la conversación                              Tiempo transcurrido, en días, entre la fecha del envío del primer y último mensaje incluido en el chat.
+ Intensidad de la conversación                            Número promedio de mensajes enviados por día en el chat.
+ Conversación nocturna                                    Más del 50% de los mensajes del chat se enviaron entre las 0:00 y las 7:00 a.m.
+Nota. NNA = Niños, niñas y adolescentes. MESIA = Material de explotación sexual infantil y adolescente. a Véase la Clasificación Española de Imágenes de Explotación
+Sexual Infantil (CIESI; Pascual et al., 2017).
+
+
+
+
+                                                                                20
+                Tabla 6. Variables criminológicas de interés. Conjunto de datos: groomers (n = 120).
+
+ Variable                                  Descripción
+ Edad                                      Edad del groomer en el momento de la primera conversación online con
+                                           una víctima.
+ Género                                    Género del groomer según el atestado policial.
+ Nacionalidad                              Nacionalidad del groomer.
+ Groomer motivado por el contacto          El groomer tenía la intención explícita de concertar un encuentro físico
+                                           con (al menos) una de sus víctimas, proporcionando detalles específicos
+                                           como fecha/hora/lugar. Alternativamente, hay evidencia de que el
+                                           groomer ha cometido algún tipo de agresión sexual física contra NNA.
+ Múltiples víctimas                        El groomer conversó con múltiples víctimas.
+ Estrategias empleadasa                    Estrategias utilizadas por el groomer para embaucar a sus víctimas
+                                           (codificado como presente si la estrategia se utilizó al menos con una de
+                                           sus víctimas).
+     Conversación sexual / role-playing    Conversación sexualmente explícita o role-playing con la víctima.
+     Pedir imágenes sexuales               Pedirle a la víctima imágenes sexualmente explícitas de sí misma.
+     Relación positiva (rapport)           Desarrollar una relación positiva y de confianza con la víctima.
+     Enviar imágenes sexuales              Enviar espontáneamente imágenes sexualmente explícitas de sí mismo a
+                                           la víctima.
+     Ofrecer imágenes sexuales             Ofrecer imágenes sexualmente explícitas a la víctima.
+     Reciprocidad                          Pedirle a la víctima que intercambie recíprocamente/mutuamente
+                                           imágenes sexualmente explícitas.
+     Ofrecer algo a cambio                 Ofrecer algo (que no sean imágenes) a cambio de cumplir su objetivo.
+     Exclusividad                          Crear un sentimiento exclusividad en la víctima (p. ej., "es nuestro
+                                           secreto", "solo nosotros lo entendemos", "eres mi novia").
+     Amenazas                              Amenazar a la víctima (p. ej., con difundir sus imágenes).
+     Identidad falsa                       El groomer utiliza exclusivamente su verdadera identidad / identidad
+                                           falsa / mezcla una identidad verdadera y falsa con cada víctima.
+     Otros métodos                         Cualquier otro método utilizado por el groomer para embaucar a sus
+                                           víctimas.
+ Objetivosa                                Objetivos que el groomer busca alcanzar con su delito (codificado como
+                                           presente si el objetivo estaba presente al menos con una de sus víctimas).
+    Imágenes sexuales                      El groomer quería imágenes sexualmente explícitas de la víctima.
+    Encuentro físico                       El groomer quería conocer a la víctima en persona y perpetrar un delito
+                                           sexual de contacto.
+    Conversación sexual                    El groomer quería mantener una conversación sexualmente explícita o
+                                           un role-playing con la víctima.
+    Venganza                               El groomer quería vengarse de la víctima.
+    Exhibicionismo                         El groomer tenía un objetivo exhibicionista.
+    Comisión de un delito entre NNAs       El groomer quería que la víctima cometiera un delito contra otros NNAs.
+    Otros objetivos                        El groomer quería lograr otros objetivos con su acción criminal.
+ Antecedentes policiales                   El groomer había sido detenido previamente por las FFCCSE.
+    Sexuales                               El groomer había sido detenido por un delito sexual en el pasado.
+    No sexuales                            El groomer había sido detenido por un delito no sexual en el pasado.
+ Múltiples detenciones                     El groomer había sido detenido previamente en más de una ocasión.
+ Edad en primera detención                 Edad del groomer en el momento de su primera detención policial.
+ Tiempo transcurrido desde la última       Tiempo transcurrido, en días, entre la última vez que el groomer fue
+ detención                                 detenido y el delito base.
+Nota. NNA = Niños, niñas y adolescentes. FFCCSE = Fuerzas y cuerpos de seguridad del Estado. a La mayoría de las
+categorías relacionadas con los métodos y objetivos del groomer se extrajeron de los datos proporcionados por
+NCMEC (2017).
+
+
+
+
+                                                        21
+                Tabla 7. Variables criminológicas de interés. Conjunto de datos: víctimas (n = 234).
+
+ Variable                                    Descripción
+ Edad                                        Edad de la víctima en el momento de la primera conversación online
+                                             con un groomer.
+ Género                                      Género de la víctima según el atestado policial.
+ Nacionalidad                                Nacionalidad de la víctima.
+ Ubicación nacional                          La víctima se encontraba en España en el momento de los hechos.
+ Múltiples groomers                          La víctima fue contactada por múltiples groomers.
+ Víctima de contacto                         La víctima fue contactada por (al menos) un groomer motivado por el
+                                             contacto.
+ Conducta de alto riesgoa                    La víctima tuvo comportamientos de alto riesgo que la hicieron más
+                                             vulnerable a la explotación sexual.
+     Cambiar la edad                         Presentarse como una persona más mayor.
+     Enviar imágenes sexuales                Enviar imágenes sexualmente explícitas de sí misma de forma
+                                             espontánea a su interlocutor.
+     Ofrecer algo a cambio                   Ofrecer a su interlocutor un intercambio por sexo o imágenes
+                                             sexualmente explícitas.
+     Pedir imágenes sexuales                 Pedirle a su interlocutor imágenes sexualmente explícitas.
+     Otras conductas de alto riesgo          La víctima presentó otros comportamientos de alto riesgo.
+Nota. a Las categorías relacionadas con los comportamientos que hicieron que las víctimas fueran más vulnerables a la
+explotación sexual se extrajeron de los datos proporcionados por NCMEC (2017).
+
+
+
+
+                                                         22
+4. RESULTADOS
+
+4.1. Características de las investigaciones policiales.
+
+      A continuación, se señalan las características principales de los 98 atestados policiales
+analizados:
+
+      -   El 67% de los atestados fueron proporcionados por la Guardia Civil y el 33%, por la
+          Policía Nacional.
+      -   La duración media de las investigaciones policiales fue de 96 días (desviación típica [DT]
+          = 126,70; rango = 1-503).
+      -   Las investigaciones policiales tuvieron lugar en diversas comunidades autónomas, a
+          excepción de Aragón, La Rioja, Navarra, País Vasco y la ciudad autónoma de Melilla (ver
+          Figura 4).
+      -   En la mayoría de los atestados (64%) solo se identificaba a una víctima, aunque en algunos
+          casos se identificaron hasta 61 víctimas para un mismo sospechoso (media de víctimas
+          por atestado = 4,12; DT = 10,77; rango = 1-61).
+      -   En la mayoría de los atestados (88%) se investigaba a un único sospechoso (media de
+          investigados por atestado = 1,67; DT = 3,30; rango = 1-3).
+      -   La mayoría de los casos (82%) fueron denunciados a las FFCCSE por los progenitores de
+          las víctimas.
+      -   La muestra incluía un total de 101.391 mensajes intercambiados entre sospechosos y
+          víctimas (media de mensajes por caso = 394,22; DT = 938,48; rango = 2-7.904). El 54%
+          de esos mensajes fueron enviados por los sospechosos (total de 246.389 palabras),
+          mientras que el 46% fueron enviados por las víctimas (total de 180.504 palabras). La
+          duración media de las conversaciones fue de 23 días. El número promedio de mensajes
+          intercambiados por día fue de 55.
+      -   Las plataformas más utilizadas para iniciar el contacto con las víctimas fueron Instagram
+          (30%), MSN Messenger (22%), Tuenti (21%) y WhatsApp (13%)11.
+
+
+
+
+11
+   Los atestados policiales analizados fueron instruidos entre los años 2008 y 2021. Somos conscientes de los avances
+tecnológicos que han ocurrido en este lapso temporal, pero en este estudio dimos prioridad al tamaño de la muestra
+frente a la actualidad de los casos.
+
+
+                                                         23
+     -   La muestra final incluyó un total de 120 sospechosos. 105 conversaron con una única
+         víctima. 15 sospechosos conversaron con múltiples víctimas (entre 2 y 61); cada víctima
+         fue tratada como un caso de OCSG distinto.
+     -   La muestra final incluyó un total de 234 víctimas menores de edad. Para 228 de estas, los
+         chats analizados involucraron a una sola persona investigada. Seis víctimas tenían
+         conversaciones con más de un sospechoso (entre 2 y 10).
+
+
+
+
+   Figura 4. Comunidad autónoma en la que se investigaron los casos de online child sexual grooming (n = 90).
+
+
+
+
+4.2. Características de los casos de online child sexual grooming.
+
+    Las características principales de los 257 casos de OCSG pueden observarse en la Tabla 8. Con
+respecto a las variables continuas:
+
+     -   La diferencia media de edad entre groomer y víctima fue de 12 años (DT = 10,46).
+     -   La distancia media entre groomer y víctima fue de 445km (DT = 568,84). La duración
+         media del trayecto necesario para encontrarse con la víctima fue de 2 horas y 57 minutos
+         en coche (DT = 176,13) y de 3 horas y 52 minutos en otros medios de transporte como el
+         autobús, el tren, el barco o el avión (DT = 176,69).
+
+
+
+                                                      24
+                  Tabla 8. Características de los casos de online child sexual grooming (N = 257).
+
+ Variable                                                                                               %
+ Envío de imágenes sexuales por parte de la víctima (n = 114)                                         48,63
+      Nivel 1                                                                                         99,12
+      Nivel 2                                                                                         38,60
+      Nivel 3                                                                                           0
+      Nivel 4                                                                                          1,75
+      Nivel 5                                                                                          3,51
+ Envío de imágenes sexuales por parte del groomer (n = 252)                                           24,21
+ Envío de pornografía por parte del groomer (n = 252)                                                  3,17
+ Envío de MESIA por parte del groomer (n = 252)                                                       11,90
+ Identidad falsa (n = 225)                                                                            74,67
+     Cambio de género (n = 167)                                                                       29,94
+     Cambio de edad (n = 162)                                                                         93,83
+ Propuesta de encuentro físico (n = 254)                                                              32,68
+ Groomer conocido (n = 257)                                                                            8,95
+Nota. Faltan algunos datos que fueron etiquetados como desconocidos. El tamaño del grupo sobre el que se calculó el
+porcentaje varía según las variables.
+
+
+
+     De los 257 casos de OCSG analizados, 153 se clasificaron como limitados al ámbito virtual y
+104 como motivados por el contacto. A continuación, se presentan los principales resultados
+respecto a las diferencias entre ambos tipos de casos de OCSG (ver Tabla 9):
+
+      -     No se encontraron diferencias estadísticamente significativas entre ambos grupos en
+            cuanto a la diferencia de edad entre groomers y víctimas.
+      -     En el 72% de los casos, los groomers utilizaron una única plataforma digital para
+            comunicarse con sus víctimas. Los groomers motivados por el contacto utilizaron en
+            mayor medida múltiples plataformas para comunicarse con sus víctimas (ɸ = 0,15).
+      -     Groomers y víctimas enviaron por término medio al menos una imagen a la conversación
+            de chat (M = 1,23; DT = 4,19; rango = 0-42; M = 1,21; DT = 3,41; rango = 0-24;
+            respectivamente). En el 48% de los casos, la víctima envió imágenes sexualmente
+            explícitas de sí misma al groomer. Era más probable que las víctimas enviaran estas
+            imágenes a los groomers limitados al ámbito virtual (ɸ = 0,19). Al examinar la gravedad
+            de las imágenes enviadas por las víctimas en función de la Clasificación Española de
+            Imágenes de Explotación Sexual Infantil (Pascual et al., 2017), se observó una diferencia
+            estadísticamente marginal entre grupos para las imágenes del Nivel 5 (es decir, actividad
+
+
+
+                                                        25
+    sexual sádica y bestialismo). En concreto, las víctimas enviaron en mayor medida
+    imágenes categorizadas como Nivel 5 en aquellos casos con groomers motivados por el
+    contacto (ɸ = 0,17, p = .06).
+-   Por lo general, la mayoría de los groomers no enviaron a sus víctimas imágenes
+    sexualmente explícitas de sí mismos, pornografía adulta o MESIA. Sin embargo,
+    groomers limitados al ámbito virtual enviaron en mayor medida MESIA a sus víctimas (ɸ
+    = 0,16). Aunque no fue estadísticamente significativo, se observó un efecto de tamaño
+    pequeño que sugería que los groomers motivados por el contacto eran más propensos a
+    enviar imágenes sexualmente explícitas de sí mismos a sus víctimas (ɸ = 0,10).
+-   En el 75% de los casos analizados, el groomer recurrió al engaño adoptando una identidad
+    falsa. No hubo diferencias estadísticamente significativas entre los casos en este tipo de
+    estrategia de engaño. Sin embargo, al centrarnos en el tipo de identidad adoptada se
+    observó que los groomers limitados al ámbito virtual utilizaron en mayor medida la
+    estrategia de adoptar la identidad de una persona de otro género (ɸ = 0,25).
+-   Los groomers motivados por el contacto propusieron en mayor medida un encuentro físico
+    a sus víctimas (ɸ = .46).
+-   Los groomers motivados por el contacto tenían más probabilidades de ser personas
+    conocidas previamente por la víctima (ɸ = .24).
+-   Los groomers motivados por el contacto se encontraban más cerca de sus víctimas en
+    distancia (r = 0,20) y tiempo de viaje, tanto en coche (r = 0,59) como en otros medios de
+    transporte (r = 0,53).
+-   Los groomers motivados por el contacto tuvieron conversaciones más largas con las
+    víctimas (r = 0,19). Sin embargo, se observó también una diferencia estadísticamente
+    marginal en el número medio de mensajes intercambiados al día; en este caso los groomers
+    limitados al ámbito virtual intercambiaron más mensajes por día (r = 0,13; p = 0,08).
+
+
+
+
+                                           26
+                       Tabla 9. Principales diferencias entre casos de OCSG con groomers
+                    motivados por el contacto y groomers limitados al ámbito virtual (N = 257).
+ Variable                                                                Groomer contacto         Groomer virtual
+ Múltiples plataformas digitales                                                 X
+ Envío de imágenes sexuales por parte de la víctima                                                     X
+ Envío de imágenes sexuales de nivel 5 por parte de la víctima                   X
+ Envío de imágenes sexuales por parte del groomer                                X
+ Envío de MESIA por parte del groomer                                                                   X
+ Identidad falsa (cambio de género)                                                                     X
+ Propuesta de encuentro físico                                                   X
+ Groomer conocido                                                                X
+ Mayor distancia entre groomer y víctima (en kms y en minutos)                                          X
+ Conversación de larga duración                                                  X
+ Conversación de alta intensidad (mensajes/día)                                                         X
+
+
+
+
+4.3. Características de los groomers.
+
+    Las características principales de los 120 groomers incluidos en la muestra pueden observarse
+en la Tabla 10. De aquellos con ubicación conocida en el momento de la comisión del delito, el
+87,5% se encontraban en España, aunque la información respecto al municipio concreto solo se
+encontró para 73 de ellos (ver Figura 5). Con respecto a las variables continuas:
+
+     -      La edad media de los groomers fue de 28 años (DT = 11,88; rango = 14-73). El 12% eran
+            menores de edad (mayores de 14 años).
+     -      La media de víctimas por groomer fue de 4 (DT = 9,79; rango = 1-61). Sin embargo, este
+            número se debe principalmente a unos pocos individuos con un alto número de víctimas,
+            ya que el 87,5% de la muestra tenía una única víctima.
+     -      La edad media en la primera detención policial fue de 26 años (DT = 9,79), para aquellos
+            individuos con antecedentes policiales; y la media de años transcurridos desde la última
+            detención hasta el inicio de las presentes diligencias policiales fue de 2 años (DT = 4,15).
+
+    De los 120 groomers, el 66% fueron categorizados como limitados al ámbito virtual, mientras
+que el 34% se clasificaron como motivados por el contacto. A continuación, se presentan los
+principales resultados respecto a las diferencias entre ambos tipos de groomers (ver Tabla 11):
+
+
+
+
+                                                        27
+      -   No se observaron diferencias estadísticamente significativas en términos de género, edad,
+          nacionalidad o antecedentes penales.
+      -   Aunque únicamente se encontró una asociación estadísticamente marginal (p = 0,06, ɸ =
+          0,19), los datos apuntan hacia una mayor proporción de groomers motivados por el
+          contacto que contactaron con sus víctimas desde España.
+      -   Aunque una relación estadísticamente marginal sugería que los groomers motivados por
+          el contacto tenían más probabilidades de tener múltiples víctimas (ɸ = 0,15, p = .09), el
+          número real de víctimas no difería significativamente entre ambos tipos de groomers.
+      -   Con respecto a la adopción de una identidad falsa, al analizarla como variable dicotómica
+          (identidad falsa vs. verdadera), no se observaron diferencias estadísticamente
+          significativas. No obstante, al examinar el uso exclusivo de identidades verdaderas o
+          falsas, o la combinación de ambos tipos de identidades, se observó una mayor proporción
+          de groomers motivados por el contacto que combinaban ambas (V de Cramer = 0,27)12.
+      -   Se observaron diferencias estadísticamente significativas en otras estrategias empleadas.
+          Los groomers motivados por el contacto utilizaron en mayor medida la relación positiva
+          (ɸ = 0,18), enviaron imágenes sexualmente explícitas de sí mismos de manera espontánea
+          (ɸ = 0,19) y ofrecieron algo a cambio de cumplir su objetivo (ɸ = 0,25). Aunque no es
+          estadísticamente significativo, un pequeño tamaño del efecto sugiere que los groomers
+          limitados al ámbito virtual podrían tener una mayor probabilidad de solicitar imágenes
+          sexualmente explícitas a sus víctimas (ɸ = 0,13).
+
+
+
+
+12
+  Se recomienda cautela a la hora de interpretar este resultado, ya que sólo tres groomers utilizaron tanto identidades
+verdaderas como falsas a la hora de contactar con sus víctimas.
+
+
+                                                         28
+                                Tabla 10. Características de los groomers (N = 120).
+
+ Variable                                                                                               %
+ Género masculino (n = 115)                                                                           97,39
+ Múltiples víctimas (n = 120)                                                                         12,50
+ Nacionalidad española (n = 86)                                                                       72,09
+ Ubicación española (n = 96)                                                                          87,50
+ Identidad adoptada (n = 90)
+      Falsa                                                                                           48,88
+      Verdadera                                                                                       47,77
+      Falsa y verdadera                                                                                3,33
+ Estrategias empleadas
+      Conversación sexual / role-playing (n = 118)                                                    78,81
+      Pedir imágenes sexuales (n = 118)                                                               90,68
+      Relación positiva (n = 117)                                                                     66,67
+      Enviar imágenes sexuales (n = 117)                                                              17,09
+      Ofrecer imágenes sexuales (n = 117)                                                             52,99
+      Reciprocidad (n = 116)                                                                          42,24
+      Ofrecer algo a cambio (n = 116)                                                                 20,69
+      Exclusividad (n = 117)                                                                          29,91
+      Amenazas (n = 117)                                                                              23,93
+      Otros métodos (n = 116)                                                                          6,90
+ Objetivos (n = 117)
+      Imágenes sexuales                                                                               93,16
+      Conversación sexual                                                                             79,49
+      Venganza                                                                                         9,40
+      Exhibicionismo                                                                                   4,27
+      Comisión de un delito entre NNAs                                                                10,26
+      Otros objetivos                                                                                  3,42
+ Antecedentes policiales (n = 62)                                                                     37,10
+      Sexuales (n = 22)                                                                               63,64
+      Múltiples detenciones (n = 22)                                                                  54,55
+Nota. Faltan algunos datos que fueron etiquetados como desconocidos. El tamaño del grupo sobre el que se calculó el
+porcentaje varía según las variables.
+
+
+
+
+                                                        29
+                                  Figura 5. Ubicación de los groomers (n = 73).
+
+
+
+
+                         Tabla 11. Principales diferencias entre groomers motivados por el
+                            contacto y groomers limitados al ámbito virtual (N = 120).
+ Variable                                                                Groomer contacto    Groomer virtual
+ Múltiples víctimas                                                               X
+ Ubicación española                                                               X
+ Combinación de identidad falsa y verdadera                                       X
+ Pedir imágenes sexuales                                                                           X
+ Embaucamiento a través de la relación positiva                                   X
+ Enviar imágenes sexuales                                                         X
+ Ofrecer algo a cambio                                                            X
+
+
+
+
+4.4. Características de las víctimas.
+
+    La mayoría de las víctimas eran niñas y adolescentes españolas, y sus edades oscilaban entre
+los 7 y los 17 años (edad media = 13 años; DT = 2,25). La mayoría de las víctimas se encontraban
+en España en el momento de los hechos (ver Figura 6). En la Tabla 12 se muestran las principales
+características de las 234 víctimas incluidas en la muestra.
+
+
+
+                                                        30
+                                   Figura 6. Ubicación de las víctimas (n = 196).
+
+
+
+
+                                Tabla 12. Características de las víctimas (N = 234).
+
+ Variable                                                                                               %
+ Género femenino (n = 234)                                                                            64,53
+ Múltiples groomers (n = 234)                                                                          2,56
+ Nacionalidad española (n = 213)                                                                      90,61
+ Ubicación española (n = 226)                                                                         97,79
+ Conducta de alto riesgo
+     Cambiar la edad (n = 230)                                                                         3,91
+      Enviar imágenes sexuales (n = 230)                                                               4,78
+      Ofrecer algo a cambio (n = 231)                                                                  4,76
+      Pedir imágenes sexuales (n = 231)                                                               11,26
+      Otras conductas de alto riesgo (n = 231)                                                         7,79
+Nota. Faltan algunos datos que fueron etiquetados como desconocidos. El tamaño del grupo sobre el que se calculó el
+porcentaje varía según las variables.
+
+
+
+     Se observaron algunas diferencias estadísticamente significativas entre las víctimas de
+groomers motivados por el contacto (n = 99) y las víctimas de los groomers limitados al ámbito
+virtual (n = 135; ver Tabla 13).
+
+
+
+
+                                                        31
+    -      Las víctimas de groomers motivados por el contacto tenían más probabilidades de ser
+           niños y adolescentes masculinos, mientras que las víctimas de groomers limitados al
+           ámbito virtual tenían más probabilidades de ser niñas y adolescentes del género femenino
+           (ɸ = 0,52).
+    -      Las víctimas de groomers limitados al ámbito virtual eran más jóvenes (r = 0,26).
+    -      Las víctimas de groomers motivados por el contacto tenían más probabilidades de
+           encontrarse en España en el momento de los hechos (ɸ = 0,13, p = 0,06; diferencia
+           estadísticamente marginal).
+    -      Al analizar las conductas de alto riesgo que hacían a las víctimas más vulnerables, las
+           víctimas de groomers motivados por el contacto tenían más probabilidades de ofrecer a
+           su interlocutor un intercambio (p. ej., alcohol, dinero) por sexo o imágenes sexualmente
+           explícitas (ɸ = 0,18). Estas víctimas mostraban también en mayor medida otro tipo de
+           conductas de alto riesgo (ɸ = 0,11, p = 0,1; diferencia estadísticamente marginal), como
+           por ejemplo proponer un encuentro físico de manera espontánea, a sabiendas de la
+           mayoría de edad del interlocutor.
+
+
+
+                 Tabla 13. Principales diferencias entre las víctimas de groomers motivados por el
+                    contacto y las víctimas de groomers limitados al ámbito virtual (N = 234).
+Variable                                                                 Groomer contacto       Groomer virtual
+Género femenino                                                                                       X
+Víctimas jóvenes                                                                                      X
+Ubicación española                                                                X
+Ofrecer algo a cambio                                                             X
+Otras conductas de alto riesgo                                                    X
+
+
+
+
+                                                        32
+5. DISCUSIÓN DE LOS RESULTADOS
+    El gran volumen de casos de OCSG denunciados, junto con el tiempo necesario para el
+esclarecimiento de los hechos (una media de tres meses), suponen un importante reto para las
+unidades especializadas de Policía Nacional y Guardia Civil. En este estudio, llevamos a cabo un
+análisis de 98 investigaciones policiales por delitos de OCSG, que abarcan 257 conversaciones
+reales entre 120 sospechosos y 234 víctimas. Nuestros resultados contribuyen a nuestra
+comprensión de las características y modus operandi de los groomers y también proporcionan
+información valiosa sobre las características de las víctimas. Los resultados también ponen de
+relieve la necesidad de diseñar intervenciones específicas y estrategias de prevención para hacer
+frente a los riesgos específicos asociados a cada tipo de groomer. Por último, las FFCCSE pueden
+beneficiarse de estos resultados mejorando sus esfuerzos para esclarecer los hechos, identificar y
+priorizar los casos de alto riesgo (groomers motivados por el contacto), proteger a las víctimas
+potenciales y poner a los detenidos a disposición judicial.
+
+
+
+
+5.1. Características de los groomers y sus víctimas.
+
+•   La mayoría de los sospechosos eran hombres jóvenes adultos. Estos resultados son consistentes
+    con los obtenidos en investigaciones previas (Babchishin et al., 2011; DeHart et al., 2017;
+    Riberas-Gutiérrez et al., 2023; van Gijn-Grosvenor & Lamb, 2021, Winters et al., 2017). Sin
+    embargo, cabe señalar que la edad promedio de los groomers en nuestro estudio fue más baja
+    (M = 28,08 años). Esta discrepancia puede atribuirse parcialmente a la inclusión de nueve
+    sospechosos menores de edad en nuestra muestra y al fenómeno del grooming entre iguales
+    (Sklenarova et al., 2018; Villacampa & Gómez, 2017).
+
+•   La mayoría de las víctimas eran chicas adolescentes (M = 13 años). Estos resultados son
+    coherentes con los obtenidos en estudios previos, los cuales indican que los adolescentes y las
+    chicas reciben un mayor número de solicitudes sexuales online que los chicos y menores más
+    jóvenes (de Santisteban & Gámez-Guadix, 2018; Gámez-Guadix & Mateos-Pérez, 2019;
+    Machimbarrena et al., 2018; Montiel et al., 2016; Quayle et al., 2014; Riberas-Gutiérrez et al.,
+
+
+
+
+                                                 33
+    2023; Sklenarova et al., 2018; Villacampa & Gómez, 2017; Whittle et al., 2013; Wolak et al.,
+    2008).
+
+•   La mayoría de los groomers no tenían una relación previa con sus víctimas y no estaban
+    registrados en las bases de datos policiales. Además, en el 75% de los casos analizados, el
+    sospechoso utilizaba una identidad falsa. Estos resultados son similares a los obtenidos por
+    Briggs et al. (2011); Gámez-Guadix et al. (2018); NCMEC (2017); Quayle et al. (2014);
+    Riberas-Gutiérrez et al. (2023); Ringenberg et al. (2022). Esto dificulta la investigación y
+    detención de las personas involucradas en este tipo de ciberdelito (Bunting, 2008).
+
+•   En los casos más recientes, Instagram y WhatsApp fueron las principales plataformas utilizadas
+    por los groomers para comunicarse con sus víctimas. Estos datos reflejan su gran popularidad
+    entre la población española (IAB Spain, 2022; Riberas-Gutiérrez et al., 2023). Con el aumento
+    del uso de estas plataformas por parte de los jóvenes, aumenta la probabilidad de entablar
+    conversaciones online con víctimas potenciales (Malesky, 2007; Quayle et al., 2014; Winters
+    et al., 2017).
+
+•   Si bien la mayoría de los agresores se comunicaban con una sola víctima, el 12,5% participaba
+    en conversaciones simultáneas con múltiples víctimas. De esta manera el groomer aumenta su
+    capacidad de lograr sus objetivos criminales (de Santisteban et al., 2018; Malesky 2007; Quayle
+    et al., 2014; Seigfried-Spellar et al., 2019; Webster et al., 2012; Winters et al., 2017).
+
+•   El 97,4% de los chats analizados involucraban exclusivamente a un único sospechoso. Sin
+    embargo, hubo casos en los que víctimas especialmente vulnerables fueron objetivo de hasta
+    10 individuos simultáneamente. No obstante, las encuestas de victimización indican que un
+    número significativo de víctimas reciben solicitudes sexuales de múltiples personas
+    (Villacampa & Gómez, 2017), lo que redunda en una proporción notable de casos que no llegan
+    a ser investigados por parte de las FFCCSE.
+
+•   Uno de los comportamientos de alto riesgo más frecuentes, que aumentaban la susceptibilidad
+    de las víctimas a la explotación, fueron las solicitudes de imágenes sexualmente explícitas a
+    sus interlocutores (11,3% de las víctimas). La concepción de los jóvenes como vulnerables solo
+    por su falta de conocimiento sobre el sexo no logra abarcar la complejidad del fenómeno del
+    OCSG (Riberas-Gutiérrez et al., 2023; Wolak et al., 2008). La realidad del desarrollo sexual
+    adolescente implica una progresión natural de curiosidad, conocimiento y experiencia a medida
+
+
+
+
+                                                  34
+    que se produce la transición de la niñez a la adultez (Riberas-Gutiérrez et al., 2023; Soldino &
+    Andrés-Pueyo, 2024; Wesche & Lefkowitz, 2023; Whittle et al., 2013; Wolak et al., 2008).
+
+•   En el 48% de los casos, las víctimas enviaron voluntariamente o bajo manipulación imágenes
+    sexualmente explícitas de sí mismas a los groomers. En este sentido, estudios previos señalan
+    una correlación significativa entre las solicitudes e interacciones sexuales online y el sexting
+    (Calvete et al., 2021, Gámez-Guadix & Mateos-Pérez, 2019). En estos casos, el hecho de recibir
+    tales imágenes constituiría un delito adicional de pornografía infantil (art.189 CP). Por otro
+    lado, la divulgación no consentida de estas imágenes a otros perpetuaría la victimización de los
+    menores involucrados, ya que perderían el control sobre sus propias imágenes (de Santisteban
+    & Gámez-Guadix, 2018; Finkelhor et al., 2023; Mitchell et al., 2007; Say et al., 2015).
+
+
+
+
+5.2. Diferencias entre los groomers motivados por el contacto y los groomers limitados
+    al ámbito virtual.
+
+•   De los 120 sospechosos incluidos en nuestra muestra, el 66% fueron clasificados como
+    groomers limitados al ámbito virtual, lo que significa que su única motivación era obtener
+    MESIA o participar en interacciones sexuales online con NNA. En cambio, el 34% fueron
+    etiquetados como groomers motivados por el contacto, ya que buscaban un encuentro físico
+    con sus víctimas. Estas proporciones coinciden con el análisis de los informes de CyberTipline
+    realizados por NCMEC (2017). Sin embargo, nuestros resultados contrastan con los obtenidos
+    en España por Riberas-Gutiérrez et al. (2023), donde en el 90% de las sentencias analizadas,
+    los groomers propusieron un encuentro físico y la mitad de estos casos acabaron en delitos
+    sexuales de contacto. En este contexto, es importante considerar que los casos con elementos
+    de prueba más sólidos contra los sospechosos tienen una mayor probabilidad de acabar en
+    sentencia condenatoria (Correia, 2021). En casos de ciberdelitos en los que la identidad del
+    sospechoso es desconocida, el esclarecimiento de los hechos puede llegar a plantear un desafío
+    (Bunting, 2008).
+
+•   Se encontraron referencias a la posibilidad de un encuentro en persona en el 66,5% de las
+    conversaciones analizadas. No obstante, las propuestas específicas con día, hora y lugar solo
+    se observaron en el 13,6% de las conversaciones. Es importante diferenciar entre la propuesta
+
+
+                                                35
+    de un encuentro físico y la verdadera intención del sospechoso de llevar a cabo dicho encuentro
+    (DeHart et al., 2017; Kloess et al., 2017). Tal y como apuntaban DeHart et al. (2017), el
+    planteamiento de la posibilidad de tener un encuentro físico puede ser utilizado por los
+    groomers limitados al ámbito virtual para prolongar las conservaciones o facilitar la
+    gratificación sexual.
+
+•   Los groomers motivados por el contacto tenían más probabilidades de tener algún tipo de
+    relación previa o parentesco con sus víctimas antes de iniciar el proceso de embaucamiento.
+    Estos resultados son consistentes con los obtenidos por el FBI (Shelton et al., 2016). En estos
+    casos, los groomers que eran familiares o conocidos utilizan las TIC para facilitar el abuso
+    (Ringenberg et al., 2022). La relación previa de los groomers con sus víctimas les
+    proporcionaba una ventaja para explotarlos y manipularlos, lo que resultaba en un impacto
+    psicológico y emocional más profundo (Riberas-Gutiérrez et al., 2023; Shelton et al., 2016).
+    Según Riberas-Gutiérrez et al. (2023), tener una víctima conocida duplicaba la probabilidad de
+    perpetrar un delito sexual de contacto fuera de la red.
+
+•   Los groomers de contacto mostraron una mayor probabilidad de entablar conversaciones de
+    larga duración con sus víctimas y de cambiar entre diferentes plataformas online a lo largo del
+    proceso de embaucamiento. Esta comunicación extendida servía para establecer confianza,
+    generar rapport y manipular a las víctimas para que cumplieran con sus peticiones, persistiendo
+    hasta que se acordaba un encuentro físico fuera del ámbito virtual (Briggs et al., 2011; van Gijn-
+    Grosvenor & Lamb, 2021). Al mismo tiempo, el uso de múltiples plataformas de comunicación
+    puede ayudar a los groomers a evitar ser detectados (Quayle et al., 2014).
+
+•   Los groomers de contacto tenían más probabilidades de comunicarse y proponer un encuentro
+    en persona con víctimas más cercanas geográficamente. Esto sugiere que los groomers de
+    contacto pueden utilizar filtros para seleccionar posibles víctimas en función de su accesibilidad
+    (Quayle et al., 2014; Ringenberg et al., 2022; Winters et al., 2017). La cercanía física entre el
+    groomer y la víctima facilita los aspectos prácticos de organizar encuentros en persona; los
+    groomers de contacto buscan activamente trasladar la interacción online a encuentros físicos,
+    lo que conlleva un mayor riesgo de violencia sexual de contacto.
+
+•   Los groomers motivados por el contacto empleaban en mayor medida estrategias para
+    establecer una relación positiva con sus víctimas. Este comportamiento se ajusta a las
+    características de los groomers de contacto “buscadores de intimidad” (van Gijn-Grosvenor &
+
+
+                                                 36
+    Lamb, 2021; Webster et al., 2012), quienes perciben su interacción con las víctimas como
+    consentida e íntima; introducen gradualmente contenido sexual en conversaciones prolongadas
+    y frecuentes, dando lugar finalmente a encuentros en persona para fomentar la relación
+    (Riberas-Gutiérrez et al., 2023; Ringenberg et al., 2022). En este sentido, es importante señalar
+    que las personas con un diagnóstico de pedohebefilia (es decir, atracción hacia menores púberes
+    y prepúberes) a menudo refieren experiencias de enamoramiento hacia NNA (Martijn et al.,
+    2020).
+
+•   Los groomers de contacto presentaban en mayor medida comportamientos exhibicionistas al
+    enviar imágenes sexualmente explícitas de sí mismos sin ser solicitadas. Este acto servía en
+    algunos casos para verificar si la atracción era mutua y en otros formaba parte de la dinámica
+    del cibersexo (Brigss et al., 2011; Quayle et al., 2014; Ringenberg et al., 2022). Al considerar
+    tanto las estrategias para establecer una relación positiva como el envío de imágenes
+    sexualmente explícitas, podemos identificar al grupo de groomers de contacto
+    “hipersexualizados” descrito por van Gijn-Grosvenor & Lamb (2021).
+
+•   Los groomers de contacto tenían más probabilidades de ofrecer incentivos a cambio de alcanzar
+    sus objetivos. Como por ejemplo ofrecer dinero o drogas a cambio de encuentros en persona
+    (Gámez-Guadix et al., 2018). Este comportamiento se asemeja al subgrupo de groomers de
+    contacto “compradores” descrito por DeHart et al., (2017), quienes negocian favores sexuales
+    y transacciones monetarias.
+
+•   En algunos casos, los groomers motivados por el contacto alternaban la utilización de
+    identidades verdaderas y falsas en función del comportamiento y la presentación online de cada
+    víctima potencial. Se trata de un modus operandi analizado en estudios anteriores (Gámez-
+    Guadix et al., 2018; Quayle et al., 2014), similar al grupo de estilo “adaptable” descrito por
+    Webster et al. (2012).
+
+•   Los groomers limitados al ámbito virtual intercambiaban en mayor medida MESIA con sus
+    víctimas. Esto les permitía cumplir con su objetivo principal de obtener gratificación sexual
+    durante el cibersexo (Briggs et al., 2011).
+
+•   Un porcentaje significativamente mayor de groomers limitados al ámbito virtual engañaban a
+    sus víctimas proporcionando información falsa sobre su género. En el contexto de nuestro
+    estudio, los sospechosos masculinos a menudo adoptaban la identidad de una mujer mientras
+    interactuaban con víctimas masculinas heterosexuales, quienes creían estar practicando
+
+
+                                                  37
+    cibersexo con chicas jóvenes y atractivas. Este patrón coincide con las observaciones realizadas
+    por Seymour-Smith y Kloess (2021), quienes identificaron numerosas instancias de
+    intercambio recíproco de fotografías o vídeos entre un groomer que simulaba ser una
+    adolescente y múltiples víctimas masculinas.
+
+
+
+
+5.3. Diferencias entre las víctimas de los groomers motivados por el contacto y las
+    víctimas de los groomers limitados al ámbito virtual.
+
+•   Las víctimas de groomers motivados por el contacto tenían más probabilidades de ser chicos y
+    de mayor edad que las víctimas de groomers limitados al ámbito virtual. Además, estas víctimas
+    tenían más probabilidades de ofrecer a su interlocutor un intercambio por sexo o imágenes
+    sexualmente explícitas. Varios factores pueden explicar estos resultados. Aunque las chicas
+    reciben un mayor número de solicitudes sexuales de adultos que los chicos (de Santisteban &
+    Gámez-Guadix, 2018; Gámez-Guadix & Riberas-Gutiérrez et al., 2023; Sklenarova et al., 2018;
+    Villacampa & Gómez, 2017; Whittle et al., 2013; Wolak et al., 2008), son menos propensas a
+    mantener un encuentro en persona con estos adultos (Calvete et al., 2021; Riberas-Gutiérrez et
+    al., 2023). Dentro del contexto de roles de género tradicionales, las chicas tienden a percibir
+    tales comportamientos como más peligrosos y anticipan resultados más adversos para ellas
+    mismas (Calvete et al., 2021; Riberas-Gutiérrez et al., 2023). Por otro lado, algunos groomers
+    tienen como objetivo a chicos homosexuales o que se cuestionan su sexualidad, animándolos a
+    participar en experiencias sexuales. En tales casos, la vergüenza asociada con revelar su propia
+    orientación sexual o encuentros sexuales previos con personas del mismo sexo puede llevar a
+    estos chicos a buscar la experimentación con adultos (Riberas-Gutiérrez et al., 2023; Whittle et
+    al., 2013; Wolak et al., 2008). Por otro lado, las características normales del desarrollo de la
+    adolescencia, como la curiosidad sobre el sexo, la disposición a correr riesgos, la iniciación en
+    experiencias sexuales y la exploración del consumo de drogas, contribuyen a su mayor
+    vulnerabilidad frente a los groomers de contacto (Soldino & Andrés-Pueyo, 2024; Walsh &
+    Wolak, 2005; Wolak et al., 2008).
+
+
+
+
+                                                 38
+•   Las víctimas de los groomers limitados al ámbito virtual solían ser chicas y más jóvenes. Este
+    patrón de selección de víctimas sugiere una preferencia por víctimas más vulnerables y
+    fácilmente manipulables, especialmente en su búsqueda de MESIA.
+
+•   Las víctimas de los groomers limitados al ámbito virtual se encontraban ubicadas en mayor
+    proporción en países extranjeros. Esto concuerda con el hecho de que estos groomers no buscan
+    un contacto físico con sus víctimas y, por lo tanto, no necesitan desplazarse para lograr sus
+    objetivos delictivos. Sin embargo, este aspecto complica la investigación de este tipo de delitos,
+    ya que requiere una colaboración internacional entre distintas autoridades policiales nacionales.
+
+
+
+
+5.4. Limitaciones y propuestas de futuro.
+
+    Debemos reconocer varias limitaciones en nuestro estudio que pueden afectar a la
+interpretación y generalización de los resultados obtenidos. Una limitación importante es la
+exclusión de casos no denunciados, lo cual afectaría a la representación general del problema. Por
+otro lado, el análisis de una muestra policial de sospechosos, pero no condenados, puede suponer
+la inclusión de individuos inocentes, sesgando los resultados y limitando la representatividad de la
+muestra. Asimismo, las diferencias en la eficacia de las distintas investigaciones policiales
+(diferencias entre caso y caso para llegar al esclarecimiento de los hechos y detención de los
+individuos investigados) pueden haber influido en la composición de nuestro conjunto de datos
+(Briggs et al., 2011).
+
+       Además, es esencial tener en cuenta que las motivaciones y comportamientos de los
+groomers pueden verse influidos por las respuestas y acciones de sus víctimas (Broome et al., 2018;
+Kloess et al., 2017; Villacampa & Gómez, 2017). Por ejemplo, el cumplimiento de las demandas
+del groomer puede alentarlo a agravar su comportamiento, incluso si inicialmente se trata de un
+groomer que no buscaba un encuentro físico. Sin embargo, debido a las limitaciones de nuestros
+datos, no podemos determinar inequívocamente si los groomers clasificados en nuestra muestra
+como limitados al ámbito virtual eventualmente harían la transición a un encuentro físico basado
+en las respuestas de las víctimas o la duración de las conversaciones.
+
+
+
+
+                                                 39
+       Para superar estas limitaciones la investigación futura debe seguir explorando los distintos
+matices del fenómeno del OCSG y las posibilidades de prevención con muestras diversas y
+representativas, teniendo en cuenta la constante evolución de las comunicaciones digitales y la
+aparición de nuevas estrategias de embaucamiento. Adicionalmente, la incorporación de métodos
+cualitativos puede ofrecer información valiosa sobre la perspectiva de groomers y víctimas,
+permitiendo una comprensión más profunda de las distintas dinámicas que se establecen entre ellos.
+De la misma manera, comprender los aspectos interseccionales de la victimización, como la edad
+y el género, resulta esencial para el desarrollo de intervenciones específicas para cada subgrupo.
+
+
+
+5.5. Posibles repercusiones del estudio.
+
+    Este estudio proporciona resultados de interés relativos a las dinámicas del OCSG, perfiles
+criminológicos y victimológicos y las estrategias empleadas tanto por groomers motivados por el
+contacto como por aquellos limitados al ámbito virtual. Los resultados obtenidos pueden
+aprovecharse en distintas áreas críticas.
+
+    En primer lugar y, ante todo, nuestros resultados pueden mejorar sustancialmente los
+programas de formación policial, ofreciendo a las FFCCSE evidencia científica respecto a las
+características distintivas de ambos tipos de groomers. Una diferenciación basada en los artículos
+183.1 y 183.2 del Código Penal que puede contribuir a la mejora y agilización de las investigaciones
+policiales de delitos de OCSG. Sobre la base de nuestro estudio, surge la oportunidad de desarrollar
+herramientas especializadas de análisis forense diseñadas para detectar de manera eficiente a los
+sospechosos de mayor prioridad (González-Álvarez et al., 2020; Seigfried-Spellar et al., 2019).
+Este enfoque se centra específicamente en los groomers de contacto, quienes se enfrentan a penas
+más severas según lo establecido en nuestro Código Penal. Estas herramientas estarían diseñadas
+para automatizar el análisis de conversaciones en línea, permitiendo la identificación rápida de
+variables críticas que diferencian estadísticamente entre ambos tipos de groomers. La
+implementación de esta automatización no solo agilizaría el proceso de investigación, sino que
+también reduciría la carga de trabajo y la carga emocional de los funcionarios policiales.
+
+    Por otro lado, los resultados obtenidos tienen el potencial de mejorar y fortalecer las estrategias
+de prevención y los sistemas de apoyo. Con el desarrollo de programas de prevención más
+focalizados y efectivos, las instituciones y organismos dedicados a estas labores pueden sensibilizar
+y concienciar a las víctimas potenciales, sus familias, educadores y a toda la comunidad en general
+
+
+                                                 40
+(Calvete et al., 2021; Dorasamy et al., 2021). En última instancia, esto podría generar una mayor
+conciencia sobre la importancia de desarrollar estrategias de prevención primaria y secundaria
+adecuadas que identifiquen a los posibles groomers desde el inicio de su interés sexual por los NNA
+(Beier, 2019; Craven et al., 2007).
+
+
+
+
+                                                41
+6. REFERENCIAS
+
+Babchishin, K. M., Karl Hanson, R., & Hermann, C. A. (2011). The Characteristics of Online Sex
+  Offenders:        A       Meta-Analysis.     Sexual        Abuse,      23(1),       92–123.
+  https://doi.org/10.1177/1079063210370708
+Beckett, H., Holmes, D., & Walker, J. (2017). Child sexual exploitation. Definition and Guide for
+  Professionals: Extended text. University of Bedfordshire. http://hdl.handle.net/10547/623178
+Beier, K. M. (2019). Preventing child sexual abuse and the use of child abuse images: The
+  Prevention Project Dunkelfeld as an international perspective. The International Journal of
+  Forensic Psychotherapy, 1(1), 61-66. http://doi.org/10.33212/ijfp.v1n1.2019.61
+Briggs, P., Simon, W. T., & Simonsen, S. (2011). An exploratory study of internet-initiated sexual
+   offenses and the chat room sex offender: Has the internet enabled a new typology of sex
+   offender? Sexual Abuse, 23(1), 72-91. https://doi.org/10.1177/1079063210384275
+Broome, L. J., Izura, C., & Lorenzo-Dus, N. (2018). A systematic review of fantasy driven vs.
+  contact driven internet-initiated sexual offences: Discrete or overlapping typologies? Child
+  Abuse & Neglect, 79, 434-444. https://doi.org/10.1016/j.chiabu.2018.02.021
+Bueno de Mata, F. (2017). El agente encubierto en Internet como instrumento para la lucha contra
+  el "child grooming" y el "sexting". En A. Figueruelo, M. del Pozo (dirs.) y P. Ramos (coord.),
+  Cambio de paradigma en la prevención y erradicación de la violencia de género (pp. 3-16).
+  Comares.
+Bunting, L. (2008). Sexual offences against children: An exploration of attrition in the Northern
+  Ireland criminal justice system. Child Abuse & Neglect, 32(12), 1109-1118.
+  https://doi.org/10.1016/j.chiabu.2008.09.002
+Calvete, E., Fernández-González, L., Royuela-Colomer, E., Morea, A., Larrucea-Iruretagoyena,
+  M., Machimbarrena, J. M., Gónzalez-Cabrera, J., & Orue, I. (2021). Moderating factors of the
+  association between being sexually solicited by adults and active online sexual behaviors in
+  adolescents.        Computers        in     Human        Behavior,        124,      106935.
+  https://doi.org/10.1016/j.chb.2021.106935
+Chiu, M. M., Seigfried-Spellar, K. C., & Ringenberg, T. R. (2018). Exploring detection of contact
+  vs. fantasy online sexual offenders in chats with minors: Statistical discourse analysis of self-
+  disclosure and emotion words. Child Abuse & Neglect, 81(2018), 128-138.
+  https://doi.org/10.1016/j.chiabu.2018.04.004
+Cinosi Fernández, M. S. (2023). Online child grooming en España: análisis del tipo penal a través
+  de la teoría del delito. Revista Boliviana de Derecho, 35, 248-289.
+Cooper, A. (1998). Sexuality and the internet: Surfing into the new millennium. CyberPsychology
+  & Behavior, 1(2), 187-193. https://doi.org/10.1089/cpb.1998.1.187
+Correia, S. (2021). Cybercrime Victims: Victim Policy through a Vulnerability Lens. SSRN.
+  https://doi.org/10.2139/ssrn.3897927
+Craven, S., Brown, S., & Gilchrist, E. (2007). Current Responses to Sexual Grooming: Implication
+  for     Prevention.    Howard        Journal    of    Criminal     Justice,  46(1),    60–71.
+  https://doi.org/10.1111/j.1468-2311.2007.00454.x
+
+
+
+                                                42
+De la Mata Barranco, N. J. y Pérez González, S. (2021). La aplicación del delito de child grooming
+  en concurrencia con otros delitos contra la indemnidad sexual. En R. De Vicente Martínez, D.
+  Gómez Iniesta, T. Martín López, M. Muñoz de Morales Romero y A. Nieto Martín, Libro
+  homenaje al profesor Luis Arroyo Zapatero. Vol. II (pp. 1311-1325). Instituto de Derecho Penal
+  Europeo e Internacional. Agencia Estatal Boletín Oficial del Estado.
+De Santisteban, P., Almendros, C., & Gámez-Guadix, M. (2018). Estrategias de persuasión
+  percibidas por adolescentes en situaciones de engaño pederasta por Internet (online grooming).
+  Behavioral Psychology, 26(2), 243–262.
+De Santisteban, P., del Hoyo, J., Alcázar-Córcoles, M. A., & Gámez-Guadix, M. (2018).
+  Progression, maintenance, and feedback of online child sexual grooming: A qualitative analysis
+  of      online      predators.     Child     Abuse      &      Neglect,    80,       203-215.
+  https://doi.org/10.1016/j.chiabu.2018.03.026
+De Santisteban, P., & Gámez-Guadix, M. (2018). Prevalence and Risk Factors Among Minors for
+  Online Sexual Solicitations and Interactions with Adults. Journal of Sex Research, 55(7), 939–
+  950. https://doi.org/10.1080/00224499.2017.1386763
+DeHart, D., Dwyer, G., Seto, M. C., Moron, R., Letourneau., E., & Schwarz-Watts, D. (2017).
+  Internet sexual solicitation of children: A proposed typology of offenders based on their chats,
+  e-mails, and social network posts. Journal of Sexual Aggression, 23(1), 77-89.
+  https://doi.org/10.1080/13552600.2016.1241309
+Dorasamy, M., Kaliannan, M., Jambulingam, M., Ramadhan, I., & Sivaji, A. (2021). Parents’
+  Awareness on Online Predators: Cyber Grooming Deterrence. The Qualitative Report, 26(11),
+  3685-3723. https://doi.org/10.46743/2160-3715/2021.4914
+Europol. (2020). Exploiting isolation: Offenders and victims of online child sexual abuse during
+  the         COVID-19            pandemic.          https://www.europol.europa.eu/publications-
+  events/publications/exploiting-isolation-offenders-and-victims-of-online-child-sexual-abuse-
+  during-covid-19-pandemic#downloads
+Europol. (2022). EU Policy Cycle – EMPACT. https://www.europol.europa.eu/crime-areas-and-
+  statistics/empact
+Expósito López, L. (2015). El agente encubierto. Revista de Derecho UNED, 17, 251-286.
+Field, A. (2018). Discovering Statistics Using SPSS (5th Ed.). Sage Publications Ltd.
+Finkelhor, D., Turner, H., Colburn, D., Mitchell, K., & Matthews, B. (2023). Child sexual abuse
+   images and youth produced images: The varieties of Image-based Sexual Exploitation and
+   Abuse        of     Children.     Child     Abuse      &     Neglect,      143,     106269.
+   https://doi.org/10.1016/j.chiabu.2023.106269
+Gámez-Guadix, M., Almendros, C., Calvete, E., & de Santisteban, P. (2018). Persuasion strategies
+  and sexual solicitations and interactions in online sexual grooming of adolescents: Modeling
+  direct     and     indirect    pathways.     Journal     of    Adolescence,    63,      11-18.
+  https://doi.org/10.1016/j.adolescence.2017.12.002
+Gámez-Guadix, M., & Mateos-Pérez, E. (2019). Longitudinal and reciprocal relationships between
+  sexting, online sexual solicitations, and cyberbullying among minors. Computers in Human
+  Behavior, 94, 70-76. https://doi.org/10.1016/j.chb.2019.01.004
+
+
+
+
+                                                43
+Gámez-Guadix, M., Román, F. J., Mateos, E., & de Santisteban, P. (2021). Creencias erróneas sobre
+  el abuso sexual online de menores ("Child grooming") y evaluación de un programa de
+  prevención. Behavioral Psychology, 29(2), 283-296.
+González-Álvarez, J. L., Santos Hermoso, J., & Camacho-Collados, M. (2020). Policía predictiva
+  en España. Aplicación y retos futuros. Behavior & Law Journal, 6(1), 26–41.
+  https://doi.org/10.47442/blj.v6.i1.75
+Górriz Royo, E. (2016). “On-line child grooming’’ en Derecho penal español. InDret, 3, 1-47.
+Guardiola Lago, M. J. (2023). El concepto de explotación sexual infantil y adolescente: una
+  realidad jurídica y criminológica indeterminada. Revista General de Derecho Penal, 40, 1-39.
+Guisasola Lerma, C. (2022). Los delitos de online child grooming y sexting (Art. 183 ter 1 y 2 CP)
+  a la luz de la reciente jurisprudencia. En E. Marín de Espinosa Ceballos, P. Esquinas Valverde
+  (dirs.) y M. A. Morales Hernández (coord.), Los delitos contra la libertad e indemnidad sexual
+  a examen: propuestas de reforma (pp. 355-385). Aranzadi.
+Harkin, D., Whelan, C., & Chang, L. (2018). The challenges facing specialist police cyber-crime
+  units: An empirical analysis. Police Practice and Research, 19(6), 519-536.
+  https://doi.org/10.1080/15614263.2018.1507889
+Henshaw, M., Ogloff, J. R. P., & Clough, J. A. (2017). Looking Beyond the Screen: A Critical
+  Review of the Literature on the Online Child Pornography Offender. Sexual Abuse, 29(5), 416–
+  445. https://doi.org/10.1177/1079063215603690
+IAB Spain. (2022). Estudio de redes sociales 2022. https://iabspain.es/estudio/estudio-de-redes-
+  sociales-2022/
+Instituto Nacional de Estadística. (2022). Encuesta sobre Equipamiento y Uso de Tecnologías de
+   Información      y     Comunicación       (TIC)     en    los    Hogares.     Año     2022.
+   https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736176741&
+   menu=ultiDatos&idp=1254735576692
+International Centre for Missing & Exploited Children. (2017). Online grooming of children for
+   sexual purposes: Model legislation & global review. https://www.icmec.org/online-grooming-
+   of-children-for-sexual-purposes-model-legislation-global-review/
+Kloess, J. A., Seymour-Smith, S., Hamilton-Giachritsis, C. E., Long, M. L., Shipley, D., & Beech,
+  A. R. (2017). A Qualitative Analysis of Offenders’ Modus Operandi in Sexually Exploitative
+  Interactions     With     Children     Online.      Sexual      Abuse,     29(6),      563–591.
+  https://doi.org/10.1177/1079063215612442
+Krone, T., Spiranovic, C., Prichard, J., Watters, P., Wortley, R., Gelb, K., & Hunn, C. (2020). Child
+  sexual abuse material in child-centred institutions: Situational crime prevention approaches.
+  Journal of Sexual Aggression, 26(1), 91-110. https://doi.org/10.1080/13552600.2019.1705925
+Lloria García, P. (2024). El delito de child grooming y el consentimiento de menores de 16 años
+   (arts. 183 y 183 bis del CP). En G. Martínez (Dir.), La reforma de los delitos sexuales (pp. 201-
+   233). J.M. Bosch Editor.
+Machimbarrena, J. M., Calvete, E., Fernández-González, L., Álvarez-Bardón, A., Álvarez-
+  Fernández, L., & González-Cabrera, J. (2018). Internet risks: An overview of victimization in
+  cyberbullying, cyber dating abuse, sexting, online grooming and problematic internet use.
+  International Journal of Environmental Research and Public Health, 15(11), 2471.
+  https://doi.org/10.3390/ijerph15112471
+
+
+                                                 44
+Malesky, L. A. (2007). Predatory online behavior: Modus operandi of convicted sex offenders in
+  identifying potential victims and contacting minors over the internet. Journal of Child Sexual
+  Abuse, 16(2), 23–32. https://doi.org/10.1300/J070v16n02_02
+Martijn, F. M., Babchishin, K. M., Pullman, L. E., & Seto, M. C. (2020). Sexual Attraction and
+  Falling in Love in Persons with Pedohebephilia. Archives of Sexual Behavior, 49(4), 1305–1318.
+  https://doi.org/10.1007/s10508-019-01579-9
+McCarthy, J. A. (2010). Internet sexual activity: A comparison between contact and non-contact
+  child pornography offenders. Journal of Sexual Aggression, 16(2), 181-195.
+  https://doi.org/10.1080/13552601003760006
+McManus, M. A., Almond, L., Cubbon, B., Boulton, L., & Mears, I. (2016). Exploring the Online
+  Communicative Themes of Child Sex Offenders. Journal of Investigative Psychology and
+  Offender Profiling, 13(2), 166– 179. https://doi.org/10.1002/jip.1450
+Merdian, H. L., Moghaddam, N., Boer, D. P., Wilson, N., Thakker, J., Curtis, C., & Dawson, D.
+  (2018). Fantasy-driven versus contact-driven users of child sexual exploitation material:
+  Offender classification and implications for their risk assessment. Sexual Abuse, 30(3), 230–
+  253. https://doi.org/10.1177/1079063216641109
+Ministerio      del     Interior.    (2023).      Portal      estadístico      de      criminalidad.
+  https://estadisticasdecriminalidad.ses.mir.es/publico/portalestadistico/
+Ministerio Fiscal. (2023). MEMORIA - 2023. Datos compendiados por especialidades a escala
+  nacional. https://www.fiscal.es/documentación
+Mitchell, K. J., Finkelhor, D., & Wolak, J. (2007). Youth Internet users at risk for the most serious
+  online sexual solicitations. American Journal of Preventive Medicine, 32(6), 532–537.
+  https://doi.org/10.1016/j.amepre.2007.02.001
+Montiel, I., Carbonell, E., & Pereda, N. (2016). Multiple online victimization of Spanish
+  adolescents: Results from a community sample. Child Abuse & Neglect, 52, 124-127.
+  https://doi.org/10.1016/j.chiabu.2015.12.005
+Mount, D., Mazerolle, L., Zahnow, R., & James, L. (2021). Triaging online child abuse material:
+  Testing a decision support tool to enhance law enforcement and investigative prioritization.
+  Policing: An International Journal, 44(4), 628-642. https://doi.org/10.1108/PIJPSM-02-2021-
+  0020
+National Center for Missing & Exploited Children. (2017). The online enticement of children: An
+  in-depth analysis of CyberTipline reports. https://www.missingkids.org
+National Center for Missing & Exploited Children. (2022). CyberTipLine 2021 Report.
+  https://www.missingkids.org/gethelpnow/cybertipline/cybertiplinedata
+Ortega-Barón, J., Machimbarrena, J. M., Calvete, E., Orue, I., Pereda, N., & González-Cabrea, J.
+  (2022). Epidemiology of online sexual solicitation and interaction of minors with adults: A
+  longitudinal       study.      Child     Abuse       &        Neglect,      131,     105759.
+  https://doi.org/10.1016/j.chiabu.2022.105759
+Pascual, A., Giménez-Salinas, A., & Igual, C. (2017). Propuesta de una Clasificación española
+  sobre imágenes de pornografía infantil. Revista Española de Investigación Criminológica, 15,
+  1–27.
+
+
+
+
+                                                 45
+Pereda, N., Guilera, G., & Abad, J. (2014). Victimization and polyvictimization of Spanish children
+   and youth: results from a community sample. Child Abuse & Neglect, 38(4), 640–649.
+   https://doi.org/10.1016/j.chiabu.2014.01.019
+Pérez González, S. y de la Mata Barranco, N. J. (2023). El delito de “child grooming”, algo más
+   que un acto preparatorio de otro delito sexual. En N. J. De la Mata Barranco, A. I. Pérez Machío
+   (dirs.) y L. Berasaluze Guerrikagoitia y H. Colomo Iraola (coord.), Personas vulnerables y tutela
+   penal (pp. 315-332). Aranzadi.
+Quayle, E., Allegro, S., Hutton, L., Sheath, M., & Lӧӧf, L. (2014). Rapid skill acquisition and
+  online sexual grooming of children. Computers in Human Behavior, 39, 368-375.
+  https://doi.org/10.1016/j.chb.2014.07.005
+Razi, A., Kim, S., Soubai, A., Stringhini, G., Solorio, T., de Choudhury, M., & Wisniewski, P. J.
+  (2021). A human-centered systematic literature review of the computational approaches for
+  online sexual risk detection. Proceedings of ACM Human-Computer Interaction, 5(CSCW2),
+  Article 465. https://doi.org/10.1145/3479609
+Riberas-Gutiérrez, M., Reneses, M., Gómez-Dorado, A., Serranos-Minguela, L. y Bueno-Guerra,
+  N. (2023). Online Grooming: Factores de riesgo y modus operandi a partir de un análisis de
+  sentencias      españolas.   Anuario   de    Psicología     Jurídica.   Avance     online.
+  https://doi.org/10.5093/apj2023a9
+Ringenberg, T. R., Seigfried-Spellar, K. C., Rogers, M. K., & Rayz, J. T. (2022). A Scoping Review
+  of Child Grooming Strategies: Pre- and Post-Internet. Child Abuse & Neglect, 123, 1-12.
+  https://doi.org/10.1016/j.chiabu.2021.105392
+Say, G. N., Babadağı, Z., Karabekiroğlu, K., Yüce, M., & Akbaş, S. (2015). Abuse characteristics
+  and psychiatric consequences associated with online sexual abuse. Cyberpsychology, Behavior,
+  and Social Networking, 18(6), 333–336. https://doi.org/10.1089/cyber.2014.0494
+Seigfried-Spellar, K. C. (2013). Individual Differences of Internet Child Pornography Users:
+   Peculiar Findings in a Community-Based Study. International Journal of Cyber Criminology,
+   7(2), 141-154.
+Seigfried-Spellar, K.C., Rogers, M.K., Rayz, J.T., Yang, S., Misra, K., & Ringenberg, T. (2019).
+   Chat Analysis Triage Tool: Differentiating Chats between Minors and Contact-Driven vs. Non-
+   Contact Driven Child Sex Offenders. Forensic Science International, 297, e8-e10.
+   https://doi.org/10.1016/j.forsciint.2019.02.028
+Seigfried-Spellar, K. C., & Soldino, V. (2020). Child sexual exploitation: Introduction to a global
+   problem. In T. Holt & A. Bossler (Eds.), The Palgrave Handbook of International Cybercrime
+   and Cyberdeviance (pp. 1203–1223). Palgrave Macmillan. https://doi.org/10.1007/978-3-319-
+   78440-3_53
+Seto, M. C. (2019). The Motivation-Facilitation Model of sexual offending. Sexual Abuse, 31(1),
+   3-24. https://doi.org/10.1177/1079063217720919
+Seymour-Smith, S., & Kloess, J. A. (2021). A discursive analysis of compliance, resistance and
+  escalation to threats in sexually exploitative interactions between offenders and male children.
+  British Journal of Social Psychology, 60(3), 988-1011. https://doi.org/10.1111/bjso.12437
+Shelton, J., Eakin, J., Hoffer, T., Muirhead, Y., & Owens, J. (2016). Online child sexual
+  exploitation: An investigative analysis of offender characteristics and offending behavior.
+  Aggression and Violent Behavior, 30, 15–23. https://doi.org/10.1016/j.avb.2016.07.002
+
+
+                                                46
+Sklenarova, H., Schulz, A., Schuhmann, P., Osterheider, M., & Neutze, J. (2018). Online sexual
+  solicitation by adults and peers – Results from a population based German sample. Child Abuse
+  & Neglect, 76, 225–236. https://doi.org/10.1016/J.CHIABU.2017.11.005
+Soldino, V., & Andrés-Pueyo, A. (2024). Los adolescentes que tienen un comportamiento sexual
+  abusivo hacia niños y niñas prepúberes. Anuario de Psicología Jurídica, 34(1), 107-117.
+  https://doi.org/10.5093/apj2023a13
+Soldino, V., Carbonell-Vayá, E. J., & Seigfried-Spellar, K. C. (2019). Criminological differences
+  between child pornography offenders arrested in Spain. Child Abuse & Neglect, 98, 104178.
+  https://doi.org/10.1016/j.chiabu.2019.104178
+Soldino, V., Carbonell-Vayá, E. J., & Seigfried-Spellar, K. C. (2021). Spanish Validation of the
+  Child Pornography Offender Risk Tool (CPORT). Sexual Abuse, 33(5), 503-528.
+  https://doi.org/10.1177/1079063220928958
+U.S. Department of Justice (2016, April). The national strategy for child exploitation prevention
+  and interdiction: A report to congress. https://www.justice.gov/psc/national-strategy-child-
+  exploitation-prevention-and-interdiction
+van Gijn-Grosvenor, E. L., & Lamb, M. E. (2021). Online groomer typology scheme. Psychology,
+  Crime & Law, 27(10), 973-987. https://doi.org/10.1080/1068316X.2021.1876048
+Villacampa, C., & Gómez, M. J. (2017). Online child sexual grooming: Empirical findings on
+   victimisation and perspectives on legal requirements. International Review of Victimology,
+   23(2), 105-121. https://doi.org/10.1177/0269758016682585
+Villacampa Estiarte, C. y Torres Ferrer, C. (2022). Los delitos de online child grooming y sexting:
+   un análisis crítico de su tipificación en el Código Penal. En E. Marín de Espinosa Ceballos, P.
+   Esquinas Valverde (dirs.) y M. A. Morales Hernández (coord.), Los delitos contra la libertad e
+   indemnidad sexual a examen: propuestas de reforma (pp. 391-438). Aranzadi.
+Webster, S., Davidson, J., Bifulco, A., Gottschalk, P., Caretti, V., Pham, T., Grove-Hills, J., Turley,
+  C., Tompkins, C., Ciulla, S., Milazzo, V., Schimmenti, A., & Craparo, G. (2012). European
+  online grooming project: Final report. European Online Grooming Project.
+  https://europeanonlinegroomingproject.com/
+Wesche, R., & Lefkowitz, E. S. (2023). Normative sexual development and milestones. In S. Hupp
+  & J. D. Jewell, The Encyclopedia of Child and Adolescent Development (pp. 1–12). John Wiley
+  & Sons, Inc. https://doi.org/10.1002/9781119171492.wecad489
+Whittle, H., Hamilton-Giachrits, C., Beech, A., & Collings, G. (2013). A review of young people's
+ vulnerabilities to online grooming. Aggression and Violent Behavior, 18(1), 135-146.
+ https://doi.org/10.1016/j.avb.2012.11.008
+Winters, G. M., Kaylor, L. E., & Jeglic, E. L. (2017). Sexual offenders contacting children online:
+  An examination of transcripts of sexual grooming. Journal of Sexual Aggression, 23(1), 62-76.
+  https://doi.org/10.1080/13552600.2016.1271146
+Wolak, J., Finkelhor, D., Mitchell, K. J., & Ybarra, M. L. (2008). Online "predators" and their
+  victims: Myths, realities, and implications for prevention and treatment. American Psychologist,
+  63(2), 111–128. https://doi.org/10.1037/0003-066X.63.2.111
+
+
+
+
+                                                  47
+

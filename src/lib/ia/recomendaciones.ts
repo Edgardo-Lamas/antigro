@@ -110,12 +110,175 @@ export interface Fuente {
  * el Ministerio de Justicia argentino a un padre de Sevilla no es un problema
  * de localización: es citar una autoridad que ahí no lo es.
  *
- * ⬜ **España está vacío todavía**, y el prompt lo dice en voz alta en vez de
- * disimularlo (ver `recomendacionesParaElPrompt`). Faltan traer, textuales y
- * con enlace: **INCIBE / IS4K**, **ANAR** y **Save the Children España**.
+ * ✅ **España dejó de estar vacío el 21/9**: entraron INCIBE (IS4K) y la
+ * Fundación ANAR, textuales y con enlace, verificados ese día en fuente.
+ *
+ * 📌 **Save the Children España quedó afuera, y no por olvido.** Su informe
+ * *«Tras la pantalla»* (enero 2026) es una fuente excelente de CIFRAS —y como
+ * tal ya se usa—, pero sus recomendaciones son de política pública
+ * (especialización judicial, modelo Barnahus), no pautas para un adulto que
+ * está mirando el teléfono de su hijo. Meterlas acá sería darle a un padre un
+ * consejo que no puede ejecutar.
  */
 export const FUENTES_POR_PAIS: Record<Pais, Fuente[]> = {
-  ES: [],
+  ES: [
+  {
+    organismo:
+      "INCIBE / Internet Segura For Kids (IS4K) — «Decálogo de mediación parental y educación digital para familias»",
+    enlace: "https://www.incibe.es/menores/familias/decalogo-mediacion-parental-familias",
+    verificado: "2026-09-21",
+    recomendaciones: [
+      /* ── Prevención ── */
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "La clave para una educación digital responsable es la comunicación. Habla regularmente " +
+          "con tus hijos/as sobre lo que hacen en línea, lo que les gusta y lo que les preocupa.",
+        porQue:
+          "🔑 Coincide con lo que dice el Ministerio de Justicia argentino, y esa coincidencia vale: " +
+          "son dos Estados independientes que llegaron a lo mismo por su cuenta.",
+      },
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "Acuerda, junto a tus hijos/as, las reglas sobre el uso de dispositivos digitales, los " +
+          "horarios de uso y el tipo de contenido al que pueden acceder. Involúcralos en la " +
+          "creación de estos pactos para fomentar su compromiso y responsabilidad.",
+        porQue:
+          "El acuerdo con el chico adentro es lo contrario de la norma impuesta: la que se impone " +
+          "se rompe a escondidas, y lo que se hace a escondidas no se cuenta.",
+      },
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "Participa activamente en la vida digital de tus hijos/as. Pasar tiempo juntos en línea " +
+          "permite comprender mejor sus actividades, intereses y las personas con las que " +
+          "interactúan. Anímalos a mostrarte lo que hacen en línea para aprender juntos y " +
+          "conversar sin prejuicios.",
+      },
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "Enséñales la importancia de proteger su información personal y a gestionar su privacidad " +
+          "en redes sociales, aplicaciones y plataformas en línea. Explícales qué datos no deben " +
+          "compartir y por qué.",
+      },
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "Fomenta el pensamiento crítico. Ayúdales a cuestionar lo que ven en Internet y a " +
+          "verificar la información antes de compartirla.",
+      },
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "Supervisar el uso de Internet es importante, pero también lo es respetar la autonomía de " +
+          "tus hijos conforme van creciendo y madurando. Evita prejuzgar, confía en su criterio y " +
+          "acompáñalos en su camino digital, permitiéndoles descubrir el mundo.",
+        porQue:
+          "🔑 Es la misma línea que sostiene este producto: acompañar no es vigilar, e informar no " +
+          "es bloquear.",
+      },
+      {
+        momento: "prevencion",
+        alcance: "universal",
+        texto:
+          "Los padres y las madres son los principales modelos a seguir, recuerda que los hijos/as " +
+          "aprenden observando. Practica una conducta digital responsable para que los menores " +
+          "puedan aprender observando tu comportamiento. Tu ejemplo es su mejor guía.",
+      },
+      /* ── Si ya pasó ── */
+      {
+        momento: "si_ya_paso",
+        alcance: "del_pais",
+        texto:
+          "Recuerda que tu tranquilidad y la de los/las menores en el mundo digital tiene un número " +
+          "de teléfono: 017. La línea está atendida por un equipo multidisciplinar de expertos que " +
+          "te darán asesoramiento según la temática de tu consulta. Además, es gratuito, " +
+          "confidencial y está disponible para toda la familia los 365 días del año.",
+      },
+    ],
+  },
+  {
+    organismo:
+      "Fundación ANAR — «Decálogo ANAR sobre cómo actuar si un menor de edad está en situación de riesgo»",
+    enlace:
+      "https://www.anar.org/soluciones-anar/consejos/decalogo-anar-sobre-como-actuar-si-un-menor-de-edad-esta-en-situacion-de-riesgo/",
+    verificado: "2026-09-21",
+    recomendaciones: [
+      /* ── Si el chico cuenta ── */
+      {
+        momento: "si_el_chico_cuenta",
+        alcance: "universal",
+        texto:
+          "No esperes. Las primeras horas pueden ser decisivas para salvar la vida de un niño/a o " +
+          "evitar la exposición a una nueva situación de maltrato.",
+        porQue:
+          "🔴 Es lo que contesta la duda más común del adulto que acaba de enterarse: «¿espero a " +
+          "ver si sigue?». La fuente dice que no, y lo dice desde 5 millones de llamadas atendidas.",
+      },
+      {
+        momento: "si_el_chico_cuenta",
+        alcance: "universal",
+        texto:
+          "Ponte en su piel. Piensa que si tú eres adulto y tienes miedo a intervenir por las " +
+          "posibles represalias, imagínate cómo se puede sentir un niño/a, que es mucho más " +
+          "vulnerable.",
+      },
+      {
+        momento: "si_el_chico_cuenta",
+        alcance: "del_pais",
+        texto:
+          "Si conoces o sospechas de alguna situación en la que un menor de edad puede estar en " +
+          "desamparo, riesgo o emergencia, tu colaboración es fundamental. Llama al Teléfono ANAR " +
+          "o escribe al Chat ANAR. Son totalmente anónimos y confidenciales y están atendidos por " +
+          "un equipo de profesionales (orientadores psicólogos, apoyados por abogados y " +
+          "trabajadores sociales) especializados en infancia.",
+      },
+      /* ── Si ya pasó ── */
+      {
+        momento: "si_ya_paso",
+        alcance: "universal",
+        texto:
+          "Recuerda que cada caso es único. Describe lo mejor que puedas la situación que padece " +
+          "el menor de edad. Esta información es determinante para identificar la emergencia y el " +
+          "riesgo concreto.",
+      },
+      {
+        momento: "si_ya_paso",
+        alcance: "del_pais",
+        texto:
+          "Recaba información. Es necesario que puedas recoger toda aquella información que nos " +
+          "permita identificar el riesgo real en el que se encuentra el menor de edad y, llegado " +
+          "el caso, poder trasladarlo a los organismos competentes y que actúen cuanto antes.",
+        porQue:
+          "📌 Va como del país porque el «nos» es ANAR. El criterio de fondo —guardar lo que hay " +
+          "antes de tocar nada— ya viaja en las recomendaciones universales del catálogo argentino.",
+      },
+      {
+        momento: "si_ya_paso",
+        alcance: "del_pais",
+        texto:
+          "Si observas que la integridad física del menor de edad está en peligro inminente, llama " +
+          "de forma urgente a las Fuerzas y Cuerpos de Seguridad, Policías Autonómicas o al 112.",
+      },
+      {
+        momento: "si_ya_paso",
+        alcance: "del_pais",
+        texto:
+          "Ten en cuenta que todo adulto conocedor de una situación de riesgo a un menor de edad " +
+          "está obligado por ley a dar traslado a las autoridades competentes, además de prestar " +
+          "auxilio inmediato.",
+      },
+    ],
+  },
+  ],
   AR: [
   {
     organismo:

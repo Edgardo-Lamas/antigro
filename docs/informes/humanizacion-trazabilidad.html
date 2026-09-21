@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<title>AntiGro — Humanización y trazabilidad</title>
+<style>
+:root{
+  --violeta:#7C6CF0; --cian:#35C6D6; --navy:#10151F; --tinta:#1B2230;
+  --tenue:#5A6572; --linea:#E3E7EE; --hueso:#FBFBFD; --suave:#F4F2FE;
+}
+@page{ size:A4; margin:17mm 15mm 15mm; }
+*{ box-sizing:border-box; }
+body{
+  margin:0; color:var(--tinta); background:#fff;
+  font-family:"Inter","Helvetica Neue",-apple-system,system-ui,sans-serif;
+  font-size:10.2pt; line-height:1.55; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+h1,h2,h3{ line-height:1.2; margin:0; }
+p{ margin:0 0 .62em; }
+strong{ font-weight:650; color:var(--navy); }
+em{ font-style:italic; }
+
+/* ── Portada ─────────────────────────────────────────── */
+.tapa{ padding:6mm 0 7mm; border-bottom:2.5px solid transparent;
+  border-image:linear-gradient(90deg,var(--violeta),var(--cian)) 1; margin-bottom:7mm; }
+.marca{ display:flex; align-items:center; gap:8px; margin-bottom:9mm; }
+.punto{ width:11px; height:11px; border-radius:50%;
+  background:linear-gradient(135deg,var(--violeta),var(--cian)); }
+.marca span{ font-size:8.6pt; font-weight:700; letter-spacing:.20em;
+  text-transform:uppercase; color:var(--navy); }
+h1{ font-size:25pt; font-weight:700; letter-spacing:-.022em; color:var(--navy); max-width:15cm; }
+h1 .g{ background:linear-gradient(90deg,var(--violeta),var(--cian));
+  -webkit-background-clip:text; background-clip:text; color:transparent; }
+.bajada{ margin-top:4.5mm; font-size:11.4pt; line-height:1.5; color:var(--tenue); max-width:15.4cm; }
+.meta{ margin-top:7mm; display:flex; gap:14mm; font-size:8.4pt; color:var(--tenue); }
+.meta b{ display:block; font-size:7.4pt; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--violeta); margin-bottom:2px; font-weight:700; }
+
+/* ── Estructura ──────────────────────────────────────── */
+h2{ font-size:14.2pt; font-weight:700; color:var(--navy); letter-spacing:-.014em;
+  margin:9mm 0 1mm; padding-top:3mm; border-top:1px solid var(--linea); }
+h2:first-of-type{ border-top:none; padding-top:0; }
+.h2sub{ font-size:9pt; color:var(--tenue); margin:0 0 4.5mm; }
+h3{ font-size:11pt; font-weight:680; color:var(--navy); margin:0 0 1.5mm;
+  page-break-after:avoid; break-after:avoid; }
+.num{ display:inline-block; min-width:19px; height:19px; line-height:19px; text-align:center;
+  border-radius:5px; background:var(--suave); color:var(--violeta);
+  font-size:8.2pt; font-weight:700; margin-right:7px; vertical-align:1px; }
+
+.grupo{ page-break-after:avoid; font-size:7.6pt; font-weight:700; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--cian); margin:6mm 0 2.5mm; }
+.grupo::after{ content:""; display:block; height:2px; width:34px; margin-top:2.5mm;
+  background:linear-gradient(90deg,var(--violeta),var(--cian)); border-radius:2px; }
+
+.idea{ padding:4mm 0 4mm; border-bottom:1px solid var(--linea); }
+.idea:last-child{ border-bottom:none; }
+.impacto{ margin-top:2.5mm; padding:2.8mm 3.4mm; background:var(--hueso);
+  border-left:2.5px solid var(--violeta); border-radius:0 4px 4px 0; font-size:9pt; }
+.impacto b{ font-size:7.4pt; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--violeta); display:block; margin-bottom:1.4mm; font-weight:700; }
+code{ font-family:"SF Mono",ui-monospace,Menlo,monospace; font-size:8.4pt;
+  background:#EEF0F6; padding:.5px 4px; border-radius:3px; color:var(--navy); }
+
+.destacado{ padding:4mm 4.5mm; margin:4mm 0; border-radius:6px;
+  background:linear-gradient(120deg,rgba(124,108,240,.075),rgba(53,198,214,.05));
+  border:1px solid rgba(124,108,240,.2); page-break-inside:avoid; }
+.destacado p:last-child{ margin-bottom:0; }
+.cita{ font-family:Georgia,"Times New Roman",serif; font-size:11.4pt; font-style:italic;
+  line-height:1.45; color:var(--navy); margin:0 0 2mm; }
+
+table{ width:100%; border-collapse:collapse; margin:3mm 0 2mm; font-size:8.9pt;
+  page-break-inside:avoid; }
+th{ text-align:left; font-size:7.4pt; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--violeta); border-bottom:1.5px solid var(--violeta); padding:0 8px 2mm 0; font-weight:700; }
+td{ padding:2.4mm 8px 2.4mm 0; border-bottom:1px solid var(--linea); vertical-align:top; }
+td:first-child{ font-weight:640; color:var(--navy); width:31%; }
+tr:last-child td{ border-bottom:none; }
+
+ul{ margin:.3em 0 .7em; padding-left:1.05em; }
+li{ margin-bottom:.3em; }
+li::marker{ color:var(--cian); }
+
+.pregunta{ padding:3.2mm 4mm; margin:2.5mm 0; background:#fff;
+  border:1px solid var(--linea); border-radius:5px; font-size:9.2pt; page-break-inside:avoid; }
+.pregunta b{ color:var(--navy); }
+.salto{ page-break-before:always; }
+
+footer{ margin-top:9mm; padding-top:3.5mm; border-top:1px solid var(--linea);
+  font-size:8pt; color:var(--tenue); display:flex; justify-content:space-between; gap:10mm; }
+footer b{ color:var(--navy); font-weight:640; }
+</style></head><body>
+
+<div class="tapa">
+  <div class="marca"><span class="punto"></span><span>AntiGro</span></div>
+  <h1>Nueve ideas para que AntiGro <span class="g">acompañe</span>, y cuatro fuentes para que pueda <span class="g">demostrar</span> lo que dice</h1>
+  <p class="bajada">Adónde puede ir AntiGro. Reúne lo pensado el 31 de agosto sobre hacer el sistema más humano, con el impacto técnico de cada idea, y la base documental española y europea que permitiría trazar de dónde sale cada peso del motor.</p>
+  <div class="meta">
+    <div><b>Fecha</b>31 de agosto de 2026</div>
+    <div><b>Para</b>Sandra Ortellado</div>
+    <div><b>Estado</b>Ideas. Nada implementado</div>
+  </div>
+</div>
+
+<h2>Para qué es este documento</h2>
+<p class="h2sub">De dónde salió y qué está decidido.</p>
+
+<p>Hay una idea de origen y es simple: <strong>que el asistente de AntiGro tenga cara.</strong> No como adorno, sino porque el que abre ese panel es una madre o un padre asustado, y hablarle a un cuadro de texto no es lo mismo que hablarle a alguien.</p>
+
+<p>De ahí salieron ocho ideas más y una pregunta de investigación, que están todas acá. <strong>Ninguna está implementada ni decidida.</strong> Se escribieron, se ordenaron y se les midió el impacto sobre el sistema antes de escribir una sola línea de código.</p>
+
+<div class="destacado">
+  <p class="cita">«Si la respuesta es fría, el padre quizá no quiera volver a preguntar.»</p>
+  <p>Esa corrección está guardada en <code>src/lib/ia/asistente.ts</code> como requisito del prompt, no como preferencia de estilo. El razonamiento es que un asistente frío no es más prudente: <strong>es menos consultado, y uno que nadie consulta no protege a nadie.</strong> Las nueve ideas de abajo son esa misma idea aplicada a los momentos donde todavía no llega.</p>
+</div>
+
+<p><strong>El contexto.</strong> IEBS —la escuela española donde estudió Edgardo— abrió un concurso de emprendedores que cierra el <strong>18 de septiembre</strong>, con categoría de IA y Big Data, votación pública en octubre y beca de máster para el ganador. <strong>Presentarse todavía no está decidido.</strong> Pero el jurado y el público serían españoles y europeos, y ese dato cambia cosas de fondo del producto que valen la pena aunque el concurso no ocurra.</p>
+
+<h2>Las nueve ideas</h2>
+<p class="h2sub">Qué es cada una, qué toca del sistema y qué cambia para quien lo usa.</p>
+
+<div class="grupo">Grupo A · La presencia</div>
+
+<div class="idea">
+  <h3><span class="num">1</span>Un avatar de cuerpo entero, no un botón</h3>
+  <p>Hoy el acceso al asistente es un botón flotante que hace scroll hasta la caja de escribir. La propuesta es reemplazarlo por una figura <strong>de cuerpo entero, tipo holograma</strong>, en la línea de Cortana en Halo.</p>
+  <p>La razón no es estética. Cortana funciona porque <strong>está al lado del que decide, nunca delante</strong>: informa y acompaña, no actúa. Es el rol de AntiGro palabra por palabra —no bloquea, no restringe, no puede leer—. Y un cuerpo entero da <strong>postura</strong>: de pie esperando, mirando hacia el informe cuando el padre lo abre, sentado cuando la conversación se pone difícil. Comunica sin afirmar nada, que es justo lo que hace falta donde el sistema tiene prohibido afirmar.</p>
+  <p>Además resuelve la pregunta incómoda de «¿quién es esa persona?». Un holograma translúcido es evidentemente una IA, y aun así tiene mirada y presencia: más honesto que un retrato realista, mucho más cálido que un ícono. <strong>Y la paleta que armaste —violeta a cian sobre navy profundo— ya es una paleta de holograma.</strong></p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Reemplaza <code>BotonDelAsistente</code> en <code>src/app/mi-familia/page.tsx:1277</code> por un componente con cuatro estados (reposo · escuchando · pensando · hablando). Cuatro clips de video pregrabados en bucle, generados una sola vez a <code>public/avatar/</code>, no un video por respuesta: eso último sumaría entre 30 y 60 segundos a cada pregunta. Sin sincronía real de labios — a 120 px nadie los lee. Respeta <code>prefers-reduced-motion</code> mostrando un cuadro fijo. <strong>El estado que más trabaja es «pensando»:</strong> convierte los quince segundos de espera actuales en «me está pensando la respuesta».</div>
+</div>
+
+<div class="idea">
+  <h3><span class="num">2</span>Que esté siempre, no sólo cuando se la llama</h3>
+  <p>Que la figura acompañe en todo el panel y no sólo en la sección del asistente. Mientras el padre lee el informe, está ahí, quieta, mirando. No dice nada: acompaña. <strong>Alguien leyendo que su hijo tuvo un cambio sostenido de conducta, solo frente a una pantalla, no está solo.</strong></p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Sube el avatar del bloque del asistente al layout de <code>/mi-familia</code>. Es la decisión de diseño más delicada del conjunto: presencia continua sin robarle lugar al informe, y en teléfono sin tapar contenido.</div>
+</div>
+
+<div class="idea">
+  <h3><span class="num">3</span>Que el padre pueda hablar en vez de escribir</h3>
+  <p>Un micrófono, opcional. Un padre angustiado cuenta mejor hablando que tecleando, y un cuadro de texto en blanco es justo la barrera que la cara vino a bajar. Además, escribir empuja a escribir corto, y una pregunta corta produce una peor respuesta.</p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Transcripción de voz a texto sobre el campo que ya existe (<code>#pregunta-al-asistente</code>). No toca el prompt ni el control: lo que llega al modelo sigue siendo texto. <strong>Es la idea de menor costo técnico de las nueve.</strong></div>
+</div>
+
+<div class="idea">
+  <h3><span class="num">4</span>Que el sistema llame por teléfono</h3>
+  <p>Un aviso de Telegram a las 23:40 compite con doscientas notificaciones. <strong>Un teléfono que suena, no.</strong> Y es el canal que un padre asocia con que algo importa de verdad: es por donde llama el colegio.</p>
+  <p>La voz diría poco: <em>«Soy [nombre], de AntiGro. No es una emergencia. Pasó algo que conviene que mires hoy. Te dejé el detalle en el panel.»</em> Nada más. El detalle vive en la pantalla y no en la voz, porque no se sabe quién está en la habitación. <strong>La llamada no informa: hace que el padre mire.</strong></p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Se engancha como último escalón de <code>src/lib/mensajeria/escalada.ts</code>, que ya decide cuándo subir de nivel (<code>HORAS_PARA_ESCALAR</code>, <code>HORAS_CON_EVASION</code>) — no es un canal nuevo suelto, es un peldaño más del que ya existe. Requiere síntesis de voz y un proveedor de telefonía. <strong>Y se conecta con la idea 6.</strong></div>
+</div>
+
+<div class="grupo">Grupo B · Lo que el sistema todavía no hace</div>
+
+<div class="idea">
+  <h3><span class="num">5</span>Ensayar la conversación con el hijo</h3>
+  <p><strong>Para mí, la funcionalidad más potente que le falta al producto.</strong></p>
+  <p>El sistema hoy le dice al padre <em>cómo</em> abrir la conversación. Pero el momento difícil no es saber qué decir: es decirlo. El padre entra a la habitación, se le seca la boca, dice cualquier cosa y el chico contesta «nada, dejame».</p>
+  <p>La propuesta es que pueda practicar. Le dice a la cara <em>«no sé cómo empezar»</em>, y la cara le contesta <em>«¿lo ensayamos? Yo hago de él. Empezá vos.»</em> Y entonces <strong>el asistente hace de hijo adolescente</strong> —cortante, defensivo, incómodo, como es de verdad—. El padre prueba, se equivoca sin costo, prueba otra vez. Al final recibe dos líneas: qué le abrió la puerta y qué se la cerró.</p>
+  <ul>
+    <li><strong>No lo tiene nadie.</strong> Ni Bark ni Qustodio. Todos avisan qué pasó; ninguno acompaña el momento que sigue.</li>
+    <li>Es lo más humano que puede hacer un software: <strong>te deja equivocarte en privado antes de equivocarte con tu hijo.</strong></li>
+    <li>Reutiliza todo lo que ya existe: el asistente, el perfil, el informe, la edad, el cuestionario.</li>
+  </ul>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Es un segundo modo de conversación dentro de <code>src/lib/ia/asistente.ts</code>, con un prompt distinto y <strong>un control propio</strong>. Y ahí está la decisión de fondo: <code>reglas.ts</code> revisa hoy lo que <em>el asistente afirma</em>, pero en modo ensayo el modelo habla como un chico — otro registro, otras reglas, otro criterio de qué no puede salir nunca.</div>
+</div>
+
+<div class="idea">
+  <h3><span class="num">6</span>Un botón antipánico para el chico</h3>
+  <p>Hoy AntiGro es un sistema <em>sobre</em> el chico: elige una persona de confianza y ahí termina su participación. La propuesta es darle algo suyo. No el informe —eso no— sino <strong>una manera de pedir ayuda sin tener que explicar nada</strong>. Toca una vez y a la persona que él mismo eligió le llega el aviso. Sin escribir, sin dar razones. <strong>Porque a los trece la parte imposible no es pedir ayuda: es tener que contar lo que pasó.</strong></p>
+  <p>Y ahí las ideas 4 y 6 se cierran entre sí: un chico que toca ese botón a las dos de la mañana necesita que alguien <strong>atienda el teléfono</strong>, no que lea un mensaje a la mañana siguiente.</p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Primera superficie del producto dirigida al chico, con todo lo que eso implica. Se apoya en la figura del referente que ya está definida en <code>src/lib/config.ts</code> y en el circuito de avisos existente. <strong>Convierte a AntiGro en un sistema con el chico y no sólo sobre él</strong> — y en Europa, donde los derechos del menor pesan de verdad, esa diferencia se nota.</div>
+</div>
+
+<div class="grupo">Grupo C · España</div>
+
+<div class="idea">
+  <h3><span class="num">7</span>Que hable en español de España</h3>
+  <p>El asistente vosea y dice «el chico». En España se tutea y se dice «tu hijo». El voseo se escucha en la primera línea, y hace que un padre español lea el producto como algo que no fue hecho para él.</p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  El corpus va entero dentro del prompt estable de <code>asistente.ts</code> y se cachea, así que la variante regional no es un ajuste de interfaz: <strong>es una segunda versión del corpus.</strong> Conviene resolverlo como parámetro desde el principio y no como reemplazo.</div>
+</div>
+
+<div class="idea">
+  <h3><span class="num">8</span>Los organismos españoles, dentro del sistema</h3>
+  <p>Hoy <code>RECURSOS</code> deriva a la Línea 137 y a GAPP, y <code>MARCO_LEGAL</code> cita la Ley 26.904 y la Ley 27.590. Todo argentino, y correcto. España tiene su equivalente y es sólido: hay una línea estatal de ciberseguridad con atención a menores, un teléfono del menor, y una agencia de protección de datos con canal urgente.</p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  <code>RECURSOS</code> y <code>MARCO_LEGAL</code> en <code>src/lib/config.ts</code> pasan de constantes únicas a constantes por país. Es poco código y mucho alcance. <strong>Los datos se traen con fuente primaria, nunca de memoria.</strong></div>
+</div>
+
+<div class="idea">
+  <h3><span class="num">9</span>Faro Digital como contenido, no sólo como aliado</h3>
+  <p>Faro Digital tiene sede en <strong>Buenos Aires y Barcelona</strong>, está fundada en 2015 y tiene detrás a UNICEF Argentina y Fundación Telefónica. Su bandera se llama «Del Peligro al Cuidado»: la tesis es que la vigilancia no protege y que el adulto tiene que ser fuente de confianza, no de control. Es la frase de AntiGro escrita por otro.</p>
+  <p>La idea nueva es que <strong>el criterio del acompañamiento salga de su material</strong>. Hoy el asistente acompaña con criterio propio; si el qué decirle a un hijo viene de una organización con UNICEF detrás, la cara deja de ser un modelo dando consejos y pasa a ser <strong>la voz de un contenido avalado</strong>. Y a ellos les da lo que buscan: su material deja de morir en el taller y llega a la casa el día que hace falta. Ellos ponen el <em>qué</em>, AntiGro pone el <em>cuándo</em>.</p>
+  <div class="impacto"><b>Impacto en el sistema</b>
+  Entra en el corpus del prompt estable, que hoy ya lleva el material completo dentro del <code>system</code> y cacheado —sin recuperación semántica, decisión tomada desde el principio para evitar que el modelo rellene huecos—. Lo que hay que resolver antes es lo de afuera: acercarse a ellos y ver si les interesa que su material viva en un sistema.</div>
+</div>
+
+<h2 class="salto">La trazabilidad: que el motor pueda decir de dónde sale cada peso</h2>
+<p class="h2sub">La pregunta que abrió esto: ¿hay en España o Europa organizaciones que puedan alimentar el sistema con datos del tipo que usa?</p>
+
+<p>Sí, y hay más de lo esperado. <strong>Se bajaron cuatro informes</strong>, que están en <code>docs/fuentes/</code> del repositorio con el texto ya extraído al lado de cada PDF para poder buscar dentro sin abrirlos.</p>
+
+<table>
+<tr><th>Fuente</th><th>Qué es y qué aporta</th></tr>
+<tr><td>Ministerio del Interior<br><span style="font-weight:400;color:#5A6572;font-size:8.4pt">España · 48 páginas</span></td>
+<td><strong>La más útil para el motor.</strong> «Investigaciones policiales por delitos de <em>online child sexual grooming</em> en España». No es divulgación: es un estudio cuantitativo sobre investigaciones policiales reales, con las variables codificadas una por una. Entre ellas, <strong>duración del delito</strong> en meses entre el principio y el final del <em>iter criminis</em>, y <strong>duración de la conversación</strong> en días entre el primer y el último mensaje del chat. Es la única fuente que le pone número a cuánto dura una captación.</td></tr>
+<tr><td>Save the Children<br><span style="font-weight:400;color:#5A6572;font-size:8.4pt">enero 2026 · 13 páginas</span></td>
+<td>«Tras la pantalla». Análisis de <strong>23 sentencias y 28 casos</strong> de grooming en España entre 2023 y 2024. Chicas: 68,6 % de las víctimas, edad media de 13 años. Denuncias por delitos sexuales digitales contra menores: de 954 en 2022 a 1.078 en 2024.</td></tr>
+<tr><td>EU Kids Online V<br><span style="font-weight:400;color:#5A6572;font-size:8.4pt">UPV/EHU · 62 páginas</span></td>
+<td>Encuesta de 2025 a menores españoles de 10 a 16 años. Da <strong>la línea base de uso normal por edad</strong>: sirve para no marcar como señal lo que a los trece es corriente. Es red académica: <strong>a ésta se le puede pedir el dataset</strong>, no sólo citarla.</td></tr>
+<tr><td>Europol — IOCTA 2026<br><span style="font-weight:400;color:#5A6572;font-size:8.4pt">44 páginas</span></td>
+<td>Undécima edición, publicada el 28 de abril de 2026, con un capítulo entero de explotación sexual infantil en línea. Es la cita de mayor peso institucional de las cuatro.</td></tr>
+</table>
+
+<div class="destacado">
+  <p class="cita">«Los agresores del entorno familiar de la víctima pasaron del 3,3 % de los casos en 2021-2022 al 25 % en 2023-2024.»</p>
+  <p>Save the Children, sobre sentencias españolas. <strong>Uno de cada cuatro agresores está dentro del entorno del chico.</strong> Ese dato valida, con fuente española y judicial, las dos decisiones más discutibles de AntiGro: que el sistema <strong>no lea los mensajes</strong>, y que <strong>la persona de confianza la elija el chico</strong> y no el padre.</p>
+</div>
+
+<h3 style="margin-top:6mm">Las que faltan, y por qué importan</h3>
+<table>
+<tr><th>Organización</th><th>Por qué</th></tr>
+<tr><td>INCIBE / IS4K</td><td><strong>Es el Safer Internet Centre oficial de España</strong>, dentro de las redes europeas INSAFE e INHOPE y cofinanciado por la Comisión Europea. Su línea 017 recibió <strong>138.003 consultas en 2025</strong>, un 40 % más que el año anterior, y más de 3.000 menores pidieron ayuda por ciberacoso y extorsión sexual. No es un teléfono de contacto: es la puerta institucional del país.</td></tr>
+<tr><td>WeProtect Global Alliance</td><td>El dato para la primera lámina: <strong>el 87 % de las tecnológicas detecta material de abuso por comparación de huellas, pero sólo el 37 % tiene herramientas capaces de detectar grooming.</strong> El hueco que ataca AntiGro, reconocido y dicho por otro.</td></tr>
+<tr><td>Fundación ANAR · INHOPE · BIK+</td><td>El teléfono del menor en España; la red de 57 líneas de denuncia en 52 países; y la estrategia europea que financia toda esa red.</td></tr>
+</table>
+
+<div class="destacado">
+  <p><strong>Cómo se usan, y esto es una regla.</strong> Son <strong>marco de referencia, no el mecanismo</strong>. El punto de comparación sigue siendo el propio chico y su línea base: estos datos no la reemplazan, explican <em>por qué un desvío importa</em>.</p>
+  <p>Lo que habilitan es doble: que el informe que lee un padre pueda decir <strong>por qué algo pesa lo que pesa</strong>, y que una organización externa pueda <strong>auditar el criterio del sistema sin ver un solo dato de ningún chico</strong>.</p>
+</div>
+
+<h2>Por qué te lo mando</h2>
+<p class="h2sub">No hay que decidir nada hoy.</p>
+
+<p>Nada más que para que lo veas. <strong>No hace falta contestar punto por punto</strong>, ni evaluar nada, ni volver sobre el código.</p>
+
+<p>AntiGro cambió bastante desde el CoderCup, y esto es hacia dónde puede ir. Vos lo conociste cuando era otra cosa, y varias de las ideas de acá salieron de mirar lo que vos misma marcaste que no se encontraba en la pantalla.</p>
+
+<p><strong>Si algo de esto te entusiasma, avisame y seguimos.</strong> Ahí sí conviene sentarse a discutir el cómo — sobre todo el ensayo y la calibración de los pesos con datos externos, que es donde tu campo pesa bastante más que el mío.</p>
+
+<p>Y si el momento no da, decilo sin vueltas: se entiende perfecto y no cambia nada entre nosotros.</p>
+
+<footer>
+  <div><b>AntiGro</b> — Sistema de detección temprana de grooming<br>Edgardo Lamas</div>
+  <div style="text-align:right">antigro.vercel.app<br>31 de agosto de 2026</div>
+</footer>
+</body></html>

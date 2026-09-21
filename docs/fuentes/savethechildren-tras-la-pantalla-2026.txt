@@ -1,0 +1,472 @@
+TRAS LA PANTALLA:
+VIOLENCIA SEXUAL
+CONTRA LA INFANCIA
+EN EL ENTORNO DIGITAL
+
+
+
+
+Análisis de sentencias sobre abusos sexuales
+a niños y niñas en Internet en España
+
+v. 2026                                        savethechildren.es
+Contenidos
+
+
+
+
+  3    Introducción
+
+
+
+  4    Características del online grooming
+
+
+
+  4    Los perfiles
+
+
+
+  6    El proceso judicial
+
+
+
+  8    Acceso a Barnahus
+
+
+
+  9    Recomendaciones
+1. Introducción
+
+El constante avance y desarrollo de las tecnologías implica que, cada vez más, el entor-
+no digital esté intrínsecamente ligado a casi todas las facetas de nuestra vida cotidiana,
+eliminando la línea que separaba lo digital de lo analógico. Esto también es cierto para
+los niños, niñas y adolescentes, quienes se relacionan desde edades tempranas con las
+tecnologías e Internet: casi el 58 % utilizan Internet de manera habitual desde los 11
+años, y casi 1 de cada 3 lo utiliza de manera habitual desde antes de cumplir los 10
+años.1
+Aunque la era digital ha traído consigo nuevas oportunidades, también ha amplificado
+riesgos ya existentes para la infancia y la adolescencia, generando al mismo tiempo
+nuevas formas de violencia y nuevas particularidades para formas de violencia ya exis-
+tentes. Entre estos riesgos, las violencias sexuales que tienen lugar en el entorno digi-
+tal destacan por su gravedad.
+Según los últimos datos del Ministerio del Interior en 2024 se presentaron 1.078 de-
+nuncias por delitos sexuales en el entorno digital que tenían como víctima a un niño,
+niña o adolescente, de las cuales el 68,6 % eran chicas.2 Las denuncias que tienen como
+víctima a la infancia y adolescencia representan el 84,2 % del total de este tipo de de-
+litos.
+Sin embargo, sabemos que estos datos son solo la punta del iceberg: en una encues-
+ta propia realizada a 1.008 jóvenes en España, el 97 % de los y las participantes res-
+pondieron haber sufrido algún tipo de violencia sexual en el entorno digital cuando
+eran menores de edad.3 El 33 % de ellos y ellas habían tenido contacto con una persona
+adulta con fines sexuales en el entorno digital durante su infancia y adolescencia.
+Por todo ello, hemos querido actualizar también los datos relativos al abuso sexual
+infantil en Internet, conocido como online grooming, para compararlos con el estudio
+de sentencias correspondiente al periodo 2021-2022. Para los años 2023-2024, he-
+mos analizado 23 sentencias4 correspondientes a 28 casos que corresponden a online
+grooming.
+
+
+
+
+1   Save the Children (2024). Derechos sin Conexión.
+2   Ministerio del Interior. Portal estadístico de cibercriminalidad.
+3   Save the Children (2025). Redes que atrapan.
+4 Análisis previo del periodo 2023-2024 realizado por la Clínica Jurídica per la Justícia Social – Facultad de
+Derecho, Campus Tarongers, Universitat de València.
+
+
+
+
+                                                        3
+2. Características del online grooming
+
+Es el delito por el cual una persona adulta contacta con una niña, un niño o adolescente
+por medios electrónicos con el fin de hacerle participar en cualquier actividad sexual,
+como por ejemplo obtener materiales digitales de contenido sexual o generar encuen-
+tros sexuales en el ámbito digital o en el físico. Para ello, hay diferentes maneras de
+conseguir esa interacción, pero, al igual que en el abuso sexual «físico» se caracteriza
+por:
+
+
+     »    Establecer un vínculo de confianza, ya sea a través de engaño, manipulación,
+          soborno, coacción, fingir otra identidad, etc.
+     »    Aislamiento de la víctima para asegurar su desprotección y que el abuso no
+          se descubra.
+     »    Valoración del riesgo con preguntas y acciones de control para garantizar
+          que la situación de abuso sigue sin salir a la luz.
+     »    Ruptura una vez que el agresor se siente con confianza para introducir la
+          temática sexual.
+     »    Petición sexual que puede ser material audiovisual, un encuentro físico,
+          ambos, etc.
+
+
+El contacto puede producirse a través de todos los espacios en los que la infancia y
+adolescencia accede de forma habitual: redes sociales, plataformas de videojuegos,
+canales de streaming, aplicaciones de mensajería, etc. Aunque suele tratarse como un
+proceso progresivo, actualmente se han descrito cambios en estas pautas «tradiciona-
+les»: se ha observado cómo el proceso se acelera con peticiones sexuales inmediatas,
+muchas veces sin llegar al entorno físico.
+
+
+
+
+3. Los perfiles
+
+  • Perfil de la víctima
+En el 60,7 % de los casos analizados, la víctima era una niña y en el 39,3 %, un niño, lo
+que confirma la predominancia de víctimas femeninas, pero en una diferencia menor
+entre niños y niñas que en el abuso físico. La edad media entre las víctimas sigue si-
+tuándose en torno a los 13 años, sin diferencias entre chicas y chicos.
+
+
+
+
+                                           4
+                                       % total
+            Edad                                             % niñas        % niños
+                                     2023-2024
+
+            9 años                     3,6 %                  0%           100 %
+            10 años                    3,6 %              100 %              0%
+            11 años                    7,1 %              100 %              0%
+            12 años                    3,6 %              100 %              0%
+            13 años                    25 %               42,9 %           57,1 %
+            14 años                   21,4 %                 50 %           50 %
+            15 años                    25 %               57,1 %           42,9 %
+            16 años                   10,7 %              100 %              0%
+            Total                     100 %               60,7 %           39,3 %
+
+
+Tan solo en el 12 % de las sentencias analizadas hubo más de una víctima, lo que supone
+un notable descenso en la tendencia observada en el período anterior. Esto se ajusta al
+modus operandi típico del grooming en el que el contacto es personalizado, adaptando
+la estrategia de contacto y manipulación a la víctima.
+
+
+
+    • Perfil de la persona agresora
+Respecto del perfil de la persona agresora, en todas las sentencias analizadas el acu-
+sado era un hombre. El 33,3 % era una persona desconocida. Estos datos confirman
+que los agresores en los entornos digitales son mayoritariamente hombres y no son
+siempre personas desconocidas.5 En el 78,3 % de los casos, las personas involucradas
+no tienen antecedentes penales, mientras que en el 8,7 % de las sentencias no consta
+esta información.
+
+
+
+                                               % 2023-2024             % 2021-2022
+
+            Conocido                             41,7 %                  49,2
+            Familiar                              25 %                   3,3 %
+            Desconocido                          33,3 %                 47,5 %
+            Total                                100 %                  100 %
+
+
+
+5   Véase Save the Children (2025). Redes que atrapan.
+
+
+
+
+                                                    5
+4. El proceso judicial
+
+  • Cómo se destapa el abuso: la madre y la víctima
+En casi la mitad de los casos (43,7 %) es la madre de la víctima quien interpone la de-
+nuncia ante las autoridades, manteniendo la tendencia de la madre como principal
+denunciante en estos casos. Sin embargo, se observa un porcentaje significativo de
+denuncias que proviene directamente de la víctima (37,5 %). El padre aparece como
+denunciante en el 12,5 % de los casos.
+
+
+  • Duración
+Más de la mitad de los casos duraron 3 años o más (60,7 %), mientras que el 35,7 % se
+resolvió entre 1 y 2 años, y el 14,3 % superó los 5 años de duración.
+
+
+
+                     Duración                      % 2023-2024
+
+                     1-2 años                       35,7 %
+                     2-3 años                        3,6 %
+                     3-4 años                       39,3 %
+                     4-5 años                        7,1 %
+                     Más de 5 años                  14,3 %
+                     Total                           100 %
+
+
+En el período anterior veíamos también como la mayor parte de los procesos duraba en
+torno a los 3 años, y el 24,6 % se extendía más a allá de los 5 años.
+
+
+  • Exploración de la víctima
+De forma similar a lo que sucede en el abuso sexual «físico», destaca la exploración ante
+juez de guardia/instrucción en el 61 % de los casos (lo que supone un aumento respecto
+al 26,2 % de 2021-2022), pero el ministerio fiscal adquiere un mayor papel frente a la
+policía: 23 % frente al 6 %, respectivamente. En el período anterior, la policía realizaba
+la exploración en el 21,3 % de los casos. Además, vemos que en el 65 % de los casos la
+víctima toma declaración más de 2 veces, pudiendo llegar a contar su experiencia hasta
+3 veces antes del juicio. Como sabemos, el hecho de que una víctima tenga que repetir
+la violencia sufrida, unido a otros aspectos como procesos judiciales largos, hacen que
+la víctima deba revivir la situación traumática, con el riesgo de revictimización que ello
+supone.
+
+
+                                            6
+  • Medios probatorios
+En cuanto a los medios de prueba, encontramos que el medio que más veces se emplea
+es la declaración de la víctima, apareciendo en el 96 % de las sentencias, seguido de la
+prueba documental y la pericial psicológica. En el caso del grooming, la declaración de
+la víctima como único medio de prueba se da en una sola sentencia. La combinación
+de medios probatorios que aparece con mayor frecuencia es la de la declaración de la
+víctima y la prueba documental. El mayor peso de la prueba documental en el abuso se-
+xual digital tiene sentido, pues tanto las conversaciones como las imágenes y archivos,
+quedan en los servidores y similares.
+En relación con la prueba preconstituida, el 35 % no consta ni es mencionada, pero se
+destaca que en 65 % de los casos sí se practicó.
+
+
+
+
+           La historia de Marta
+
+           Marta cursaba 6º de primaria cuando Víctor, el profesor de música de su
+           colegio, la contactó a través de Instagram a través de un perfil falso. Ocul-
+           tando su verdadera identidad y su aspecto, inició una relación virtual con
+           la niña, presentándose como un apoyo emocional e intentando ayudarla a
+           solucionar sus problemas, para después pedirle fotos y vídeos de conteni-
+           do sexual. Él conocía perfectamente la situación problemática familiar de
+           Marta y aprovechó su vulnerabilidad. Cuando, tras insistir ella, el profesor
+           finalmente le reveló su verdadera identidad en el colegio, ella se quedó en
+           estado de shock. A partir de ese momento, los abusos se produjeron en
+           varias ocasiones en el entorno físico, tanto dentro como fuera del centro
+           escolar, en ocasiones acompañados de otras formas de violencia física. Fi-
+           nalmente, Marta bloqueó a Víctor en redes sociales, y al reanudarse el cur-
+           so escolar, contó lo sucedido en el centro. En compañía de su padre, Marta
+           denunció lo sucedido ante las autoridades.
+           La sentencia reconoce cómo Víctor, que tenía 45 años cuando cometió los
+           abusos, ostentaba una posición de superioridad derivada de la diferencia
+           de edad, su condición de docente, y el ascendente que ejercía sobre la niña.
+           El proceso duró 3 años, y fue finalmente condenado a prisión por abusos
+           sexuales continuados a través de las tecnologías.
+
+
+
+
+  • Medidas de protección cautelares
+En el 42 % no se menciona o no consta la aplicación de medidas cautelares. En los casos
+que sí se mencionan, la medida cautelar más utilizada sola o en conjunto con otras es la
+libertad condicional, en el 26 % de los casos, seguida de la prisión provisional con una
+
+
+
+                                              7
+orden de alejamiento en el 10 % de los casos. Se produce así un cambio de tendencia
+respecto a 2021-2022, en el que la medida más utilizada fue la prisión provisional.
+
+
+    • Condenas y absoluciones, medidas y penas
+En el 65,2 % de los casos el fallo de la sentencia es condenatorio, lo que supone un des-
+censo significativo respecto al 96,7 % de condenas en 2021-2022. Las absoluciones se
+deben principalmente a que no se considera que concurran todos los elementos exi-
+gidos por el tipo penal y, en otros casos, la falta de pruebas. En el 71,4 % de los casos
+en los que se impuso pena de prisión, la duración de la pena fue de más de 3 años. Las
+penas de prisión de entre 1 y 2 años constituyen el 14,3 %. La pena accesoria de inhabi-
+litación para trabajar en profesiones o cargos que requieran contacto con menores de
+edad se aplica en la mayoría de casos, pero todavía hay sentencias que no la incluyen,
+pese a ser de obligada aplicación tras la modificación del Código Penal introducida por
+la LOPIVI.
+
+
+
+
+5. Acceso a Barnahus
+
+Aunque surgió como modelo para abordar casos de violencia sexual en entornos físi-
+cos, la Barnahus también es un recurso clave para el abordaje de los casos de violen-
+cia sexual contra la infancia y la adolescencia que tienen lugar en el entorno digital,
+al garantizar una atención especializada, coordinada y centrada en el interés superior.
+El grooming es una forma de abuso sexual infantil y por tanto una forma de violencia
+sexual contra la infancia y la adolescencia contemplada en los marcos legales que fun-
+damentan el modelo Barnahus.6
+Según el Estándar 3 «Grupo objetivo inclusivo» de los estándares de calidad,7 la
+Barnahus debe atender a todos los niños y niñas que han sido víctimas o testigos de
+cualquier tipo de violencia. Los marcos normativos reconocen todas las tipologías de
+violencia sexual incluidos bajo el concepto más amplio de abuso y explotación sexual
+infantil, sin importar si estos ocurrieron en el entorno físico o digital.
+De este modo, todos los niños y niñas víctimas de grooming tienen derecho a acce-
+der a Barnahus. En Catalunya, las Barnahus ya atiende también los casos de violencia
+sexual online.
+
+
+
+6 Artículo 19 de la CDN y el Comentario General n° 13 del CRC (2011): «todas las formas de violencia física
+o mental, lesiones y abuso, negligencia o trato negligente, maltrato o explotación, incluyendo el abuso sexual».
+7   Ver aquí.
+
+
+
+
+                                                       8
+6. Recomendaciones
+
+Desde Save the Children, llevamos años impulsando y recomendando una especiali-
+zación de la justicia en violencia contra la infancia y adolescencia. Esta especialización
+debe tener como objetivo una atención adecuada, eficaz y centrada en los derechos
+de la infancia y la adolescencia, conforme al mandato y los derechos recogidos en la
+LOPIVI.
+La materialización de esta especialización se ha desarrollado en la Ley Orgánica
+1/2025, de 2 de enero, de medidas en materia de eficiencia del Servicio Público de Jus-
+ticia, con la creación de las secciones especializadas en violencia contra la infancia y la
+adolescencia, y con el reciente RD 422/2025, que prevé únicamente la conformación
+de tres secciones, un comienzo que implica dejar fuera de esta respuesta a gran parte
+de la infancia víctima.
+Así, a pesar de los avances legislativos a nivel nacional, entre los que se incluyen tanto
+la citada ley como el RD que la desarrolla, todavía persisten retos para una implemen-
+tación completa y efectiva de un modelo de justicia que esté verdaderamente a la altu-
+ra de la infancia. Para ello, es necesario:
+
+
+    1.   Garantizar un número suficiente de secciones de violencia contra la infan-
+         cia y la adolescencia desde el inicio de su implantación. La creación de úni-
+         camente tres secciones en todo el territorio nacional resulta manifiestamente
+         insuficiente para asegurar una respuesta especializada a todas las formas de
+         violencia que afectan a niñas, niños y adolescentes, dejando la mayoría de los
+         casos en manos de secciones de instrucción sin enfoque de infancia. Pese a
+         que la implantación de estas secciones deba ser progresiva, cumplir con los
+         compromisos establecidos en la LOPIVI exige una implementación más ambi-
+         ciosa desde el inicio.
+
+    2.   Crear fiscalías especializadas en violencia contra la infancia y la adoles-
+         cencia que participen en todos los procesos donde haya infancia víctima, dife-
+         renciada a la de menores (protección y menores infractores), o mediante la es-
+         pecialización de plazas. La reforma del Estatuto Orgánico del Ministerio Fiscal
+         supone una oportunidad clave para incorporar la previsión de estas fiscalías
+         en su artículo 18.3.
+
+    3.   Discernir cuestiones competenciales o de coordinación con respecto a la
+         especialidad civil de familia, violencia contra la mujer y secciones de menores.
+         En particular, debe asegurarse que los casos de violencia sexual contra niñas
+         (también en el entorno digital) recaigan en las secciones de violencia contra la
+         infancia y la adolescencia, en lugar de las secciones de violencia sobre la mujer,
+         pues las niñas tienen necesidades específicas diferenciadas de las de las mu-
+         jeres adultas, motivadas por su edad, el momento de desarrollo, el tipo de vio-
+
+
+
+
+                                            9
+     lencia, o la relación con la persona agresora. Lo contrario supondría además
+     en la práctica un trato desigual entre niños y niñas, cuyos casos por el mismo
+     tipo de violencia serían tramitados por secciones distintas.
+
+4.   Extender la especialización a todos los niveles judiciales que intervengan
+     en casos de infancia y adolescencia, incluidos el Tribunal Supremo, la Audien-
+     cia Nacional, los Tribunales Superiores de Justicia y el Tribunal Central de Ins-
+     tancia.
+
+5.   Crear equipos técnicos en violencia contra la infancia que auxilien a jueces
+     y magistrados, tanto de las secciones de violencia contra la infancia y la ado-
+     lescencia como a otras secciones cuando la competencia sobre un caso que
+     afecten a niños, niñas o adolescentes recaiga en ellas. Estos equipos resultan
+     fundamentales debido a su carácter multidisciplinar y a que contribuyen a
+     prevenir posibles sesgos cognitivos y asistencia técnica en aquellas cuestio-
+     nes que no son propias de la judicatura.
+
+6.   Asegurar la formación inicial y continuada de todos los operadores jurí-
+     dicos, más allá de los jueces, juezas, magistrados y magistradas. Estas forma-
+     ciones deben incluir de forma específica las formas de violencia digital que
+     afectan a la infancia y la adolescencia, así como sus consecuencias y efectos.
+
+7.   Garantizar que las formaciones incluyan contenidos fundamentales para
+     dotar de foco y contenido a esta especialización, abordando materias como:
+     los derechos fundamentales de la infancia y la adolescencia recogidos en la
+     CDN y en la LOPIVI; la determinación del interés superior; el derecho a ser
+     escuchado y su aplicación en decisiones procesales clave; las formas de vio-
+     lencia reconocidas en la LOPIVI, el buen trato y la generación de entornos se-
+     guros; el impacto de la violencia en la infancia y cuestiones relacionadas con la
+     revictimización; el enfoque de género; y los elementos clave para una justicia
+     adaptada y accesible.
+
+8.   Garantizar la práctica sistemática de la prueba preconstituida en todos los
+     procesos, alejando de manera efectiva a la infancia víctima y testigo de las ins-
+     talaciones judiciales. La obligatoriedad para la grabación del testimonio debe
+     extenderse a los menores de edad mayores de catorce años, de modo que se
+     asegure una protección efectiva frente a la revictimización en todas las eda-
+     des.
+
+9.   Extender y consolidar el modelo Barnahus, integrado en el modelo especiali-
+     zado de justicia, asegurando que también integre los casos de violencia sexual
+     en el entorno digital, para garantizar una actuación coordinada, especializada
+     y adaptada a las necesidades de la infancia y la adolescencia que ha sido víc-
+     tima en este entorno, reduciendo la victimización secundaria. Los proyectos
+     piloto deben comenzar atendiendo casos de violencia sexual infantil y ampliar
+     su tofo a medida que crezcan los recursos, poniendo especial foco en la vio-
+     lencia digital.
+
+
+
+                                       10
+10. Evaluación formal del Interés Superior. Es fundamental incorporar en la
+    práctica judicial una evaluación formal, individualizada y estandarizada del
+    interés superior, que analice todos los elementos que lo componen y garan-
+    tice su aplicación efectiva en cada caso. Para ello, es necesario que todos los
+    operadores que intervienen en un proceso judicial reciban formación sobre
+    en qué consiste, cuáles son los puntos principales para su análisis y cómo se
+    lleva a cabo.
+
+
+
+
+       La historia de Laura
+
+       Laura, una chica de 16 años, contactó a través de una aplicación con un
+       usuario adulto para pedir marihuana. Como respuesta, el usuario le pro-
+       puso entregarle lo que pedía a cambio de que la niña realizara actos se-
+       xuales a través de una videollamada, a lo que la chica aceptó. Tras hacerlo,
+       dicha persona le dijo que había obtenido pantallazos de los actos que llevó
+       a cabo la adolescente, y que si no aceptaba continuar con las videollama-
+       das de carácter sexual, iba a difundir las capturas de pantalla en las que
+       además se veía su rostro.
+       La sentencia considera que los hechos podrían constituir varios delitos:
+       proposición de actos sexuales a menores a través de Internet, agresión se-
+       xual a menores de edad e incluso amenazas. Supone por tanto un ejemplo
+       de cómo los actos que tienen lugar a través de una pantalla también pue-
+       den constituir agresiones sexuales sobre la infancia, y también de cómo
+       el material obtenido a través del abuso puede seguir utilizándose para
+       perpetuar la agresión. Además, se destaca que la sentencia establece que
+       el hecho de que el primero contacto entre la víctima y el investigado se
+       produjese por iniciativa de la primera, eso no resta gravedad a los hechos.
+       Al contrario: dada la gran diferencia de edad, lo que muestra es su especial
+       vulnerabilidad y cómo el acusado se aprovechó de ello.
+
+
+
+
+11. Educación en el uso seguro y responsable de Internet, junto con la educa-
+    ción afectivo-sexual integral (reglada, desde edades tempranas, y adaptada
+    a cada fase educativa), atendiendo a las particularidades de la socialización y
+    entorno digital de la infancia y adolescencia, abordando de manera adaptada
+    a cada etapa aspectos clave como el consentimiento, la privacidad, la gestión
+    de la identidad digital, presiones ejercidas en este ámbito y herramientas para
+    establecer límites saludables en entornos digitales.
+
+
+
+                                        11
+12. Medidas dirigidas a promover la responsabilidad de las plataformas y em-
+    presas digitales para asegurar un compromiso firme con la protección de la
+    infancia y la adolescencia, garantizando mecanismos efectivos de supervisión,
+    sanción y rendición de cuentas, que garanticen su responsabilidad en la pre-
+    vención, detección, actuación y colaboración con las autoridades frente a la
+    violencia sexual en los entornos digitales. La actual tramitación del Proyecto
+    de Ley Orgánica de protección de personas menores de edad en entornos digi-
+    tales ofrece una oportunidad para adaptar y fortalecer el marco legal estatal.
+
+
+
+
+                                     12
+savethechildren.es
+

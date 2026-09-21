@@ -622,9 +622,26 @@ alguno vuelve a aprobar, el control se aflojó: no son pruebas de estilo. **17 d
 
 ### ⬜ Lo que falta de España (en este orden)
 
-1. 🟡 **Los consejos españoles — resuelto a medias el 21/9, y el criterio lo corrigió Edgardo.**
-   `FUENTES_POR_PAIS.ES` sigue en `[]`, pero **España ya no está muda**: recibe los 27 consejos
-   universales argentinos.
+1. ✅ **Los consejos españoles — CERRADO el 21/9. `FUENTES_POR_PAIS.ES` ya no está vacío.**
+   España tiene ahora **dos organismos propios y 15 recomendaciones textuales** (10 universales,
+   5 del país), además de los 27 consejos universales argentinos que ya recibía.
+
+   | Organismo | Qué aporta |
+   |---|---|
+   | **INCIBE / IS4K** — «Decálogo de mediación parental y educación digital para familias» | 7 de prevención + el **017** |
+   | **Fundación ANAR** — «Decálogo sobre cómo actuar si un menor está en situación de riesgo» | Lo que faltaba: **qué hacer cuando ya pasó** (112, obligación legal de dar traslado, «no esperes») |
+
+   🔑 **Y apareció la validación cruzada que buscábamos:** INCIBE dice *«habla regularmente con tus
+   hijos sobre lo que hacen en línea»* y el Ministerio de Justicia argentino dice lo mismo por su
+   cuenta. Dos Estados independientes llegando al mismo criterio vale más que cualquiera solo.
+
+   🔴 **Lo que NO se cargó, y es una decisión de producto:** el punto del decálogo de INCIBE que
+   dice *«implementa herramientas de control parental»*. Es la recomendación del organismo y está
+   bien para ellos, pero **este producto tiene tomada la posición contraria** —no bloquea, informa—
+   y el asistente no puede darle a un padre un consejo que contradice al sistema que lo está dando.
+   📌 **Save the Children España quedó afuera por otro motivo:** sus recomendaciones son de política
+   pública (especialización judicial, modelo Barnahus), no pautas para un adulto. Como fuente de
+   CIFRAS sigue valiendo y se usa.
 
    **Su planteo:** *"un buen consejo de Argentina debería ser bueno también para los españoles, y
    viceversa"*. 🔴 **Tenía razón y el error era mío: había estirado a TODO consejo una regla que
@@ -648,11 +665,7 @@ alguno vuelve a aprobar, el control se aflojó: no son pruebas de estilo. **17 d
    órgano, un teléfono, una ley o un país se escape marcado `universal`. Con sus cuatro trampas que
    tienen que frenarse.
 
-   ⬜ **Sigue faltando traer los españoles** —🔴 textuales y con enlace: **INCIBE/IS4K**, **ANAR**—,
-   y ahora valen doble: los que coincidan con los argentinos son **validación cruzada**, dos Estados
-   independientes diciendo lo mismo.
-   🔴 **Y `docs/fuentes/` NO los tiene:** las «Recomendaciones» de Save the Children son de política
-   pública al Estado español (crear fiscalías, formar jueces), no consejos para una familia.
+   📌 **El catálogo quedó en 43 recomendaciones entre los dos países.**
 2. **El barrido de voseo de la interfaz** — quedan unas 30 apariciones en pantallas y textos del
    panel, el alta, la consola y el tour. Los mensajes al chico y el prompt del asistente ya están.
 3. **Las cifras** — el corpus es argentino (Estudio nacional, Grooming Argentina). El material
@@ -893,8 +906,13 @@ producción. Si devuelve `origen: "respaldo"`, no contestó el modelo.
 chico y su línea base; estos datos explican **por qué un desvío importa**. Es la misma corrección
 que Edgardo hizo el 24/8 sobre el correo a Faro Digital.
 📌 Faltan ir a buscar: **INCIBE / IS4K** (el Safer Internet Centre oficial de España, redes INSAFE
-e INHOPE, línea 017 con 138.003 consultas en 2025), **WeProtect** (87 % de las tecnológicas detecta
-material de abuso por hash-matching, **sólo el 37 % puede detectar grooming**), ANAR, INHOPE y BIK+.
+e INHOPE, línea 017 con 138.003 consultas en 2025), INHOPE y BIK+.
+✅ **WeProtect — VERIFICADO EN FUENTE el 21/9** (`weprotect.org/survey-of-tech-companies`): de las
+**32 empresas que respondieron** la encuesta de WeProtect y la Technology Coalition (2021), el
+**87 % usa hash-matching de imágenes** y **sólo el 37 % usa herramientas para detectar grooming**.
+🔴 **La base son esas 32 empresas, no «las tecnológicas»**, y el dato es de 2021. Así estaba escrito
+acá y en el dossier, y sobregeneralizaba: es la misma forma de error que el 90 % de UNESCO/CIPDH.
+✅ **INCIBE y ANAR ya no faltan: entraron al catálogo de consejos el 21/9** — ver abajo.
 
 📄 **`docs/informes/AntiGro-humanizacion-y-trazabilidad.pdf`** — las nueve ideas para humanizar el
 sistema con su impacto técnico, escrito para que lo evalúe Sandra. Fuente en `.html`, se regenera
