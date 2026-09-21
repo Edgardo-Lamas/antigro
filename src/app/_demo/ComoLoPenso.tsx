@@ -96,16 +96,24 @@ export default function ComoLoPenso({
      así que al llegar acá con el tabulador el navegador deja el encabezado JUSTO
      DEBAJO de esa barra y no se lee. Se vio en pantalla, no en el código. */
   return (
-    <details className="group mt-8 scroll-mt-14 rounded-lg border border-borde bg-superficie/60">
-      <summary className="flex cursor-pointer list-none items-center gap-2.5 px-4 py-3 text-sm text-tinta transition hover:text-acento [&::-webkit-details-marker]:hidden">
+    <details className="group mt-8 scroll-mt-14 rounded-lg border border-acento/40 bg-acentoSuave/40">
+      {/* 🔴 **Se ve como algo que se toca, y costó una corrección de Edgardo (21/9):**
+          *"no puedo ver esa sección"*. Estaba gris entre dos bloques grises, el
+          título se partía en dos renglones en el teléfono, y a 5,4 pantallas de
+          scroll. **Si él no lo encontró, el jurado tampoco** — el mismo patrón
+          que ya había pasado con el asistente a 1.865 px y con «Ver el mensaje».
+          📌 El arreglo NO agranda el bloque, sólo lo hace visible: color de
+          acento en vez de gris, el título en una sola línea, y el subtítulo se
+          esconde en el teléfono, que es donde empujaba el renglón. */}
+      <summary className="flex cursor-pointer list-none items-center gap-2.5 px-4 py-3.5 text-sm text-acento transition hover:bg-acentoSuave [&::-webkit-details-marker]:hidden">
         <span
-          className="shrink-0 text-[10px] text-acento transition-transform group-open:rotate-90"
+          className="shrink-0 text-[10px] transition-transform group-open:rotate-90"
           aria-hidden
         >
           ▶
         </span>
-        <span className="font-medium">Ver cómo lo pensó</span>
-        <span className="text-xs text-apagado">la cuenta de esta lectura</span>
+        <span className="whitespace-nowrap font-semibold">Ver cómo lo pensó</span>
+        <span className="hidden text-xs text-apagado sm:inline">la cuenta de esta lectura</span>
       </summary>
 
       <div className="space-y-6 border-t border-borde px-4 py-5">
