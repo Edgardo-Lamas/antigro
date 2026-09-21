@@ -38,7 +38,15 @@
  *     se cae el producto entero.
  */
 
-import { fueraDelRadar, nombreDeLugar, puertaDe, type Puerta } from "@/lib/senales/plataformas";
+/* ⚠ Ruta relativa y con extensión, no el alias `@/`: así este módulo se puede
+   probar con node pelado (`--experimental-strip-types`), que no resuelve el
+   alias de TypeScript. Es la misma razón que está escrita en `evaluar.ts`. */
+import {
+  fueraDelRadar,
+  nombreDeLugar,
+  puertaDe,
+  type Puerta,
+} from "../senales/plataformas.ts";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -146,6 +154,17 @@ export interface Hallazgo {
   /** Nadie lo tiene catalogado: ni juego, ni mensajería, ni red conocida. */
   fueraDelRadar: boolean;
   /**
+   * 🔑 Qué dice de este dominio la lista de categorización, cuando el catálogo
+   * propio no lo conoce: «juegos», «red social», «sitio de citas». `null` si
+   * tampoco está ahí — **ése es el que de verdad no conoce nadie**.
+   */
+  queEsAfuera: string | null;
+  /**
+   * 🔑 Hace cuántos días está registrado el dominio, si el registro contestó.
+   * **Contexto, no hallazgo:** todos los sitios fueron nuevos alguna vez.
+   */
+  diasDesdeElAlta: number | null;
+  /**
    * 0 a 1 — qué porción de los chicos cae en un mismo casillero de perfil.
    * `null` cuando hay muy pocos para mirarlo sin identificar a nadie.
    * 1 = todos iguales (diez nenas de 10). 0,3 = público diverso, como un juego.
@@ -217,7 +236,29 @@ function diasEntre(a: string, b: string): number {
  * se puede probar con números a mano. Eso no es prolijidad — es lo que permite
  * que alguien discuta el criterio sin leer el resto del sistema.
  */
-export function analizar(filas: FilaDelObservatorio[], universo: Universo): Hallazgo[] {
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  🔑 QUÉ ES ESE LUGAR, SEGÚN LA LISTA DE AFUERA
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * **Se inyecta desde afuera y es opcional a propósito.** Este módulo es puro y
+ * tiene que poder correr en cualquier lado; la lista de UT1 son 47 MB en un
+ * archivo que sólo existe en el servidor. Sin la función, el observatorio se
+ * comporta exactamente como antes.
+ *
+ * 🔴 **Lo que arregla es un falso positivo caro:** hasta hoy, un juego que
+ * nosotros no teníamos en el catálogo propio aparecía como «no lo reconoce
+ * nadie», que es justo el motivo más fuerte de la lista. **El juego de todos los
+ * días se leía como un lugar desconocido.** Si la lista dice que es un juego o
+ * una red social, ya no es un hallazgo — es vida normal.
+ */
+export type QueEsAfuera = (dominio: string) => { esto: string; daLineaBase: boolean } | null;
+
+export function analizar(
+  filas: FilaDelObservatorio[],
+  universo: Universo,
+  queEsAfuera?: QueEsAfuera,
+): Hallazgo[] {
   if (universo.chicos === 0) return [];
 
   /* La frecuencia base de CUALQUIER dominio entre los alertados. Sin esto, el
@@ -237,7 +278,11 @@ export function analizar(filas: FilaDelObservatorio[], universo: Universo): Hall
         f.chicosQueLoVieron >= CHICOS_MINIMOS &&
         diasEntre(f.primeraVez, f.ultimaVez) <= VENTANA_SIMULTANEIDAD_DIAS;
 
-      const raro = fueraDelRadar(f.dominio);
+      const afuera = queEsAfuera?.(f.dominio) ?? null;
+      /* 🔑 Deja de ser «un lugar que no conoce nadie» sólo si la lista dice que
+         es vida normal —un juego, una red social—. Que esté catalogado como
+         sitio de citas no lo vuelve conocido: lo vuelve peor. */
+      const raro = fueraDelRadar(f.dominio) && !afuera?.daLineaBase;
       const solidez = solidezDe(f.chicosQueLoVieron);
       const homo = homogeneidadDe(f);
 
@@ -270,7 +315,13 @@ export function analizar(filas: FilaDelObservatorio[], universo: Universo): Hall
          28/8 para que diga lo que de verdad se sabe. El motivo sigue valiendo
          igual —un lugar que no reconocemos, con lift alto, es un hallazgo— pero
          ahora se lee sin prometer una autoridad que no hay detrás. */
-      if (raro) motivos.push("no lo reconoce el catálogo de lugares del sistema");
+      if (raro) {
+        motivos.push(
+          afuera
+            ? `no lo reconoce el catálogo de lugares del sistema, y la lista de categorización lo da como ${afuera.esto}`
+            : "no lo reconoce el catálogo de lugares del sistema ni la lista de categorización",
+        );
+      }
 
       return {
         dominio: f.dominio,
@@ -281,6 +332,8 @@ export function analizar(filas: FilaDelObservatorio[], universo: Universo): Hall
         lift: Number(lift.toFixed(2)),
         simultaneo,
         fueraDelRadar: raro,
+        queEsAfuera: afuera?.esto ?? null,
+        diasDesdeElAlta: null,
         homogeneidad: homo.valor,
         perfilDominante: homo.dominante,
         solidez,
@@ -294,4 +347,41 @@ export function analizar(filas: FilaDelObservatorio[], universo: Universo): Hall
       if (a.fueraDelRadar !== b.fueraDelRadar) return a.fueraDelRadar ? -1 : 1;
       return b.lift - a.lift;
     });
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  🔑 Y HACE CUÁNTO EXISTE ESE LUGAR — se agrega después, y por separado
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * Va aparte de `analizar` porque **preguntarlo es salir a la red**, y este
+ * módulo tiene que poder correr sin internet y sin esperar a nadie. Quien llama
+ * pide las edades de los pocos dominios que ya pasaron el filtro y las trae acá.
+ *
+ * ⚠ **Sólo agrega el motivo cuando el hallazgo ya se sostenía por otro lado.**
+ * Un dominio nuevo, solo, no es nada: se registran miles por día y casi todos
+ * son la panadería del barrio. Un dominio **nuevo, que nadie reconoce y con
+ * público anormalmente angosto** es otra cosa, y es la que el observatorio
+ * busca.
+ */
+export function conLaEdad(
+  hallazgos: Hallazgo[],
+  edades: Map<string, { dias: number; nuevo: boolean } | null>,
+): Hallazgo[] {
+  return hallazgos.map((h) => {
+    const edad = edades.get(h.dominio) ?? null;
+    if (!edad) return h;
+
+    const sostieneAlgoMas = h.fueraDelRadar || h.perfilDominante !== null || h.simultaneo;
+    const motivos = h.porQue === "sin nada que lo destaque" ? [] : [h.porQue];
+    if (edad.nuevo && sostieneAlgoMas) {
+      motivos.push(`el dominio se registró hace ${edad.dias} días`);
+    }
+
+    return {
+      ...h,
+      diasDesdeElAlta: edad.dias,
+      porQue: motivos.length > 0 ? motivos.join(" · ") : "sin nada que lo destaque",
+    };
+  });
 }

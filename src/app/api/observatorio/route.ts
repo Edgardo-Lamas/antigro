@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
+
+import { queEsEsteLugar } from "@/lib/senales/categorias";
+import { edadDelDominio } from "@/lib/senales/edad-del-dominio";
 import { repositorio } from "@/lib/datos";
-import { analizar, type FilaDelObservatorio, type Universo } from "@/lib/observatorio";
+import { analizar, conLaEdad, type FilaDelObservatorio, type Universo } from "@/lib/observatorio";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -118,15 +121,36 @@ export async function GET(req: Request) {
     });
   }
 
+  /* 🔑 Acá se le pasa la lista de categorización, que sólo existe del lado del
+     servidor. Ver `QueEsAfuera` en el observatorio. */
+  const queEsAfuera = (dominio: string) => {
+    const lugar = queEsEsteLugar(dominio);
+    if (!lugar) return null;
+    return { esto: lugar.esto, daLineaBase: lugar.hace === "linea_base" };
+  };
+  const crudos = analizar(FILAS_EJEMPLO, UNIVERSO_EJEMPLO, queEsAfuera);
+
+  /* 🔑 La edad del dominio se pregunta SÓLO por los que ya pasaron el filtro, y
+     con tope: es una consulta de red por dominio. Si el registro no contesta, el
+     observatorio contesta igual sin ese dato. */
+  const edades = new Map<string, { dias: number; nuevo: boolean } | null>();
+  await Promise.all(
+    crudos.slice(0, 10).map(async (h) => {
+      const edad = await edadDelDominio(h.dominio);
+      edades.set(h.dominio, edad ? { dias: edad.dias, nuevo: edad.nuevo } : null);
+    }),
+  );
+  const hallazgos = conLaEdad(crudos, edades);
+
   return NextResponse.json({
     ejemplo: true,
     advertencia:
       "🔴 NÚMEROS INVENTADOS. Sirven para mostrar cómo decide el observatorio, no son " +
       "un hallazgo ni una medición. Ningún dato de acá se puede citar.",
     universo: UNIVERSO_EJEMPLO,
-    hallazgos: analizar(FILAS_EJEMPLO, UNIVERSO_EJEMPLO),
-    descartados: FILAS_EJEMPLO.filter(
-      (f) => !analizar(FILAS_EJEMPLO, UNIVERSO_EJEMPLO).some((h) => h.dominio === f.dominio),
-    ).map((f) => f.dominio),
+    hallazgos,
+    descartados: FILAS_EJEMPLO.filter((f) => !hallazgos.some((h) => h.dominio === f.dominio)).map(
+      (f) => f.dominio,
+    ),
   });
 }

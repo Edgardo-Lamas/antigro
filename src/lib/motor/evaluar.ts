@@ -24,6 +24,7 @@ import type { SenalDeRed, TipoDeSenal } from "@/lib/senales/tipos";
    antes de resolver nada; éstos traen valores y sí se resuelven. Sin esto, el
    motor —el archivo que más importa que se pueda probar— es el único que no se
    puede probar sin levantar Next. */
+import { CATEGORIAS_DE_ENLACE, comoSeDice, type QueHace } from "../senales/criterio.ts";
 import { esCruce, nombreDeLugar, puertaDe } from "../senales/plataformas.ts";
 import { NOMBRE_DE_SENAL } from "../senales/tipos.ts";
 import type { Chico, TurnoEscolar } from "@/lib/datos/tipos";
@@ -78,6 +79,54 @@ const HUECO_TOLERADO = 1;
 
 /** La evasión repetida tiene camino propio: es la señal más fuerte que hay. */
 export const EVASIONES_PARA_HABLAR = 2;
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  🔑 LO QUE LOS LUGARES LE HACEN A LA REGLA — cableado el 21/9/2026
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * **La categoría del lugar llega anotada en el contexto de la señal**, no la
+ * consulta el motor: la lista de UT1 son 47 MB en un archivo y este motor corre
+ * también en el navegador. Ver `anotarLugares` en `senales/categorias.ts`.
+ *
+ * 🔴 **Y no rompe la regla 5 —no se alerta por un evento—: le agrega un camino
+ * propio**, que es exactamente lo que ya hacía `evasion_repetida`. La regla 5
+ * nació para señales **ambiguas por naturaleza** (un salto de volumen, una noche
+ * despierto): cada una sola puede ser cualquier cosa. **Una categoría de dominio
+ * no es ambigua de la misma manera** — un chico en un sitio de citas no es un
+ * pico que pueda ser ruido. La decisión es de Edgardo, del 21/9.
+ */
+
+/**
+ * Cuántos días de racha le saca al mínimo la aparición de un lugar de los que
+ * **pesan y adelantan** (chat, acortador, filehosting, redirector, adult).
+ *
+ * 📌 **Dos, y con piso de cuatro**, igual que el adelanto que ya daba la
+ * coincidencia con los adultos. El motivo de que la perilla sea ésta y no el
+ * umbral de puntaje está escrito arriba, medido el 15/8: **lo que ata es
+ * `diasSostenidos`**, no el puntaje.
+ */
+export const DIAS_QUE_ADELANTA_UN_LUGAR = 2;
+
+/**
+ * Cuánto peso agrega al día un lugar de los que pesan.
+ *
+ * ⚠ Entra al producto de probabilidades como una señal más, **no se suma**:
+ * tres cosas flojas no equivalen a una fuerte. Es modesto a propósito — es
+ * contexto de una lectura que se sostiene por otro lado, no la lectura misma.
+ */
+export const PESO_DEL_LUGAR = 0.2;
+
+/**
+ * 🔴 La ventana para que `phishing` o `malware` cuenten como «llegó por un
+ * enlace», y con eso hablen a la primera.
+ *
+ * **En el registro real del filtro esto son segundos**: el chico toca el enlace
+ * y el acortador y el destino se consultan casi juntos. Acá las señales están
+ * agrupadas por día, así que la aproximación honesta es un día — y conviene que
+ * quede dicho que es una aproximación, no una medición.
+ */
+export const HORAS_PARA_QUE_SEA_EL_MISMO_ENLACE = 24;
 
 /**
  * ⚠ El umbral de "hay un cambio" es bajo a propósito, y se puede permitir
@@ -139,6 +188,12 @@ export type Estado = "en_calma" | "atencion" | "patron_sostenido";
 export type ReglaDelMotor =
   /** Dos o más intentos de saltar el filtro en la última semana. Camino propio. */
   | "evasion_repetida"
+  /**
+   * 🔑 Apareció un lugar cuya categoría no necesita repetirse para significar
+   * algo: software espía, un sitio de citas, o un sitio de engaño al que se
+   * llegó por un enlace. Camino propio, como la evasión.
+   */
+  | "lugar_que_habla_solo"
   /** La racha llegó a los días exigidos **y** el puntaje pasó el umbral. */
   | "racha_y_umbral"
   /** Hubo días distintos y puntaje, pero sin racha. Se cuenta, no se alarma. */
@@ -150,6 +205,7 @@ export type ReglaDelMotor =
 
 export const NOMBRE_DE_REGLA: Record<ReglaDelMotor, string> = {
   evasion_repetida: "Evasión repetida del filtro",
+  lugar_que_habla_solo: "Un lugar que no necesita repetirse",
   racha_y_umbral: "Días sostenidos + umbral de puntaje",
   cambio_sin_racha: "Días sueltos, sin racha",
   solo_los_adultos: "Lo que marcaron los adultos, sin la red",
@@ -161,6 +217,27 @@ export const NOMBRE_DE_ESTADO: Record<Estado, string> = {
   atencion: "Hay un cambio",
   patron_sostenido: "El patrón se sostiene",
 };
+
+/**
+ * 🔴 **El título que lee una persona, que no siempre es el nombre del estado.**
+ *
+ * Cuando el que habló fue un lugar —un sitio de citas, software espía—, **no
+ * hubo ningún patrón que se sostuviera**: hubo un hecho que no necesita
+ * repetirse. Poner «El patrón se sostiene» encima de eso es escribir algo que no
+ * pasó, justo arriba del hecho que sí pasó.
+ *
+ * 📌 Lo dice el motor y no lo deduce la pantalla, por el mismo motivo que
+ * `reglaQueDecidio`: un componente que lo rearme por su cuenta se desincroniza
+ * en silencio.
+ */
+export function tituloDeLaLectura(
+  lectura: Pick<Lectura, "estado" | "reglaQueDecidio" | "lugarQueHablo">,
+): string {
+  if (lectura.reglaQueDecidio === "lugar_que_habla_solo" && lectura.lugarQueHablo) {
+    return `Apareció un lugar catalogado como ${lectura.lugarQueHablo.esto}`;
+  }
+  return NOMBRE_DE_ESTADO[lectura.estado];
+}
 
 export interface DiaDeLaVentana {
   /** `YYYY-MM-DD` en hora local. */
@@ -199,8 +276,17 @@ export interface Lectura {
    * solo lugar.
    */
   diasExigidos: number;
-  /** Por cuál de las cinco reglas salió este estado. Ver `ReglaDelMotor`. */
+  /** Por cuál de las reglas salió este estado. Ver `ReglaDelMotor`. */
   reglaQueDecidio: ReglaDelMotor;
+  /**
+   * 🔑 El lugar que hizo hablar al sistema por sí solo, si lo hubo. Va con su
+   * fecha porque **lo único que el sistema afirma es el hecho fechado**.
+   */
+  lugarQueHablo?: LugarVisto;
+  /** Los lugares que pesaron y adelantaron el aviso, sin decidirlo solos. */
+  lugaresQuePesaron: LugarVisto[];
+  /** Cuántos días de racha le sacó al mínimo la clase de lugares que aparecieron. */
+  diasAdelantadosPorLugar: number;
   /** Media reciente menos media anterior. Positivo = se está profundizando. */
   tendencia: number;
   evasionesRecientes: number;
@@ -253,9 +339,73 @@ function cargaDelDia(
     const porEdad =
       s.tipo === "madrugada" ? factorMadrugada(edad, new Date(s.fecha).getHours(), turno) : 1;
     const aporte = Math.min(1, s.intensidad * PESO_POR_TIPO[s.tipo] * atenuacion * porEdad);
-    return acc * (1 - aporte);
+    /* 🔑 Y si el lugar es de los que pesan —un chat abierto, un acortador, un
+       filehosting— entra como una señal más del mismo día. Ver
+       `PESO_DEL_LUGAR`: se combina, no se suma. */
+    const porElLugar = s.contexto?.que_hace === "pesa_y_adelanta" ? PESO_DEL_LUGAR : 0;
+    return acc * (1 - aporte) * (1 - porElLugar);
   }, 1);
   return 1 - restante;
+}
+
+/* ── Los lugares que vinieron anotados en las señales ─────────────────────── */
+
+export interface LugarVisto {
+  fecha: string;
+  /** La categoría de UT1 que mandó después del desempate. */
+  categoria: string;
+  /** Cómo se nombra en castellano: «sitio de citas», «software espía». */
+  esto: string;
+  hace: QueHace;
+  condicion?: string;
+}
+
+/**
+ * 🔑 **El motor lee lo que la puerta de entrada anotó, no consulta la lista.**
+ * Una señal sin anotar se comporta exactamente como antes: esto no puede
+ * cambiar ninguna lectura vieja.
+ */
+function lugaresVistos(senales: SenalDeRed[]): LugarVisto[] {
+  return senales
+    .filter((s) => typeof s.contexto?.que_hace === "string")
+    .map((s) => ({
+      fecha: s.fecha,
+      categoria: String(s.contexto!.categoria_del_lugar ?? ""),
+      esto: String(s.contexto!.lugar_es ?? "un lugar catalogado"),
+      hace: String(s.contexto!.que_hace) as QueHace,
+      condicion:
+        typeof s.contexto!.condicion_del_lugar === "string"
+          ? String(s.contexto!.condicion_del_lugar)
+          : undefined,
+    }))
+    .sort((a, b) => a.fecha.localeCompare(b.fecha));
+}
+
+/**
+ * 🔴 **`phishing` y `malware` no hablan por aparecer: hablan por cómo llegaron.**
+ *
+ * Son 537.330 dominios contra los 9.181 de las otras dos — 58 veces más
+ * superficie—, y un aviso por semana que no era nada apaga al adulto para el día
+ * que sí lo es. Un dominio de malware suelto entre cuarenta consultas de una
+ * página es un rastreador incrustado; **el mismo dominio detrás de un acortador
+ * o un filehosting es un chico que hizo clic en un enlace que le mandaron.**
+ * El filtro no ve el clic, pero ve la secuencia.
+ */
+function llegoPorUnEnlace(lugar: LugarVisto, todos: LugarVisto[]): boolean {
+  const cuando = new Date(lugar.fecha).getTime();
+  return todos.some((otro) => {
+    if (!CATEGORIAS_DE_ENLACE.includes(otro.categoria)) return false;
+    const antes = new Date(otro.fecha).getTime();
+    return antes <= cuando && cuando - antes <= HORAS_PARA_QUE_SEA_EL_MISMO_ENLACE * 3600_000;
+  });
+}
+
+/** El día y la hora, para el hecho fechado. Nunca va solo: siempre con qué se vio. */
+function cuandoFue(iso: string): string {
+  const f = new Date(iso);
+  const dia = f.toLocaleDateString("es-AR", { day: "numeric", month: "long" });
+  const hora = `${`${f.getHours()}`.padStart(2, "0")}:${`${f.getMinutes()}`.padStart(2, "0")}`;
+  return `el ${dia} a las ${hora}`;
 }
 
 /**
@@ -413,6 +563,14 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
   /* Lo que ven los adultos — la segunda entrada. */
   const adultos = evaluarObservaciones(observaciones ?? {});
 
+  /* ── Los lugares de la ventana, con lo que la puerta de entrada anotó ── */
+  const senalesDeLaVentana = claves.flatMap((c) => porDia.get(c) ?? []);
+  const lugares = lugaresVistos(senalesDeLaVentana);
+  const hablanSolos = lugares.filter(
+    (l) => l.hace === "habla_a_la_primera" && (!l.condicion || llegoPorUnEnlace(l, lugares)),
+  );
+  const lugaresQuePesaron = lugares.filter((l) => l.hace === "pesa_y_adelanta");
+
   /**
    * Las dos entradas se combinan como probabilidades, no promediando: una
    * entrada floja no puede bajar a la otra. Si la red no vio nada, el aporte
@@ -427,10 +585,23 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
    * están viendo cambios, no tiene sentido esperar los ocho días completos
    * para decírselo. Nunca baja de cuatro días: la persistencia sigue mandando.
    */
-  const diasExigidos =
+  const exigidosSinLugares =
     adultos.puntaje >= COINCIDENCIA_FUERTE
       ? Math.max(4, DIAS_SOSTENIDOS_MINIMOS - 3)
       : DIAS_SOSTENIDOS_MINIMOS;
+
+  /**
+   * 🔑 Y un lugar de los que pesan adelanta otro par de días, por el mismo
+   * motivo: no es una segunda mirada como la de los adultos, pero **sí es
+   * información que no sale de comparar al chico consigo mismo** — un acortador
+   * es un acortador en cualquier casa. El piso de cuatro días no se toca: la
+   * persistencia sigue mandando.
+   */
+  const diasAdelantadosPorLugar =
+    lugaresQuePesaron.length > 0
+      ? Math.min(DIAS_QUE_ADELANTA_UN_LUGAR, Math.max(0, exigidosSinLugares - 4))
+      : 0;
+  const diasExigidos = exigidosSinLugares - diasAdelantadosPorLugar;
 
   /* ── El estado. La persistencia manda: sin racha no se habla. ── */
   let estado: Estado = "en_calma";
@@ -441,6 +612,11 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
   if (evasiones.length >= EVASIONES_PARA_HABLAR) {
     estado = "patron_sostenido";
     reglaQueDecidio = "evasion_repetida";
+  } else if (hablanSolos.length > 0) {
+    /* 🔴 El segundo camino propio del motor. No espera racha ni umbral, igual
+       que la evasión, y por el mismo motivo: lo que se vio no es ambiguo. */
+    estado = "patron_sostenido";
+    reglaQueDecidio = "lugar_que_habla_solo";
   } else if (diasSostenidos >= diasExigidos && puntaje >= PUNTAJE_PARA_HABLAR) {
     estado = "patron_sostenido";
     reglaQueDecidio = "racha_y_umbral";
@@ -463,6 +639,20 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
 
   /* ── Por qué ── */
   const porQue: string[] = [];
+
+  /**
+   * ⚠ **Va primero y se dice como hecho fechado, nunca como interpretación.**
+   * El filtro ve la CONSULTA, no la visita: una publicidad incrustada genera la
+   * consulta de un dominio sin que el chico haya entrado a ningún lado. Por eso
+   * dice «el teléfono consultó», y por eso lleva el día y la hora encima.
+   */
+  for (const lugar of hablanSolos) {
+    porQue.push(
+      `${comoSeDice(lugar.esto).replace(/^el/, "El")} ${cuandoFue(lugar.fecha)}. ` +
+        "Eso no espera a repetirse para contarse: el sistema lo dice la primera vez que lo ve. " +
+        "⚠ El filtro ve la consulta del dominio, no que el chico haya entrado.",
+    );
+  }
 
   if (soloLosAdultos) {
     porQue.push(
@@ -491,6 +681,17 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
       );
     }
     if (tendencia > 0.05) porQue.push("La última semana fue más marcada que la anterior.");
+  }
+
+  if (lugaresQuePesaron.length > 0 && !soloLosAdultos) {
+    const cuales = [...new Set(lugaresQuePesaron.map((l) => l.esto))];
+    porQue.push(
+      `Entre los lugares de estos días hubo ${cuales.join(", ")}. ` +
+        (diasAdelantadosPorLugar > 0
+          ? `Por eso el sistema pidió ${diasExigidos} días sostenidos en lugar de ${exigidosSinLugares}: ` +
+            "no decide nada por sí solo, pero es información que no sale de comparar al chico consigo mismo."
+          : "Suma al día en que apareció, sin decidir nada por sí solo."),
+    );
   }
 
   if (evasiones.length > 0) {
@@ -628,6 +829,16 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
    * ⚠ El de calma **no dice que el chico esté a salvo** (regla 1). Dice qué
    * fue lo que no apareció, que es lo único que el sistema puede sostener.
    */
+  /**
+   * 🔴 Y con el camino nuevo el cierre de «patrón sostenido» sería falso: no
+   * hubo ningún patrón que se sostuviera, hubo **un hecho que no necesita
+   * repetirse**. Decir lo otro sería el sistema contradiciéndose a sí mismo en
+   * la misma pantalla, que es el defecto que ya se arregló una vez acá.
+   */
+  const cierreDelLugar =
+    "Esto no dice que esté pasando algo. Dice que apareció un lugar que, por lo que es, " +
+    "no hace falta ver dos veces para contártelo.";
+
   const cierre: Record<Estado, string> = {
     en_calma:
       "Esto no dice que el chico esté a salvo. Dice que en este tramo no apareció nada que se " +
@@ -664,7 +875,7 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
         ]
       : []),
     ...advertenciasDelPerfil(perfil, hasta),
-    cierre[estado],
+    reglaQueDecidio === "lugar_que_habla_solo" ? cierreDelLugar : cierre[estado],
   ];
 
   return {
@@ -679,6 +890,9 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
     diasSostenidos,
     diasExigidos,
     reglaQueDecidio,
+    lugarQueHablo: hablanSolos[0],
+    lugaresQuePesaron,
+    diasAdelantadosPorLugar,
     tendencia,
     evasionesRecientes: evasiones.length,
     senalesQueLaSostienen: senales

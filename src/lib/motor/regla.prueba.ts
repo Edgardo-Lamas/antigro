@@ -73,6 +73,7 @@ const ESCENARIOS: Escenario[] = ["normal", "cambio_leve", "persistente", "evasio
 /** Qué estado puede tener cada regla. Es el contrato que la pantalla publica. */
 const ESTADO_ESPERADO: Record<ReglaDelMotor, Estado> = {
   evasion_repetida: "patron_sostenido",
+  lugar_que_habla_solo: "patron_sostenido",
   racha_y_umbral: "patron_sostenido",
   cambio_sin_racha: "atencion",
   solo_los_adultos: "atencion",

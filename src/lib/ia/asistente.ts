@@ -44,7 +44,7 @@ import {
   type Pais,
 } from "@/lib/paises";
 import type { Lectura } from "@/lib/motor";
-import { NOMBRE_DE_ESTADO } from "@/lib/motor";
+import { tituloDeLaLectura } from "@/lib/motor";
 import { revisarRespuestaDelAsistente } from "./reglas";
 import type { Redaccion } from "./redactar";
 
@@ -421,7 +421,7 @@ function contexto(chico: { nombre: string; edad: number }, lectura: Lectura | nu
   return [
     `EL CHICO: ${chico.nombre}, ${chico.edad} años.`,
     ``,
-    `ESTADO ACTUAL: ${NOMBRE_DE_ESTADO[lectura.estado]}`,
+    `ESTADO ACTUAL: ${tituloDeLaLectura(lectura)}`,
     `Días con alguna señal en las últimas tres semanas: ${lectura.diasConSenal}`,
     `Días que el cambio viene sosteniéndose sin cortarse: ${lectura.diasSostenidos}`,
     `Días que el sistema lleva conociendo a este chico: ${lectura.perfil.diasObservados}`,

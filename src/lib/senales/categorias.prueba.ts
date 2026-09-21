@@ -21,8 +21,8 @@
  */
 
 /* ⚠ Ruta relativa y con extensión: estas tandas las corre node pelado. */
-import { catalogoDeCategorias, categoriasDe, estadoDelIndice } from "./categorias.ts";
-import { comoSeDice, desempatar, queEsEsteLugar } from "./criterio.ts";
+import { catalogoDeCategorias, categoriasDe, estadoDelIndice, queEsEsteLugar } from "./categorias.ts";
+import { comoSeDice, desempatar } from "./criterio.ts";
 import { puertaDe } from "./plataformas.ts";
 
 let fallaron = 0;
@@ -260,7 +260,7 @@ comprobar(
 
 /* ── 10. ⚠ Cómo se dice: el hecho fechado, nunca la interpretación ──────── */
 
-const frase = comoSeDice(queEsEsteLugar("tinder.com")!);
+const frase = comoSeDice(queEsEsteLugar("tinder.com")!.esto);
 
 comprobar(
   "⚠ la frase dice que el teléfono CONSULTÓ, no que el chico entró",

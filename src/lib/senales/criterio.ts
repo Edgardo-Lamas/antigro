@@ -6,6 +6,13 @@
  *  `categorias.ts` contesta **qué es** un sitio. Este archivo contesta **qué
  *  hace el sistema con eso**, que es una decisión de producto y no de código.
  *
+ *  🔴 **Este archivo es PURO a propósito: no abre el índice ni toca `fs`.** El
+ *  motor corre también en el navegador —la consola de la home y el panel lo
+ *  llaman desde el cliente—, así que si el criterio arrastrara la lectura del
+ *  archivo de 47 MB, el panel no compilaría. **La consulta al índice vive en
+ *  `categorias.ts`, que sólo corre en el servidor**, y lo que viaja hasta el
+ *  motor es el resultado, anotado en el contexto de la señal.
+ *
  *  ─── 🔑 SU PLANTEO, QUE ES EL ORIGEN DE TODO ESTO ─────────────────────────
  *
  *  *"Si detectamos que el chico está metiéndose en un lugar peligroso, no
@@ -50,8 +57,6 @@
  *  se dice *«el teléfono consultó un dominio catalogado como sitio de citas»* y
  *  nunca *«tu hijo entró a un sitio de citas»*, y jamás un diagnóstico.
  */
-
-import { categoriasDe } from "./categorias.ts";
 
 /* ── Qué puede hacer el sistema con una categoría ────────────────────────── */
 
@@ -268,6 +273,14 @@ export const CRITERIO: Record<string, Criterio> = {
   },
 };
 
+/**
+ * 🔑 **Las categorías que son «el enlace», para la condición de `phishing` y
+ * `malware`.** Un dominio de malware **inmediatamente después** de uno de éstos
+ * es un chico que hizo clic en algo que le mandaron; suelto, es un rastreador
+ * incrustado en una página.
+ */
+export const CATEGORIAS_DE_ENLACE = ["shortener", "filehosting"];
+
 /* ── Resolver un dominio que cae en varias categorías ─────────────────────── */
 
 /**
@@ -319,40 +332,6 @@ export function desempatar(categorias: string[]): { categoria: string; criterio:
   );
 }
 
-export interface LecturaDelLugar {
-  /** El dominio consultado, tal como se preguntó. */
-  dominio: string;
-  /** El sufijo que coincidió en la lista: puede ser el padre del consultado. */
-  coincidio: string;
-  /** Todas las categorías, sin filtrar. Lo que se guarda. */
-  categorias: string[];
-  /** La que manda después del desempate. */
-  manda: string;
-  hace: QueHace;
-  condicion?: Condicion;
-  esto: string;
-  porque: string;
-}
-
-/** Qué es este lugar y qué hace el sistema con él. `null` si no está catalogado. */
-export function queEsEsteLugar(dominio: string): LecturaDelLugar | null {
-  const lectura = categoriasDe(dominio);
-  if (!lectura) return null;
-
-  const elegido = desempatar(lectura.categorias);
-
-  return {
-    dominio,
-    coincidio: lectura.coincidio,
-    categorias: lectura.categorias,
-    manda: elegido.categoria,
-    hace: elegido.criterio.hace,
-    condicion: elegido.criterio.condicion,
-    esto: elegido.criterio.esto,
-    porque: elegido.criterio.porque,
-  };
-}
-
 /**
  * La frase con la que esto se dice, **sin interpretación y sin fecha**: la fecha
  * la pone quien escribe el aviso, con el formato del país de la familia.
@@ -360,6 +339,6 @@ export function queEsEsteLugar(dominio: string): LecturaDelLugar | null {
  * ⚠ Dice «el teléfono consultó», no «tu hijo entró». Ver la salvedad del
  * encabezado: el filtro ve la consulta, no la visita.
  */
-export function comoSeDice(lectura: LecturaDelLugar): string {
-  return `el teléfono consultó un dominio catalogado como ${lectura.esto}`;
+export function comoSeDice(esto: string): string {
+  return `el teléfono consultó un dominio catalogado como ${esto}`;
 }

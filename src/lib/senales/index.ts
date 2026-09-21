@@ -8,6 +8,7 @@
  * resuelto.
  */
 
+import { anotarLugares } from "./categorias.ts";
 import { FuenteNextDNS } from "./nextdns.ts";
 import { FuenteSimulador, type Escenario } from "./simulador.ts";
 import type { EstadoDeFuente, FuenteDeSenales, IdDeFuente } from "./tipos.ts";
@@ -16,6 +17,27 @@ export * from "./tipos.ts";
 export { FuenteSimulador, ESCENARIOS } from "./simulador.ts";
 export type { Escenario } from "./simulador.ts";
 export { FuenteNextDNS } from "./nextdns.ts";
+
+/**
+ * 🔑 **Acá se le pega a cada señal qué clase de lugar era.**
+ *
+ * Es el único lugar del sistema que sabe de dónde salen los datos, así que es
+ * el que corresponde: **la categoría se anota en la puerta de entrada y viaja
+ * adentro de la señal**, como un metadato más. El motor no consulta la lista —
+ * no podría, corre también en el navegador— y el histórico queda con lo que ese
+ * lugar era **ese día**. Ver `anotarLugares` en `categorias.ts`.
+ *
+ * 📌 Vale para las dos fuentes: el simulador de hoy y el NextDNS de mañana
+ * entran por la misma puerta y salen anotados igual.
+ */
+function conLugares(fuente: FuenteDeSenales): FuenteDeSenales {
+  return {
+    id: fuente.id,
+    nombre: fuente.nombre,
+    estado: () => fuente.estado(),
+    leer: async (consulta) => anotarLugares(await fuente.leer(consulta)),
+  };
+}
 
 /**
  * Devuelve la fuente que corresponde usar.
@@ -33,12 +55,12 @@ export async function obtenerFuente(escenario: Escenario = "normal"): Promise<{
   const estadoReal = await real.estado();
 
   if (estadoReal.disponible) {
-    return { fuente: real, estado: estadoReal, simulada: false };
+    return { fuente: conLugares(real), estado: estadoReal, simulada: false };
   }
 
   const simulador = new FuenteSimulador(escenario);
   return {
-    fuente: simulador,
+    fuente: conLugares(simulador),
     estado: await simulador.estado(),
     simulada: true,
     motivo: estadoReal.motivo,

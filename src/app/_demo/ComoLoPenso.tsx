@@ -357,6 +357,8 @@ export default function ComoLoPenso({
 /** Qué hizo cada regla, en una línea. Va debajo del nombre. */
 const EXPLICA: Record<Lectura["reglaQueDecidio"], string> = {
   evasion_repetida: `Hubo ${EVASIONES_PARA_HABLAR} o más intentos de saltar el filtro en la última semana. Es la única señal que habla sola: no espera racha ni umbral, porque esquivar un control es un acto deliberado y no se explica por la vida normal de un chico.`,
+  lugar_que_habla_solo:
+    "Apareció un lugar cuya categoría no necesita repetirse para significar algo: software espía —que no es conducta del chico, es alguien actuando sobre él—, un sitio de citas, o un sitio de engaño al que se llegó por un enlace. Es el segundo camino propio del motor, junto con la evasión: la regla de persistencia existe para señales que solas pueden ser cualquier cosa, y éstas no lo son.",
   racha_y_umbral:
     "Las dos condiciones a la vez: el patrón se sostuvo los días que hacían falta y el puntaje pasó el umbral. Ninguna de las dos alcanza sola — es la regla de persistencia, y es lo que separa una semana rara de algo que viene pasando.",
   cambio_sin_racha:

@@ -35,7 +35,7 @@ import { NOMBRE_DE_SENAL, type SenalDeRed, type TipoDeSenal } from "@/lib/senale
    servido y otro al hidratar. Y sobre todo, para una familia dada de alta el
    país es el de la casa. Ver la migración 20. */
 import { LOCALE_DEL_PAIS, NOMBRE_DEL_PAIS, type Pais } from "@/lib/paises";
-import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
+import { NOMBRE_DE_ESTADO, tituloDeLaLectura, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import { MOTIVOS_DE_BAJA, type MotivoDeBaja } from "@/lib/datos/tipos";
 import { COMO_FUNCIONA } from "@/lib/config";
 import CampoDeClave from "@/components/CampoDeClave";
@@ -361,7 +361,9 @@ export default function MiFamilia() {
               </ul>
             </div>
           )}
-          <p className={`text-lg font-semibold ${color.texto}`}>{NOMBRE_DE_ESTADO[estado]}</p>
+          <p className={`text-lg font-semibold ${color.texto}`}>
+            {datos.lectura ? tituloDeLaLectura(datos.lectura) : NOMBRE_DE_ESTADO[estado]}
+          </p>
           {datos.chico && (
             <p className="mt-1.5 text-xs text-tenue">
               Últimos {datos.ventana.dias} días de {datos.chico.nombre}. El sistema lo viene

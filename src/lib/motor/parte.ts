@@ -29,6 +29,7 @@
  */
 
 import type { SenalDeRed } from "@/lib/senales/tipos";
+import { comoSeDice } from "../senales/criterio.ts";
 import { diaLocal } from "./dia.ts";
 
 /**
@@ -102,6 +103,18 @@ export interface Parte {
   plataformasNuevas: number;
   saltosDeVolumen: number;
   evasiones: number;
+  /**
+   * 🔑 **Los otros riesgos, que van acá y NO a la alerta.** Apuestas, drogas,
+   * contenido violento: no es de lo que se ocupa este sistema, pero **para esa
+   * casa puede ser lo único que importa**, así que callarlo sería elegir no
+   * decir algo que se sabe.
+   *
+   * 🔴 Y van al parte justamente para que la alerta no se gaste: si un adulto
+   * recibiera el mismo mensaje por un sitio de apuestas y por un patrón
+   * sostenido de meses, la segunda perdería fuerza, y es la que no puede
+   * perderla.
+   */
+  otrosRiesgos: { esto: string; dia: string }[];
   /** 🔴 Cuánto fue lo más largo que algo se sostuvo. Es el porqué del silencio. */
   rachaMasLarga: number;
   /** Si hubo aviso en el período. */
@@ -124,7 +137,18 @@ export function armarParte(entrada: {
   const { senales, diasMirados, rachaMasLarga, huboAviso } = entrada;
   const cuantas = (tipo: string) => senales.filter((s) => s.tipo === tipo).length;
 
+  /* Un hecho por lugar y por día: si el mismo lugar aparece cuatro veces el
+     mismo día, es el mismo hecho contado cuatro veces. */
+  const otros = new Map<string, { esto: string; dia: string }>();
+  for (const s of senales) {
+    if (s.contexto?.que_hace !== "va_al_parte") continue;
+    const esto = String(s.contexto.lugar_es ?? "un lugar catalogado");
+    const dia = diaLocal(s.fecha);
+    otros.set(`${esto}|${dia}`, { esto, dia });
+  }
+
   return {
+    otrosRiesgos: [...otros.values()].sort((a, b) => a.dia.localeCompare(b.dia)),
     diasMirados,
     senalesQueLlegaron: senales.length,
     diasConAlgo: new Set(senales.map((s) => diaLocal(s.fecha))).size,
@@ -185,6 +209,27 @@ export function textoDelParte(chico: string, parte: Parte): string {
       vistos.length > 0
         ? `Lo que vimos: ${vistos.join(", ")}, en ${enCriollo(parte.diasConAlgo, "día", "días")} distintos.`
         : `Hubo actividad en ${enCriollo(parte.diasConAlgo, "día", "días")}, sin nada que se apartara de lo habitual.`,
+    );
+  }
+
+  /**
+   * 🔑 **Los otros riesgos, como hechos fechados y sin una sola conclusión.**
+   *
+   * ⚠ El filtro ve la CONSULTA, no la visita: una publicidad incrustada genera
+   * la consulta de un dominio sin que el chico haya entrado a ningún lado. Por
+   * eso el texto dice qué consultó el teléfono y qué día, y ahí se para.
+   */
+  if (parte.otrosRiesgos.length > 0) {
+    const enFecha = (dia: string) =>
+      new Date(`${dia}T12:00:00`).toLocaleDateString("es-AR", { day: "numeric", month: "long" });
+    partes.push(
+      "",
+      "Aparte de eso, y aunque no es de lo que se ocupa AntiGro, esto lo vimos y preferimos " +
+        "contártelo:",
+      ...parte.otrosRiesgos.map((r) => `· ${comoSeDice(r.esto)}, el ${enFecha(r.dia)}.`),
+      "El filtro ve la consulta del dominio, no que haya entrado a ningún lado, y no sacamos " +
+        "ninguna conclusión de esto. Te lo decimos acá y no por un aviso porque no es una " +
+        "urgencia: los avisos los guardamos para lo otro.",
     );
   }
 

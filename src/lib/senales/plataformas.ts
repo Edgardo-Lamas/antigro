@@ -186,6 +186,25 @@ function buscarImportado(dominio: string): { nombre: string; puerta: Puerta } | 
   return undefined;
 }
 
+/**
+ * 🔴🔴 **¿Sobre este dominio hay una decisión NUESTRA?**
+ *
+ * Mira **sólo el catálogo propio de arriba**, no los 400 dominios importados de
+ * NextDNS. La diferencia es la que gobierna todo este archivo: acá arriba hay
+ * decisiones discutidas —WhatsApp es destino y no lugar peligroso, Snapchat va
+ * con los abiertos—, y abajo hay una lista de afuera que sólo dice cómo se llama
+ * cada servicio.
+ *
+ * 🔑 **La usa `anotarLugares` para saber qué puede pisar la lista de
+ * categorización y qué no.** Que Tinder tenga nombre en la lista importada no
+ * es una decisión nuestra sobre Tinder: si UT1 dice que es un sitio de citas,
+ * habla. Que WhatsApp sea un destino, sí lo es: eso no lo pisa nadie.
+ */
+export function loDecidimosNosotros(dominio: string): boolean {
+  const limpio = dominio.trim().toLowerCase();
+  return CATALOGO.some((c) => c.patron.test(limpio));
+}
+
 export function puertaDe(dominio: string): Puerta {
   const limpio = dominio.trim().toLowerCase();
   const propio = CATALOGO.find((c) => c.patron.test(limpio));

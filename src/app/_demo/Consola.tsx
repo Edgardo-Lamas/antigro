@@ -20,7 +20,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EyeOff } from "lucide-react";
-import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
+import { NOMBRE_DE_ESTADO, tituloDeLaLectura, type Estado, type Lectura } from "@/lib/motor/evaluar";
 import ComoLoPenso from "./ComoLoPenso";
 
 const DIAS = 21;
@@ -371,7 +371,7 @@ export default function Consola() {
                     aria-hidden
                   />
                   <p className={`text-lg font-semibold ${color.texto}`}>
-                    {NOMBRE_DE_ESTADO[estado]}
+                    {lectura ? tituloDeLaLectura(lectura) : NOMBRE_DE_ESTADO[estado]}
                   </p>
                 </div>
                 <p className="mt-1.5 text-sm leading-relaxed text-tenue">

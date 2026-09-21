@@ -4,6 +4,7 @@ import { avisar, avisarDeLaCeguera, enviarParte, escalar } from "@/lib/mensajeri
 import { redactarLecturaParaAdultos, redactarMensajeAlChico } from "@/lib/ia";
 import { quienLoVio } from "@/lib/mensajeria/acuse";
 import { obtenerFuente } from "@/lib/senales";
+import { refrescarLaLista } from "@/lib/senales/refresco";
 import {
   DIAS_ENTRE_PARTES,
   armarParte,
@@ -309,10 +310,16 @@ export async function GET(req: Request) {
   /* 📌 Devuelve el detalle de cada familia, y no un «ok». Un reloj que corre en
      silencio y no cuenta qué decidió es imposible de auditar después: la
      escalada que no salió y la que no correspondía se ven igual. */
+  /* 🔑 Y de paso, que la lista de categorías no envejezca en un mes tranquilo.
+     Viene apagado: sin `DEPLOY_HOOK_UT1` no hace nada y lo dice. Ver
+     `senales/refresco.ts`. */
+  const listaDeCategorias = await refrescarLaLista();
+
   return NextResponse.json({
     ok: true,
     corrida: ahora.toISOString(),
     revisadas,
     escaladas: revisadas.filter((r) => r.escalo).length,
+    listaDeCategorias,
   });
 }

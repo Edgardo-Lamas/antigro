@@ -69,7 +69,10 @@ mismo que bajar 18 y **el histórico no se recupera hacia atrás**.
 | `scripts/construir-ut1.mjs` | Baja el `.tar.gz` (25 MB) y arma el índice. **Corre en cada compilación** (`prebuild`), así la lista viaja siempre al día adentro del despliegue |
 | `src/lib/senales/categorias.ts` | `categoriasDe(dominio)` — **qué es** ese sitio |
 | `src/lib/senales/criterio.ts` | `queEsEsteLugar(dominio)` — **qué hace el sistema** con eso |
+| `src/lib/senales/refresco.ts` | El refresco diario, apagado por defecto |
+| `src/lib/senales/edad-del-dominio.ts` | `edadDelDominio(dominio)` — hace cuánto existe, por RDAP |
 | `src/lib/senales/categorias.prueba.ts` | `npm run probar-categorias` · 25 comprobaciones |
+| `src/lib/motor/lugares.prueba.ts` | `npm run probar-lugares` · 21 comprobaciones del cableado |
 
 **Medido el 21/9:** 5.186.913 dominios · 62 categorías · **47 MB** · el peor caso —un dominio que no
 está— tarda **0,12 ms**. Y **cero colisiones de huella**: los dominios únicos de la lista y las
@@ -121,15 +124,75 @@ catalogado como sitio de citas»*. **El filtro ve la CONSULTA, no la visita** �
 incrustada genera consulta sin que el chico haya entrado—, así que es un hecho fechado y nunca un
 diagnóstico. Hay dos comprobaciones automáticas que lo vigilan.
 
+### ✅ EL CABLEADO — los cuatro caminos, hechos el 21/9
+
+**Y lo primero, porque es lo que hace que todo lo demás sea seguro:**
+
+🔴🔴 **EL MOTOR NO CONSULTA LA LISTA: LA RECIBE ANOTADA EN LA SEÑAL.** Dos motivos y los dos mandan:
+el motor **corre también en el navegador** (la consola de la home y el panel lo llaman desde el
+cliente), así que `fs` ahí no existe; y **la categoría es un dato de la señal, no del análisis** —
+anotada viaja con ella, se guarda con ella, y el histórico dice qué era ese lugar **ese día**.
+➡ La anotación se hace en `obtenerFuente()` (`senales/index.ts`), que es el único lugar que sabe de
+dónde salen los datos. Vale igual para el simulador de hoy y el NextDNS de mañana.
+📌 Por eso `criterio.ts` es **puro** (la tabla) y `categorias.ts` es **de servidor** (el índice).
+
+| Camino | Qué hace ahora |
+|---|---|
+| **Habla a la primera** | Regla nueva `lugar_que_habla_solo`, al lado de `evasion_repetida`. Un solo día con un sitio de citas o software espía y el sistema habla |
+| **Pesa y adelanta** | Suma al día (`PESO_DEL_LUGAR`) y **baja 2 los días exigidos**, con piso de 4 |
+| **Da la línea base** | El observatorio deja de marcarlo como «no lo reconoce nadie» — un juego catalogado es vida normal |
+| **Va al parte** | `armarParte` cuenta los otros riesgos como hechos fechados, **sin alerta** |
+
+🔴🔴 **Y EL CATÁLOGO PROPIO NO SE PISA — `loDecidimosNosotros()`.** Para UT1 **WhatsApp es `chat`**,
+que pesa y adelanta el aviso; para nosotros es un destino, no un lugar de riesgo, y eso se decidió
+mirando el producto el 15/8. Si la lista de afuera pudiera pisarlo, **un cambio de ellos aceleraría
+las alertas de todas las familias sin que nadie se entere.**
+⚠ **Mira SÓLO el catálogo propio, no los 400 dominios importados de NextDNS.** Que Tinder tenga
+nombre en esa lista no es una decisión nuestra sobre Tinder. La primera versión no los distinguía y
+**dejaba mudo justo al sitio de citas** — lo encontró la tanda de pruebas el mismo día.
+
+🔴 **El título dejó de ser el nombre del estado: `tituloDeLaLectura()`.** Cuando el que habla es un
+lugar **no hubo ningún patrón que se sostuviera**, así que poner «El patrón se sostiene» encima sería
+escribir algo que no pasó. Dice *«Apareció un lugar catalogado como sitio de citas»*. Lo resuelve el
+motor, no la pantalla.
+
+⚠ **Cómo se dice, y hay dos comprobaciones que lo vigilan:** *«El teléfono consultó un dominio
+catalogado como sitio de citas el 20 de septiembre a las 02:14»*. Hecho fechado, con la salvedad de
+que **el filtro ve la consulta, no la visita**.
+
+📌 **La demo no cambió** y está verificado en `/api/motor/lectura`: los dominios del simulador son
+todos del catálogo propio, así que los escenarios siguen dando lo mismo. **La contra es que el
+camino nuevo no se ve en la consola de la home** — para que se vea habría que agregarle al simulador
+un escenario con un lugar de esos, y eso es decisión de Edgardo.
+
+### ✅ El refresco diario — hecho, y VIENE APAGADO
+
+`senales/refresco.ts`, llamado por el reloj de `/api/cron/revisar`. Si la lista tiene más de 36
+horas, pide una publicación nueva por *deploy hook*.
+🔴 **Sin `DEPLOY_HOOK_UT1` en el entorno no hace nada y lo dice en la respuesta del reloj.**
+Encenderlo significa **publicar a producción todos los días de forma automática**, y eso lo decide
+él. Un paso para encenderlo: crear el hook en Vercel (Ajustes → Git → Deploy Hooks, rama `main`) y
+pegar la dirección en `DEPLOY_HOOK_UT1`.
+
+### ✅ La edad del dominio (RDAP) — hecha y verificada
+
+`senales/edad-del-dominio.ts`. Gratis, sin cuenta y sin clave.
+✅ **Verificado el 21/9 contra la fuente:** `mspy.com` → alta en 2002. **Y `.ar` también contesta**
+(pasa por una redirección que `fetch` sigue solo), que estaba anotado como dudoso desde el 19/9.
+📌 Sube por sufijo —`www.tinder.com` no existe como registro, `tinder.com` sí—, guarda lo preguntado
+en memoria y **nunca tira**.
+⚠ **Se pregunta SÓLO por los dominios que ya pasaron el filtro del observatorio** (tope de 10): es
+una consulta de red, no puede estar en la ruta de cada señal.
+🔴 **Y es contexto, nunca hallazgo:** un dominio nuevo solo no es nada —se registran miles por día—;
+sólo suma cuando el hallazgo ya se sostenía por el público angosto o la simultaneidad.
+
 ### ⬜ Lo que falta de esto
 
-1. **Que el motor lo consuma.** Hoy `criterio.ts` contesta bien y **no lo llama nadie**: falta
-   cablear los cuatro caminos en `evaluar.ts` (hablar a la primera, adelantar los días exigidos,
-   restar del lugar-desconocido del observatorio) y la fila del parte.
-2. **El refresco diario sin compilar.** Hoy la lista se renueva cuando hay un despliegue. Dejarla al
-   día sola pide un *deploy hook* disparado por el cron — **es un despliegue automático a
-   producción todos los días y eso lo decide él.**
-3. La edad del dominio por RDAP, que es el otro dato externo probado.
+1. **Que se vea en la app**: hoy el camino nuevo no aparece en la consola de la home porque el
+   simulador usa sólo dominios del catálogo propio.
+2. **Encender el refresco diario** (un paso de él, arriba).
+3. **NextDNS real**: cuando haya cuenta, las señales entran anotadas por la misma puerta, sin tocar
+   nada de esto.
 
 ---
 

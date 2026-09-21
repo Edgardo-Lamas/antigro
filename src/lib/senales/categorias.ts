@@ -51,6 +51,10 @@ import { createHash } from "node:crypto";
 import { openSync, readSync } from "node:fs";
 import { join } from "node:path";
 
+import { desempatar, type Condicion, type QueHace } from "./criterio.ts";
+import { loDecidimosNosotros } from "./plataformas.ts";
+import type { SenalDeRed } from "./tipos.ts";
+
 const ARCHIVO = join(process.cwd(), "datos", "ut1.bin");
 const ANCHO = 9; /* 7 de huella + 2 de combinación */
 
@@ -192,4 +196,99 @@ export function estadoDelIndice(): {
     dominios: idx.dominios,
     categorias: idx.categorias.length,
   };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+    QUÉ ES ESTE LUGAR Y QUÉ HACE EL SISTEMA CON ÉL
+   ───────────────────────────────────────────────────────────────────────────*/
+
+export interface LecturaDelLugar {
+  /** El dominio consultado, tal como se preguntó. */
+  dominio: string;
+  /** El sufijo que coincidió en la lista: puede ser el padre del consultado. */
+  coincidio: string;
+  /** Todas las categorías, sin filtrar. Lo que se guarda. */
+  categorias: string[];
+  /** La que manda después del desempate. */
+  manda: string;
+  hace: QueHace;
+  condicion?: Condicion;
+  esto: string;
+  porque: string;
+}
+
+/** Qué es este lugar y qué hace el sistema con él. `null` si no está catalogado. */
+export function queEsEsteLugar(dominio: string): LecturaDelLugar | null {
+  const lectura = categoriasDe(dominio);
+  if (!lectura) return null;
+
+  const elegido = desempatar(lectura.categorias);
+
+  return {
+    dominio,
+    coincidio: lectura.coincidio,
+    categorias: lectura.categorias,
+    manda: elegido.categoria,
+    hace: elegido.criterio.hace,
+    condicion: elegido.criterio.condicion,
+    esto: elegido.criterio.esto,
+    porque: elegido.criterio.porque,
+  };
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  🔑 DÓNDE SE ANOTA LA CATEGORÍA: EN LA PUERTA DE ENTRADA, NO EN EL MOTOR
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * **El motor no consulta el índice: recibe la señal ya anotada.** Son dos
+ * motivos y los dos mandan:
+ *
+ * 1. 🔴 **El motor corre en el navegador** (la consola de la home y el panel lo
+ *    llaman desde el cliente). Leer un archivo de 47 MB con `fs` ahí no existe.
+ * 2. 🔑 **La categoría es un dato de la señal, no del análisis.** Anotada en el
+ *    contexto viaja con ella, **se guarda con ella** y queda en el histórico: el
+ *    día que se mire un caso hacia atrás, va a decir qué era ese lugar *ese
+ *    día*, no lo que UT1 diga el día que se mire.
+ *
+ * ⚠ Las claves son metadatos y pasan el guardarraíl de privacidad: dicen **qué
+ * clase de lugar** era, nunca qué se hizo ahí ni qué se dijo.
+ *
+ * ─── 🔴🔴 Y EL CATÁLOGO PROPIO SIGUE MANDANDO ────────────────────────────
+ *
+ * **Si el dominio ya lo tenemos catalogado, UT1 se guarda pero NO decide.** El
+ * caso que lo obliga es WhatsApp: para UT1 es `chat`, que pesa y adelanta el
+ * aviso; **para nosotros es un destino, no un lugar de riesgo** —es donde habla
+ * con la familia—, y eso se decidió el 15/8 mirando el producto. Si la lista de
+ * afuera pudiera pisarlo, un cambio de ellos aceleraría las alertas de todas
+ * las familias **sin que nadie se entere**. Pasa lo mismo con Snapchat y Discord.
+ *
+ * 📌 La categoría real se anota igual (el histórico la va a querer), pero
+ * `que_hace` queda en `se_guarda`: entra al registro y no toca el motor.
+ *
+ * ⚠ **Y son SÓLO las decisiones nuestras, no los 400 dominios importados de
+ * NextDNS.** Que Tinder tenga nombre en esa lista no es una decisión sobre
+ * Tinder: es un nombre. Confundir las dos cosas dejaba mudo justo al sitio de
+ * citas, que es el ejemplo con el que se explica todo esto — encontrado el 21/9
+ * al escribir la tanda de pruebas.
+ */
+export function anotarLugares(senales: SenalDeRed[]): SenalDeRed[] {
+  return senales.map((senal) => {
+    const dominio = senal.contexto?.dominio;
+    if (typeof dominio !== "string") return senal;
+    const lugar = queEsEsteLugar(dominio);
+    if (!lugar) return senal;
+    const loConocemos = loDecidimosNosotros(dominio);
+    return {
+      ...senal,
+      contexto: {
+        ...senal.contexto,
+        categoria_del_lugar: lugar.manda,
+        que_hace: loConocemos ? "se_guarda" : lugar.hace,
+        lugar_es: lugar.esto,
+        ...(loConocemos ? { manda_el_catalogo_propio: 1 } : {}),
+        ...(!loConocemos && lugar.condicion ? { condicion_del_lugar: lugar.condicion } : {}),
+      },
+    };
+  });
 }

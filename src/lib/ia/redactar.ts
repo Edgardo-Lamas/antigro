@@ -15,7 +15,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { bandaDeEdad, type BandaDeEdad } from "@/lib/config";
 import type { Estado, Lectura } from "@/lib/motor";
-import { NOMBRE_DE_ESTADO } from "@/lib/motor";
+import { NOMBRE_DE_ESTADO, tituloDeLaLectura } from "@/lib/motor";
 import { revisarLecturaParaAdultos, revisarMensajeAlChico } from "./reglas";
 import { respaldoParaElChico, respaldoParaLosAdultos } from "./respaldo";
 import { ayudaDeSiempre, comoSeLoNombra, PAIS_POR_DEFECTO, type Pais } from "../paises.ts";
@@ -296,7 +296,7 @@ export async function redactarLecturaParaAdultos(entrada: {
 
   const datos = [
     `Escribiles a los adultos responsables de ${entrada.nombreDelChico}, de ${entrada.edad} años.`,
-    `Lo que resolvió el motor: ${NOMBRE_DE_ESTADO[entrada.lectura.estado]}.`,
+    `Lo que resolvió el motor: ${tituloDeLaLectura(entrada.lectura)}.`,
     "",
     "Qué se vio (usá esto, no agregues nada que no esté acá):",
     ...entrada.lectura.porQue.map((p) => `· ${p}`),
