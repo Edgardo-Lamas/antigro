@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { queEsEsteLugar } from "@/lib/senales/categorias";
+import { estadoDelIndice, queEsEsteLugar } from "@/lib/senales/categorias";
 import { edadDelDominio } from "@/lib/senales/edad-del-dominio";
 import { repositorio } from "@/lib/datos";
 import { analizar, conLaEdad, type FilaDelObservatorio, type Universo } from "@/lib/observatorio";
@@ -142,8 +142,13 @@ export async function GET(req: Request) {
   );
   const hallazgos = conLaEdad(crudos, edades);
 
+  /* 🔑 Con qué lista está trabajando, y de cuándo es. Va en la respuesta por el
+     mismo motivo que el parte dice cuándo el sistema dejó de ver: **un sistema
+     que perdió una fuente tiene que poder contarlo.** Y de paso es la única
+     forma de verificar desde afuera que el índice llegó al despliegue. */
   return NextResponse.json({
     ejemplo: true,
+    lista: estadoDelIndice(),
     advertencia:
       "🔴 NÚMEROS INVENTADOS. Sirven para mostrar cómo decide el observatorio, no son " +
       "un hallazgo ni una medición. Ningún dato de acá se puede citar.",
