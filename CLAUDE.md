@@ -471,10 +471,37 @@ alguno vuelve a aprobar, el control se aflojó: no son pruebas de estilo. **17 d
 
 ### ⬜ Lo que falta de España (en este orden)
 
-1. **Los consejos de organismos españoles.** `FUENTES_POR_PAIS.ES` está **vacío a propósito**, y
-   el prompt lo dice en voz alta: le prohíbe al agente presentar un consejo como respaldado y le
-   prohíbe citar organismos de otro país. Faltan traer, 🔴 textuales y con enlace: **INCIBE/IS4K**,
-   **ANAR** y **Save the Children España**. Los argentinos quedaron intactos en `FUENTES_POR_PAIS.AR`.
+1. 🟡 **Los consejos españoles — resuelto a medias el 21/9, y el criterio lo corrigió Edgardo.**
+   `FUENTES_POR_PAIS.ES` sigue en `[]`, pero **España ya no está muda**: recibe los 27 consejos
+   universales argentinos.
+
+   **Su planteo:** *"un buen consejo de Argentina debería ser bueno también para los españoles, y
+   viceversa"*. 🔴 **Tenía razón y el error era mío: había estirado a TODO consejo una regla que
+   este proyecto escribió para los teléfonos y los recursos.** Son tres capas y sólo una es local:
+
+   | Capa | ¿Viaja? |
+   |---|---|
+   | El **contenido** —«no borres nada», «no lo interrogues» | ✅ Sí. **Medido: 27 de 28** |
+   | **Quién lo firma** | 🟡 Viaja, pero se dice de dónde es |
+   | El **canal y el órgano** —«la fiscalía más cercana» | ❌ Nunca |
+
+   ✅ `Recomendacion` tiene ahora **`alcance`: `universal` | `del_pais`**, 🔴 **obligatorio y sin
+   valor por defecto** — un defecto en `universal` haría viajar el primer consejo que traiga un
+   teléfono adentro, y uno en `del_pais` dejaría mudo a un país por olvido.
+   📌 La única `del_pais` de las 28 es *«denunciá en la fiscalía o comisaría más cercana»*.
+   📌 El prompt de un país que recibe prestadas **lleva siempre una advertencia**: el criterio se
+   puede usar, el organismo se nombra diciendo de qué país es, **nunca** se presenta como la
+   autoridad local, **nunca** se deriva a sus teléfonos, y el texto no se copia literal porque está
+   escrito en el registro del otro país.
+   ✅ **`npm run probar-consejos`** vigila lo único que no se puede romper: que nada que nombre un
+   órgano, un teléfono, una ley o un país se escape marcado `universal`. Con sus cuatro trampas que
+   tienen que frenarse.
+
+   ⬜ **Sigue faltando traer los españoles** —🔴 textuales y con enlace: **INCIBE/IS4K**, **ANAR**—,
+   y ahora valen doble: los que coincidan con los argentinos son **validación cruzada**, dos Estados
+   independientes diciendo lo mismo.
+   🔴 **Y `docs/fuentes/` NO los tiene:** las «Recomendaciones» de Save the Children son de política
+   pública al Estado español (crear fiscalías, formar jueces), no consejos para una familia.
 2. **El barrido de voseo de la interfaz** — quedan unas 30 apariciones en pantallas y textos del
    panel, el alta, la consola y el tour. Los mensajes al chico y el prompt del asistente ya están.
 3. **Las cifras** — el corpus es argentino (Estudio nacional, Grooming Argentina). El material
@@ -4144,6 +4171,7 @@ publicación, se confirma antes.
   | `probar-reglas` (12) | Que el control del asistente no frene de más ni de menos |
   | `probar-sugerencias` (11) | Que no se le diga a una familia que está incompleta cuando no lo está |
   | `probar-instalacion` (27) | Que los endpoints de DNS estén letra por letra |
+  | `probar-consejos` (11) | 🔴 **Que ningún consejo que nombre un órgano, un teléfono o una ley pueda viajar a otro país.** La marca la pone una persona a mano, así que sin esto un padre de Madrid termina mandado a «la fiscalía más cercana» |
   | `probar-regla` (14) | 🔴 **Que el motivo que el motor DECLARA no contradiga el estado**, en las 252 corridas que la consola puede producir moviendo perillas. Existe porque el desplegable publica ese motivo en pantalla, y **un cartel que explica mal es peor que no tener cartel** |
 
   🔑 **Y para que esa tanda pudiera existir hubo que hacer al motor cargable con node pelado**
