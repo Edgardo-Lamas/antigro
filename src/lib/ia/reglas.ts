@@ -216,8 +216,20 @@ function infracciones(texto: string): string[] {
  *
  * 🔴 **Barrido del 21/8, contra el PDF oficial descargado.** Salieron cuatro
  * números que no eran del estudio: el **63%** (El Litoral, 2018) y el **74,3%**,
- * **80%** y **90%** (UNESCO/CIPDH, y miden *bullying virtual*, no grooming).
- * Entraron las cifras que el estudio SÍ midió. El **43%** y el **56,4/35,4%**
+ * **80%** y **90%**, que son del informe del CIPDH (UNESCO). Entraron las cifras
+ * que el estudio SÍ midió.
+ *
+ * 🔴🔴 **Y el 21/9 volvieron las tres del CIPDH, porque la nota que las sacó era
+ * falsa.** Decía que ese informe «mide bullying virtual, no grooming»: no es así
+ * —abarca los cuatro fenómenos y **el 86,7 % de sus casos son grooming y
+ * pornografía infantil**—, y mientras tanto **la guía del producto las publica**.
+ * O sea que el asistente no podía repetir un número que el propio sitio muestra:
+ * el control lo tomaba por inventado y lo mandaba al respaldo.
+ * ⚠ **El costo de que entren, dicho:** `80` y `90` son redondos, así que quedan
+ * habilitados también en frases donde no vienen de ninguna fuente. Es el mismo
+ * costo que ya se aceptó con `43`, `60` y `40`, y se banca por lo mismo: esta
+ * lista sólo decide si un número está inventado — **de quién es lo gobierna el
+ * corpus**, que sí trae el pie de fuente. El **43%** y el **56,4/35,4%**
  * se quedan porque el producto los usa diciendo de quién son —encuesta en 11
  * escuelas y Grooming Argentina—, que es lo que gobierna el corpus.
  * ⚠ Esta lista sólo decide si un número está inventado. **Quién lo dice lo
@@ -231,6 +243,9 @@ const CIFRAS_CITABLES = [
   "27,6", "27.6", "8,3", "8.3",
   // Citadas dentro del estudio, y el producto dice de quién son
   "56,4", "56.4", "35,4", "35.4", "43", "60", "40",
+  // Informe del CIPDH (UNESCO, 2021) — el producto las publica en la guía,
+  // diciendo de quién son y con sus dos límites a la vista
+  "74,3", "74.3", "80", "90", "86,7", "86.7",
   // Informe Grooming LATAM 2024/2025
   "72,8", "72.8", "33,3", "33.3", "64,9", "64.9", "25,5", "25.5",
   "62,2", "62.2", "12,3", "12.3", "57,9", "57.9", "36,8", "36.8", "21,1", "21.1",

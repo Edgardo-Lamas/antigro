@@ -45,6 +45,40 @@ bloque de abajo. ⬜ Falta la edad del dominio por RDAP, probada: gratis y sin c
 
 ---
 
+## 🔴🔴 LA NOTA DEL CIPDH ERA FALSA, Y NOS ESTABA COSTANDO CIFRAS — 21/9
+
+**Desde el 21/8 este repositorio decía, en cinco archivos, que el informe del CIPDH (UNESCO, 2021)
+«mide bullying virtual, no grooming». Es falso.** El informe abarca ciberacoso, bullying virtual,
+grooming y pornografía infantil, y **el 86,7 % de sus casos son grooming y pornografía infantil**.
+
+✅ **Verificado el 21/9 en fuente primaria, hasta donde la fuente llega:** el propio CIPDH registra
+ese estudio como suyo en su **Informe de Gestión 2021** (`cipdh.gob.ar`), listado con sus
+repercusiones de prensa. 🔴 **Pero el documento del estudio NO está publicado** —ni en el CIPDH ni
+en UNESDOC—: se conoce por la difusión de noviembre de 2021. Eso hay que decirlo cada vez que se
+cite, y la guía del producto ahora lo dice.
+
+### Qué rompía, y no era sólo una nota al pie
+
+🔴 **`CIFRAS_CITABLES` en `reglas.ts` tenía excluidos el 74,3 %, el 80 % y el 90 %** — o sea que si
+el asistente repetía un número **que el propio sitio publica en `/guia`**, el control anti-invención
+lo tomaba por inventado y mandaba la respuesta al respaldo. **El producto se desmentía a sí mismo.**
+✅ Ya entraron, con el 86,7 %.
+⚠ **El costo, dicho:** `80` y `90` son redondos y quedan habilitados también donde no vengan de
+ninguna fuente. Es el mismo costo ya aceptado con `43`, `60` y `40`.
+
+### Lo que NO cambia
+
+**Las decisiones del motor siguen iguales, y el motivo también.** No se usa el 80 % para el factor
+de género ni el 90 % para la ventana, pero no porque el informe hable de otra cosa: porque **son dos
+metodologías distintas** —el CIPDH cuenta denuncias y causas, el estudio nacional es una encuesta de
+prevalencia— y mezclarlas sería inventar un promedio que nadie midió. La ventana de 21 días sigue
+siendo **una decisión de producto**, no un dato.
+
+📌 Corregido en `guia/page.tsx` (lo que lee una persona), `reglas.ts`, `pesos.ts` (dos lugares),
+`datos/tipos.ts` y `senales/plataformas.ts`.
+
+---
+
 ## 🧩 QUÉ ES CADA SITIO — la lista de UT1, adentro del sistema (21/9)
 
 **Es el paso 01 del orden aprobado**, y lo que convierte la sección 02 del dossier en algo que el

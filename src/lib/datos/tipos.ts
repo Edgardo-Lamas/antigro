@@ -141,7 +141,17 @@ export interface Hogar {
  * que el **66,3% de las víctimas de grooming fue de género femenino**. El tono y
  * el respeto son iguales para todos.
  * ⚠ Acá decía «el 80% de las víctimas de acoso virtual son nenas». Corregido el
- * 21/8: ese 80% es de UNESCO/CIPDH y mide bullying virtual, no grooming.
+ * 21/8: ese 80 % es del informe del CIPDH (UNESCO), no del estudio nacional.
+ * 🔴🔴 **CORREGIDA LA CORRECCIÓN, el 21/9/2026.** La nota decía que el informe
+ * del CIPDH «mide bullying virtual, no grooming», y **eso es falso**: el informe
+ * abarca ciberacoso, bullying virtual, grooming y pornografía infantil, y **el
+ * 86,7 % de sus casos son grooming y pornografía infantil**. Verificado ese día:
+ * el propio CIPDH lo registra como estudio suyo en su informe de gestión 2021.
+ * ⚠ Lo que sí vale, y es el motivo por el que acá se usa la cifra del estudio
+ * nacional: **son dos fuentes con metodologías distintas** —el CIPDH cuenta
+ * denuncias y causas, el estudio nacional es una encuesta de prevalencia— y no
+ * se mezclan. 📌 Y el documento del CIPDH no está publicado: se conoce por su
+ * difusión de noviembre de 2021.
  */
 export type Genero = "nena" | "varon" | "otro";
 

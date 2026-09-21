@@ -35,8 +35,12 @@
  *  fuente:** el Estudio nacional argentino (Ministerio de Justicia, 2023) mide
  *  **Facebook 52,8%, Instagram 33,1% y WhatsApp 30,7%**; el británico pone a
  *  Snapchat primero con 48% y a Facebook/Messenger en 12%.
- *  ⚠ Acá decía «74,3% pasa por WhatsApp». Corregido el 21/8: ese número es de
- *  UNESCO/CIPDH, mide bullying virtual y está en el estado del arte del estudio.
+ *  ⚠ Acá decía «74,3% pasa por WhatsApp». Corregido el 21/8: ese número es del
+ *  informe del CIPDH (UNESCO), no del estudio nacional, y cuenta sobre denuncias.
+ *  🔴🔴 **Corregida la corrección el 21/9:** la nota decía que ese informe mide
+ *  «bullying virtual, no grooming», y es falso — **el 86,7 % de sus casos son
+ *  grooming y pornografía infantil**. Lo que vale es que son metodologías
+ *  distintas y no se mezclan.
  *  No es que uno esté mal: **el ranking de plataformas es propio de cada país**
  *  —Snapchat es masivo entre adolescentes británicos y marginal acá, y WhatsApp
  *  es dominante en Argentina para todo—.

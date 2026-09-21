@@ -229,9 +229,19 @@ export function factorMadrugada(edad: number, hora: number, turno?: TurnoEscolar
  * 📊 Medido por el estudio nacional: el **66,3% de las víctimas de grooming fue
  * de género femenino** y el 33,7% masculino.
  * ⚠ Acá decía «el 80% de las víctimas de acoso virtual infantil son nenas».
- * Corregido el 21/8: ese 80% es de UNESCO/CIPDH, mide bullying virtual y estaba
- * mal atribuido al estudio. **Y el dato real es bastante menos desparejo**, lo
- * que refuerza el guardarraíl en vez de debilitarlo.
+ * Corregido el 21/8: ese 80 % es del informe del CIPDH (UNESCO) y estaba mal
+ * atribuido al estudio nacional. **Y el dato del estudio es bastante menos
+ * desparejo**, lo que refuerza el guardarraíl en vez de debilitarlo.
+ * 🔴🔴 **CORREGIDA LA CORRECCIÓN, el 21/9/2026.** La nota decía que el informe
+ * del CIPDH «mide bullying virtual, no grooming», y **eso es falso**: el informe
+ * abarca ciberacoso, bullying virtual, grooming y pornografía infantil, y **el
+ * 86,7 % de sus casos son grooming y pornografía infantil**. Verificado ese día:
+ * el propio CIPDH lo registra como estudio suyo en su informe de gestión 2021.
+ * ⚠ Lo que sí vale, y es el motivo por el que acá se usa la cifra del estudio
+ * nacional: **son dos fuentes con metodologías distintas** —el CIPDH cuenta
+ * denuncias y causas, el estudio nacional es una encuesta de prevalencia— y no
+ * se mezclan. 📌 Y el documento del CIPDH no está publicado: se conoce por su
+ * difusión de noviembre de 2021.
  *
  * 🔴 Guardarraíl. El rango es todavía más angosto (0,94 a 1) y por una razón
  * que no es de cortesía: si el factor bajara de verdad para los varones, el
@@ -368,9 +378,19 @@ export const REGULARIDAD_MINIMA = 0.6;
  * las víctimas la acosaron más de una vez**, contra un 29,3% una sola. Eso
  * sostiene que la unidad de análisis sea la semana y no el evento.
  * ⚠ Acá decía «el 90% sufre acoso cotidiano sostenido durante meses». Corregido
- * el 21/8: es de UNESCO/CIPDH, sobre bullying virtual. **El largo de la ventana
- * —21 días— no lo dice ninguna fuente: es una decisión de producto**, y conviene
- * no volver a presentarla como si saliera de un dato.
+ * el 21/8: ese 90 % es del informe del CIPDH (UNESCO), no del estudio nacional.
+ * **El largo de la ventana —21 días— no lo dice ninguna fuente: es una decisión
+ * de producto**, y conviene no volver a presentarla como si saliera de un dato.
+ * 🔴🔴 **CORREGIDA LA CORRECCIÓN, el 21/9/2026.** La nota decía que el informe
+ * del CIPDH «mide bullying virtual, no grooming», y **eso es falso**: el informe
+ * abarca ciberacoso, bullying virtual, grooming y pornografía infantil, y **el
+ * 86,7 % de sus casos son grooming y pornografía infantil**. Verificado ese día:
+ * el propio CIPDH lo registra como estudio suyo en su informe de gestión 2021.
+ * ⚠ Lo que sí vale, y es el motivo por el que acá se usa la cifra del estudio
+ * nacional: **son dos fuentes con metodologías distintas** —el CIPDH cuenta
+ * denuncias y causas, el estudio nacional es una encuesta de prevalencia— y no
+ * se mezclan. 📌 Y el documento del CIPDH no está publicado: se conoce por su
+ * difusión de noviembre de 2021.
  */
 export const VENTANA_DIAS = 21;
 

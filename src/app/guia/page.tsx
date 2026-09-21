@@ -427,11 +427,18 @@ export default function Guia() {
             <ul className="mt-2 flex flex-col gap-1.5 text-sm leading-relaxed text-tenue">
               <li>
                 · Argentina es el <strong className="text-tinta">segundo país de América Latina</strong>{" "}
-                con más casos de ciberacoso infantil, sólo detrás de México. 74,3% del{" "}
-                <em>ciberacoso</em> pasa por WhatsApp · 80% de las víctimas son nenas · 90% sufre
-                acoso cotidiano durante meses · 60% no se denuncia. ⚠ Todo eso es{" "}
-                <strong className="text-tinta">UNESCO y CIPDH, 2021, y mide bullying virtual</strong>
-                , no grooming.
+                con más casos de ciberacoso infantil, sólo detrás de México. 74,3% pasa por WhatsApp
+                · 80% de las víctimas son nenas · 90% sufre acoso cotidiano durante meses · 60% no
+                se denuncia. Es el informe del{" "}
+                <strong className="text-tinta">CIPDH, en el marco de UNESCO, de 2021</strong>, que
+                abarca ciberacoso, bullying virtual, grooming y pornografía infantil:{" "}
+                <strong className="text-tinta">
+                  el 86,7% de sus casos son grooming y pornografía infantil
+                </strong>
+                . ⚠ Dos límites, y van dichos: las cifras salen de denuncias y causas, así que
+                miden también cuánto se denuncia en cada país; y el documento del estudio no está
+                publicado — se conoce por su difusión de noviembre de 2021, que el propio CIPDH
+                registra como propia en su informe de gestión.
               </li>
               <li>
                 · 56,4% de los chicos de 9 a 17 habla por internet con gente que no conoce · 35,4%
