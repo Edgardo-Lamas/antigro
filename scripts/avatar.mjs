@@ -28,9 +28,9 @@
  *  el final empalma exacto con el principio. 📌 Sirve porque el movimiento es
  *  una respiración; si alguna vez hay un gesto con dirección, `--sin-espejo`.
  *
- *  🔑 **Lo achica a 640 px de alto.** El lugar más grande donde se ve son los
- *  ~420 px de la franja del monitor. Más resolución que esa no se ve y sí se
- *  descarga.
+ *  🔑 **Lo achica a 480 px de alto.** El lugar más grande donde se ve son los
+ *  200-224 px de la franja del monitor; 480 cubre eso con el doble de densidad
+ *  de las pantallas buenas. Más resolución no se ve y sí se descarga.
  *
  *  🔴 **NO le toca el negro del fondo.** El panel lo funde con `mix-blend-mode:
  *  screen`, que hace desaparecer el negro y sumar sólo la luz: por eso el clip
@@ -83,7 +83,7 @@ async function buscarCrudo(estado) {
 
 function filtro() {
   const recorte = segundos > 0 ? `trim=0:${segundos},setpts=PTS-STARTPTS,` : "";
-  const base = `[0:v]${recorte}scale=-2:640,format=yuv420p`;
+  const base = `[0:v]${recorte}scale=-2:480,format=yuv420p`;
   if (!espejo) return `${base}[v]`;
   return `${base},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1:a=0[v]`;
 }

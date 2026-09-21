@@ -1667,7 +1667,12 @@ function PresenciaDelAsistente({ oculto, alTocar }: { oculto: boolean; alTocar: 
         aria-label="Abrir el asistente y escribir una pregunta"
         className={`fixed bottom-0 left-0 top-0 z-30 hidden w-40 flex-col items-center justify-end pb-10 transition-opacity duration-300 motion-reduce:transition-none lg:flex xl:w-56 ${apagada}`}
       >
-        <div className="h-[22rem] w-full px-3 xl:h-[26rem]">
+        {/* 🔑 200 px de alto, elegido por Edgardo el 21/9: «debe ser una imagen
+            chica al costado de los informes». Los 352/416 px anteriores eran
+            casi la mitad del alto de la pantalla y competían con el informe.
+            📌 Es el piso del cuerpo entero: más chica, las piernas son un palito
+            y conviene pasar a busto como en el teléfono. */}
+        <div className="h-[12.5rem] w-full px-3 xl:h-[14rem]">
           <Presencia estado={estado} forma="cuerpo" />
         </div>
         <span className="mt-3 text-[11px] uppercase tracking-[0.14em] text-apagado transition group-hover:text-acento">
