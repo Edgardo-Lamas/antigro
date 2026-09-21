@@ -81,8 +81,43 @@ pegado al gráfico que controla; con el marco deja de corresponder, porque elegi
 justo de lo que un padre en su panel no puede hacer.
 📌 «Lo que no se ve desde acá» va **corrido y en cuerpo chico**, no en lista como el panel real: son
 seis frases largas y en lista medían 608 px.
-⬜ **Queda pendiente el desplegable «Ver cómo lo pensó»** (datos externos y motor) dentro del mismo
-marco — estaba marcado como opcional en el acuerdo.
+✅ **EL DESPLEGABLE «VER CÓMO LO PENSÓ» — HECHO el 21/9** (`src/app/_demo/ComoLoPenso.tsx`).
+Era opcional y **él lo subió el 20/9**: *"vamos a meterlo antes del 24"*.
+
+🔴 **No es una explicación del motor: es la LIQUIDACIÓN de la corrida que se está mirando.** Un
+texto que cuente cómo funciona el sistema se escribe una vez y envejece solo. Esto muestra, con los
+números de esa lectura: cuál de **las cinco reglas** decidió el estado · lo que vio la red y lo que
+marcaron los adultos por separado, con la fórmula de cómo se combinan · **cuántos días sostenidos
+lleva contra los que le exige** · el alcance con sus dos componentes · el peso de cada señal con las
+de esa corrida marcadas · y de dónde salen los datos.
+
+🔑 **Y lo que lo vuelve verificable en serio: los umbrales los LEE del motor, no los copia.**
+`evaluar.ts` ahora exporta los siete (`DIAS_SOSTENIDOS_MINIMOS`, `PUNTAJE_PARA_HABLAR`, …) con una
+nota que explica por qué. **Escritos a mano en el componente, el día que alguien mueva una perilla
+la pantalla seguiría mostrando el número viejo y nadie se enteraría** — la misma familia de error
+que el `catch` que devolvía `{}`, y en el único lugar donde hay que convencer a alguien de que el
+sistema no inventa.
+
+🔑 **`Lectura` ganó dos campos, y los dos los calcula el motor y no los deduce la pantalla:**
+`reglaQueDecidio` (`evasion_repetida` · `racha_y_umbral` · `cambio_sin_racha` · `solo_los_adultos` ·
+`sin_novedad`) y `diasExigidos`. **Dos lecturas con el mismo estado pueden haber llegado por
+caminos distintos** — evasión repetida es un acto deliberado, racha y umbral es una conducta que se
+sostuvo ocho días — y hasta ahora la pantalla no podía distinguirlas. Un componente que reconstruya
+el `if` por su cuenta se desincroniza en silencio.
+
+📌 **Va al PIE del marco, no en el medio**, y es la regla del 20/9: adentro la secuencia «Cómo viene
+→ Qué vio la red → El mensaje» es una réplica del panel real, y un bloque que en el panel de una
+familia no existe la rompería. **Cerrado cuesta ~44 px.**
+
+✅ **Verificado moviendo las perillas en pantalla, no sólo en el código:** con `evasion` la regla
+pasa a «Evasión repetida del filtro» y marca ✓ 3 intentos; y **el caso que muestra la tesis del
+producto** — persistente + adultos «Bastantes cosas» en el día 17 — dice **«Días sostenidos 5 · ✓ 5
+exigidos · bajó de 8 a 5: los adultos están marcando lo mismo que ve la red»**, y el sistema habla
+tres días antes.
+
+⚠ **Un detalle que sólo apareció en pantalla:** la barra «datos de ejemplo» es `sticky`, así que al
+llegar al desplegable con el tabulador el encabezado quedaba **justo debajo** y no se leía
+(`scroll-mt-14`).
 
 ➡ **Da vuelta el problema: hasta ahora el simulador competía con el panel; así lo ENSEÑA.** El que
 movió las perillas en la home ya sabe leer el suyo cuando entra, porque es el mismo dibujo.
@@ -490,7 +525,14 @@ cuáles entran, había que decidir en qué puerta cae cada una.**
 `xboxlive.xom` (typo de `.com`), `youtube` sin dominio y `_spotify-connect._tcp.local`, que es
 mDNS— y `ttvnw.net` viene repetido. Quedan **400 únicos**.
 
-🔴 **La decisión que sostiene todo: dominios de USO vs. INFRAESTRUCTURA.** 127 de los 400 son CDN y
+🔴 **Corregido el 21/9 contándolos del catálogo, no de memoria: son 260 de uso + 140 de
+infraestructura.** Este bloque decía «127 de los 400 son CDN» y la cifra de uso no estaba separada
+en ningún lado — el desplegable «Ver cómo lo pensó» la iba a repetir tal cual. Ahora
+`servicios.ts` exporta `TOTAL_SERVICIOS`, `TOTAL_DOMINIOS`, `TOTAL_DOMINIOS_DE_USO`,
+`TOTAL_DOMINIOS_DE_INFRAESTRUCTURA` y `TOTAL_DOMINIOS_DE_EVASION` **contados del propio catálogo**,
+así que la pantalla no puede volver a mentir cuando alguien agregue un servicio.
+
+🔴 **La decisión que sostiene todo: dominios de USO vs. INFRAESTRUCTURA.** 140 de los 400 son CDN y
 analítica (`rbxcdn.com`, `ttvnw.net`, `scdn.co`, `nflxvideo.net`). **Entran igual** —si no, el
 observatorio los levantaría como lugares sin catalogar y llenaría los hallazgos con las texturas de
 Roblox— pero van en `infraestructura` y se leen como **`sin_contacto`**. El motivo es el cruce:
@@ -4081,6 +4123,13 @@ publicación, se confirma antes.
   | `probar-reglas` (12) | Que el control del asistente no frene de más ni de menos |
   | `probar-sugerencias` (11) | Que no se le diga a una familia que está incompleta cuando no lo está |
   | `probar-instalacion` (27) | Que los endpoints de DNS estén letra por letra |
+  | `probar-regla` (14) | 🔴 **Que el motivo que el motor DECLARA no contradiga el estado**, en las 252 corridas que la consola puede producir moviendo perillas. Existe porque el desplegable publica ese motivo en pantalla, y **un cartel que explica mal es peor que no tener cartel** |
+
+  🔑 **Y para que esa tanda pudiera existir hubo que hacer al motor cargable con node pelado**
+  (21/9): `evaluar.ts` importaba con el alias `@/`, que node no resuelve, y `simulador.ts` usaba una
+  *parameter property* en el constructor, que el modo strip-only no soporta. **El archivo que más
+  importa que se pueda probar era el único que no se podía probar sin levantar Next.** Es el mismo
+  motivo por el que `dia.ts` se separó el 19/8.
 
   🔑 **Las tres existen por el mismo motivo: son errores que el typecheck NO ve.** Una regla que
   frena de más deja al padre sin respuesta; una sugerencia de más le dice a una familia que le

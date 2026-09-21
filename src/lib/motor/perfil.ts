@@ -40,7 +40,7 @@ import {
   MEDIA_VIDA_PERFIL_DIAS,
   REGULARIDAD_MINIMA,
   TAU_HISTORIA_DIAS,
-} from "./pesos";
+} from "./pesos.ts";
 
 /** Un día de la historia del chico, ya reducido a cuánto se apartó de lo suyo. */
 export interface DiaDelPerfil {

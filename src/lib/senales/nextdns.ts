@@ -16,7 +16,7 @@ import type {
   EstadoDeFuente,
   FuenteDeSenales,
   SenalDeRed,
-} from "./tipos";
+} from "./tipos.ts";
 
 const API = "https://api.nextdns.io";
 

@@ -20,7 +20,7 @@ import {
   type FuenteDeSenales,
   type SenalDeRed,
   type TipoDeSenal,
-} from "./tipos";
+} from "./tipos.ts";
 
 export type Escenario = "normal" | "cambio_leve" | "persistente" | "evasion";
 
@@ -164,7 +164,16 @@ export class FuenteSimulador implements FuenteDeSenales {
   readonly id = "simulador" as const;
   readonly nombre = "Simulador de señales";
 
-  constructor(private escenario: Escenario = "normal") {}
+  /* ⚠ Campo y asignación en vez de `constructor(private escenario…)`. La forma
+     corta es una «parameter property», que node no soporta en modo strip-only
+     —borra tipos, no transforma— y hace que cualquier tanda de pruebas que
+     llegue hasta acá muera antes de correr. Es exactamente la misma razón por
+     la que el motor importa con rutas relativas. */
+  private escenario: Escenario;
+
+  constructor(escenario: Escenario = "normal") {
+    this.escenario = escenario;
+  }
 
   async estado(): Promise<EstadoDeFuente> {
     return { disponible: true, detalle: `Escenario: ${this.escenario}` };

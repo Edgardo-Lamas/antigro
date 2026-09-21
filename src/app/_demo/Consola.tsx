@@ -21,6 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EyeOff } from "lucide-react";
 import { NOMBRE_DE_ESTADO, type Estado, type Lectura } from "@/lib/motor/evaluar";
+import ComoLoPenso from "./ComoLoPenso";
 
 const DIAS = 21;
 
@@ -548,6 +549,18 @@ export default function Consola() {
                 </div>
               </div>
             </section>
+
+            {/* ── 🔍 CÓMO LO PENSÓ ─────────────────────────────────────
+                🔑 **Va al pie y no en el medio, y es la misma regla del 20/9:**
+                adentro del marco, la secuencia «Cómo viene → Qué vio la red →
+                El mensaje» es una RÉPLICA del panel real. Meter acá en el medio
+                un bloque que en el panel de una familia no existe rompe justo
+                lo que se consiguió — que el simulador enseñe a leer el panel en
+                vez de competir con él.
+
+                📌 Cerrado, así que cuesta ~44 px. El que lo abre es el que no
+                se conforma con que le digan que hay una cuenta detrás. */}
+            <ComoLoPenso lectura={lectura} edad={edad} genero={genero} />
 
             {/* ── 🔴 La nota que blinda, no la que debilita ─────────────
                 Se mudó ACÁ ADENTRO, al pie del marco. Suelta al final de la

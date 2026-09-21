@@ -8,14 +8,14 @@
  * resuelto.
  */
 
-import { FuenteNextDNS } from "./nextdns";
-import { FuenteSimulador, type Escenario } from "./simulador";
-import type { EstadoDeFuente, FuenteDeSenales, IdDeFuente } from "./tipos";
+import { FuenteNextDNS } from "./nextdns.ts";
+import { FuenteSimulador, type Escenario } from "./simulador.ts";
+import type { EstadoDeFuente, FuenteDeSenales, IdDeFuente } from "./tipos.ts";
 
-export * from "./tipos";
-export { FuenteSimulador, ESCENARIOS } from "./simulador";
-export type { Escenario } from "./simulador";
-export { FuenteNextDNS } from "./nextdns";
+export * from "./tipos.ts";
+export { FuenteSimulador, ESCENARIOS } from "./simulador.ts";
+export type { Escenario } from "./simulador.ts";
+export { FuenteNextDNS } from "./nextdns.ts";
 
 /**
  * Devuelve la fuente que corresponde usar.

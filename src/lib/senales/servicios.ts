@@ -382,3 +382,37 @@ export function claseDeEvasion(dominio: string): ClaseDeEvasion | null {
   if (DNS_ALTERNATIVO.some((x) => d === x || d.endsWith(`.${x}`))) return "dns_alternativo";
   return null;
 }
+
+/* ── Cuánto trae el catálogo ─────────────────────────────────────────────── */
+
+/**
+ * 🔑 **Contados del catálogo, no escritos a mano.** Los muestra el desplegable
+ * «Ver cómo lo pensó» de la consola, que es donde alguien de afuera verifica de
+ * dónde sale lo que el sistema reconoce. Un número escrito a mano ahí aguanta
+ * hasta el primer servicio que se agregue, y después miente sin avisar.
+ */
+export const TOTAL_SERVICIOS = SERVICIOS.length;
+
+/**
+ * Dominios únicos del catálogo, **los de uso y los de infraestructura juntos**.
+ * Únicos porque la fuente trae repetidos (`ttvnw.net` viene dos veces en Twitch).
+ *
+ * ⚠ Contarlos destapó que la cabecera de este archivo decía «400» sobre los dos
+ * grupos sumados, pero sólo 260 son dominios donde el chico ESTUVO: el resto es
+ * el cable. Separados abajo, porque la diferencia es justo la que sostiene al
+ * cruce — reconocer un CDN no es reconocer un lugar.
+ */
+export const TOTAL_DOMINIOS = new Set(
+  SERVICIOS.flatMap((s) => [...s.dominios, ...(s.infraestructura ?? [])]),
+).size;
+
+/** Sólo los lugares: dominios donde el chico estuvo. Son los que mandan la puerta. */
+export const TOTAL_DOMINIOS_DE_USO = new Set(SERVICIOS.flatMap((s) => s.dominios)).size;
+
+/** Sólo el cable: CDN y analítica. Se reconocen para NO contarlos como lugar. */
+export const TOTAL_DOMINIOS_DE_INFRAESTRUCTURA = new Set(
+  SERVICIOS.flatMap((s) => s.infraestructura ?? []),
+).size;
+
+/** Los de evasión van aparte: no son lugares, son formas de esquivar el filtro. */
+export const TOTAL_DOMINIOS_DE_EVASION = new Set([...VPN_O_PROXY, ...DNS_ALTERNATIVO]).size;

@@ -17,8 +17,15 @@
  */
 
 import type { SenalDeRed, TipoDeSenal } from "@/lib/senales/tipos";
-import { esCruce, nombreDeLugar, puertaDe } from "@/lib/senales/plataformas";
-import { NOMBRE_DE_SENAL } from "@/lib/senales/tipos";
+/* ⚠ Rutas relativas y con `.ts`, no el alias `@/`, y es el mismo motivo por el
+   que `dia.ts` se separó de acá el 19/8: las tandas de pruebas corren con node
+   pelado (`--experimental-strip-types`), que no resuelve el alias de
+   TypeScript. Los `import type` de arriba no molestan porque node los borra
+   antes de resolver nada; éstos traen valores y sí se resuelven. Sin esto, el
+   motor —el archivo que más importa que se pueda probar— es el único que no se
+   puede probar sin levantar Next. */
+import { esCruce, nombreDeLugar, puertaDe } from "../senales/plataformas.ts";
+import { NOMBRE_DE_SENAL } from "../senales/tipos.ts";
 import type { Chico, TurnoEscolar } from "@/lib/datos/tipos";
 import {
   CLASE_DE_SENAL,
@@ -28,45 +35,58 @@ import {
   factorEdad,
   factorMadrugada,
   factorGenero,
-} from "./pesos";
+} from "./pesos.ts";
 import {
   advertenciasDelPerfil,
   alcanceDeLaLectura,
   construirPerfil,
   type AlcanceDeLaLectura,
   type PerfilDelChico,
-} from "./perfil";
-import { evaluarObservaciones, type AporteDeLosAdultos } from "./cuestionario";
-import { hastaDondeSeVio } from "./modus-operandi";
+} from "./perfil.ts";
+import { evaluarObservaciones, type AporteDeLosAdultos } from "./cuestionario.ts";
+import { hastaDondeSeVio } from "./modus-operandi.ts";
 
 const DIA_MS = 24 * 60 * 60 * 1000;
 
 /* ── Umbrales ────────────────────────────────────────────────────────────── */
 
+/**
+ * 🔴 **Estas constantes se exportan a propósito, y no es para reutilizarlas: es
+ * para que la pantalla no las copie.** El desplegable «Ver cómo lo pensó» de la
+ * consola muestra la cuenta de la corrida —cuántos días sostenidos lleva contra
+ * los que exige, qué umbral pasó y cuál no—, y si esos números estuvieran
+ * escritos a mano en el componente, **el día que alguien mueva una perilla acá
+ * la pantalla seguiría mostrando el número viejo y nadie se enteraría.**
+ *
+ * ⚠ Es la misma familia de error que el `catch` que devolvía `{}` en la consola:
+ * no rompe nada, no tira ningún error, y miente en silencio delante de la única
+ * persona a la que hay que convencer de que el sistema no inventa.
+ */
+
 /** Por debajo de esto, el día no cuenta como día con señal. Es vida normal. */
-const CARGA_MINIMA_DIA = 0.25;
+export const CARGA_MINIMA_DIA = 0.25;
 
 /**
  * 🔴 El corazón de la regla: cuántos días tiene que llevar el patrón antes de
  * que el sistema abra la boca. Ocho días no es un número mágico; es lo que
  * separa "una semana rara" de "esto viene pasando".
  */
-const DIAS_SOSTENIDOS_MINIMOS = 8;
+export const DIAS_SOSTENIDOS_MINIMOS = 8;
 
 /** Una racha tolera un día de silencio sin cortarse. Dos, no. */
 const HUECO_TOLERADO = 1;
 
 /** La evasión repetida tiene camino propio: es la señal más fuerte que hay. */
-const EVASIONES_PARA_HABLAR = 2;
+export const EVASIONES_PARA_HABLAR = 2;
 
 /**
  * ⚠ El umbral de "hay un cambio" es bajo a propósito, y se puede permitir
  * serlo: ese estado **no le escribe a nadie**. Es lo que el sistema está
  * mirando, no lo que dice. El umbral que importa es el de abajo.
  */
-const PUNTAJE_PARA_ATENCION = 0.2;
+export const PUNTAJE_PARA_ATENCION = 0.2;
 
-const PUNTAJE_PARA_HABLAR = 0.45;
+export const PUNTAJE_PARA_HABLAR = 0.45;
 
 /**
  * 🔴 **Medido el 15/8/2026, y sirve para no volver a equivocarse de perilla.**
@@ -91,14 +111,50 @@ const PUNTAJE_PARA_HABLAR = 0.45;
  * Techo del aporte de los adultos. No llega a 1 a propósito: el cuestionario
  * es una impresión, no una medición, y no puede disparar solo una alerta.
  */
-const APORTE_MAXIMO_ADULTOS = 0.7;
+export const APORTE_MAXIMO_ADULTOS = 0.7;
 
 /** A partir de acá se considera que las dos entradas están coincidiendo. */
-const COINCIDENCIA_FUERTE = 0.55;
+export const COINCIDENCIA_FUERTE = 0.55;
 
 /* ── Estado ──────────────────────────────────────────────────────────────── */
 
 export type Estado = "en_calma" | "atencion" | "patron_sostenido";
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ *  POR QUÉ CAMINO SALIÓ — la regla que decidió, no el resultado
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * 🔑 **Dos lecturas con el mismo estado pueden haber llegado por caminos
+ * distintos, y la diferencia importa.** «El patrón se sostiene» por evasión
+ * repetida es un acto deliberado del chico contra el filtro; el mismo estado
+ * por racha más umbral es un cambio de conducta que se sostuvo ocho días. No
+ * son lo mismo para el adulto que lo lee, y hasta hoy la pantalla no podía
+ * distinguirlos.
+ *
+ * 🔴 **Lo dice el motor y no lo deduce la pantalla.** Un componente que
+ * reconstruya el `if` por su cuenta se desincroniza el día que la cadena
+ * cambie, y se desincroniza en silencio.
+ */
+export type ReglaDelMotor =
+  /** Dos o más intentos de saltar el filtro en la última semana. Camino propio. */
+  | "evasion_repetida"
+  /** La racha llegó a los días exigidos **y** el puntaje pasó el umbral. */
+  | "racha_y_umbral"
+  /** Hubo días distintos y puntaje, pero sin racha. Se cuenta, no se alarma. */
+  | "cambio_sin_racha"
+  /** La red no vio nada; lo que habla es el cuestionario de los adultos. */
+  | "solo_los_adultos"
+  /** Ninguna regla se activó. */
+  | "sin_novedad";
+
+export const NOMBRE_DE_REGLA: Record<ReglaDelMotor, string> = {
+  evasion_repetida: "Evasión repetida del filtro",
+  racha_y_umbral: "Días sostenidos + umbral de puntaje",
+  cambio_sin_racha: "Días sueltos, sin racha",
+  solo_los_adultos: "Lo que marcaron los adultos, sin la red",
+  sin_novedad: "Ninguna regla se activó",
+};
 
 export const NOMBRE_DE_ESTADO: Record<Estado, string> = {
   en_calma: "Sin novedad",
@@ -135,6 +191,16 @@ export interface Lectura {
   diasConSenal: number;
   /** Hace cuántos días viene sosteniéndose, sin cortarse. */
   diasSostenidos: number;
+  /**
+   * 🔑 Cuántos días sostenidos le hacía falta **a esta lectura**. Son ocho,
+   * salvo que los adultos estén marcando lo mismo: ahí baja a cinco, porque
+   * dos entradas independientes que coinciden necesitan menos evidencia de
+   * cada una. Va en la lectura y no se recalcula afuera — la regla vive en un
+   * solo lugar.
+   */
+  diasExigidos: number;
+  /** Por cuál de las cinco reglas salió este estado. Ver `ReglaDelMotor`. */
+  reglaQueDecidio: ReglaDelMotor;
   /** Media reciente menos media anterior. Positivo = se está profundizando. */
   tendencia: number;
   evasionesRecientes: number;
@@ -368,13 +434,19 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
 
   /* ── El estado. La persistencia manda: sin racha no se habla. ── */
   let estado: Estado = "en_calma";
+  /* 📌 Se anota en la misma cadena que decide, no después: reconstruirlo más
+     abajo sería tener la regla escrita dos veces y una de las dos envejece. */
+  let reglaQueDecidio: ReglaDelMotor = "sin_novedad";
 
   if (evasiones.length >= EVASIONES_PARA_HABLAR) {
     estado = "patron_sostenido";
+    reglaQueDecidio = "evasion_repetida";
   } else if (diasSostenidos >= diasExigidos && puntaje >= PUNTAJE_PARA_HABLAR) {
     estado = "patron_sostenido";
+    reglaQueDecidio = "racha_y_umbral";
   } else if (conSenal.length >= 2 && puntaje >= PUNTAJE_PARA_ATENCION) {
     estado = "atencion";
+    reglaQueDecidio = "cambio_sin_racha";
   }
 
   /**
@@ -384,7 +456,10 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
    * sostenido" — eso lo tiene que sostener el registro, no una impresión.
    */
   const soloLosAdultos = estado === "en_calma" && adultos.puntaje >= COINCIDENCIA_FUERTE;
-  if (soloLosAdultos) estado = "atencion";
+  if (soloLosAdultos) {
+    estado = "atencion";
+    reglaQueDecidio = "solo_los_adultos";
+  }
 
   /* ── Por qué ── */
   const porQue: string[] = [];
@@ -602,6 +677,8 @@ export function evaluar({ chico, senales, hasta, observaciones, diasObservados }
     dias,
     diasConSenal: conSenal.length,
     diasSostenidos,
+    diasExigidos,
+    reglaQueDecidio,
     tendencia,
     evasionesRecientes: evasiones.length,
     senalesQueLaSostienen: senales
