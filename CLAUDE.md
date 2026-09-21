@@ -81,8 +81,29 @@ pegado al gráfico que controla; con el marco deja de corresponder, porque elegi
 justo de lo que un padre en su panel no puede hacer.
 📌 «Lo que no se ve desde acá» va **corrido y en cuerpo chico**, no en lista como el panel real: son
 seis frases largas y en lista medían 608 px.
-✅ **EL DESPLEGABLE «VER CÓMO LO PENSÓ» — HECHO el 21/9** (`src/app/_demo/ComoLoPenso.tsx`).
-Era opcional y **él lo subió el 20/9**: *"vamos a meterlo antes del 24"*.
+✅ **EL DESPLEGABLE «POR QUÉ EL SISTEMA DICE ESTO» — HECHO el 21/9**
+(`src/app/_demo/ComoLoPenso.tsx`). Era opcional y **él lo subió el 20/9**: *"vamos a meterlo antes
+del 24"*.
+
+🔴🔴 **DOS CORRECCIONES SUYAS EL MISMO DÍA, Y LAS DOS SON DE PRODUCTO, NO DE ESTILO:**
+
+1. **No lo encontraba.** *"No puedo ver esa sección"*. Estaba gris entre dos bloques grises, con el
+   título partido en dos renglones en el teléfono, y **a 2,4 pantallas de scroll en una notebook y
+   a 5,4 en un teléfono**. 🔑 **Si él no lo encontró, el jurado tampoco** — el mismo patrón que el
+   asistente enterrado a 1.865 px y «Ver el mensaje» muerto cuatro días. Ahora va en color de
+   acento con borde propio, el título en una sola línea y el subtítulo escondido en el teléfono:
+   **no agranda el bloque, sólo lo hace visible.**
+   ⚠ **Y él mira en la NOTEBOOK.** Toda la verificación se había hecho a 390×844; las medidas de
+   un teléfono no describen lo que él ve.
+2. 🔴 **El título no tenía sujeto.** Se llamaba «Ver cómo lo pensó» y preguntó lo correcto:
+   *"¿a quién se refiere? ¿al chico, al padre, la madre, el sistema?"*. Encima **«pensó»
+   antropomorfiza justo donde el producto se cuida de no hacerlo** — el motor no piensa, calcula,
+   y es la misma familia que «la figura NO reacciona al riesgo».
+   ✅ **Eligió «Por qué el sistema dice esto»**, con subtítulo «la cuenta, paso por paso»: arranca
+   por la pregunta del que mira y no por el mecanismo.
+   📌 Se le hizo notar que el panel real ya tiene un «Por qué» adentro de la caja de estado y
+   decidió igual — son distinguibles porque éste es una frase entera, y el de adentro son las
+   razones en criollo mientras que éste es la aritmética que hay detrás.
 
 🔴 **No es una explicación del motor: es la LIQUIDACIÓN de la corrida que se está mirando.** Un
 texto que cuente cómo funciona el sistema se escribe una vez y envejece solo. Esto muestra, con los
