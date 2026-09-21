@@ -2,7 +2,7 @@
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- *  LA PRESENCIA — dónde vive el asistente. 20/9
+ *  LA PRESENCIA — dónde vive el asistente. 20/9 · clips 21/9
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  🔑 **La idea es de Edgardo, del 31/8, y son dos decisiones distintas:**
@@ -27,34 +27,70 @@
  *  por el que no se hace.
  *
  *  ─────────────────────────────────────────────────────────────────────────
- *  ⬜ **LOS CLIPS TODAVÍA NO EXISTEN — son el punto 4 del plan.**
+ *  🎬 LOS CLIPS — quién es la figura y cómo entra
  *  ─────────────────────────────────────────────────────────────────────────
  *
- *  Van **cuatro clips pregrabados en bucle** a `public/avatar/`, generados una
- *  sola vez: `reposo` · `escuchando` · `pensando` · `hablando`.
- *  🔴 **Nunca un video por respuesta:** generar al vuelo suma 30-60 s encima de
- *  los ~15 s que el asistente ya tarda. Sin lip-sync real — a este tamaño nadie
- *  lee los labios. 📌 El que más trabaja es `pensando`: convierte la espera en
- *  *"me está pensando la respuesta"*.
+ *  **Decidido por Edgardo el 21/9: es una mujer adulta, tratada como
+ *  proyección** —no fotorrealista—, con la paleta de la casa (violeta `acento`
+ *  arriba → cian `acentoDos` abajo). Se genera en Google Flow: una imagen base
+ *  única, y de esa misma imagen salen los clips, que es lo único que garantiza
+ *  que sea **la misma persona** en todos los estados.
  *
- *  **Mientras tanto se dibuja la silueta de abajo**, que es un marcador honesto:
- *  ocupa exactamente el lugar y la medida que va a ocupar el clip, así que el
- *  día que los cuatro archivos estén, se cambia `HAY_CLIPS` a `true` y **no hay
- *  que tocar una sola línea del layout.**
+ *  🔑 **SON DOS CLIPS, NO CUATRO, y es lo que las pantallas piden de verdad:**
+ *  la franja y el círculo del teléfono están siempre en `reposo`, y el
+ *  encabezado de la charla alterna `reposo` ↔ `pensando`. `escuchando` no lo
+ *  pide nadie hasta que exista el micrófono, y `hablando` no tiene dónde
+ *  aparecer porque **no hay audio de salida en la web** (decidido el 20/9).
+ *  Los dos que faltan caen a `reposo` en `CLIP_DE`: el día que se generen, se
+ *  cambia esa tabla y nada más.
+ *
+ *  🔑 **Fondo negro + `mix-blend-mode: screen`, y no canal alfa.** Flow no
+ *  entrega alfa, y recortar un holograma con chroma deja los bordes sucios
+ *  justo donde la figura tiene que ser translúcida. Con el clip filmado como
+ *  luz sobre negro puro, `screen` hace desaparecer el negro y **suma sólo la
+ *  luz** sobre el navy del panel: la translucidez sale gratis y correcta.
+ *
+ *  🔴 **Si el archivo no está o no carga, se vuelve solo a la silueta.** Nunca
+ *  queda un hueco negro en el panel: `HAY_CLIPS` prende la función, pero el
+ *  `onError` es el que la sostiene si falta un archivo.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-/** 🔜 Pasa a `true` el día que los cuatro clips estén en `public/avatar/`. */
+/** 🔜 Pasa a `true` el día que los clips estén en `public/avatar/`. */
 const HAY_CLIPS = false;
 
 export type EstadoDeLaPresencia = "reposo" | "escuchando" | "pensando" | "hablando";
+
+/**
+ * Qué clip mira cada estado. 📌 Los que todavía no se generaron miran a
+ * `reposo`: es preferible la figura correcta quieta que una silueta distinta
+ * apareciendo en el medio de una charla.
+ */
+const CLIP_DE: Record<EstadoDeLaPresencia, "reposo" | "pensando"> = {
+  reposo: "reposo",
+  escuchando: "reposo",
+  pensando: "pensando",
+  hablando: "reposo",
+};
 
 /**
  * `cuerpo` es la franja del monitor: de pie, entero, al costado del informe.
  * `busto` es el teléfono: de cintura para arriba, que es lo que entra.
  */
 type Forma = "cuerpo" | "busto";
+
+/**
+ * ⚠ El clip es uno solo y vertical; el busto es un **recorte** suyo, no otro
+ * video. `cuerpo` va `contain` para no comerle los pies ni la cabeza en una
+ * franja más angosta que el cuadro; `busto` va `cover` corrido arriba, que es
+ * donde está la cara. 📌 Si en el teléfono queda muy pegada al borde superior,
+ * el número de `busto` es lo único que hay que mover.
+ */
+const ENCUADRE: Record<Forma, string> = {
+  cuerpo: "object-contain",
+  busto: "object-cover object-[50%_8%]",
+};
 
 export default function Presencia({
   estado = "reposo",
@@ -78,17 +114,40 @@ export default function Presencia({
     return () => mq.removeEventListener("change", alCambiar);
   }, []);
 
-  if (HAY_CLIPS) {
+  /* 🔴 El seguro: si el archivo falta o el navegador no puede con el formato,
+     esto vuelve a la silueta en vez de dejar un rectángulo negro. */
+  const [sinClip, setSinClip] = useState(false);
+  const video = useRef<HTMLVideoElement>(null);
+
+  /* Con movimiento reducido el clip igual se usa —es la misma figura— pero
+     detenido en el primer cuadro: presencia sí, bucle no. */
+  useEffect(() => {
+    const v = video.current;
+    if (!v) return;
+    if (quieto) {
+      v.pause();
+      v.currentTime = 0;
+    } else {
+      void v.play().catch(() => {});
+    }
+  }, [quieto, estado]);
+
+  if (HAY_CLIPS && !sinClip) {
     return (
       <video
-        key={estado}
-        src={`/avatar/${estado}.webm`}
-        autoPlay
+        ref={video}
+        key={CLIP_DE[estado]}
+        src={`/avatar/${CLIP_DE[estado]}.webm`}
+        autoPlay={!quieto}
         loop
         muted
         playsInline
+        preload="auto"
         aria-hidden
-        className={`h-full w-full object-contain ${className}`}
+        onError={() => setSinClip(true)}
+        /* 🔑 `screen` es lo que convierte «video con fondo negro» en «luz sobre
+           el panel». Sin esto se ve una caja negra con una señora adentro. */
+        className={`h-full w-full mix-blend-screen ${ENCUADRE[forma]} ${className}`}
       />
     );
   }

@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "node scripts/construir-ut1.mjs --si-hace-falta",
     "ut1": "node scripts/construir-ut1.mjs",
+    "avatar": "node scripts/avatar.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
