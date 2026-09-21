@@ -387,7 +387,7 @@ export function claseDeEvasion(dominio: string): ClaseDeEvasion | null {
 
 /**
  * 🔑 **Contados del catálogo, no escritos a mano.** Los muestra el desplegable
- * «Ver cómo lo pensó» de la consola, que es donde alguien de afuera verifica de
+ * «Por qué el sistema dice esto» de la consola, donde alguien de afuera verifica de
  * dónde sale lo que el sistema reconoce. Un número escrito a mano ahí aguanta
  * hasta el primer servicio que se agregue, y después miente sin avisar.
  */

@@ -4,7 +4,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  🔴 **Esta tanda existe porque la consola dejó de decir sólo el resultado y
- *  empezó a mostrar la cuenta.** El desplegable «Ver cómo lo pensó» publica, en
+ *  empezó a mostrar la cuenta.** El desplegable «Por qué el sistema dice esto» publica, en
  *  pantalla y delante de quien quiera verificarlo, cuál de las cinco reglas
  *  decidió el estado y cuántos días sostenidos le hacían falta a esa lectura.
  *

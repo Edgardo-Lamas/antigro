@@ -52,7 +52,7 @@ const DIA_MS = 24 * 60 * 60 * 1000;
 
 /**
  * 🔴 **Estas constantes se exportan a propósito, y no es para reutilizarlas: es
- * para que la pantalla no las copie.** El desplegable «Ver cómo lo pensó» de la
+ * para que la pantalla no las copie.** El desplegable «Por qué el sistema dice esto» de la
  * consola muestra la cuenta de la corrida —cuántos días sostenidos lleva contra
  * los que exige, qué umbral pasó y cuál no—, y si esos números estuvieran
  * escritos a mano en el componente, **el día que alguien mueva una perilla acá

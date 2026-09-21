@@ -2,7 +2,7 @@
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
- *  VER CÓMO LO PENSÓ — la cuenta de la corrida que se está mirando
+ *  POR QUÉ EL SISTEMA DICE ESTO — la cuenta de la corrida que se está mirando
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  🔴 **No es una explicación del motor: es la liquidación de ESTA lectura.**
@@ -15,6 +15,17 @@
  *  de una cuenta o de un `if` escrito para la demo. Acá está la cuenta: cuántos
  *  días sostenidos lleva contra los que le exige, qué umbral pasó y cuál no, y
  *  **cuál de las cinco reglas disparó ese estado**.
+ *
+ *  🔴 **El título lo eligió Edgardo el 21/9, y corrige uno mío que estaba mal.**
+ *  Se llamaba «Ver cómo lo pensó», y él levantó lo que nadie había visto:
+ *  *"¿a quién se refiere? ¿al chico, al padre, la madre, el sistema?"*. **No
+ *  tenía sujeto**, y encima «pensó» antropomorfiza justo donde el producto se
+ *  cuida de no hacerlo — el motor no piensa, calcula.
+ *  📌 Él eligió arrancar por la PREGUNTA del que mira y no por el mecanismo.
+ *  ⚠ Se le hizo notar que el panel real ya tiene un «Por qué» adentro de la caja
+ *  de estado, y decidió igual: son distinguibles porque éste es una frase entera,
+ *  y el de adentro son las razones en criollo mientras que éste es la aritmética
+ *  que hay detrás de esas razones.
  *
  *  📌 Va cerrado. Un `<details>` cerrado cuesta ~44 px, y la pantalla que se
  *  ganó el 20/9 no se devuelve para poner una tabla que casi nadie abre. El que
@@ -112,8 +123,8 @@ export default function ComoLoPenso({
         >
           ▶
         </span>
-        <span className="whitespace-nowrap font-semibold">Ver cómo lo pensó</span>
-        <span className="hidden text-xs text-apagado sm:inline">la cuenta de esta lectura</span>
+        <span className="whitespace-nowrap font-semibold">Por qué el sistema dice esto</span>
+        <span className="hidden text-xs text-apagado sm:inline">la cuenta, paso por paso</span>
       </summary>
 
       <div className="space-y-6 border-t border-borde px-4 py-5">
