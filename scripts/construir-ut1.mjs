@@ -78,14 +78,52 @@ function aviso(texto) {
   process.stdout.write(`${texto}\n`);
 }
 
-function bajarYExtraer(carpeta) {
+/* El tarball ronda los 25 MB. Cualquier cosa mucho más chica no es la lista:
+   es una página de error, una redirección o un bloqueo contestado con un 200. */
+const MINIMO_CREIBLE = 5e6;
+
+/**
+ * 🔴 **Con `curl` esto falló en Vercel el 21/9 y falló en silencio:** bajó 0 MB
+ * y recién se vio porque `tar` no pudo abrir el archivo. El `--fail` de curl no
+ * cubre una redirección ni un cuerpo de error servido con 200.
+ *
+ * Con `fetch` se puede mirar el código, el tipo de contenido y el tamaño, y
+ * **decir qué pasó en el registro de la compilación** en vez de dejar un archivo
+ * roto. Además sigue las redirecciones solo y no depende de que curl esté.
+ */
+async function bajar(destino) {
+  let ultimo = "";
+  for (let intento = 1; intento <= 3; intento++) {
+    try {
+      const res = await fetch(FUENTE, {
+        headers: { "user-agent": "AntiGro/1.0 (+https://antigro.vercel.app)" },
+        redirect: "follow",
+      });
+      const tipo = res.headers.get("content-type") ?? "sin tipo";
+      if (!res.ok) throw new Error(`contestó ${res.status} (${tipo})`);
+      const datos = Buffer.from(await res.arrayBuffer());
+      if (datos.length < MINIMO_CREIBLE) {
+        throw new Error(
+          `trajo ${datos.length} bytes (${tipo}) — no es la lista: ` +
+            `«${datos.toString("utf8", 0, 200).replace(/\s+/g, " ").trim()}»`,
+        );
+      }
+      writeFileSync(destino, datos);
+      aviso(`· Bajado: ${(datos.length / 1e6).toFixed(1)} MB (intento ${intento})`);
+      return;
+    } catch (error) {
+      ultimo = error instanceof Error ? error.message : String(error);
+      aviso(`  intento ${intento} de 3: ${ultimo}`);
+      if (intento < 3) await new Promise((listo) => setTimeout(listo, 3000 * intento));
+    }
+  }
+  throw new Error(`no se pudo bajar la lista: ${ultimo}`);
+}
+
+async function bajarYExtraer(carpeta) {
   const tar = join(carpeta, "ut1.tar.gz");
   aviso(`· Bajando ${FUENTE}`);
-  execFileSync("curl", ["-sS", "--fail", "--max-time", "600", "-o", tar, FUENTE], {
-    stdio: ["ignore", "inherit", "inherit"],
-  });
-  const peso = statSync(tar).size;
-  aviso(`· Bajado: ${(peso / 1e6).toFixed(1)} MB`);
+  await bajar(tar);
   execFileSync("tar", ["xzf", tar, "-C", carpeta]);
   return join(carpeta, "blacklists");
 }
@@ -247,7 +285,7 @@ function estaAlDia() {
   }
 }
 
-function main() {
+async function main() {
   const arranque = Date.now();
   if (process.argv.includes("--si-hace-falta") && estaAlDia()) {
     aviso("· El índice de categorías ya es del día: no se vuelve a bajar.");
@@ -256,7 +294,7 @@ function main() {
   const carpeta = join(tmpdir(), `ut1-${process.pid}`);
   mkdirSync(carpeta, { recursive: true });
   try {
-    const listas = bajarYExtraer(carpeta);
+    const listas = await bajarYExtraer(carpeta);
     const alDia = statSync(join(listas, "README")).mtime.toISOString();
     const indice = construir(listas);
     const archivo = escribir(indice, alDia);
@@ -277,4 +315,4 @@ function main() {
   }
 }
 
-main();
+await main();
