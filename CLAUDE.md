@@ -36,12 +36,100 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
    datos, alta y mensajería.
 6. **El micrófono.** 7. **La llamada telefónica** (única que necesita contratar telefonía).
 
-🔑 **En paralelo, porque no toca ninguna pantalla: los datos externos.** Lista de categorización de
-la Universidad de Toulouse (CC BY-SA, 66 categorías, conversión a NextDNS ya hecha — `dating` tiene
-8.656 dominios, `stalkerware` 525) y la edad del dominio por RDAP, probada: gratis y sin cuenta.
+🔑 **En paralelo, porque no toca ninguna pantalla: los datos externos.**
+✅ **La lista de categorización de la Universidad de Toulouse YA ESTÁ ADENTRO** (21/9) — ver el
+bloque de abajo. ⬜ Falta la edad del dominio por RDAP, probada: gratis y sin cuenta.
 🔴 **No existen listas públicas de dominios de grooming.** Verificado tres veces. No volver a buscar.
 
 ⛔ **Fuera del alcance y del discurso: bullying.** Decisión suya del 19/9.
+
+---
+
+## 🧩 QUÉ ES CADA SITIO — la lista de UT1, adentro del sistema (21/9)
+
+**Es el paso 01 del orden aprobado**, y lo que convierte la sección 02 del dossier en algo que el
+sistema hace. Hasta hoy reconocía **260 dominios propios** y todo el resto de internet le caía como
+«sin clasificar»: un dominio nuevo a las dos de la mañana era igual de mudo si era un sitio de
+citas, un acortador o la textura de un juego.
+
+### 🔴 Son 62 categorías, no 66 — corregido contra la fuente el 21/9
+
+El número que veníamos repitiendo sale de la página de ellos. **Bajada y contada, la lista de hoy
+trae 69 carpetas con dominios, de las cuales 7 son listas internas de la universidad**
+(`liste_blanche`, `liste_bu`, `examen_pix`, `tricheur_pix`, `reaffected`, `special`,
+`exceptions_liste_bu`) y no categorizan sitios. **Quedan 62**, y ésas entran enteras.
+
+📌 **Entran las 62, no las 18 que el criterio usa hoy** — decisión suya del 21/9: bajar 62 cuesta lo
+mismo que bajar 18 y **el histórico no se recupera hacia atrás**.
+
+### Las tres piezas
+
+| Archivo | Qué hace |
+|---|---|
+| `scripts/construir-ut1.mjs` | Baja el `.tar.gz` (25 MB) y arma el índice. **Corre en cada compilación** (`prebuild`), así la lista viaja siempre al día adentro del despliegue |
+| `src/lib/senales/categorias.ts` | `categoriasDe(dominio)` — **qué es** ese sitio |
+| `src/lib/senales/criterio.ts` | `queEsEsteLugar(dominio)` — **qué hace el sistema** con eso |
+| `src/lib/senales/categorias.prueba.ts` | `npm run probar-categorias` · 25 comprobaciones |
+
+**Medido el 21/9:** 5.186.913 dominios · 62 categorías · **47 MB** · el peor caso —un dominio que no
+está— tarda **0,12 ms**. Y **cero colisiones de huella**: los dominios únicos de la lista y las
+entradas del índice dan el mismo número exacto.
+
+### 📦 Por qué un binario y no una tabla
+
+Son 5,19 millones de dominios: en texto ocupan 175 MB y en la base serían millones de filas que hay
+que reescribir todos los días. Acá cada dominio son **9 bytes** —7 de huella y 2 que dicen qué
+combinación de categorías le toca—, ordenados por huella. La consulta es una búsqueda binaria de
+veintitrés saltos sobre el archivo: **sin red, sin base de datos y sin cargar los 47 MB en memoria**.
+
+🔴 **No se versiona** (`.gitignore`): cambia todos los días y el repositorio engordaría 47 MB por
+jornada. Se genera solo al compilar; `npm run ut1` lo fuerza y `--si-hace-falta` lo saltea si ya es
+del día.
+🔴 **`next.config.mjs` tiene que nombrarlo en `outputFileTracingIncludes`**: no lo importa ningún
+módulo —se abre por ruta con `fs`—, así que Next no lo ve al rastrear y no lo subiría.
+⚠ **Si UT1 no contesta, la compilación NO se cae:** se escribe un índice vacío, `categoriasDe()`
+devuelve `null` y el sistema sigue exactamente como antes. Un dato externo que falta no puede
+voltear el producto — pero lo dice, con `estadoDelIndice()`.
+
+### 🔴 Los dos desempates, que salieron de mirar la lista y no de suponer
+
+Un dominio suele tener varias categorías (`badoo.com` es `blog`, `dating` y `social_networks`), así
+que hace falta desempatar. **«Gana la más fuerte» no alcanza:**
+
+1. 🔴🔴 **`sexual_education` le gana a `adult`.** **Cinco de sus quince sitios están en las dos**
+   —`kinseyconfidential.org`, `masexualite.ca`—, y esa categoría existe justamente para que no se
+   lean como pornografía. Con la regla simple, la categoría anti-falso-positivo no serviría de nada.
+2. 🔴 **`publicite` y `update` no le ganan a nada peligroso:** descartan sólo cuando son la ÚNICA
+   lectura. Hay **diez dominios que son publicidad y malware a la vez**, y ahí manda el riesgo.
+
+### El criterio de producto, que es de él
+
+La tabla entera vive en `criterio.ts` con su porqué al lado. En una línea: **hablan a la primera**
+`stalkerware` · `dating` · `phishing`+`malware` (éstas dos **sólo después de un acortador o un
+filehosting**: son 58 veces más superficie y un aviso semanal que no era nada apaga al adulto) ·
+**pesan y adelantan los días exigidos** `chat` · `shortener` · `filehosting` · `redirector` ·
+`adult` · **van al parte y no a la alerta** `gambling` · `drogue` · **dan la línea base** `games` ·
+`social_networks` · **evitan el falso positivo** `publicite` · `update` · `sexual_education`. El
+resto **se guarda**: ninguna sobra.
+
+🔴 **`dating` habla a la primera A CUALQUIER EDAD** — lo decidió él el 21/9 entre tres opciones:
+todos los chicos del sistema son menores y esos sitios son para mayores de 18. Revisable en
+producción, mirando cuántos avisos genera de verdad.
+
+⚠ **Cómo se dice, y gobierna toda redacción que salga de acá:** *«el teléfono consultó un dominio
+catalogado como sitio de citas»*. **El filtro ve la CONSULTA, no la visita** —una publicidad
+incrustada genera consulta sin que el chico haya entrado—, así que es un hecho fechado y nunca un
+diagnóstico. Hay dos comprobaciones automáticas que lo vigilan.
+
+### ⬜ Lo que falta de esto
+
+1. **Que el motor lo consuma.** Hoy `criterio.ts` contesta bien y **no lo llama nadie**: falta
+   cablear los cuatro caminos en `evaluar.ts` (hablar a la primera, adelantar los días exigidos,
+   restar del lugar-desconocido del observatorio) y la fila del parte.
+2. **El refresco diario sin compilar.** Hoy la lista se renueva cuando hay un despliegue. Dejarla al
+   día sola pide un *deploy hook* disparado por el cron — **es un despliegue automático a
+   producción todos los días y eso lo decide él.**
+3. La edad del dominio por RDAP, que es el otro dato externo probado.
 
 ---
 

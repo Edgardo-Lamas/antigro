@@ -4,13 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/construir-ut1.mjs --si-hace-falta",
+    "ut1": "node scripts/construir-ut1.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "probar-reglas": "node --experimental-strip-types --no-warnings src/lib/ia/reglas.prueba.ts",
     "probar-sugerencias": "node --experimental-strip-types --no-warnings src/lib/datos/sugerencias.prueba.ts",
-    "probar": "npm run probar-reglas && npm run probar-sugerencias && npm run probar-instalacion && npm run probar-turno && npm run probar-tour && npm run probar-terminos && npm run probar-cuestionario && npm run probar-acuse && npm run probar-escalada && npm run probar-parte && npm run probar-hogares && npm run probar-plataformas && npm run probar-regla && npm run probar-consejos",
+    "probar": "npm run probar-reglas && npm run probar-sugerencias && npm run probar-instalacion && npm run probar-turno && npm run probar-tour && npm run probar-terminos && npm run probar-cuestionario && npm run probar-acuse && npm run probar-escalada && npm run probar-parte && npm run probar-hogares && npm run probar-plataformas && npm run probar-regla && npm run probar-consejos && npm run probar-categorias",
     "probar-consejos": "node --experimental-strip-types --no-warnings src/lib/ia/consejos.prueba.ts",
     "probar-regla": "node --experimental-strip-types --no-warnings src/lib/motor/regla.prueba.ts",
     "probar-instalacion": "node --experimental-strip-types --no-warnings src/lib/instalacion.prueba.ts",
@@ -22,7 +24,8 @@
     "probar-escalada": "node --experimental-strip-types --no-warnings src/lib/mensajeria/escalada.prueba.ts",
     "probar-parte": "node --experimental-strip-types --no-warnings src/lib/motor/parte.prueba.ts",
     "probar-hogares": "node --experimental-strip-types --no-warnings src/lib/hogares.prueba.ts",
-    "probar-plataformas": "node --experimental-strip-types --no-warnings src/lib/senales/plataformas.prueba.ts"
+    "probar-plataformas": "node --experimental-strip-types --no-warnings src/lib/senales/plataformas.prueba.ts",
+    "probar-categorias": "node --experimental-strip-types --no-warnings src/lib/senales/categorias.prueba.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
