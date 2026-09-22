@@ -28,10 +28,19 @@ base ni entrega de mensajes**, y hay que dejar tiempo para grabar y editar el vi
    Argentino y lo van a ver así, cargarle todo al español de ellos… no me parece que tenga sentido
    ahora"*. En su lugar entró **que el país lo elija el usuario** (abajo), que es lo que sí cambia
    a quién se llama. Relevado: **192 marcas de voseo, ~138 en texto que lee una persona.**
-3. **El ensayo de la conversación con el hijo** — el asistente hace de hijo adolescente. El
-   diferencial que no tiene ningún competidor.
-4. **El avatar** — dónde vive (presente, no un botón) y qué forma tiene (cuerpo entero translúcido).
-   Cuatro clips en bucle, nunca video por respuesta.
+3. ⛔ **El ensayo de la conversación con el hijo — POSTERGADO por Edgardo el 21/9**, después de
+   pedirme la opinión honesta: *"las reacciones de los chicos puede ser cualquier cosa, y no vamos
+   a poder encapsular todas las variables posibles, además de que nos metemos en un terreno
+   complicado para definirlo con tan poco tiempo"*. Sigue siendo el diferencial que no tiene ningún
+   competidor; se retoma después del 24. 🔴 **El reparo de fondo, para cuando se retome:** la
+   devolución de «qué abrió la puerta y qué la cerró» es criterio psicológico y **hoy no tiene
+   fuente atrás** —Faro Digital salió el 19/9—, en un sistema construido sobre no afirmar lo que no
+   puede fundar. Eso se resuelve antes de escribir código.
+4. 🟡 **El avatar — EN CURSO desde el 21/9, y ocupó la sesión entera.** Es una **mujer latina
+   adulta**, «Sofi», y **son dos clips y no cuatro**. 📄 Todo —las decisiones, los prompts de la
+   imagen y de los dos movimientos, y cómo entran al panel— vive en `docs/avatar-sofi.md`.
+   ⬜ **Falta sólo lo suyo: generar en Flow la imagen final y los dos clips.** De este lado está
+   todo hecho y en producción.
 5. **El botón antipánico del chico** — conceptualmente lo más valioso; va quinto porque toca base de
    datos, alta y mensajería.
 6. **El micrófono.** 7. **La llamada telefónica** (única que necesita contratar telefonía).
