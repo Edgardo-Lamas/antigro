@@ -32,10 +32,14 @@
  *  200-224 px de la franja del monitor; 480 cubre eso con el doble de densidad
  *  de las pantallas buenas. Más resolución no se ve y sí se descarga.
  *
- *  🔴 **NO le toca el negro del fondo.** El panel lo funde con `mix-blend-mode:
- *  screen`, que hace desaparecer el negro y sumar sólo la luz: por eso el clip
- *  tiene que venir filmado como luz sobre negro puro y por eso no hace falta
- *  canal alfa, que Flow no entrega.
+ *  🔑 **Le recorta los negros, y esto no es cosmético.** El panel funde el clip
+ *  con `mix-blend-mode: screen`, que hace desaparecer el negro y sumar sólo la
+ *  luz — por eso alcanza con filmar sobre negro puro y no hace falta canal
+ *  alfa, que Flow no entrega. 🔴 **Pero la compresión deja el fondo en un gris
+ *  de 3-6 %, no en cero, y `screen` lo suma igual: se ve un cerco rectangular
+ *  clarito alrededor de la figura.** Comprobado el 21/9 sobre la primera imagen.
+ *  `colorlevels` manda a negro puro todo lo que esté por debajo del 6 % y el
+ *  cerco desaparece, con la ventaja extra de que el color queda más saturado.
  */
 
 import { spawn } from "node:child_process";
@@ -83,7 +87,7 @@ async function buscarCrudo(estado) {
 
 function filtro() {
   const recorte = segundos > 0 ? `trim=0:${segundos},setpts=PTS-STARTPTS,` : "";
-  const base = `[0:v]${recorte}scale=-2:480,format=yuv420p`;
+  const base = `[0:v]${recorte}colorlevels=rimin=0.06:gimin=0.06:bimin=0.06,scale=-2:480,format=yuv420p`;
   if (!espejo) return `${base}[v]`;
   return `${base},split[a][b];[b]reverse[r];[a][r]concat=n=2:v=1:a=0[v]`;
 }
