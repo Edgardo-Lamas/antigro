@@ -54,6 +54,54 @@ bloque de abajo. ⬜ Falta la edad del dominio por RDAP, probada: gratis y sin c
 
 ---
 
+## 🏫 LOS CENTROS EDUCATIVOS — construidos el 23/9, rama `centros-educativos`
+
+**Lo pidió Edgardo:** *"crea las dos funciones, no las dejes escritas"*. El formulario de IEBS y el
+resumen describían al centro educativo (la escuela que contrata AntiGro para sus familias) haciendo
+dos cosas que el sistema no hacía. Ahora las hace:
+
+1. **El aviso al centro** cuando un mismo sitio que merece atención aparece entre varios alumnos.
+2. **El distintivo**: un sello para la web del centro que enlaza a una verificación pública.
+
+🔴 **El centro nunca ve a un alumno ni a una familia.** Recibe un dominio y un número. Sabe cuántas
+familias activaron su licencia, nunca cuáles. `avisos_centro` no tiene una sola columna que apunte a
+un chico. 🔴 **Y AntiGro no produce contenido** (decisión de Edgardo, 23/9): el material que el centro
+reparte es de INCIBE y ANAR (o del Ministerio de Justicia en AR); se selecciona y se acerca.
+
+| Pieza | Dónde |
+|---|---|
+| La base | Migración **21** (`schema.sql`): `centros`, `avisos_centro`, `familias.centro_id`, `usuarios.centro_id` y rol `centro`. ✅ **Aplicada a producción el 23/9** |
+| El criterio, puro y probado | `src/lib/centros/patrones.ts` · `npm run probar-centros` (18) |
+| El reloj | `src/lib/centros/revisar.ts`, llamado al final de `/api/cron/revisar` |
+| La base, del lado del servidor | `src/lib/centros/datos.ts` |
+| El sello | `src/lib/centros/distintivo.ts` · `/distintivo/[codigo]` y `/distintivo/[codigo]/sello.svg` |
+| El panel del coordinador | `/centro` (rol `centro`; el middleware lo separa de `/mi-familia` y `/panel`) |
+| El alta de un centro | La administración, en `/panel` → `POST /api/panel/centros` (y `PATCH` para pausar) |
+| La invitación a las familias | El mismo `?i=` del alta: si el código es de un centro activo con licencias libres, la familia nace con `centro_id` |
+| El Telegram del coordinador | El webhook prueba `vincularCoordinador` si el código no es de una familia |
+| De punta a punta | `CANAL=chrome node prueba-centros.mjs` (20 comprobaciones, **borra lo que crea**) |
+
+**El criterio del aviso, más exigente que el observatorio** porque del otro lado hay una institución:
+el centro tiene que tener **5 alumnos o más**, el lugar lo tienen que haber visto **3 o más**, no puede
+ser un lugar sin contacto ni de mensajería que exige entregar el contacto (WhatsApp), y tiene que
+destacarse: que no lo reconozca nadie, que su público sea angosto **comparado con el centro**, o que
+se concentre en alumnos con alerta (2 o más). No se repite el mismo sitio al mismo centro en 30 días.
+
+🔴 **El perfil angosto se mide contra el centro, no contra el mundo.** En un colegio de primaria solo de
+niñas, todas son «nenas de 7 a 10»: cualquier juego se vería angosto. Hay una prueba que lo cuida.
+🔴 **El porqué que lee el centro NO es el del observatorio.** Aquél dice «aparece N veces más entre los
+chicos con alerta», y eso le contaría a la escuela que en esas casas sonó un aviso. El criterio usa las
+alertas para decidir; el texto no las nombra nunca (`motivosParaElCentro`).
+🔴 **Mismo freno que las familias: con señales simuladas no se avisa nada.** Hoy, sin NextDNS, el
+panel del centro lo dice en pantalla.
+
+⚠ **Lo que apareció en la prueba y no en el typecheck:** Next 14 guardaba en caché la consulta de
+supabase-js, y un centro **pausado seguía mostrando el distintivo vigente**. Todas las lecturas de
+`centros/datos.ts` llaman `unstable_noStore()`. 📌 **Puede estar pasando en otras rutas sin cookies**
+(por ejemplo `/api/observatorio`): no se tocó, queda anotado.
+
+---
+
 ## 🔴🔴 LA NOTA DEL CIPDH ERA FALSA, Y NOS ESTABA COSTANDO CIFRAS — 21/9
 
 **Desde el 21/8 este repositorio decía, en cinco archivos, que el informe del CIPDH (UNESCO, 2021)

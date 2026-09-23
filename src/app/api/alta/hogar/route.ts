@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { repositorio } from "@/lib/datos";
 import { deQuienViene, tomarTurno } from "@/lib/limite";
 import { VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
+import { centroPorInvitacion, familiasDelCentro } from "@/lib/centros/datos";
 
 /**
  * ─────────────────────────────────────────────────────────────────────────────
@@ -186,26 +187,49 @@ export async function POST(req: Request) {
   /* ── 2. El código de invitación ──────────────────────────────────────────
      ⚠ Va ANTES del tope global a propósito: si no, cualquiera sin código
      quemaría el cupo del día y el jurado encontraría la puerta cerrada. */
-  const esperado = codigoEsperado();
-  if (!esperado) {
-    return NextResponse.json(
-      {
-        error:
-          "Las altas están cerradas en este momento. Podés ver el sistema entero " +
-          "funcionando sin registrarte.",
-        cerrado: true,
-      },
-      { status: 503 },
-    );
+  /* ── 🏫 LA INVITACIÓN DE UN CENTRO EDUCATIVO (23/9) ──────────────────────
+     🔑 El enlace que un centro reparte entre sus familias lleva SU código en
+     el mismo lugar que el del jurado (`?i=`). Se prueba primero: si es de un
+     centro activo y le quedan licencias, la familia nace colgada de él.
+     🔴 La licencia se cuenta ANTES de crear nada, y si no quedan se dice con
+     todas las letras: la familia tiene que saber que es el centro el que tiene
+     que ampliar, no ella la que hizo algo mal. */
+  const centro = invitacion ? await centroPorInvitacion(invitacion) : null;
+  if (centro) {
+    if ((await familiasDelCentro(centro.id)) >= centro.licencias) {
+      return NextResponse.json(
+        {
+          error:
+            `${centro.nombre} ya usó todas sus licencias. Avisale al centro para que ` +
+            "las amplíe; mientras tanto podés ver el sistema funcionando sin registrarte.",
+          sinLicencias: true,
+        },
+        { status: 409 },
+      );
+    }
+  } else {
+    const esperado = codigoEsperado();
+    if (!esperado) {
+      return NextResponse.json(
+        {
+          error:
+            "Las altas están cerradas en este momento. Podés ver el sistema entero " +
+            "funcionando sin registrarte.",
+          cerrado: true,
+        },
+        { status: 503 },
+      );
+    }
+    if (invitacion?.trim() !== esperado) {
+      /* 📌 No dice «código incorrecto» ni «falta el código»: los dos casos suenan
+         igual desde afuera. El que tiene el enlace bueno nunca ve esto. */
+      return NextResponse.json(
+        { error: "Este enlace no habilita crear una cuenta.", sinInvitacion: true },
+        { status: 403 },
+      );
+    }
   }
-  if (invitacion?.trim() !== esperado) {
-    /* 📌 No dice «código incorrecto» ni «falta el código»: los dos casos suenan
-       igual desde afuera. El que tiene el enlace bueno nunca ve esto. */
-    return NextResponse.json(
-      { error: "Este enlace no habilita crear una cuenta.", sinInvitacion: true },
-      { status: 403 },
-    );
-  }
+
 
   /* ── 3. El techo del gasto, pase lo que pase ─────────────────────────────
      🔑 Existe porque el código viaja escrito adentro del enlace, y un enlace
@@ -241,6 +265,9 @@ export async function POST(req: Request) {
     hogar,
     familiaId,
     nombreDeLaFamilia,
+    /* 🏫 Sólo al crear la familia: la segunda puerta de padres separados ya
+       tiene su familia, y con ella su centro. */
+    centroId: familiaId ? undefined : centro?.id,
     /* 📌 Sólo pesa cuando se crea la familia. En la segunda puerta de padres
        separados la familia ya existe y su país con ella: el que abre la otra
        casa no le cambia el país al panel del otro. */

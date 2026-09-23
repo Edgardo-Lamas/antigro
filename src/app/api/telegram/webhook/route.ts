@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { repositorio } from "@/lib/datos";
+import { vincularCoordinador } from "@/lib/centros/datos";
 import { codigoDeUnStart } from "@/lib/mensajeria/vinculacion";
 import { tokenDeUnToque } from "@/lib/mensajeria/acuse";
 import { TransporteTelegram } from "@/lib/mensajeria";
@@ -152,6 +153,23 @@ export async function POST(req: Request) {
   }
 
   const vinculacion = await repositorio().vincularPorCodigo(codigo, String(chatId));
+
+  /* ── 🏫 El coordinador de un centro educativo (23/9) ──────────────────────
+     Si el código no es de nadie de una familia, puede ser el de un centro. Va
+     después a propósito: las familias son el caso común. */
+  if (!vinculacion) {
+    const centro = await vincularCoordinador(codigo, String(chatId));
+    if (centro) {
+      await responder(
+        `Listo${centro.coordinador ? `, ${centro.coordinador}` : ""}. Este canal queda conectado ` +
+          `como el del centro ${centro.nombre}.\n\n` +
+          "Por acá van a llegar los avisos cuando un mismo sitio que merece atención aparezca " +
+          "entre varios alumnos. Siempre como un número: nunca se identifica a ningún alumno " +
+          "ni a ninguna familia.",
+      );
+      return NextResponse.json({ ok: true, vinculado: "centro" });
+    }
+  }
 
   if (!vinculacion) {
     await responder(

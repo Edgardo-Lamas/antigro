@@ -89,6 +89,12 @@ export interface AltaDeHogar {
   /** Cómo se llama la familia. Sólo cuando se está creando. */
   nombreDeLaFamilia?: string;
   /**
+   * 🏫 El centro educativo que la invitó, si llegó por la licencia de una
+   * escuela (23/9). Sólo cuenta al crear la familia. El centro no ve nada de
+   * esta familia: sólo suma uno a cuántas activaron su licencia.
+   */
+  centroId?: string;
+  /**
    * ───────────────────────────────────────────────────────────────────────────
    * 🔴 QUÉ VERSIÓN DE LOS TÉRMINOS ACEPTÓ — 18/8, y es obligatorio
    * ───────────────────────────────────────────────────────────────────────────

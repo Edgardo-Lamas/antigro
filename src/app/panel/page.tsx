@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ADULTOS_SUGERIDOS, repositorio } from "@/lib/datos";
+import { familiasDelCentro, listarCentros } from "@/lib/centros/datos";
+import Centros from "./Centros";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,18 @@ export default async function Panel() {
   const repo = repositorio();
   const familias = await repo.listarFamilias();
   const enMemoria = repo.clase === "memoria";
+  const centros = await Promise.all(
+    (await listarCentros()).map(async (c) => ({
+      id: c.id,
+      nombre: c.nombre,
+      pais: c.pais,
+      licencias: c.licencias,
+      familias: await familiasDelCentro(c.id),
+      activo: c.activo,
+      distintivo: c.distintivo,
+      telegram: Boolean(c.canalDestino),
+    })),
+  );
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -60,6 +74,8 @@ export default async function Panel() {
           ))}
         </ul>
       </section>
+
+      <Centros centros={centros} hayBase={!enMemoria} />
 
       <section className="mt-8 rounded-lg border border-borde bg-superficie px-5 py-5">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-acento">

@@ -5,6 +5,7 @@ import { redactarLecturaParaAdultos, redactarMensajeAlChico } from "@/lib/ia";
 import { quienLoVio } from "@/lib/mensajeria/acuse";
 import { obtenerFuente } from "@/lib/senales";
 import { refrescarLaLista } from "@/lib/senales/refresco";
+import { revisarCentros } from "@/lib/centros/revisar";
 import {
   DIAS_ENTRE_PARTES,
   armarParte,
@@ -315,11 +316,17 @@ export async function GET(req: Request) {
      `senales/refresco.ts`. */
   const listaDeCategorias = await refrescarLaLista();
 
+  /* 🔑 Los centros van DESPUÉS de las familias y aparte: lo que se le avisa a
+     un centro es un agregado de sus alumnos, nunca lo de una casa. Ver
+     `centros/revisar.ts`, que tiene el mismo freno con señales simuladas. */
+  const centros = await revisarCentros(ahora);
+
   return NextResponse.json({
     ok: true,
     corrida: ahora.toISOString(),
     revisadas,
     escaladas: revisadas.filter((r) => r.escalo).length,
     listaDeCategorias,
+    centros,
   });
 }

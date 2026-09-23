@@ -801,3 +801,88 @@ alter table familias add constraint familias_pais_check
 
 comment on column familias.pais is
   'A que pais se deriva esta familia: decide los telefonos de ayuda, los organismos y los articulos que se citan. NO decide el idioma. Lo elige quien crea la cuenta y se puede cambiar desde el panel.';
+
+
+-- ═════════════════════════════════════════════════════════════════
+--  21. LOS CENTROS EDUCATIVOS — 23/9
+-- ═════════════════════════════════════════════════════════════════
+--
+--  🔑 **Lo pidió Edgardo: construir las dos funciones del centro, no dejarlas
+--  escritas.** El centro educativo es la escuela que contrata AntiGro para sus
+--  familias (licencia institucional). Hace dos cosas en el sistema:
+--    1. Recibe un AVISO cuando un mismo sitio que merece atención aparece entre
+--       varios de sus alumnos. Siempre agregado: cuántos, nunca quiénes.
+--    2. Muestra un DISTINTIVO público y verificable.
+--
+--  🔴 **El centro nunca ve datos de ningún alumno ni de ninguna familia.** Por
+--  eso `avisos_centro` guarda un dominio y un número, y no hay una sola columna
+--  que apunte a un chico. Es la misma disciplina del observatorio: por dominio,
+--  cuántos chicos distintos, nunca cuáles.
+--
+--  📌 AntiGro no crea contenido: el material que el centro reparte es de
+--  organismos oficiales (INCIBE, ANAR). No hay tabla para eso porque no hay nada
+--  nuestro que guardar.
+
+create table if not exists centros (
+  id                  uuid primary key default gen_random_uuid(),
+  nombre              text not null,
+  pais                text not null default 'ES' check (pais in ('AR', 'ES')),
+  --  🔑 La invitación que el centro reparte entre sus familias. Viaja en el
+  --  enlace (`/entrar?i=<codigo>`), igual que la del jurado.
+  codigo              text not null unique,
+  --  Cuántas familias puede sumar. El alta se frena al llegar.
+  licencias           integer not null default 0 check (licencias >= 0),
+  --  🔑 La dirección pública del distintivo. Distinta del código de invitación
+  --  a propósito: el distintivo se publica en la web del centro, y si fuera el
+  --  mismo código cualquiera que lo viera podría darse de alta con él.
+  distintivo          text not null unique,
+  activo              boolean not null default true,
+  --  El coordinador de bienestar y protección (LOPIVI art. 35). Recibe los
+  --  avisos por Telegram, igual que un adulto responsable.
+  coordinador         text,
+  canal_destino       text,
+  codigo_vinculacion  text unique,
+  vinculado_en        timestamptz,
+  created_at          timestamptz not null default now()
+);
+
+alter table centros enable row level security;
+
+alter table familias add column if not exists centro_id uuid
+  references centros(id) on delete set null;
+create index if not exists familias_centro_idx on familias (centro_id);
+
+--  La cuenta del centro vive en `usuarios`, como las demás: una sola tabla para
+--  NextAuth. `rol = 'centro'` y colgada del centro, nunca de una familia.
+alter table usuarios add column if not exists centro_id uuid
+  references centros(id) on delete cascade;
+
+alter table usuarios drop constraint if exists usuarios_rol_check;
+alter table usuarios add constraint usuarios_rol_check
+  check (rol in ('admin', 'adulto', 'centro'));
+
+alter table usuarios drop constraint if exists usuarios_familia_coherente;
+alter table usuarios add constraint usuarios_familia_coherente check (
+  (rol = 'admin'  and familia_id is null and centro_id is null) or
+  (rol = 'adulto' and familia_id is not null and centro_id is null) or
+  (rol = 'centro' and familia_id is null and centro_id is not null)
+);
+
+--  🔴 Lo que se le avisó a un centro. Un dominio y un número, nada más.
+create table if not exists avisos_centro (
+  id          uuid primary key default gen_random_uuid(),
+  centro_id   uuid not null references centros(id) on delete cascade,
+  dominio     text not null,
+  --  Cuántos alumnos DISTINTOS lo vieron. Un conteo, no una lista.
+  alumnos     integer not null check (alumnos > 0),
+  por_que     text not null,
+  texto       text not null,
+  entregado   boolean not null default false,
+  fecha       timestamptz not null default now()
+);
+
+create index if not exists avisos_centro_idx on avisos_centro (centro_id, fecha desc);
+alter table avisos_centro enable row level security;
+
+comment on table avisos_centro is
+  'Patrones colectivos avisados a un centro educativo: un dominio y cuantos alumnos distintos lo vieron. Nunca identifica a un alumno ni a una familia.';

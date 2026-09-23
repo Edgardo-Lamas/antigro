@@ -252,6 +252,7 @@ export class RepositorioSupabase implements Repositorio {
              los teléfonos a los que el sistema va a derivar y las leyes que
              esta familia acaba de aceptar. */
           pais: alta.pais ?? PAIS_POR_DEFECTO,
+          centro_id: alta.centroId ?? null,
         })
         .select()
         .single<FilaFamilia>();

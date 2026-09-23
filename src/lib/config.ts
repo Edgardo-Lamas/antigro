@@ -131,3 +131,10 @@ export const EDAD_PARA_ELEGIR_REFERENTE = 11;
 export function quienEligeAlReferente(edad: number): "el_chico" | "los_padres" {
   return edad >= EDAD_PARA_ELEGIR_REFERENTE ? "el_chico" : "los_padres";
 }
+
+/**
+ * La dirección pública del sitio. La usa el distintivo de los centros, que se
+ * inserta en webs ajenas y tiene que enlazar de vuelta a una dirección entera.
+ * 📌 Misma variable y mismo respaldo que `layout.tsx`.
+ */
+export const SITIO = process.env.NEXT_PUBLIC_SITE_URL ?? "https://antigro.vercel.app";

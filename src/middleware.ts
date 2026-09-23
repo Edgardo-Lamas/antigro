@@ -10,6 +10,7 @@ import { NextResponse } from "next/server";
  *  |----------------|--------------------------------|------------------|
  *  | `/panel`       | La administración (Edgardo)    | cuenta `admin`   |
  *  | `/mi-familia`  | Los dos adultos responsables   | cuenta `adulto`  |
+ *  | `/centro`      | El coordinador de un centro    | cuenta `centro`  |
  *  | `/familia/[t]` | Cualquiera con el enlace       | nada             |
  *
  *  🔴 **Un `admin` NO entra a `/mi-familia`, aunque sea la cuenta más
@@ -21,8 +22,8 @@ import { NextResponse } from "next/server";
  *  diseña con la familia enterada, no como efecto secundario de un rol.
  */
 
-const puerta = (rol: unknown): "/panel" | "/mi-familia" =>
-  rol === "adulto" ? "/mi-familia" : "/panel";
+const puerta = (rol: unknown): "/panel" | "/mi-familia" | "/centro" =>
+  rol === "adulto" ? "/mi-familia" : rol === "centro" ? "/centro" : "/panel";
 
 export default auth((req) => {
   const ruta = req.nextUrl.pathname;
@@ -35,6 +36,8 @@ export default auth((req) => {
   const enEntrar = ruta === "/entrar";
   /** El recorrido de alta: ya hay credencial, falta quién vive en la casa. */
   const enAlta = ruta.startsWith("/alta");
+  /** El panel del centro educativo (23/9). */
+  const enCentro = ruta.startsWith("/centro");
 
   /* ── Las dos pantallas de logueo ──────────────────────────────────────── */
   // Ya con sesión abierta, ninguna de las dos tiene sentido: va a su casa.
@@ -45,13 +48,21 @@ export default auth((req) => {
   /* ── El panel de administración ───────────────────────────────────────── */
   if (enPanel && !enLoginDelPanel) {
     if (!sesion) return NextResponse.redirect(new URL("/panel/login", req.url));
-    if (rol !== "admin") return NextResponse.redirect(new URL("/mi-familia", req.url));
+    if (rol !== "admin") return NextResponse.redirect(new URL(puerta(rol), req.url));
   }
 
   /* ── El panel de la familia ───────────────────────────────────────────── */
   if (enMiFamilia) {
     if (!sesion) return NextResponse.redirect(new URL("/entrar", req.url));
-    if (rol !== "adulto") return NextResponse.redirect(new URL("/panel", req.url));
+    if (rol !== "adulto") return NextResponse.redirect(new URL(puerta(rol), req.url));
+  }
+
+  /* ── El panel del centro educativo ────────────────────────────────────── */
+  /* 🔴 Un centro NO entra a `/mi-familia` ni al revés: una escuela no pertenece
+     a ninguna familia, y una familia no ve lo que se le avisa a la escuela. */
+  if (enCentro) {
+    if (!sesion) return NextResponse.redirect(new URL("/entrar", req.url));
+    if (rol !== "centro") return NextResponse.redirect(new URL(puerta(rol), req.url));
   }
 
   /* ── El recorrido de alta ─────────────────────────────────────────────── */
@@ -59,7 +70,7 @@ export default auth((req) => {
      `admin` no pertenece a ninguna familia, así que acá no tiene qué cargar. */
   if (enAlta) {
     if (!sesion) return NextResponse.redirect(new URL("/entrar", req.url));
-    if (rol !== "adulto") return NextResponse.redirect(new URL("/panel", req.url));
+    if (rol !== "adulto") return NextResponse.redirect(new URL(puerta(rol), req.url));
   }
 });
 
@@ -74,5 +85,7 @@ export const config = {
     "/entrar",
     "/alta",
     "/alta/:path*",
+    "/centro",
+    "/centro/:path*",
   ],
 };

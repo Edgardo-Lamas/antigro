@@ -43,7 +43,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         const db = baseDeDatos()!;
         const { data: usuario, error } = await db
           .from("usuarios")
-          .select("id, email, nombre, rol, password_hash, activo, familia_id, hogar")
+          .select("id, email, nombre, rol, password_hash, activo, familia_id, hogar, centro_id")
           .eq("email", email.toLowerCase())
           .single();
 
@@ -90,6 +90,22 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           familiaId = usuario.familia_id as string;
         }
 
+        /* ── 🏫 La cuenta de un centro educativo (23/9) ──────────────────
+           🔑 Igual que la de una familia: el centro sale de ACÁ y viaja en la
+           sesión, nunca del navegador. Y si el centro se pausa, la cuenta
+           deja de abrir. */
+        let centroId: string | null = null;
+        if (usuario.rol === "centro") {
+          if (!usuario.centro_id) return null;
+          const { data: centro } = await db
+            .from("centros")
+            .select("activo")
+            .eq("id", usuario.centro_id)
+            .single();
+          if (!centro || centro.activo === false) return null;
+          centroId = usuario.centro_id as string;
+        }
+
         /* ─────────────────────────────────────────────────────────────────
            🔴 QUEDA CONSTANCIA DE QUE SE ENTRÓ — 20/8, migración 19
            ─────────────────────────────────────────────────────────────────
@@ -128,6 +144,7 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           name: usuario.nombre,
           rol: usuario.rol,
           familiaId,
+          centroId,
           /** Cuál de las dos casas. `null` cuando hay una sola, que es lo normal. */
           hogar: (usuario.hogar as string | null) ?? null,
         };
@@ -143,10 +160,12 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           usuarioId?: string;
           rol?: string;
           familiaId?: string | null;
+          centroId?: string | null;
           hogar?: string | null;
         };
         token.rol = u.rol;
         token.familiaId = u.familiaId ?? null;
+        token.centroId = u.centroId ?? null;
         token.hogar = u.hogar ?? null;
         token.usuarioId = u.usuarioId ?? u.id ?? null;
       }
@@ -171,11 +190,13 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
       const u = session.user as {
         rol?: unknown;
         familiaId?: unknown;
+        centroId?: unknown;
         hogar?: unknown;
         usuarioId?: unknown;
       };
       u.rol = token.rol;
       u.familiaId = token.familiaId;
+      u.centroId = token.centroId ?? null;
       u.hogar = token.hogar;
       /* 📌 `token.sub` de respaldo: las sesiones abiertas ANTES del 20/8 no
          llevan `usuarioId`, y sin esto quedarían sin poder cambiar su clave
