@@ -33,7 +33,7 @@
    cual, sin empaquetador, y como módulo ES exige la extensión para resolverlo.
    El `allowImportingTsExtensions` del tsconfig es lo que deja escribirlo así
    sin que se queje el typecheck. */
-import { revisarRespuestaDelAsistente } from "./reglas.ts";
+import { frasesQueFrenaron, revisarRespuestaDelAsistente } from "./reglas.ts";
 
 interface Caso {
   nombre: string;
@@ -196,5 +196,19 @@ for (const caso of CASOS) {
   }
 }
 
-console.log(`\n${CASOS.length - fallaron} de ${CASOS.length}`);
+/* ── 🔴 Lo que va al registro del servidor (auditoría del 24/9) ─────────────
+   Sólo la frase que frenó, nunca el resto: el resto habla de un chico concreto.
+   Si esto se afloja, el nombre de un menor vuelve a terminar en los registros
+   de Vercel. */
+const frenada =
+  "Ana pasó varias noches despierta hablando con alguien de Roblox. " +
+  "Quedate tranquila, no es nada.";
+const frases = frasesQueFrenaron(frenada);
+const soloLaFrase =
+  frases.length > 0 && frases.every((f) => !f.includes("Ana") && !f.includes("Roblox"));
+if (!soloLaFrase) fallaron++;
+console.log(`${soloLaFrase ? "✓" : "✗"} 🔴 al registro va la frase que frenó, sin el nombre ni el resto`);
+if (!soloLaFrase) console.log(`    frases: ${JSON.stringify(frases)}`);
+
+console.log(`\n${CASOS.length + 1 - fallaron} de ${CASOS.length + 1}`);
 process.exit(fallaron > 0 ? 1 : 0);

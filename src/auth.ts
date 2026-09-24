@@ -1,7 +1,20 @@
-import NextAuth from "next-auth";
+import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { baseDeDatos, hayBase } from "@/lib/supabase";
+import { deQuienViene, tomarTurno } from "@/lib/limite";
+
+/**
+ * El tope de intentos del login, con nombre propio para que la pantalla lo
+ * diga como lo que es. Sin esto, quien llegó al tope leería «el email o la
+ * contraseña no coinciden» con la clave correcta, y seguiría probando.
+ *
+ * 📌 No revela si el correo existe: el tope por correo salta igual para una
+ * dirección que tiene cuenta que para una que no.
+ */
+class DemasiadosIntentos extends CredentialsSignin {
+  code = "demasiados_intentos";
+}
 
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   providers: [
@@ -11,10 +24,30 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         password: { label: "Contraseña", type: "password" },
       },
 
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         const email = credentials?.email as string | undefined;
         const password = credentials?.password as string | undefined;
         if (!email || !password) return null;
+
+        /* ── 🔴 EL TOPE DE INTENTOS — auditoría del 24/9 ─────────────────────
+           Era la única puerta del sistema sin freno: la clave, la segunda
+           puerta y el alta ya tenían el suyo, y justo ésta —la que abre el
+           informe de un chico— dejaba probar claves sin parar. La clave de un
+           hogar la elige la familia y alcanza con ocho caracteres.
+
+           🔑 **Dos topes, y cada uno frena un ataque distinto:** por CORREO
+           frena al que insiste sobre una casa; por IP, al que prueba la misma
+           clave filtrada contra muchos correos. Se cuenta ANTES de bcrypt: si
+           no, cada intento frenado igual costaría el cálculo del hash.
+
+           📌 Cuenta todos los intentos, también los buenos. Una familia que
+           entra diez veces en quince minutos no existe; un script sí. Y ojo:
+           correr todas las `prueba-*.mjs` seguidas desde una misma máquina
+           puede tocar el tope por IP — es el tope andando, no un fallo. */
+        const ip = request ? deQuienViene(request) : "desconocido";
+        const porCorreo = await tomarTurno(`login:${email.toLowerCase()}`, 15 * 60, 10);
+        const porIp = await tomarTurno(`login-ip:${ip}`, 15 * 60, 30);
+        if (!porCorreo.permitido || !porIp.permitido) throw new DemasiadosIntentos();
 
         /* ── Modo demo: sin Supabase, el panel igual se puede abrir ──
            🔴 **Sin credenciales en el entorno no entra nadie, y eso es a

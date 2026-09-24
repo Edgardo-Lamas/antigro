@@ -187,6 +187,12 @@ function Puerta() {
          contraseña equivocada— a propósito: si dijera cuál de las dos es,
          cualquiera podría averiguar qué direcciones tienen cuenta en un
          sistema que cuida chicos. */
+      /* 🔑 El tope de intentos (auditoría del 24/9) se dice aparte: con la
+         clave buena y el mensaje de siempre, la persona seguiría probando. */
+      if (res.code === "demasiados_intentos") {
+        setError("Hubo demasiados intentos seguidos. Esperá quince minutos y probá de nuevo.");
+        return;
+      }
       setError("El email o la contraseña no coinciden.");
     } catch {
       /* 🔴 Acá no había NADA: un `try` con `finally` y sin `catch`. Si el

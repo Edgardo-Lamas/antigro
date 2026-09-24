@@ -45,7 +45,7 @@ import {
 } from "@/lib/paises";
 import type { Lectura } from "@/lib/motor";
 import { tituloDeLaLectura } from "@/lib/motor";
-import { revisarRespuestaDelAsistente } from "./reglas";
+import { frasesQueFrenaron, revisarRespuestaDelAsistente } from "./reglas";
 import type { Redaccion } from "./redactar";
 
 const MODELO = "claude-opus-5";
@@ -506,14 +506,16 @@ export async function responderAlAdulto(entrada: {
          los dos contestan el respaldo. Acá quedan el motivo y la frase que lo
          disparó, que es lo único con lo que después se puede afinar el patrón.
 
-         ⚠ Va al registro del servidor, no a la pantalla del adulto: es texto
-         que justamente se decidió no mostrarle. */
+         🔴 **La frase, NO la respuesta entera** — auditoría del 24/9. Hasta ese
+         día iba el texto completo, y habla de un chico concreto: datos
+         sensibles de un menor en el registro de Vercel, sin control de acceso
+         ni plazo de borrado. Ver `frasesQueFrenaron`. */
+      const frases = frasesQueFrenaron(texto);
       console.warn(
         "[asistente] el control frenó una respuesta ·",
         veredicto.motivos.join(" · "),
-        "\n────────\n",
-        texto,
-        "\n────────",
+        frases.length > 0 ? `· frases: ${frases.map((f) => `«${f}»`).join(", ")}` : "",
+        `· ${texto.length} caracteres`,
       );
 
       return {

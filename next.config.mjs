@@ -1,5 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  /* 🔴 El optimizador de imágenes (`/_next/image`) queda APAGADO — auditoría
+     del 24/9. La app no usa `next/image` en ningún lado, y Next 14 ya no recibe
+     parches: el aviso GHSA-2xp9-vwfh-vxw4 (ejecución remota con archivos AVIF)
+     se corrige recién en la 15.5.24. Una puerta que nadie usa y que no se puede
+     arreglar, se cierra. Si algún día hace falta `next/image`, se vuelve a
+     encender DESPUÉS de subir de versión. */
+  images: { unoptimized: true },
+
+  /* 📌 Sin la cabecera `x-powered-by: Next.js`: no le sirve a nadie más que al
+     que busca qué versión atacar. */
+  poweredByHeader: false,
+
   /* 🔑 El índice de categorías de UT1 (`datos/ut1.bin`, ~47 MB) no lo importa
      ningún módulo: se abre por ruta con `fs`, así que Next no lo ve al rastrear
      las dependencias y no lo subiría al despliegue. Esto se lo dice. Ver

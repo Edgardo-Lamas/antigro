@@ -181,7 +181,12 @@ function laNombraSinDecirla(texto: string, indice: number): boolean {
  * verdad más abajo: alcanzaba con nombrar la frase antes de decirla.
  */
 function revisar(texto: string, reglas: ReglaDeTexto[]): string[] {
-  const motivos: string[] = [];
+  return hallazgos(texto, reglas).map((h) => h.motivo);
+}
+
+/** Lo mismo que `revisar`, pero con la frase exacta que disparó cada regla. */
+function hallazgos(texto: string, reglas: ReglaDeTexto[]): { motivo: string; frase: string }[] {
+  const encontrados: { motivo: string; frase: string }[] = [];
 
   for (const regla of reglas) {
     const patron = new RegExp(regla.patron.source, `${regla.patron.flags.replace("g", "")}g`);
@@ -190,11 +195,27 @@ function revisar(texto: string, reglas: ReglaDeTexto[]): string[] {
       const indice = encontrado.index ?? 0;
       if (regla.negarLoHaceCorrecto && vaNegada(texto, indice)) continue;
       if (laNombraSinDecirla(texto, indice)) continue;
-      motivos.push(regla.motivo);
+      encontrados.push({ motivo: regla.motivo, frase: encontrado[0] });
       break;
     }
   }
-  return motivos;
+  return encontrados;
+}
+
+/**
+ * 🔴 **Las frases que frenaron una respuesta del asistente, y NADA más del
+ * texto** — auditoría del 24/9. Hasta ese día el registro del servidor guardaba
+ * la respuesta entera, y esa respuesta habla de un chico concreto: su nombre, su
+ * edad, lo que vio el sistema. Son datos sensibles de un menor en un lugar sin
+ * control de acceso ni plazo de borrado.
+ *
+ * 🔑 Para afinar un patrón que frena de más alcanza con la frase que lo
+ * disparó: es lo único que la lección del 16/8 pedía ver.
+ */
+export function frasesQueFrenaron(texto: string): string[] {
+  return hallazgos(texto, [...AFIRMACIONES_PROHIBIDAS, ...TRANQUILIZAR_O_ESTIMAR]).map(
+    (h) => h.frase,
+  );
 }
 
 function infracciones(texto: string): string[] {

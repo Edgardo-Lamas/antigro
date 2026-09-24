@@ -27,6 +27,8 @@ export default function LoginPage() {
          volvía muda. Medido y arreglado el 20/8; el mismo cambio está en
          `/entrar`, que es la puerta de las familias. */
       if (!res?.error) router.push("/panel");
+      else if (res.code === "demasiados_intentos")
+        setError("Hubo demasiados intentos seguidos. Esperá quince minutos y probá de nuevo.");
       else setError("El email o la contraseña no coinciden.");
     } catch {
       /* Sin esto, un pedido cortado dejaba la pantalla sin decir nada. */

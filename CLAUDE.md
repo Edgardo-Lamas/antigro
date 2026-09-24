@@ -54,6 +54,32 @@ bloque de abajo. ⬜ Falta la edad del dominio por RDAP, probada: gratis y sin c
 
 ---
 
+## 🔐 LA AUDITORÍA DEL 24/9 — tres arreglos hechos, el resto anotado
+
+La pidió Edgardo, con el formato completo de auditoría pre-producción. **Veredicto: apto con
+correcciones, riesgo medio, ningún crítico confirmado.** Hecho ese mismo día:
+
+1. **El login tiene tope** (`auth.ts`): 10 intentos por correo y 30 por IP cada 15 min, contados
+   ANTES de bcrypt. Al tope, las dos pantallas dicen «demasiados intentos» (`code:
+   "demasiados_intentos"`), no «no coinciden». ⚠ Correr todas las `prueba-*.mjs` seguidas desde
+   una máquina puede tocar el tope por IP: es el tope andando.
+2. **`/_next/image` apagado** (`images.unoptimized`) y sin `x-powered-by`. La app no usa
+   `next/image` y Next 14 no tiene parche para GHSA-2xp9-vwfh-vxw4.
+3. **El registro del asistente ya no guarda la respuesta frenada entera**, sólo la frase que la
+   frenó (`frasesQueFrenaron` en `reglas.ts`, con su prueba). Era el nombre de un menor y su
+   contexto en los registros de Vercel.
+
+⬜ **Lo que queda, en orden** (detalle en la auditoría de esa sesión):
+- 🔴 **Antes de familias reales:** sesiones de 30 días sin revocación y 6 rutas de `mi-familia`
+  que no miran `familia.activo` · el reloj revisa en serie con 60 s y se corta con pocas familias
+  alertando (latente: hoy frena antes por la fuente simulada) · verificar si las vistas previas
+  escriben en la base de producción y los respaldos de Supabase.
+- **Después:** CI en los PR · subir a Next 15.5.24+ (el aviso de caída por Server Actions,
+  GHSA-h25m-26qc-wcjf, no tiene parche en la 14) · CSP · el turno escolar **se guarda pero ninguna
+  ruta real se lo pasa al motor** · se aceptan varios chicos y sólo se vigila el primero.
+
+---
+
 ## 🏫 LOS CENTROS EDUCATIVOS — construidos el 23/9, rama `centros-educativos`
 
 **Lo pidió Edgardo:** *"crea las dos funciones, no las dejes escritas"*. El formulario de IEBS y el
