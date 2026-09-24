@@ -22,6 +22,10 @@ import { analizar, conLaEdad, type FilaDelObservatorio, type Universo } from "@/
  */
 
 export const dynamic = "force-dynamic";
+/* 🔴 Sin caché de `fetch` — auditoría del 24/9. En Next 14 `force-dynamic` solo
+   no alcanzaba: el reloj leía la base desde el caché. Esta ruta no lee la
+   sesión antes de ir a la base, así que estaba expuesta a lo mismo. */
+export const fetchCache = "force-no-store";
 
 /**
  * Números a mano, elegidos para que se vea la trampa que el módulo resuelve.
