@@ -107,13 +107,21 @@ console.log("(limpieza previa: una sola puerta, sin registro)\n");
 
 const nav = await chromium.launch({ headless: false });
 const pag = await (await nav.newContext({ viewport: { width: 1100, height: 1500 } })).newPage();
+/* 📌 Desde el 20/9 «Las entradas», la clave y el registro viven dentro de «La
+   casa», un <details> que arranca plegado. La prueba lo abre sola —también
+   después de cada recarga— para mirar lo de adentro como lo vería alguien que
+   lo desplegó. */
+await pag.addInitScript(() => {
+  const abrir = () => document.querySelectorAll("details").forEach((d) => (d.open = true));
+  new MutationObserver(abrir).observe(document, { childList: true, subtree: true });
+});
 
 try {
   // ── 1 · Entrar ────────────────────────────────────────────────────────
   console.log(`(contra ${SITIO})\n`);
   await pag.goto(`${SITIO}/entrar`);
   await pag.getByLabel(/email/i).fill(CUENTA);
-  await pag.getByLabel(/contrase/i).fill(CLAVE);
+  await pag.getByRole("textbox", { name: /contrase/i }).fill(CLAVE);
   await pag.getByRole("button", { name: /entrar/i }).click();
   await pag.waitForURL("**/mi-familia", { timeout: 30000 });
   ok("entra al panel", pag.url().includes("/mi-familia"));

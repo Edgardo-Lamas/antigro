@@ -70,7 +70,7 @@ const ok = (n, c, d) => { console.log(`${c ? "✓" : "✗"} ${n}`); if (!c) { fa
 // ── 1 · Entrar ──────────────────────────────────────────────────────────
 await pag.goto("http://localhost:3000/entrar");
 await pag.getByLabel(/email/i).fill("mariana@ejemplo.ar");
-await pag.getByLabel(/contrase/i).fill(CLAVE);
+await pag.getByRole("textbox", { name: /contrase/i }).fill(CLAVE);
 await pag.getByRole("button", { name: /entrar/i }).click();
 await pag.waitForURL("**/mi-familia", { timeout: 20000 });
 ok("entra al panel", pag.url().includes("/mi-familia"));

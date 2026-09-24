@@ -82,6 +82,15 @@ cada familia en su propia ejecución (`?familia=<id>`), de a 10, con `maxDuratio
 corren en paralelo, no al final. Un cerrojo de 5 min por familia (`reloj:<id>` en `frecuencia`)
 evita que el cron de Vercel y el de GitHub manden el mismo aviso dos veces. Una familia que falla
 queda contada como `no_se_pudo_revisar`, no tapa al resto. El pinger espera hasta 300 s.
+🔴🔴 **Y apareció algo peor probándolo EN PRODUCCIÓN: el reloj leía la base desde el CACHÉ de
+Next 14.** El cerrojo no llegaba nunca a la base —la fila no se movía en tres llamadas seguidas—
+aun con `force-dynamic`. Arreglado con `fetchCache = "force-no-store"` + `unstable_noStore()`, y
+verificado: la segunda llamada ahora contesta `otra_corrida_en_curso`. ⚠ **Es probable que antes
+del 24/9 el reloj decidiera avisos y escaladas con datos viejos** (lo que se avisó, lo que se
+acusó). No se notó porque con la fuente simulada frena antes. 📌 **Toda ruta GET que lea la base
+tiene que llevar las dos cosas** — ya mordió con los centros el 23/9 y acá el 24/9.
+📌 `prueba-puertas.mjs` estaba rota desde el 20/9 (la sección vive dentro de «La casa», plegada, y
+el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde contra producción.
 - 🔴 **Antes de familias reales:** verificar si las vistas previas
   escriben en la base de producción y los respaldos de Supabase.
 - **Después:** CI en los PR · subir a Next 15.5.24+ (el aviso de caída por Server Actions,
