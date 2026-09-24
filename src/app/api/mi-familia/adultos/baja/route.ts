@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import {
   canalListo,
   repositorio,
@@ -44,12 +44,9 @@ const Pedido = z.object({
 });
 
 export async function POST(req: Request) {
-  const sesion = await auth();
-  const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; hogar?: string | null; usuarioId?: string | null }
-    | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
   }
 

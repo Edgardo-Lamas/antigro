@@ -73,8 +73,12 @@ export default async function PanelDelCentro() {
   const centroId = (sesion?.user as { centroId?: string } | undefined)?.centroId;
   if (!centroId) redirect("/entrar");
 
+  /* 🔴 Un centro pausado deja de entrar (auditoría del 24/9). Antes esto sólo
+     lo miraba el login, así que la sesión abierta seguía viendo el panel hasta
+     vencer. Y va a `/api/salir`, no a `/entrar`: con la sesión viva, el
+     middleware la devolvería acá y quedaría dando vueltas. */
   const centro = await centroPorId(centroId);
-  if (!centro) redirect("/entrar");
+  if (!centro || !centro.activo) redirect("/api/salir");
 
   const [familias, avisos, { simulada }] = await Promise.all([
     familiasDelCentro(centro.id),

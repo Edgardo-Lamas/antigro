@@ -886,3 +886,25 @@ alter table avisos_centro enable row level security;
 
 comment on table avisos_centro is
   'Patrones colectivos avisados a un centro educativo: un dominio y cuantos alumnos distintos lo vieron. Nunca identifica a un alumno ni a una familia.';
+
+
+-- ═════════════════════════════════════════════════════════════════
+--  22. CAMBIAR LA CLAVE CIERRA LAS OTRAS SESIONES — 24/9, auditoría
+-- ═════════════════════════════════════════════════════════════════
+--
+--  🔴 **La sesión dura 30 días y hasta hoy no había forma de cortarla.**
+--  Cambiar la clave no echaba al que ya estaba adentro: una sesión robada, o
+--  un teléfono que quedó logueado en otra casa, seguía viendo el informe de un
+--  chico hasta que vencía.
+--
+--  🔑 Una marca de tiempo alcanza: la sesión anota cuándo se entró, y la que
+--  sea ANTERIOR a este cambio deja de servir. La escribe la app con SU reloj
+--  —el mismo que firma la sesión—, no `now()` de la base: comparar dos relojes
+--  distintos dejaría afuera, por milisegundos, al que acaba de volver a entrar.
+--
+--  📌 Aditiva: `null` es «nunca se cambió» y deja pasar a todas las sesiones.
+
+alter table usuarios add column if not exists clave_cambiada_en timestamptz;
+
+comment on column usuarios.clave_cambiada_en is
+  'Cuando se cambio la clave de esta puerta por ultima vez. Las sesiones abiertas antes de esto dejan de valer. Null: nunca se cambio.';

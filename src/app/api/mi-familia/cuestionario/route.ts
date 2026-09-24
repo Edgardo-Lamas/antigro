@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import { repositorio } from "@/lib/datos";
 import { tomarTurno } from "@/lib/limite";
 import { INDICADORES, VALOR_MAXIMO, VENTANA_DIAS } from "@/lib/motor";
@@ -55,8 +55,6 @@ const Pedido = z.object({
   respuestas: z.record(z.string(), z.number().int().min(0).max(VALOR_MAXIMO)),
 });
 
-type Sesion = { rol?: string; familiaId?: string | null; hogar?: string | null };
-
 /** Quién puede firmar: los adultos que entran al panel, y sólo los activos. */
 function quienesPuedenFirmar(adultos: { id: string; nombre: string; vinculo: string; rol: string; activo: boolean }[]) {
   return adultos
@@ -67,10 +65,9 @@ function quienesPuedenFirmar(adultos: { id: string; nombre: string; vinculo: str
 /* ── Qué hay antes de contestar ─────────────────────────────────────────── */
 
 export async function GET() {
-  const sesion = await auth();
-  const usuario = sesion?.user as Sesion | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
   }
 
@@ -111,10 +108,9 @@ export async function GET() {
 /* ── Contestar ──────────────────────────────────────────────────────────── */
 
 export async function POST(req: Request) {
-  const sesion = await auth();
-  const usuario = sesion?.user as Sesion | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
   }
 

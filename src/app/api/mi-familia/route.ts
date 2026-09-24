@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import {
   canalListo,
   loQueImpideTrabajar,
@@ -88,18 +88,9 @@ function firmasDelCuestionario(
 }
 
 export async function GET(req: Request) {
-  const sesion = await auth();
-  const usuario = sesion?.user as
-    | {
-        rol?: string;
-        familiaId?: string | null;
-        hogar?: string | null;
-        name?: string | null;
-        usuarioId?: string | null;
-      }
-    | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
   }
 
@@ -175,7 +166,7 @@ export async function GET(req: Request) {
        viaja en un token que dura treinta días: leerlo de ahí mostraría el
        nombre viejo hasta el próximo ingreso. */
     yo: {
-      nombre: usuario.name ?? null,
+      nombre: usuario.nombre,
       hogar: laMia?.hogar ?? usuario.hogar ?? null,
       puertaId: laMia?.id ?? null,
     },

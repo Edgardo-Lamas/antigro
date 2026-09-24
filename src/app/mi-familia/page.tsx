@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import {
   ArrowRight,
   BellRing,
@@ -2388,6 +2388,17 @@ function LaClave({
         setError(datos.error ?? "No pudimos cambiar la clave.");
         return;
       }
+      /* 🔴 El cambio de clave corta las sesiones abiertas antes de ahora —la
+         de esta pantalla también— (auditoría del 24/9). Se vuelve a entrar con
+         la clave nueva, sin que la persona haga nada. Si no sale, se la manda a
+         entrar a mano: la clave ya quedó cambiada y es la que acaba de escribir. */
+      const otraVez = datos.email
+        ? await signIn("credentials", { email: datos.email, password: nueva, redirect: false })
+        : null;
+      if (!otraVez || otraVez.error) {
+        await signOut({ callbackUrl: "/entrar" });
+        return;
+      }
       setActual("");
       setNueva("");
       setRepetida("");
@@ -2413,7 +2424,7 @@ function LaClave({
 
       {lista && (
         <p className="mt-3 rounded-md border border-calma/30 bg-calma/10 px-4 py-3 text-sm text-calma">
-          Listo, la clave quedó cambiada. Tu sesión sigue abierta.
+          Listo, la clave quedó cambiada. Tu sesión sigue abierta; cualquier otra que estuviera abierta con la clave vieja se cerró.
           {hayMasDeUnaCasa
             ? " La otra casa no se ve afectada: sigue entrando con la suya."
             : " Si alguien más de esta casa la usaba, pasale la nueva."}

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import { repositorio } from "@/lib/datos";
 import {
   APARATOS,
@@ -41,10 +41,9 @@ const TIPO = {
 } as const;
 
 export async function GET(req: Request) {
-  const sesion = await auth();
-  const usuario = sesion?.user as { rol?: string; familiaId?: string | null } | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
   }
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import { repositorio } from "@/lib/datos";
 import { tomarTurno } from "@/lib/limite";
 import { revisarClaveNueva } from "@/lib/hogares";
@@ -42,18 +42,10 @@ const Cuerpo = z.object({
   repetida: z.string().max(200),
 });
 
-type Sesion = {
-  rol?: string;
-  familiaId?: string | null;
-  hogar?: string | null;
-  usuarioId?: string | null;
-};
-
 export async function POST(req: Request) {
-  const sesion = await auth();
-  const usuario = sesion?.user as Sesion | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId || !usuario.usuarioId) {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "sin_sesion" }, { status: 401 });
   }
 
@@ -116,9 +108,14 @@ export async function POST(req: Request) {
     detalle: null,
   });
 
-  /* 📌 **La sesión sigue abierta, a propósito.** El que cambia la clave está
-     probando que es el dueño de la casa: echarlo de su propio panel sería
-     castigarlo por hacer lo correcto. Lo que sí conviene decirle —y lo dice la
-     pantalla— es que si la comparte con alguien más, hay que pasarle la nueva. */
-  return NextResponse.json({ ok: true });
+  /* 📌 **La sesión del que la cambió sigue abierta, a propósito.** El que
+     cambia la clave está probando que es el dueño de la casa: echarlo de su
+     propio panel sería castigarlo por hacer lo correcto.
+
+     🔴 **Pero desde el 24/9 las OTRAS sesiones de esta puerta se cortan**
+     (migración 22): era el agujero de la auditoría — una sesión robada seguía
+     adentro treinta días. Y como esta sesión también es de antes del cambio,
+     la pantalla vuelve a entrar sola con la clave nueva: por eso viaja el
+     correo. Es el correo de la propia puerta, que la sesión ya conoce. */
+  return NextResponse.json({ ok: true, email: usuario.email });
 }

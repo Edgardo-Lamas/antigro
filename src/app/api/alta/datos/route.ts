@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import { repositorio, EDAD_MAXIMA, EDAD_MINIMA } from "@/lib/datos";
 import { sugerenciasParaLaFamilia } from "@/lib/datos/tipos";
 import { EDAD_PARA_ELEGIR_REFERENTE } from "@/lib/config";
@@ -69,9 +69,9 @@ const Cuerpo = z.object({
 });
 
 export async function POST(req: Request) {
-  const sesion = await auth();
-  const usuario = sesion?.user as { rol?: string; familiaId?: string } | undefined;
-  if (!usuario?.familiaId || usuario.rol !== "adulto") {
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  const usuario = await hogarDeLaSesion();
+  if (!usuario) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 

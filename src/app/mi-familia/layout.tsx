@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { repositorio } from "@/lib/datos";
+import { hogarDeLaSesion } from "@/lib/sesion";
 
 /**
  * 🔐 La segunda línea de defensa del panel de la familia.
@@ -27,6 +28,10 @@ export default async function LayoutDeMiFamilia({
   // Una cuenta de administración no pertenece a ninguna familia: acá no hay
   // nada coherente que mostrarle.
   if (usuario?.rol !== "adulto") redirect("/panel");
+
+  /* 🔐 El token dice que hay sesión; la base dice si todavía vale (clave
+     cambiada, familia pausada). Si no vale, se sale de verdad: ver `/api/salir`. */
+  if (!(await hogarDeLaSesion())) redirect("/api/salir");
 
   /**
    * 🔴 **Una familia recién creada no tiene chico, y un panel vacío no le

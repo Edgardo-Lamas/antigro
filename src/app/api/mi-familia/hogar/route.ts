@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth, unstable_update } from "@/auth";
+import { unstable_update } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import { repositorio } from "@/lib/datos";
 import { tomarTurno } from "@/lib/limite";
 import {
@@ -48,12 +49,6 @@ export const dynamic = "force-dynamic";
 const VENTANA_SEG = 60 * 60;
 const TOPE = 5;
 
-type Sesion = {
-  rol?: string;
-  familiaId?: string | null;
-  hogar?: string | null;
-  usuarioId?: string | null;
-};
 
 const Cuerpo = z.object({
   /**
@@ -68,19 +63,12 @@ const Cuerpo = z.object({
   claveRepetida: z.string().max(200),
 });
 
-/** Lo que la sesión sabe de quién está pidiendo, o el 401 correspondiente. */
+/**
+ * Lo que la sesión sabe de quién está pidiendo, o el 401 correspondiente.
+ * 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`.
+ */
 async function quienPide() {
-  const sesion = await auth();
-  const usuario = sesion?.user as Sesion | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId || !usuario.usuarioId) {
-    return null;
-  }
-  return {
-    familiaId: usuario.familiaId,
-    usuarioId: usuario.usuarioId,
-    hogar: usuario.hogar ?? null,
-  };
+  return hogarDeLaSesion();
 }
 
 /** Las puertas de la familia, ya con «cuál es la mía» resuelto. */

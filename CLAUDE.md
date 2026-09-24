@@ -70,8 +70,14 @@ correcciones, riesgo medio, ningún crítico confirmado.** Hecho ese mismo día:
    contexto en los registros de Vercel.
 
 ⬜ **Lo que queda, en orden** (detalle en la auditoría de esa sesión):
-- 🔴 **Antes de familias reales:** sesiones de 30 días sin revocación y 6 rutas de `mi-familia`
-  que no miran `familia.activo` · el reloj revisa en serie con 60 s y se corta con pocas familias
+✅ **Y el mismo día, las sesiones** (migración 22, `usuarios.clave_cambiada_en`, aplicada):
+`src/lib/sesion.ts` → `hogarDeLaSesion()` comprueba contra la base, en las 11 rutas de la familia
+y en las pantallas, que la puerta esté activa, la familia no esté pausada y la sesión sea posterior
+al último cambio de clave (`sesionVigente` en `hogares.ts`, probada). El JWT anota `emitido` SÓLO
+al entrar. Cambiar la clave corta las otras sesiones de esa puerta; la pantalla vuelve a entrar
+sola con la nueva. Una sesión que ya no vale va a `/api/salir` — 🔴 no a `/entrar`: el middleware
+la devolvería al panel y quedaría en bucle. El centro pausado también sale.
+- 🔴 **Antes de familias reales:** el reloj revisa en serie con 60 s y se corta con pocas familias
   alertando (latente: hoy frena antes por la fuente simulada) · verificar si las vistas previas
   escriben en la base de producción y los respaldos de Supabase.
 - **Después:** CI en los PR · subir a Next 15.5.24+ (el aviso de caída por Server Actions,

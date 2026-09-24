@@ -367,7 +367,10 @@ export class RepositorioSupabase implements Repositorio {
     const hash = await bcrypt.hash(nueva, 12);
     const { error } = await this.db
       .from("usuarios")
-      .update({ password_hash: hash })
+      /* 🔴 `clave_cambiada_en` corta las sesiones abiertas antes de ahora
+         (migración 22). Con el reloj de la app, que es el mismo que anota
+         cuándo se entró: ver `sesionVigente`. */
+      .update({ password_hash: hash, clave_cambiada_en: new Date().toISOString() })
       .eq("id", usuarioId)
       .eq("familia_id", familiaId);
 

@@ -14,6 +14,7 @@
  */
 
 import {
+  sesionVigente,
   CLAVE_MINIMA,
   COMO_SE_LEE,
   LARGO_MAXIMO_DE_CASA,
@@ -219,6 +220,21 @@ comprobar(
   QUE_SE_REGISTRA.every((q) => COMO_SE_LEE[q].startsWith("Se ")),
   `salió: ${QUE_SE_REGISTRA.map((q) => COMO_SE_LEE[q]).join(" · ")}`,
 );
+
+/* ── La sesión y el cambio de clave (auditoría del 24/9) ─────────────────── */
+
+const CAMBIO = "2026-09-24T15:00:00.000Z";
+const antes = Date.parse(CAMBIO) - 60_000;
+const despues = Date.parse(CAMBIO) + 500;
+
+comprobar("una clave que nunca se cambió deja pasar a cualquier sesión", sesionVigente(antes, null));
+comprobar("🔴 la sesión abierta ANTES del cambio de clave deja de valer", !sesionVigente(antes, CAMBIO));
+comprobar("la que se abrió DESPUÉS del cambio sigue valiendo — es la del que la cambió", sesionVigente(despues, CAMBIO));
+comprobar(
+  "🔴 una sesión sin fecha de ingreso (de antes del 24/9) no vale si la clave ya se cambió",
+  !sesionVigente(undefined, CAMBIO),
+);
+comprobar("pero sí vale mientras la clave no se haya cambiado nunca", sesionVigente(undefined, null));
 
 console.log(`\n${fallaron === 0 ? "todo bien" : `${fallaron} fallaron`}`);
 if (fallaron > 0) process.exit(1);

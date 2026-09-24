@@ -2,7 +2,7 @@ import { ayudaDeSiempre } from "@/lib/paises";
 import { paisDeLaPeticion } from "@/lib/pais-elegido";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
+import { hogarDeLaSesion as laSesionComprobada } from "@/lib/sesion";
 import { repositorio } from "@/lib/datos";
 import { tomarTurno } from "@/lib/limite";
 import { obtenerFuente, type Escenario } from "@/lib/senales";
@@ -72,17 +72,8 @@ const VENTANA_ASISTENTE_SEG = 60 * 60;
  * privada de cada adulto: entre padres no hay nada separado.
  */
 async function hogarDeLaSesion() {
-  const sesion = await auth();
-  const usuario = sesion?.user as
-    | { rol?: string; familiaId?: string | null; hogar?: string | null; usuarioId?: string | null }
-    | undefined;
-
-  if (!sesion || usuario?.rol !== "adulto" || !usuario.familiaId) return null;
-  return {
-    familiaId: usuario.familiaId,
-    hogar: usuario.hogar ?? null,
-    usuarioId: usuario.usuarioId ?? null,
-  };
+  /* 🔐 Comprobada contra la base: ver `src/lib/sesion.ts`. */
+  return laSesionComprobada();
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -201,6 +201,12 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         token.centroId = u.centroId ?? null;
         token.hogar = u.hogar ?? null;
         token.usuarioId = u.usuarioId ?? u.id ?? null;
+        /* 🔴 Cuándo se entró — auditoría del 24/9. Se escribe SÓLO acá, al
+           entrar, y nunca en un refresco: es lo que compara `hogarDeLaSesion`
+           contra `clave_cambiada_en` para cortar las sesiones de antes de un
+           cambio de clave. Si se renovara en cada refresco, una sesión robada
+           se volvería «nueva» sola. */
+        token.emitido = Date.now();
       }
 
       /* ── El nombre de la casa puede cambiar con la sesión abierta ────────
@@ -226,8 +232,10 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
         centroId?: unknown;
         hogar?: unknown;
         usuarioId?: unknown;
+        emitido?: unknown;
       };
       u.rol = token.rol;
+      u.emitido = token.emitido ?? null;
       u.familiaId = token.familiaId;
       u.centroId = token.centroId ?? null;
       u.hogar = token.hogar;

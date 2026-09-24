@@ -210,3 +210,21 @@ export const COMO_SE_LEE: Record<QueSeRegistra, string> = {
   borro_la_charla: "Se borró la charla con el asistente",
   cambio_el_pais: "Se cambió el país de la familia",
 };
+
+/* ── La sesión y el cambio de clave (auditoría del 24/9) ─────────────────── */
+
+/**
+ * ¿La sesión que viene sigue valiendo para ESTA casa? Pura, para poder
+ * probarla sin base: `npm run probar-hogares`. La usa `src/lib/sesion.ts`.
+ */
+export function sesionVigente(
+  emitido: number | null | undefined,
+  claveCambiadaEn: string | null | undefined,
+): boolean {
+  if (!claveCambiadaEn) return true;
+  /* 🔴 Una sesión sin fecha de ingreso es de antes del 24/9. Si la clave se
+     cambió después, no hay cómo saber si esa sesión es la de antes o la de
+     después del cambio — y se decide del lado seguro. */
+  if (!emitido) return false;
+  return emitido >= Date.parse(claveCambiadaEn);
+}

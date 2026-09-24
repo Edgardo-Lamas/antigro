@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
+import { hogarDeLaSesion } from "@/lib/sesion";
 import { repositorio } from "@/lib/datos";
 import Recorrido from "./Recorrido";
 
@@ -32,6 +33,8 @@ export default async function Alta() {
   // El middleware ya redirige; el recorrido no depende de eso para cerrarse.
   if (!sesion?.user) redirect("/entrar");
   if (usuario?.rol !== "adulto" || !usuario.familiaId) redirect("/panel");
+  // 🔐 Comprobada contra la base: ver `src/lib/sesion.ts` y `/api/salir`.
+  if (!(await hogarDeLaSesion())) redirect("/api/salir");
 
   const datos = await repositorio().familiaPorId(usuario.familiaId);
 
