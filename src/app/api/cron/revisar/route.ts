@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { unstable_noStore } from "next/cache";
 import { repositorio } from "@/lib/datos";
 import { avisar, avisarDeLaCeguera, enviarParte, escalar } from "@/lib/mensajeria/avisar";
 import { redactarLecturaParaAdultos, redactarMensajeAlChico } from "@/lib/ia";
@@ -43,6 +44,13 @@ import {
  */
 
 export const dynamic = "force-dynamic";
+/* 🔴 Y ningún `fetch` de esta ruta se guarda en caché — auditoría del 24/9.
+   `force-dynamic` solo NO alcanzaba en Next 14: el cerrojo de abajo no llegaba
+   nunca a la base, porque la llamada de supabase-js salía del caché con la
+   respuesta de la primera vez. Un reloj que lee la base de ayer decide sobre
+   datos que ya no son. Es la misma trampa que `unstable_noStore()` en
+   `centros/datos.ts`. */
+export const fetchCache = "force-no-store";
 /* 🔴 300 y no 60 — auditoría del 24/9. El coordinador espera a que terminen las
    revisiones de todas las familias, y cada una puede tardar lo que tardan dos
    textos del modelo. Ver «UNA FAMILIA POR EJECUCIÓN» abajo. */
@@ -96,6 +104,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "no_autorizado" }, { status: 401 });
   }
 
+  unstable_noStore();
   const ahora = new Date();
   const url = new URL(req.url);
   const unaFamilia = url.searchParams.get("familia");
