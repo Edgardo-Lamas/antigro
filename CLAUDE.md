@@ -77,8 +77,12 @@ al último cambio de clave (`sesionVigente` en `hogares.ts`, probada). El JWT an
 al entrar. Cambiar la clave corta las otras sesiones de esa puerta; la pantalla vuelve a entrar
 sola con la nueva. Una sesión que ya no vale va a `/api/salir` — 🔴 no a `/entrar`: el middleware
 la devolvería al panel y quedaría en bucle. El centro pausado también sale.
-- 🔴 **Antes de familias reales:** el reloj revisa en serie con 60 s y se corta con pocas familias
-  alertando (latente: hoy frena antes por la fuente simulada) · verificar si las vistas previas
+✅ **Y el reloj:** `/api/cron/revisar` es ahora un COORDINADOR que pide a la misma ruta revisar
+cada familia en su propia ejecución (`?familia=<id>`), de a 10, con `maxDuration` 300. Los centros
+corren en paralelo, no al final. Un cerrojo de 5 min por familia (`reloj:<id>` en `frecuencia`)
+evita que el cron de Vercel y el de GitHub manden el mismo aviso dos veces. Una familia que falla
+queda contada como `no_se_pudo_revisar`, no tapa al resto. El pinger espera hasta 300 s.
+- 🔴 **Antes de familias reales:** verificar si las vistas previas
   escriben en la base de producción y los respaldos de Supabase.
 - **Después:** CI en los PR · subir a Next 15.5.24+ (el aviso de caída por Server Actions,
   GHSA-h25m-26qc-wcjf, no tiene parche en la 14) · CSP · el turno escolar **se guarda pero ninguna

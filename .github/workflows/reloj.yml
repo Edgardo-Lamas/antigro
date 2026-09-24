@@ -54,7 +54,7 @@ jobs:
           # -sS: sin barra de progreso pero con errores a la vista.
           # El cuerpo va a un archivo para poder mostrarlo sin el encabezado.
           codigo=$(curl -sS -o respuesta.json -w '%{http_code}' \
-            --max-time 60 \
+            --max-time 300 \
             -H "Authorization: Bearer $CRON_SECRET" \
             https://antigro.vercel.app/api/cron/revisar)
 
