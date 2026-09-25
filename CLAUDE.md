@@ -105,8 +105,10 @@ el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde
    nuevo para una sola persona (volver a guardar el alta reemplaza y desvincula a todos): un
    código vencido dejaba a ese adulto sin poder conectarse nunca. Primero el botón de «código
    nuevo», después el vencimiento (migración: `codigo_generado_en`). Edgardo lo dejó para DESPUÉS del 5/10.
-2. **AUD-009 · CI:** workflow con `typecheck`, `lint` y `probar` en cada PR, exigido para mergear
-   (Sandra tiene `write` y los PR van con cero aprobaciones).
+2. ✅ **25/9 — AUD-009 · CI, HECHO:** `.github/workflows/revision.yml` corre tipos, lint y
+   `probar` en cada push a `main` y en cada PR (~40 s, verde). El push a `main` NO la espera: si
+   algo se rompe, avisa con la cruz roja y el correo de GitHub. ⬜ Exigirla para mergear PRs es
+   un ajuste de GitHub (reglas de la rama) que decide Edgardo.
 3. **AUD-007 · CSP**, primero en `Report-Only`.
 4. **AUD-010 · dos decisiones de Edgardo:** las vistas previas usan la base de producción
    (verificado con `vercel env ls`: las de Supabase están en Production, Preview y Development) —
