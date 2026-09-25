@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { FuenteSimulador, type Escenario } from "@/lib/senales";
 import { evaluar, VENTANA_DIAS } from "@/lib/motor";
+import { deQuienViene, tomarTurno } from "@/lib/limite";
 
 /**
  * La lectura del motor, a una altura cualquiera de la historia.
@@ -15,8 +16,17 @@ import { evaluar, VENTANA_DIAS } from "@/lib/motor";
  */
 
 export const dynamic = "force-dynamic";
+/* 🔴 Sin caché de `fetch`: desde el tope por IP esta ruta va a la base, y en
+   Next 14 `force-dynamic` solo no alcanza (ver el reloj, 24/9). */
+export const fetchCache = "force-no-store";
 
 const DIA_MS = 24 * 60 * 60 * 1000;
+
+/* 📌 Tope por IP (AUD-016). Es ancho a propósito: la consola de la home pide
+   una lectura cada vez que se mueve un control, y el reloj de la demo pide más
+   de dos por segundo. Frena un bucle o un script, no a quien la está mostrando. */
+const TOPE_LECTURAS = 240;
+const VENTANA_LECTURAS_SEG = 60;
 
 const Params = z.object({
   escenario: z.enum(["normal", "cambio_leve", "persistente", "evasion"]).default("normal"),
@@ -74,6 +84,14 @@ export async function GET(req: Request) {
     return NextResponse.json(
       { error: "Parámetros inválidos", detalle: parsed.error.issues.map((i) => i.message) },
       { status: 400 },
+    );
+  }
+
+  const limite = await tomarTurno(`lectura:${deQuienViene(req)}`, VENTANA_LECTURAS_SEG, TOPE_LECTURAS);
+  if (!limite.permitido) {
+    return NextResponse.json(
+      { error: "demasiado_seguido", esperaSeg: limite.esperaSeg },
+      { status: 429 },
     );
   }
 

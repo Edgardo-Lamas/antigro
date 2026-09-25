@@ -93,15 +93,18 @@ tiene que llevar las dos cosas** — ya mordió con los centros el 23/9 y acá e
 el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde contra producción.
 ### 🔜🔜 AL RETOMAR — lo que queda de la auditoría, en el orden aprobado (cierre del 24/9)
 
-1. **La tanda de arreglos chicos, juntos y de bajo riesgo** — era lo próximo:
-   AUD-004 el turno escolar llega al motor real (hoy `chico: { edad, genero }` en mi-familia,
-   cron, parte, asistente y alertas: falta `turnoEscolar`) · AUD-005 `.max(1)` en `chicos` de
-   `/api/alta/datos` · AUD-011 el login compara contra un hash falso si el correo no existe (hoy
-   contesta más rápido y revela que no existe) · AUD-013 `timingSafeEqual` en cron, webhook e
-   invitación · AUD-014 `req.json().catch` en `panel/familias`, `hogar`, `clave`, `alta/datos`,
-   `alta/hogar` · AUD-015 borrar ventanas vencidas de `frecuencia` (el comentario dice que se limpia
-   sola y no hay ningún delete) · AUD-016 `tomarTurno` por IP en `/api/motor/lectura` y
-   `/api/observatorio` · AUD-012 que los códigos de Telegram venzan + tope por chat.
+1. ✅ **25/9 — la tanda de arreglos chicos, HECHA** menos una mitad: AUD-004 el turno escolar
+   llega al motor en mi-familia, parte, asistente y cron · AUD-005 `.max(1)` en `chicos` ·
+   AUD-011 el login compara contra `HASH_DE_RELLENO` si el correo no existe · AUD-013
+   `mismoSecreto` (`src/lib/secretos.ts`) en cron, webhook e invitación · AUD-014
+   `req.json().catch` en las cinco rutas · AUD-015 el reloj borra las filas de `frecuencia` de
+   más de 2 días (`limpiarVentanasVencidas`, sale como `contadoresBorrados`) · AUD-016 tope por IP
+   en `/api/motor/lectura` (240/min, ancho por la consola de la home) y `/api/observatorio`
+   (30/min) · AUD-012 **sólo el tope**: 10 códigos por hora por chat de Telegram.
+   ⬜ **Falta: que los códigos venzan.** No se hizo porque hoy NO HAY forma de pedir un código
+   nuevo para una sola persona (volver a guardar el alta reemplaza y desvincula a todos): un
+   código vencido dejaba a ese adulto sin poder conectarse nunca. Primero el botón de «código
+   nuevo», después el vencimiento (migración: `codigo_generado_en`).
 2. **AUD-009 · CI:** workflow con `typecheck`, `lint` y `probar` en cada PR, exigido para mergear
    (Sandra tiene `write` y los PR van con cero aprobaciones).
 3. **AUD-007 · CSP**, primero en `Report-Only`.

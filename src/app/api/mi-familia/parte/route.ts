@@ -77,7 +77,7 @@ export async function GET() {
   const respuestas = await repo.respuestasDe(chico.id, desde, hasta);
 
   const lectura = evaluar({
-    chico: { edad: chico.edad, genero: chico.genero },
+    chico: { edad: chico.edad, genero: chico.genero, turnoEscolar: chico.turnoEscolar },
     senales,
     hasta: ahora,
     observaciones: juntarObservaciones(observaciones),

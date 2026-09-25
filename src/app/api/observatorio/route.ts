@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { estadoDelIndice, queEsEsteLugar } from "@/lib/senales/categorias";
 import { edadDelDominio } from "@/lib/senales/edad-del-dominio";
 import { repositorio } from "@/lib/datos";
+import { deQuienViene, tomarTurno } from "@/lib/limite";
 import { analizar, conLaEdad, type FilaDelObservatorio, type Universo } from "@/lib/observatorio";
 
 /**
@@ -95,7 +96,24 @@ const FILAS_EJEMPLO: FilaDelObservatorio[] = [
   },
 ];
 
+/* 📌 Tope por IP (AUD-016): sin sesión y con una consulta a la base en cada
+   pedido. Nadie legítimo lo pide más de un par de veces por minuto. */
+const TOPE_OBSERVATORIO = 30;
+const VENTANA_OBSERVATORIO_SEG = 60;
+
 export async function GET(req: Request) {
+  const limite = await tomarTurno(
+    `observatorio:${deQuienViene(req)}`,
+    VENTANA_OBSERVATORIO_SEG,
+    TOPE_OBSERVATORIO,
+  );
+  if (!limite.permitido) {
+    return NextResponse.json(
+      { error: "demasiado_seguido", esperaSeg: limite.esperaSeg },
+      { status: 429 },
+    );
+  }
+
   const ejemplo = new URL(req.url).searchParams.get("ejemplo") === "1";
 
   if (!ejemplo) {

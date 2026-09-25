@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { repositorio } from "@/lib/datos";
+import { mismoSecreto } from "@/lib/secretos";
+import { tomarTurno } from "@/lib/limite";
 import { vincularCoordinador } from "@/lib/centros/datos";
 import { codigoDeUnStart } from "@/lib/mensajeria/vinculacion";
 import { tokenDeUnToque } from "@/lib/mensajeria/acuse";
@@ -45,7 +47,7 @@ export async function POST(req: Request) {
   if (!esperado) {
     return NextResponse.json({ error: "Webhook sin secreto configurado" }, { status: 503 });
   }
-  if (req.headers.get("x-telegram-bot-api-secret-token") !== esperado) {
+  if (!mismoSecreto(req.headers.get("x-telegram-bot-api-secret-token"), esperado)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
@@ -150,6 +152,18 @@ export async function POST(req: Request) {
         "pasaron cuando se dio de alta el sistema en tu casa.",
     );
     return NextResponse.json({ ok: true });
+  }
+
+  /* 🔐 Tope por chat (AUD-012): 10 códigos por hora. Un código tiene 6
+     caracteres; sin tope, un chat podía probarlos de a miles hasta caer en el
+     canal de una familia. Quien tiene su enlace lo usa una vez y nunca ve esto. */
+  const intentos = await tomarTurno(`vincular:${chatId}`, 60 * 60, 10);
+  if (!intentos.permitido) {
+    await responder(
+      "Probaste demasiados códigos seguidos. Esperá una hora y volvé a abrir el " +
+        "enlace que te pasaron.",
+    );
+    return NextResponse.json({ ok: true, vinculado: false, motivo: "demasiados_intentos" });
   }
 
   const vinculacion = await repositorio().vincularPorCodigo(codigo, String(chatId));

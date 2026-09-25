@@ -205,7 +205,7 @@ export async function POST(req: Request) {
   );
 
   const lectura = evaluar({
-    chico: { edad: chico.edad, genero: chico.genero },
+    chico: { edad: chico.edad, genero: chico.genero, turnoEscolar: chico.turnoEscolar },
     senales,
     hasta,
     observaciones: juntas,

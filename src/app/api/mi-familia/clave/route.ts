@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const parsed = Cuerpo.safeParse(await req.json());
+  const parsed = Cuerpo.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Datos inválidos" },

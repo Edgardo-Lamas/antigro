@@ -7,7 +7,8 @@ import { quienLoVio } from "@/lib/mensajeria/acuse";
 import { obtenerFuente } from "@/lib/senales";
 import { refrescarLaLista } from "@/lib/senales/refresco";
 import { revisarCentros } from "@/lib/centros/revisar";
-import { tomarTurno } from "@/lib/limite";
+import { limpiarVentanasVencidas, tomarTurno } from "@/lib/limite";
+import { mismoSecreto } from "@/lib/secretos";
 import {
   DIAS_ENTRE_PARTES,
   armarParte,
@@ -100,7 +101,7 @@ export async function GET(req: Request) {
   if (!esperado) {
     return NextResponse.json({ error: "cron_sin_secreto" }, { status: 503 });
   }
-  if (req.headers.get("authorization") !== `Bearer ${esperado}`) {
+  if (!mismoSecreto(req.headers.get("authorization"), `Bearer ${esperado}`)) {
     return NextResponse.json({ error: "no_autorizado" }, { status: 401 });
   }
 
@@ -160,10 +161,11 @@ export async function GET(req: Request) {
      🔑 Y de paso, que la lista de categorías no envejezca en un mes tranquilo.
      Viene apagado: sin `DEPLOY_HOOK_UT1` no hace nada y lo dice. Ver
      `senales/refresco.ts`. */
-  const [revisadas, listaDeCategorias, centros] = await Promise.all([
+  const [revisadas, listaDeCategorias, centros, contadoresBorrados] = await Promise.all([
     familias(),
     refrescarLaLista(),
     revisarCentros(ahora),
+    limpiarVentanasVencidas(),
   ]);
 
   /* 📌 Devuelve el detalle de cada familia, y no un «ok». Un reloj que corre en
@@ -177,6 +179,7 @@ export async function GET(req: Request) {
     noRevisadas: revisadas.filter((r) => r.motivo === "no_se_pudo_revisar").length,
     listaDeCategorias,
     centros,
+    contadoresBorrados,
   });
 }
 
@@ -235,7 +238,7 @@ async function revisarUnaFamilia(familiaId: string, ahora: Date): Promise<Revisa
   );
 
   const lectura = evaluar({
-    chico: { edad: chico.edad, genero: chico.genero },
+    chico: { edad: chico.edad, genero: chico.genero, turnoEscolar: chico.turnoEscolar },
     senales,
     hasta: ahora,
     observaciones: juntarObservaciones(observaciones),

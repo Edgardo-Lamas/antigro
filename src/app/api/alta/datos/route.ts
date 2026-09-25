@@ -59,7 +59,7 @@ const AdultoSchema = z.object({
 
 const Cuerpo = z.object({
   nombre: z.string().max(100).optional(),
-  chicos: z.array(ChicoSchema).min(1, "Hay que cargar al menos un chico."),
+  chicos: z.array(ChicoSchema).min(1, "Hay que cargar al menos un chico.").max(1, "Por ahora cada alta es de un solo chico."),
   /**
    * 📌 Puede venir vacío. Un hogar sin ningún adulto cargado es raro, pero la
    * regla del 17/8 es que nada se exige: el sistema lo sugiere con el porqué y
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const parsed = Cuerpo.safeParse(await req.json());
+  const parsed = Cuerpo.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Datos inválidos" },

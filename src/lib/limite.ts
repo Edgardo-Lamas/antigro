@@ -96,3 +96,29 @@ export function deQuienViene(req: Request): string {
   const primera = reenviado?.split(",")[0]?.trim();
   return primera || req.headers.get("x-real-ip") || "desconocido";
 }
+
+/**
+ * Borra los contadores que ya no pueden frenar a nadie (AUD-015).
+ *
+ * 🔴 El esquema decía que la tabla «se limpia sola» y no había ningún delete:
+ * cada IP que alguna vez pasó por la demo o el login quedaba para siempre.
+ * La ventana más larga en uso es de un día (`altas:global`); con dos de margen,
+ * una fila más vieja ya arrancaría de cero en el próximo pedido, así que
+ * borrarla no cambia ninguna decisión.
+ *
+ * La llama el reloj una vez por corrida. Devuelve cuántas borró, o por qué no.
+ */
+export async function limpiarVentanasVencidas(): Promise<number | "sin_base" | "falla"> {
+  const db = baseDeDatos();
+  if (!db) return "sin_base";
+  const limite = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await db
+    .from("frecuencia")
+    .delete({ count: "exact" })
+    .lt("ventana", limite);
+  if (error) {
+    console.warn(`[limite] no se pudo limpiar frecuencia (${error.message}).`);
+    return "falla";
+  }
+  return count ?? 0;
+}

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { repositorio } from "@/lib/datos";
 import { deQuienViene, tomarTurno } from "@/lib/limite";
+import { mismoSecreto } from "@/lib/secretos";
 import { VERSION_DE_LOS_TERMINOS } from "@/lib/legal";
 import { centroPorInvitacion, familiasDelCentro } from "@/lib/centros/datos";
 
@@ -155,7 +156,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const parsed = Cuerpo.safeParse(await req.json());
+  const parsed = Cuerpo.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Datos inválidos" },
@@ -220,7 +221,7 @@ export async function POST(req: Request) {
         { status: 503 },
       );
     }
-    if (invitacion?.trim() !== esperado) {
+    if (!mismoSecreto(invitacion?.trim(), esperado)) {
       /* 📌 No dice «código incorrecto» ni «falta el código»: los dos casos suenan
          igual desde afuera. El que tiene el enlace bueno nunca ve esto. */
       return NextResponse.json(

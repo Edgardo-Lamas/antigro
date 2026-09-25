@@ -85,7 +85,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const parsed = AltaSchema.safeParse(await req.json());
+  const parsed = AltaSchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Datos inválidos", detalle: parsed.error.issues.map((i) => i.message) },
@@ -126,7 +126,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
-  const parsed = BajaSchema.safeParse(await req.json());
+  const parsed = BajaSchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Datos inválidos" }, { status: 400 });
 
   const repo = repositorio();

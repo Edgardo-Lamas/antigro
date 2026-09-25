@@ -16,6 +16,9 @@ class DemasiadosIntentos extends CredentialsSignin {
   code = "demasiados_intentos";
 }
 
+/** No es la clave de nadie: sólo iguala el tiempo cuando el correo no existe. */
+const HASH_DE_RELLENO = "$2b$12$GLNSQrFqt.r1N.5OvEJQYeX8OYdZw2/QapQwUYEY6kozOjVZMfLK6";
+
 export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
   providers: [
     Credentials({
@@ -80,9 +83,13 @@ export const { handlers, auth, signIn, signOut, unstable_update } = NextAuth({
           .eq("email", email.toLowerCase())
           .single();
 
-        if (error || !usuario || !usuario.activo) return null;
-        const ok = await bcrypt.compare(password, usuario.password_hash);
-        if (!ok) return null;
+        /* 🔑 Si el correo no existe se compara igual, contra un hash de
+           relleno con el mismo costo que los verdaderos. Sin esto, «no existe»
+           contestaba en milisegundos y «clave mala» en un cuarto de segundo:
+           el reloj decía qué correos tienen cuenta (AUD-011). */
+        const existe = !error && !!usuario && usuario.activo;
+        const ok = await bcrypt.compare(password, existe ? usuario.password_hash : HASH_DE_RELLENO);
+        if (!existe || !ok) return null;
 
         /* ─────────────────────────────────────────────────────────────────
            🔴 LA CREDENCIAL ES DEL HOGAR, NO DE UNA PERSONA (17/8)

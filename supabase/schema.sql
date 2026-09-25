@@ -367,7 +367,8 @@ end;
 $$;
 
 -- Higiene: las claves que ya no se van a volver a mirar no tienen por qué
--- quedar. No hace falta cron — se limpia solo cuando alguien pasa por acá.
+-- quedar. Las borra el reloj en cada corrida (`limpiarVentanasVencidas` en
+-- `src/lib/limite.ts`): las de más de dos días. Este índice es para ese delete.
 create index if not exists frecuencia_ventana_idx on frecuencia (ventana);
 
 
