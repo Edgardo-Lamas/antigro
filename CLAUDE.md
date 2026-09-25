@@ -3976,6 +3976,8 @@ puede contar como dirección del proyecto, no como algo que ya hace.
 - **Familia**
 - **Chico** — `edad` y `género` son **datos del motor**, no adornos: cambian el peso de las
   señales y cambian el texto del mensaje.
+  🔴 **25/9: el género es `nena` o `varon`, nada más — «otro» lo sacó Edgardo** (no le explicaba
+  nada al padre y el motor lo trataba como `varon`). La base todavía acepta 'otro'; el código no lo escribe.
 - **Adultos responsables — mínimo dos**, cada uno con su canal.
   📌 Propuesta abierta: que **uno de los dos lo elija el chico** (una tía, un hermano mayor).
   El 43% de los chicos dice no hablar sobre los riesgos en Internet con sus padres (encuesta en
