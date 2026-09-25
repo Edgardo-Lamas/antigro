@@ -1,3 +1,19 @@
+const CSP = [
+  "default-src 'self'",
+  // En desarrollo Next evalúa código para recargar en caliente; en producción no.
+  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob:",
+  "media-src 'self' blob:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+  "report-uri /api/csp",
+].join("; ");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   /* 🔴 El optimizador de imágenes (`/_next/image`) queda APAGADO — auditoría
@@ -32,6 +48,16 @@ const nextConfig = {
     },
   },
 
+  /* 🔐 LA CSP, EN MODO SÓLO-AVISO — AUD-007, 25/9.
+     Todo lo que carga el navegador sale de este mismo sitio (la tipografía
+     viaja con el paquete `geist`, los clips del avatar están en `public/`, el
+     QR es un SVG dibujado acá). Por eso la política es corta: `'self'`.
+     ⚠ `'unsafe-inline'` en scripts es obligatorio en Next 14 sin nonce: la
+     hidratación va en scripts en línea. Lo que la CSP igual cierra es cargar
+     un script de OTRO sitio, que es cómo termina casi toda inyección.
+     📌 Va en `Report-Only`: no bloquea nada, los avisos llegan a `/api/csp`
+     y quedan en el registro de Vercel como `[csp]`. Cuando pasen unos días sin
+     avisos legítimos, se cambia el nombre de la cabecera y empieza a bloquear. */
   async headers() {
     return [
       {
@@ -42,6 +68,7 @@ const nextConfig = {
           { key: "X-XSS-Protection",          value: "1; mode=block" },
           { key: "Referrer-Policy",           value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy",        value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Content-Security-Policy-Report-Only", value: CSP },
         ],
       },
     ];

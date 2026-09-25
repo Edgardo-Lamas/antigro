@@ -109,7 +109,13 @@ el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde
    `probar` en cada push a `main` y en cada PR (~40 s, verde). El push a `main` NO la espera: si
    algo se rompe, avisa con la cruz roja y el correo de GitHub. ⬜ Exigirla para mergear PRs es
    un ajuste de GitHub (reglas de la rama) que decide Edgardo.
-3. **AUD-007 · CSP**, primero en `Report-Only`.
+3. ✅ **25/9 — AUD-007 · CSP en `Report-Only`, HECHA.** La política vive en `next.config.mjs`
+   (todo `'self'`; `'unsafe-inline'` en scripts porque Next 14 hidrata en línea sin nonce) y los
+   avisos llegan a `POST /api/csp`, que los deja en el registro de Vercel con la marca `[csp]`
+   (tope 30/min por IP). Probado en la Mac: recorriendo home, guía, términos, entrar y el panel
+   logueado → **cero avisos**; un script de otro sitio inyectado → **llega el aviso**.
+   ⬜ **Siguiente paso:** mirar los `[csp]` de Vercel unos días (`npx vercel logs`) y, si no hay
+   nada legítimo, cambiar `Content-Security-Policy-Report-Only` por `Content-Security-Policy`.
 4. **AUD-010 · dos decisiones de Edgardo:** las vistas previas usan la base de producción
    (verificado con `vercel env ls`: las de Supabase están en Production, Preview y Development) —
    la salida es sacarlas de Preview y que las previas corran en modo demo · los respaldos de
