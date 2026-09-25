@@ -57,7 +57,7 @@ export const DIAS_SIN_REPETIR = 30;
 export interface AlumnoObservado {
   chicoId: string;
   edad: number;
-  genero: "nena" | "varon" | "otro";
+  genero: "nena" | "varon";
   /** ¿Tuvo una alerta a los adultos en la ventana? */
   conAlerta: boolean;
 }

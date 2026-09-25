@@ -22,7 +22,7 @@ const ChicoSchema = z.object({
     .int()
     .min(EDAD_MINIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`)
     .max(EDAD_MAXIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`),
-  genero: z.enum(["nena", "varon", "otro"]),
+  genero: z.enum(["nena", "varon"]),
   canal: CanalSchema,
   /** 🔑 Del chico, no de la familia: el filtro va en su dispositivo. */
   nextdnsProfileId: z.string().max(50).optional(),

@@ -22,7 +22,7 @@ const Params = z.object({
   escenario: z.enum(["normal", "cambio_leve", "persistente", "evasion"]).default("normal"),
   dia: z.coerce.number().int().min(0).max(VENTANA_DIAS - 1).default(VENTANA_DIAS - 1),
   edad: z.coerce.number().int().min(7).max(17).default(12),
-  genero: z.enum(["nena", "varon", "otro"]).default("nena"),
+  genero: z.enum(["nena", "varon"]).default("nena"),
   /**
    * 🔑 Corre la hora a partir de la cual la conexión deja de explicarse sola.
    * Sin esto el motor mira sólo la edad, que es lo que hacía antes del 17/8.

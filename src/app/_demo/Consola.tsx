@@ -41,7 +41,6 @@ const ADULTOS = [
 const GENEROS = [
   { id: "nena", label: "nena" },
   { id: "varon", label: "varón" },
-  { id: "otro", label: "otro" },
 ] as const;
 
 /** 🔴 Sólo se avisa con patrón sostenido: dos adultos y el chico. Si no, nadie. */

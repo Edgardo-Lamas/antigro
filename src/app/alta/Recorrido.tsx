@@ -286,7 +286,6 @@ export default function Recorrido({ nombreDeLaFamilia, familiaId, yaCargado }: P
                 >
                   <option value="nena">Nena</option>
                   <option value="varon">Varón</option>
-                  <option value="otro">Otro</option>
                 </select>
               </div>
             </div>

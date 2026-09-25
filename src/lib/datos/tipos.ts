@@ -153,7 +153,13 @@ export interface Hogar {
  * se mezclan. 📌 Y el documento del CIPDH no está publicado: se conoce por su
  * difusión de noviembre de 2021.
  */
-export type Genero = "nena" | "varon" | "otro";
+/**
+ * 🔴 25/9/2026 — **Salió «otro», lo decidió Edgardo.** En la pantalla no le
+ * explicaba nada al padre y el motor lo trataba igual que a «varon».
+ * 📌 La base (`schema.sql`) sigue aceptando 'otro': no molesta, porque el código
+ * ya no lo escribe, y achicar la regla es una migración que no hizo falta.
+ */
+export type Genero = "nena" | "varon";
 
 export const EDAD_MINIMA = 7;
 export const EDAD_MAXIMA = 17;

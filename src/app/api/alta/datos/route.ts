@@ -41,7 +41,7 @@ const ChicoSchema = z.object({
     .int()
     .min(EDAD_MINIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`)
     .max(EDAD_MAXIMA, `La edad va de ${EDAD_MINIMA} a ${EDAD_MAXIMA} años.`),
-  genero: z.enum(["nena", "varon", "otro"]),
+  genero: z.enum(["nena", "varon"]),
   /** 🔑 Corre la hora de la madrugada, igual que la edad. Ver `pesos.ts`. */
   turnoEscolar: z.enum(["manana", "tarde", "doble", "noche", "no_va"]).optional(),
   canal: CanalSchema,
