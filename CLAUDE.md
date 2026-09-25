@@ -91,11 +91,30 @@ acusó). No se notó porque con la fuente simulada frena antes. 📌 **Toda ruta
 tiene que llevar las dos cosas** — ya mordió con los centros el 23/9 y acá el 24/9.
 📌 `prueba-puertas.mjs` estaba rota desde el 20/9 (la sección vive dentro de «La casa», plegada, y
 el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde contra producción.
-- 🔴 **Antes de familias reales:** verificar si las vistas previas
-  escriben en la base de producción y los respaldos de Supabase.
-- **Después:** CI en los PR · subir a Next 15.5.24+ (el aviso de caída por Server Actions,
-  GHSA-h25m-26qc-wcjf, no tiene parche en la 14) · CSP · el turno escolar **se guarda pero ninguna
-  ruta real se lo pasa al motor** · se aceptan varios chicos y sólo se vigila el primero.
+### 🔜🔜 AL RETOMAR — lo que queda de la auditoría, en el orden aprobado (cierre del 24/9)
+
+1. **La tanda de arreglos chicos, juntos y de bajo riesgo** — era lo próximo:
+   AUD-004 el turno escolar llega al motor real (hoy `chico: { edad, genero }` en mi-familia,
+   cron, parte, asistente y alertas: falta `turnoEscolar`) · AUD-005 `.max(1)` en `chicos` de
+   `/api/alta/datos` · AUD-011 el login compara contra un hash falso si el correo no existe (hoy
+   contesta más rápido y revela que no existe) · AUD-013 `timingSafeEqual` en cron, webhook e
+   invitación · AUD-014 `req.json().catch` en `panel/familias`, `hogar`, `clave`, `alta/datos`,
+   `alta/hogar` · AUD-015 borrar ventanas vencidas de `frecuencia` (el comentario dice que se limpia
+   sola y no hay ningún delete) · AUD-016 `tomarTurno` por IP en `/api/motor/lectura` y
+   `/api/observatorio` · AUD-012 que los códigos de Telegram venzan + tope por chat.
+2. **AUD-009 · CI:** workflow con `typecheck`, `lint` y `probar` en cada PR, exigido para mergear
+   (Sandra tiene `write` y los PR van con cero aprobaciones).
+3. **AUD-007 · CSP**, primero en `Report-Only`.
+4. **AUD-010 · dos decisiones de Edgardo:** las vistas previas usan la base de producción
+   (verificado con `vercel env ls`: las de Supabase están en Production, Preview y Development) —
+   la salida es sacarlas de Preview y que las previas corran en modo demo · los respaldos de
+   Supabase, mirarlo en su panel.
+5. **AUD-001b · Next 15.5.24+** — 🔴 **DESPUÉS del 5/10** (cierre de la inscripción de IEBS): pide
+   React 19 y `cookies()`/`headers()` asíncronos. Hasta ahí sigue abierto GHSA-h25m-26qc-wcjf (caída
+   por Server Actions), que no tiene parche en la 14.
+
+Y aparte, no es de la auditoría: **la cuenta de Brevo** para recuperar la clave (ver el bloque
+«RECUPERAR LA CONTRASEÑA»). La crea Edgardo, guiado de a un paso.
 
 ---
 
