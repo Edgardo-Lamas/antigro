@@ -116,10 +116,15 @@ el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde
    logueado → **cero avisos**; un script de otro sitio inyectado → **llega el aviso**.
    ⬜ **Siguiente paso:** mirar los `[csp]` de Vercel unos días (`npx vercel logs`) y, si no hay
    nada legítimo, cambiar `Content-Security-Policy-Report-Only` por `Content-Security-Policy`.
-4. **AUD-010 · dos decisiones de Edgardo:** las vistas previas usan la base de producción
-   (verificado con `vercel env ls`: las de Supabase están en Production, Preview y Development) —
-   la salida es sacarlas de Preview y que las previas corran en modo demo · los respaldos de
-   Supabase, mirarlo en su panel.
+4. **AUD-010 · dos decisiones de Edgardo.**
+   a) ✅ **25/9 DECIDIÓ: las vistas previas se desconectan de la base de producción.** ⏸ **Lo hace
+      ÉL desde el panel de Vercel** — `vercel env rm` lo frena el clasificador de permisos (escritura
+      de secretos), y además las 18 variables son de la integración de Supabase («Config»): se
+      sacan juntas destildando **Preview** en la conexión de `supabase-beige-flower` con `antigro`
+      (Storage). **Se quedó en el paso 1** (entrar a Vercel → antigro → Storage). Guiarlo DE A UN
+      PASO; yo no vi esa pantalla, pedirle captura si no coincide. Después: verificar con
+      `npx vercel env ls` que ninguna de Supabase diga Preview. Production y Development no se tocan.
+   b) ⬜ Los respaldos de Supabase: mirarlo en su panel (todavía no se le planteó).
 5. **AUD-001b · Next 15.5.24+** — 🔴 **DESPUÉS del 5/10** (cierre de la inscripción de IEBS): pide
    React 19 y `cookies()`/`headers()` asíncronos. Hasta ahí sigue abierto GHSA-h25m-26qc-wcjf (caída
    por Server Actions), que no tiene parche en la 14.
