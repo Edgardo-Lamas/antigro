@@ -111,7 +111,7 @@ pidan hacer el cambio"*. Hasta ese día una familia que perdía la clave no volv
 | Pedir / usar, del lado de la base | `src/lib/recuperacion-datos.ts` |
 | Las rutas | `POST /api/clave/olvide` · `POST /api/clave/restablecer` |
 | Las pantallas | `/entrar/olvide` · `/entrar/nueva-clave?t=…` · el enlace en `/entrar` |
-| El correo | `mensajeria/correo.ts`: con `CORREO_GMAIL_USUARIO` + `CORREO_GMAIL_CLAVE` sale por Gmail (nodemailer 10) |
+| El correo | `mensajeria/correo.ts`: con `CORREO_BREVO_USUARIO` + `CORREO_BREVO_CLAVE` + `CORREO_BREVO_REMITENTE` sale por el SMTP de Brevo (nodemailer 10) |
 
 🔴 **Las decisiones que lo hacen seguro:** contesta lo mismo exista o no el correo · el enlace
 sirve UNA vez y vence a los 30 min · pedir otro anula los anteriores · la dirección del enlace sale
@@ -119,9 +119,12 @@ de `SITIO`, NUNCA del `Host` del pedido (si no, alguien pide la recuperación de
 host y el correo verdadero lleva un enlace a su servidor) · usarlo escribe `clave_cambiada_en` y
 corta toda sesión vieja · el correo no nombra al chico · la pantalla saca el enlace de la barra de
 direcciones apenas lo lee · topes: 5 pedidos cada 15 min por IP, 3 por hora por correo.
-⏸ **Sin la cuenta de Gmail, `/api/clave/olvide` contesta 503 y la pantalla lo dice.** La cuenta la
-crea Edgardo más adelante (Google ya le rechazó una vez el teléfono por usarlo en varias cuentas;
-Brevo, que no pide teléfono, es la reserva). Cargar las dos variables en Vercel y queda andando.
+⏸ **Sin la cuenta de Brevo, `/api/clave/olvide` contesta 503 y la pantalla lo dice.** 🔴 **Es
+Brevo, no Gmail** — decisión de Edgardo del 24/9, para la beta del concurso (Gmail se descartó:
+Google le había rechazado el teléfono por usarlo en varias cuentas). Plan gratis: 300 correos por
+día, sin dominio propio; Brevo reescribe el remitente a `brevosend.com`, así que puede caer en no
+deseado (la pantalla ya pide mirar ahí). Crear la cuenta, verificar un remitente, generar la clave
+SMTP y cargar las tres variables en Vercel: queda andando.
 ⚠ `nodemailer` va en la **10** con `overrides`: `next-auth` pide la 8 como peer opcional (para su
 proveedor de correo, que no usamos) y la 8 tiene cinco avisos de seguridad.
 ⚠ `npm install` borra `pg` y `playwright`, que no están en `package.json`: se reponen con

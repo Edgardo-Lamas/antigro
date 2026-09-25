@@ -1,27 +1,33 @@
 /**
- * Transporte: correo, por Gmail o por Resend.
+ * Transporte: correo, por Brevo o por Resend.
  *
  * Sirve para los adultos; para el chico casi siempre va a ser Telegram, que es
  * donde está.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- *  🔑 GMAIL PRIMERO — 24/9, para poder recuperar la contraseña
+ *  🔑 BREVO PRIMERO — 24/9, para poder recuperar la contraseña
  * ─────────────────────────────────────────────────────────────────────────────
  *
  *  AntiGro no tiene dominio propio, y sin dominio Resend sólo le escribe a la
- *  casilla dueña de la cuenta (abajo). Una cuenta de Gmail sólo de AntiGro, con
- *  una «contraseña de aplicación», manda hasta 500 correos por día sin dominio.
- *  Lo decidió Edgardo el 24/9: recuperar la clave no puede depender de que él
- *  esté atento a un pedido.
+ *  casilla dueña de la cuenta (abajo). Brevo, en su plan gratis, manda hasta
+ *  300 correos por día sin dominio propio: alcanza con verificar un correo
+ *  remitente. Lo decidió Edgardo el 24/9 para la versión beta del concurso
+ *  (antes se había pensado en una cuenta de Gmail, y quedó descartada).
  *
- *  Con `CORREO_GMAIL_USUARIO` y `CORREO_GMAIL_CLAVE` en el entorno, sale por
- *  Gmail. Si no, sigue la regla de Resend de siempre. 📌 El día que haya
- *  dominio, se sacan esas dos variables y se completa `CORREO_REMITENTE`: nada
- *  de lo que usa este transporte se entera.
+ *  Con `CORREO_BREVO_USUARIO`, `CORREO_BREVO_CLAVE` y `CORREO_BREVO_REMITENTE`
+ *  en el entorno, sale por el servidor SMTP de Brevo. Si no, sigue la regla de
+ *  Resend de siempre. 📌 El día que haya dominio, se autentica en Brevo y los
+ *  correos dejan de salir con el dominio prestado: nada de lo que usa este
+ *  transporte se entera.
  *
- *  ⚠ `CORREO_GMAIL_CLAVE` NO es la contraseña de la cuenta: es la de 16 letras
- *  que Google genera en «Contraseñas de aplicaciones», y exige tener activada la
- *  verificación en dos pasos.
+ *  ⚠ Los tres datos salen del panel de Brevo, en «SMTP y API»:
+ *    - USUARIO es el «login SMTP» (del tipo `xxx@smtp-brevo.com`), NO el correo
+ *      con el que se entra a Brevo.
+ *    - CLAVE es una «clave SMTP» generada ahí, NO la contraseña de la cuenta.
+ *    - REMITENTE es un correo verificado en «Remitentes»: el que ve la familia.
+ *  ⚠ Sin dominio propio, Brevo reescribe el remitente con un dominio suyo
+ *  (`brevosend.com`) para cumplir las reglas de Gmail y Yahoo. Llega igual; es
+ *  más probable que caiga en correo no deseado, y la pantalla ya pide mirar ahí.
  */
 
 import nodemailer from "nodemailer";
@@ -50,20 +56,19 @@ function esSandbox(remitente: string): boolean {
   return /@resend\.dev>?\s*$/i.test(remitente.trim());
 }
 
-/** La cuenta de Gmail de AntiGro, si está configurada. */
-function cuentaDeGmail(): { usuario: string; clave: string } | null {
-  const usuario = process.env.CORREO_GMAIL_USUARIO?.trim();
-  /* Google muestra la clave de aplicación en grupos de cuatro con espacios; se
-     aceptan pegados o separados. */
-  const clave = process.env.CORREO_GMAIL_CLAVE?.replace(/\s+/g, "");
-  return usuario && clave ? { usuario, clave } : null;
+/** La cuenta de Brevo de AntiGro, si está configurada. */
+function cuentaDeBrevo(): { usuario: string; clave: string; remitente: string } | null {
+  const usuario = process.env.CORREO_BREVO_USUARIO?.trim();
+  const clave = process.env.CORREO_BREVO_CLAVE?.trim();
+  const remitente = process.env.CORREO_BREVO_REMITENTE?.trim();
+  return usuario && clave && remitente ? { usuario, clave, remitente } : null;
 }
 
 export class TransporteCorreo implements Transporte {
   readonly canal = "correo" as const;
 
   get nombre() {
-    return cuentaDeGmail() ? "Correo (Gmail)" : "Correo (Resend)";
+    return cuentaDeBrevo() ? "Correo (Brevo)" : "Correo (Resend)";
   }
 
   private get apiKey() {
@@ -71,8 +76,8 @@ export class TransporteCorreo implements Transporte {
   }
 
   async estado(): Promise<EstadoDeTransporte> {
-    const gmail = cuentaDeGmail();
-    if (gmail) return { disponible: true, detalle: gmail.usuario };
+    const brevo = cuentaDeBrevo();
+    if (brevo) return { disponible: true, detalle: brevo.remitente };
     if (!this.apiKey) return { disponible: false, motivo: "Falta RESEND_API_KEY" };
     if (esSandbox(REMITENTE)) {
       return {
@@ -86,8 +91,8 @@ export class TransporteCorreo implements Transporte {
   }
 
   async enviar(envio: Envio): Promise<ResultadoDeEnvio> {
-    const gmail = cuentaDeGmail();
-    if (gmail) return this.porGmail(gmail, envio);
+    const brevo = cuentaDeBrevo();
+    if (brevo) return this.porBrevo(brevo, envio);
 
     if (!this.apiKey) {
       return {
@@ -126,17 +131,21 @@ export class TransporteCorreo implements Transporte {
     }
   }
 
-  private async porGmail(
-    cuenta: { usuario: string; clave: string },
+  private async porBrevo(
+    cuenta: { usuario: string; clave: string; remitente: string },
     envio: Envio,
   ): Promise<ResultadoDeEnvio> {
     try {
+      /* 587 con STARTTLS: el canal va cifrado aunque arranque en claro. */
       const transporte = nodemailer.createTransport({
-        service: "gmail",
+        host: "smtp-relay.brevo.com",
+        port: 587,
+        secure: false,
+        requireTLS: true,
         auth: { user: cuenta.usuario, pass: cuenta.clave },
       });
       await transporte.sendMail({
-        from: { name: "AntiGro", address: cuenta.usuario },
+        from: { name: "AntiGro", address: cuenta.remitente },
         to: envio.destino,
         subject: envio.asunto ?? "AntiGro",
         // Texto plano a propósito: es un aviso, no una pieza de marketing.
