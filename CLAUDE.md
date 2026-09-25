@@ -104,7 +104,7 @@ el ojo de la clave duplicaba el rótulo «contraseña»): arreglada, 33 en verde
    ⬜ **Falta: que los códigos venzan.** No se hizo porque hoy NO HAY forma de pedir un código
    nuevo para una sola persona (volver a guardar el alta reemplaza y desvincula a todos): un
    código vencido dejaba a ese adulto sin poder conectarse nunca. Primero el botón de «código
-   nuevo», después el vencimiento (migración: `codigo_generado_en`).
+   nuevo», después el vencimiento (migración: `codigo_generado_en`). Edgardo lo dejó para DESPUÉS del 5/10.
 2. **AUD-009 · CI:** workflow con `typecheck`, `lint` y `probar` en cada PR, exigido para mergear
    (Sandra tiene `write` y los PR van con cero aprobaciones).
 3. **AUD-007 · CSP**, primero en `Report-Only`.

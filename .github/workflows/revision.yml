@@ -1,0 +1,52 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  LA REVISIÓN — tipos, lint y las pruebas, en cada cambio (AUD-009, 25/9)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+#  🔑 **Corre en cada push a `main` y en cada PR.** Se trabaja derecho sobre
+#  `main`, que es producción: el push no espera a esto, así que si algo se
+#  rompe, esta revisión es la que avisa (cruz roja en el commit y correo de
+#  GitHub). En un PR, además, se ve ANTES de mergear.
+#
+#  📌 No compila (`next build`): eso ya lo hace Vercel en cada despliegue, y el
+#  `prebuild` baja la lista de categorías, que acá no hace falta.
+#
+#  🔐 No usa ningún secreto: las pruebas no tocan la base ni la API.
+
+name: Revisión
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Dos pushes seguidos: se revisa sólo el último.
+concurrency:
+  group: revision-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  revisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Las pruebas corren con --experimental-strip-types: pide Node 22.6+.
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Tipos
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Pruebas
+        run: npm run probar
