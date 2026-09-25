@@ -44,8 +44,8 @@ export async function POST(req: Request) {
   if (!puerta) {
     return NextResponse.json(
       {
-        error:
-          "Este enlace ya se usó o venció (duran 30 minutos). Pedí uno nuevo desde «¿Olvidaste la contraseña?».",
+        /* La pantalla pone al lado el enlace para pedir otro. */
+        error: "Este enlace ya se usó o venció (duran 30 minutos).",
         vencido: true,
       },
       { status: 410 },

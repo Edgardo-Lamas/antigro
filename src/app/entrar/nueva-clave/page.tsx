@@ -120,7 +120,7 @@ function Formulario() {
             {error}{" "}
             {vencido && (
               <Link href="/entrar/olvide" className="text-acento hover:underline">
-                Pedir uno nuevo
+                Pedí uno nuevo
               </Link>
             )}
           </p>
