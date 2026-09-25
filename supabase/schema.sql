@@ -908,3 +908,35 @@ alter table usuarios add column if not exists clave_cambiada_en timestamptz;
 
 comment on column usuarios.clave_cambiada_en is
   'Cuando se cambio la clave de esta puerta por ultima vez. Las sesiones abiertas antes de esto dejan de valer. Null: nunca se cambio.';
+
+
+-- ═════════════════════════════════════════════════════════════════
+--  23. RECUPERAR LA CONTRASEÑA — 24/9
+-- ═════════════════════════════════════════════════════════════════
+--
+--  🔑 **Lo pidió Edgardo, y descartó la alternativa de que lo haga él a mano:**
+--  *"no puedo estar pendiente que me pidan hacer el cambio"*. Una familia que
+--  pierde la clave pide un enlace, le llega por correo, y pone una nueva.
+--
+--  🔴 **Se guarda la HUELLA del enlace (SHA-256), nunca el enlace.** Quien lea
+--  esta tabla no puede usar lo que encuentra: para entrar hace falta el enlace
+--  que viajó por correo, y ése no está en ningún lado del sistema.
+--  🔴 Un enlace sirve UNA vez (`usado_en`) y vence a los 30 minutos (`vence`).
+--  Pedir otro borra los anteriores sin usar de esa puerta.
+--  📌 Usarlo escribe `usuarios.clave_cambiada_en` (migración 22), así que corta
+--  cualquier sesión abierta con la clave vieja — incluida la de quien la robó.
+
+create table if not exists recuperaciones (
+  id          uuid primary key default gen_random_uuid(),
+  usuario_id  uuid not null references usuarios(id) on delete cascade,
+  huella      text not null unique,
+  vence       timestamptz not null,
+  usado_en    timestamptz,
+  creado      timestamptz not null default now()
+);
+
+create index if not exists recuperaciones_usuario_idx on recuperaciones (usuario_id);
+alter table recuperaciones enable row level security;
+
+comment on table recuperaciones is
+  'Enlaces para recuperar la contrasena. Guarda la huella SHA-256 del enlace, nunca el enlace. Un solo uso, vencen a los 30 minutos.';

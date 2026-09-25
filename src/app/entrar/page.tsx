@@ -296,8 +296,9 @@ function Puerta() {
               </label>
               {/* 🔑 Con el ojo para verla. En el alta es lo que evita que
                   alguien se quede afuera de su propia casa por un carácter de
-                  más: AntiGro no manda correos, así que una clave mal tipeada
-                  no se recupera. Ver `CampoDeClave`. */}
+                  más. Desde el 24/9 una clave olvidada se recupera por correo
+                  (abajo), pero sólo si hay una cuenta de correo configurada.
+                  Ver `CampoDeClave`. */}
               <CampoDeClave
                 id="clave"
                 value={clave}
@@ -306,6 +307,15 @@ function Puerta() {
                 minLength={creando ? CLAVE_MINIMA : undefined}
                 autoComplete={creando ? "new-password" : "current-password"}
               />
+              {/* 🔑 24/9: la clave ya se puede recuperar por correo. Hasta ese
+                  día una familia que la perdía no volvía a entrar. */}
+              {!creando && (
+                <p className="mt-1.5 text-right text-xs">
+                  <Link href="/entrar/olvide" className="text-acento hover:underline">
+                    ¿Olvidaste la contraseña?
+                  </Link>
+                </p>
+              )}
               {creando && (
                 <p className="mt-1.5 text-xs leading-relaxed text-apagado">
                   {/* 🔴 Corregido el 18/8. Decía «la usan los dos», y Edgardo

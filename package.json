@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "probar-reglas": "node --experimental-strip-types --no-warnings src/lib/ia/reglas.prueba.ts",
     "probar-sugerencias": "node --experimental-strip-types --no-warnings src/lib/datos/sugerencias.prueba.ts",
-    "probar": "npm run probar-reglas && npm run probar-sugerencias && npm run probar-instalacion && npm run probar-turno && npm run probar-tour && npm run probar-terminos && npm run probar-cuestionario && npm run probar-acuse && npm run probar-escalada && npm run probar-parte && npm run probar-hogares && npm run probar-plataformas && npm run probar-regla && npm run probar-consejos && npm run probar-categorias && npm run probar-lugares && npm run probar-centros",
+    "probar": "npm run probar-reglas && npm run probar-sugerencias && npm run probar-instalacion && npm run probar-turno && npm run probar-tour && npm run probar-terminos && npm run probar-cuestionario && npm run probar-acuse && npm run probar-escalada && npm run probar-parte && npm run probar-hogares && npm run probar-plataformas && npm run probar-regla && npm run probar-consejos && npm run probar-categorias && npm run probar-lugares && npm run probar-centros && npm run probar-recuperacion",
     "probar-consejos": "node --experimental-strip-types --no-warnings src/lib/ia/consejos.prueba.ts",
     "probar-regla": "node --experimental-strip-types --no-warnings src/lib/motor/regla.prueba.ts",
     "probar-instalacion": "node --experimental-strip-types --no-warnings src/lib/instalacion.prueba.ts",
@@ -28,7 +28,8 @@
     "probar-plataformas": "node --experimental-strip-types --no-warnings src/lib/senales/plataformas.prueba.ts",
     "probar-categorias": "node --experimental-strip-types --no-warnings src/lib/senales/categorias.prueba.ts",
     "probar-lugares": "node --experimental-strip-types --no-warnings src/lib/motor/lugares.prueba.ts",
-    "probar-centros": "node --experimental-strip-types --no-warnings src/lib/centros/patrones.prueba.ts"
+    "probar-centros": "node --experimental-strip-types --no-warnings src/lib/centros/patrones.prueba.ts",
+    "probar-recuperacion": "node --experimental-strip-types --no-warnings src/lib/recuperacion.prueba.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.91.1",
@@ -42,7 +43,8 @@
     "react": "^18",
     "react-dom": "^18",
     "resend": "^6.12.3",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "nodemailer": "^10.0.10"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
@@ -54,6 +56,10 @@
     "eslint-config-next": "14.2.35",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@types/nodemailer": "^8.0.2"
+  },
+  "overrides": {
+    "nodemailer": "$nodemailer"
   }
 }
