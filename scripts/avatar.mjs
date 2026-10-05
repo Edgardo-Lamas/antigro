@@ -11,7 +11,7 @@
  *
  *      npm run avatar
  *
- *  Busca en `~/Desktop/avatar-antigro/` archivos que se llamen `reposo` y
+ *  Busca en `~/Desktop/AntiGro - Concurso IEBS 2026/3 - Sofi, clips originales del panel/clip/` archivos que se llamen `reposo` y
  *  `pensando` (con cualquier extensión de video) y escribe
  *  `public/avatar/reposo.webm` y `public/avatar/pensando.webm`.
  *  Con `npm run avatar -- --desde <carpeta>` se le puede dar otra carpeta.
@@ -59,7 +59,7 @@ const valorDe = (bandera) => {
   return i !== -1 ? argumentos[i + 1] : undefined;
 };
 
-const carpeta = valorDe("--desde") ?? path.join(homedir(), "Desktop", "avatar-antigro");
+const carpeta = valorDe("--desde") ?? path.join(homedir(), "Desktop", "AntiGro - Concurso IEBS 2026", "3 - Sofi, clips originales del panel", "clip");
 const espejo = !argumentos.includes("--sin-espejo");
 const segundos = Number(valorDe("--segundos") ?? 0); // 0 = el clip entero
 const destino = path.join(process.cwd(), "public", "avatar");

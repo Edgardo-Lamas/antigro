@@ -57,8 +57,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-/** 🔜 Pasa a `true` el día que los clips estén en `public/avatar/`. */
-const HAY_CLIPS = false;
+/** ✅ 5/10: los dos clips (`reposo` y `pensando`) están en `public/avatar/`. */
+const HAY_CLIPS = true;
 
 export type EstadoDeLaPresencia = "reposo" | "escuchando" | "pensando" | "hablando";
 
@@ -89,7 +89,7 @@ type Forma = "cuerpo" | "busto";
  */
 const ENCUADRE: Record<Forma, string> = {
   cuerpo: "object-contain",
-  busto: "object-cover object-[50%_8%]",
+  busto: "object-cover object-[50%_0%] scale-[2.1] origin-[50%_8%]",
 };
 
 export default function Presencia({

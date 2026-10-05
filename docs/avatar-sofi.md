@@ -98,12 +98,12 @@ costado del panel, se vuelve un tic que molesta más que la silueta.
 
 ## Cómo entran los clips al panel
 
-1. Los videos de Flow van a **`~/Desktop/avatar-antigro/`** con los nombres `reposo` y `pensando`
+1. Los videos de Flow van a **`~/Desktop/AntiGro - Concurso IEBS 2026/3 - Sofi, clips originales del panel/clip/`** con los nombres `reposo` y `pensando`
    (cualquier extensión de video).
 2. `npm run avatar` — les saca el audio que Flow inventa, recorta los negros, los cierra en bucle
    de ida y vuelta para que no den el salto al repetir, los achica a 480 px de alto y los deja en
    `public/avatar/`.
-3. `HAY_CLIPS` a `true` en `src/components/Presencia.tsx`.
+3. `HAY_CLIPS` a `true` en `src/components/Presencia.tsx`. ✅ Hecho el 5/10: `reposo` es el clip del 21/9 y `pensando` salió de su primer cuadro.
 4. 📌 Con la imagen final a la vista, **medir cuánto alto se lleva la bandeja** y ajustar
    `h-[12.5rem] xl:h-[14rem]` en `src/app/mi-familia/page.tsx` para que la mujer siga midiendo los
    200 px decididos y no pierda tamaño por la base.
